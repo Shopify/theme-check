@@ -5,8 +5,8 @@ module ThemeCheck
       @checks = checks
     end
 
-    def visit_template(template, path: nil)
-      visit(Node.new(template.root, nil, path))
+    def visit_template(template)
+      visit(Node.new(template.root, nil, template))
     end
 
     def visit(node)

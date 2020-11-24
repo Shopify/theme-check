@@ -3,31 +3,30 @@ require "pathname"
 
 module ThemeCheck
   class Theme
-    attr_reader :root, :file_system
+    attr_reader :root
 
     def initialize(root)
       @root = Pathname.new(root)
-      @file_system = Liquid::LocalFileSystem.new(@root, "%.liquid")
     end
 
-    def all_files_paths
-      @root.glob("**/*.liquid")
+    def all
+      @all ||= @root.glob("**/*.liquid").map { |path| Template.new(path) }
     end
 
-    def template_paths
-      @root.glob("templates/**/*.liquid")
+    def [](name)
+      all.find { |t| t.name == name }
     end
 
-    def section_paths
-      @root.glob("sections/**/*.liquid")
+    def templates
+      all.select(&:template?)
+    end
+
+    def sections
+      all.select(&:section?)
     end
 
     def snippets
-      @root.glob("snippets/**/*.liquid").map { |p| p.relative_path_from(@root).to_s }
-    end
-
-    def template_path(name)
-      @root.join("#{name}.liquid")
+      all.select(&:snippet?)
     end
   end
 end

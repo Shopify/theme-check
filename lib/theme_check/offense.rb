@@ -5,19 +5,28 @@ module ThemeCheck
       node&.line_number
     end
 
+    def code
+      template.excerpt(line_number) if line_number
+    end
+
     def severity
       check.severity
+    end
+
+    def check_name
+      check.class.name.demodulize
     end
 
     def doc
       check.doc
     end
 
+    def location
+      [template.relative_path, line_number].compact.join(":")
+    end
+
     def to_s
-      out = +''
-      out << "#{message} at #{template}"
-      out << ":#{line_number}" if line_number
-      out
+      "#{message} at #{location}"
     end
   end
 end

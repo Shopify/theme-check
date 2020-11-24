@@ -4,4 +4,7 @@
 require "theme_check"
 
 path = ARGV[0] || abort("usage: theme-check theme/root/path")
-puts ThemeCheck.analyze(path)
+theme = ThemeCheck::Theme.new(path)
+analyzer = ThemeCheck::Analyzer.new(theme)
+analyzer.analyze_theme
+ThemeCheck::Printer.new.print(theme, analyzer.offenses)

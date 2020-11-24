@@ -11,7 +11,7 @@ module ThemeCheck
 
     def on_include(node)
       if node.value.template_name_expr.is_a?(String)
-        @used_templates << "snippets/#{node.value.template_name_expr}.liquid"
+        @used_templates << "snippets/#{node.value.template_name_expr}"
       else
         # Can't reliably track unused snippets if an expression is used, ignore this check
         @used_templates.clear
@@ -21,9 +21,13 @@ module ThemeCheck
     alias_method :on_render, :on_include
 
     def on_end
-      (theme.snippets - @used_templates.to_a).each do |template|
+      missing_snippets.each do |template|
         add_offense("This template is not used", template: template)
       end
+    end
+
+    def missing_snippets
+      theme.snippets.reject { |t| @used_templates.include?(t.name) }
     end
   end
 end
