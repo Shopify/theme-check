@@ -1,0 +1,14 @@
+inherit_from:
+  - 'https://shopify.github.io/ruby-style-guide/rubocop.yml'
+
+Metrics/MethodLength:
+  Enabled: false
+
+Layout/LineLength:
+  Enabled: false
+
+Lint/MissingSuper:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false

@@ -1,0 +1,13 @@
+/.bundle/
+/.yardoc
+/_yardoc/
+/coverage/
+/doc/
+/pkg/
+/spec/reports/
+/tmp/
+
+*.gem
+Gemfile.lock
+
+.rubocop-https---shopify-github-io-ruby-style-guide-rubocop-yml

@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+require "theme_check"
+
+path = ARGV[0] || abort("usage: theme-check theme/root/path")
+puts ThemeCheck.analyze(path)
