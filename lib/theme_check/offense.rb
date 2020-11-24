@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module ThemeCheck
   class Offense < Struct.new(:check, :template, :node, :message)
     def line_number

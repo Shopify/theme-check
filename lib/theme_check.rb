@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "liquid/c"
 
 require_relative "theme_check/analyzer"

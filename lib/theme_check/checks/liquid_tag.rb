@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module ThemeCheck
   # Recommends using {% liquid ... %} if 3 or more consecutive {% ... %} are found.
   class LiquidTag < Check
