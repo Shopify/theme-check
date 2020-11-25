@@ -22,6 +22,16 @@ module ThemeCheck
           else
             []
           end
+        # Work around a bug in Liquid::Variable::ParseTreeVisitor that doesn't return
+        # the args in a hash as children nodes.
+        nodes = nodes.flat_map do |node|
+          case node
+          when Hash
+            node.values
+          else
+            node
+          end
+        end
         nodes.map { |node| Node.new(node, self, @template) }
       end
     end
