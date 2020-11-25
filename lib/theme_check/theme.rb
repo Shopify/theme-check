@@ -10,7 +10,7 @@ module ThemeCheck
     end
 
     def all
-      @all ||= @root.glob("**/*.liquid").map { |path| Template.new(path) }
+      @all ||= @root.glob("**/*.liquid").map { |path| Template.new(path, @root) }
     end
 
     def [](name)

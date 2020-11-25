@@ -5,11 +5,10 @@ module ThemeCheck
     severity :suggestion
     doc "https://shopify.dev/docs/themes/liquid/reference/tags/theme-tags#liquid"
 
-    MIN_CONSECUTIVE_STATEMENTS = 4
-
-    def initialize
+    def initialize(min_consecutive_statements: 10)
       @first_statement = nil
       @consecutive_statements = 0
+      @min_consecutive_statements = min_consecutive_statements
     end
 
     def on_tag(node)
@@ -35,7 +34,7 @@ module ThemeCheck
     end
 
     def reset_consecutive_statements
-      if @consecutive_statements >= MIN_CONSECUTIVE_STATEMENTS
+      if @consecutive_statements >= @min_consecutive_statements
         add_offense("Use {% liquid ... %} to write multiple tags", node: @first_statement)
       end
       @first_statement = nil

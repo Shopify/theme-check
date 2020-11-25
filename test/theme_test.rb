@@ -6,7 +6,7 @@ class ThemeTest < Minitest::Test
     @theme = make_theme(
       "templates/index.liquid" => "",
       "snippets/product.liquid" => "",
-      "sections/product-card.liquid" => "",
+      "sections/article-template/template.liquid" => "",
     )
   end
 
@@ -16,6 +16,7 @@ class ThemeTest < Minitest::Test
 
   def test_by_name
     assert_equal("templates/index", @theme["templates/index"].name)
+    assert_equal("sections/article-template/template", @theme["sections/article-template/template"].name)
   end
 
   def test_templates
@@ -24,5 +25,9 @@ class ThemeTest < Minitest::Test
 
   def test_snippets
     assert_equal(["snippets/product"], @theme.snippets.map(&:name))
+  end
+
+  def test_sections
+    assert_equal(["sections/article-template/template"], @theme.sections.map(&:name))
   end
 end

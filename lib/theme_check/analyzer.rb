@@ -3,13 +3,12 @@ module ThemeCheck
   class Analyzer
     attr_reader :offenses
 
-    def initialize(theme, check_classes = Check.all)
+    def initialize(theme, checks = Check.all.map(&:new))
       @theme = theme
       @offenses = []
 
       @checks = Checks.new
-      check_classes.each do |check_class|
-        check = check_class.new
+      checks.each do |check|
         check.theme = @theme
         check.offenses = @offenses
         @checks << check

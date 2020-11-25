@@ -4,7 +4,7 @@ require "test_helper"
 class UnusedSnippetTest < Minitest::Test
   def test_finds_unused
     offenses = analyze_theme(
-      ThemeCheck::UnusedSnippet,
+      ThemeCheck::UnusedSnippet.new,
       "templates/index.liquid" => <<~END,
         {% include 'muffin' %}
       END
@@ -22,7 +22,7 @@ class UnusedSnippetTest < Minitest::Test
 
   def test_ignores_dynamic_includes
     offenses = analyze_theme(
-      ThemeCheck::UnusedSnippet,
+      ThemeCheck::UnusedSnippet.new,
       "templates/index.liquid" => <<~END,
         {% assign name = 'muffin' %}
         {% include name %}

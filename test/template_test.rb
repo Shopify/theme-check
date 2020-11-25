@@ -9,7 +9,7 @@ class TemplateTest < Minitest::Test
         {{ 1 + 2 }}
       </p>
     END
-    @template = ThemeCheck::Template.new(theme.root.join("templates/index.liquid"))
+    @template = ThemeCheck::Template.new(theme.root.join("templates/index.liquid"), theme.root)
   end
 
   def test_relative_path

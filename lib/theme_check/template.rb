@@ -5,32 +5,29 @@ module ThemeCheck
   class Template
     attr_reader :path
 
-    def initialize(path)
-      @path = Pathname.new(path)
+    def initialize(path, root)
+      @path = Pathname(path)
+      @root = Pathname(root)
     end
 
     def relative_path
-      @path.relative_path_from(@path.parent.parent)
+      @path.relative_path_from(@root)
     end
 
     def name
       relative_path.sub_ext('').to_s
     end
 
-    def dirname
-      @path.parent.basename.to_s
-    end
-
     def template?
-      dirname == 'templates'
+      name.start_with?('templates')
     end
 
     def section?
-      dirname == 'sections'
+      name.start_with?('sections')
     end
 
     def snippet?
-      dirname == 'snippets'
+      name.start_with?('snippets')
     end
 
     def source

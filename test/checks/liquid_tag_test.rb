@@ -4,7 +4,7 @@ require "test_helper"
 class LiquidTagTest < Minitest::Test
   def test_consecutive_statements
     offenses = analyze_theme(
-      ThemeCheck::LiquidTag,
+      ThemeCheck::LiquidTag.new(min_consecutive_statements: 4),
       "templates/index.liquid" => <<~END,
         {% assign x = 1 %}
         {% if x == 1 %}
@@ -21,7 +21,7 @@ class LiquidTagTest < Minitest::Test
 
   def test_ignores_non_consecutive_statements
     offenses = analyze_theme(
-      ThemeCheck::LiquidTag,
+      ThemeCheck::LiquidTag.new(min_consecutive_statements: 4),
       "templates/index.liquid" => <<~END,
         {% assign x = 1 %}
         Hello
