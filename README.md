@@ -30,10 +30,10 @@ theme-check
 
 Theme Check is built around the concept of Checks. Each one checks for only one thing:
 
-✅ Liquid parsing errors
-✅ Unused `{% assign ... %}`
-✅ Unused `snippets/` templates
-✅ Template length is under 200 lines
+✅ Liquid parsing errors  
+✅ Unused `{% assign ... %}`  
+✅ Unused `snippets/` templates  
+✅ Template length is under 200 lines  
 ✅ Use of `{% liquid ... %}` instead of several `{% ... %}`
 
 And many more to come! Suggestions welcome (create an issue).
@@ -42,7 +42,7 @@ And many more to come! Suggestions welcome (create an issue).
 
 Under `lib/theme_check/checks`, create new Ruby file with a unique name describing what you want to check for.
 
-```
+```ruby
 module ThemeCheck
   # Does one thing, and does it well!
   class MyCheckName < Check
