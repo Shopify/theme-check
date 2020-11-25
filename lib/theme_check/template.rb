@@ -42,15 +42,23 @@ module ThemeCheck
     end
 
     def parse
-      @ast ||= Liquid::Template.parse(
-        source,
-        line_numbers: true,
-        disable_liquid_c_nodes: true
-      )
+      @ast ||= self.class.parse(source)
+    end
+
+    def errors
+      @ast.errors
     end
 
     def root
       parse.root
+    end
+
+    def self.parse(source)
+      Liquid::Template.parse(
+        source,
+        line_numbers: true,
+        error_mode: :strict,
+      )
     end
   end
 end

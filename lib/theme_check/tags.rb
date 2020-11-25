@@ -23,9 +23,6 @@ module ThemeCheck
       end
     end
 
-    class IgnoredRaw < Liquid::Raw
-    end
-
     class Form < Liquid::Block
       TAG_ATTRIBUTES = /([\w\-]+)\s*:\s*(#{Liquid::QuotedFragment})/o
       # Matches forms with arguments:
@@ -108,11 +105,13 @@ module ThemeCheck
       end
     end
 
-    Liquid::Template.register_tag('section', Section)
-    Liquid::Template.register_tag('schema', IgnoredRaw)
-    Liquid::Template.register_tag('style', IgnoredRaw)
     Liquid::Template.register_tag('form', Form)
-    Liquid::Template.register_tag('paginate', Paginate)
     Liquid::Template.register_tag('layout', Layout)
+    Liquid::Template.register_tag('paginate', Paginate)
+    Liquid::Template.register_tag('section', Section)
+    Liquid::Template.register_tag('style', Liquid::Block)
+    Liquid::Template.register_tag('schema', Liquid::Raw)
+    Liquid::Template.register_tag('javascript', Liquid::Raw)
+    Liquid::Template.register_tag('stylesheet', Liquid::Raw)
   end
 end

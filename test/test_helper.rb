@@ -7,11 +7,7 @@ require "tmpdir"
 module Minitest
   class Test
     def parse_liquid(code)
-      Liquid::Template.parse(
-        code,
-        line_numbers: true,
-        disable_liquid_c_nodes: true
-      )
+      ThemeCheck::Template.parse(code)
     end
 
     def analyze_theme(*check_classes, templates)

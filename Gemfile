@@ -12,4 +12,3 @@ gem 'minitest'
 gem 'rubocop', require: false
 
 gem 'liquid', github: 'Shopify/liquid', branch: 'master'
-gem 'liquid-c', github: 'Shopify/liquid-c', branch: 'master'

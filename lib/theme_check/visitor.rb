@@ -7,6 +7,9 @@ module ThemeCheck
 
     def visit_template(template)
       visit(Node.new(template.root, nil, template))
+    rescue Liquid::Error => exception
+      exception.template_name = template.name
+      call_checks(:on_error, exception)
     end
 
     def visit(node)
@@ -23,13 +26,6 @@ module ThemeCheck
 
     def visit_children(node)
       node.children.each { |child| visit(child) }
-    end
-
-    def call_node_checks_around(node, *types)
-      types += [:node, node.type_name]
-      types.each { |type| call_checks("on_#{type}", node) }
-      yield
-      types.each { |type| call_checks("after_#{type}", node) }
     end
 
     def call_checks(method, *args)

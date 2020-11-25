@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require "liquid/c"
+require "liquid"
 
 require_relative "theme_check/analyzer"
 require_relative "theme_check/check"
