@@ -4,6 +4,8 @@ Theme Check is a command line tool that helps you follow Shopify Themes & Liquid
 
 Think RuboCop, or eslint, but for Liquid, and designed specifically to be used on themes.
 
+![](docs/preview.png)
+
 ## Installation
 
 You need Ruby & Bundler installed.
