@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 require "test_helper"
 
-class UnusedSnippetsTest < Minitest::Test
+class UnusedSnippetTest < Minitest::Test
   def test_finds_unused
     offenses = analyze_theme(
-      ThemeCheck::UnusedSnippets,
+      ThemeCheck::UnusedSnippet,
       "templates/index.liquid" => <<~END,
         {% include 'muffin' %}
       END
@@ -22,7 +22,7 @@ class UnusedSnippetsTest < Minitest::Test
 
   def test_ignores_dynamic_includes
     offenses = analyze_theme(
-      ThemeCheck::UnusedSnippets,
+      ThemeCheck::UnusedSnippet,
       "templates/index.liquid" => <<~END,
         {% assign name = 'muffin' %}
         {% include name %}

@@ -4,7 +4,7 @@ require "test_helper"
 class ParseErrorTest < Minitest::Test
   def test_reports_parse_errors
     offenses = analyze_theme(
-      ThemeCheck::ParseErrors,
+      ThemeCheck::ParseError,
       "templates/index.liquid" => <<~END,
         {% include 'muffin'
       END
@@ -16,7 +16,7 @@ class ParseErrorTest < Minitest::Test
 
   def test_reports_missing_tag
     offenses = analyze_theme(
-      ThemeCheck::ParseErrors,
+      ThemeCheck::ParseError,
       "templates/index.liquid" => <<~END,
         {% unknown %}
       END
