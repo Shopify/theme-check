@@ -3,8 +3,6 @@
 module ThemeCheck
   class Printer
     def print(theme, offenses)
-      return if offenses.empty?
-
       offenses.each do |offense|
         print_offense(offense)
         puts
