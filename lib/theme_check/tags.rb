@@ -105,13 +105,21 @@ module ThemeCheck
       end
     end
 
+    class Style < Liquid::Block; end
+
+    class Schema < Liquid::Raw; end
+
+    class Javascript < Liquid::Raw; end
+
+    class Stylesheet < Liquid::Raw; end
+
     Liquid::Template.register_tag('form', Form)
     Liquid::Template.register_tag('layout', Layout)
     Liquid::Template.register_tag('paginate', Paginate)
     Liquid::Template.register_tag('section', Section)
-    Liquid::Template.register_tag('style', Liquid::Block)
-    Liquid::Template.register_tag('schema', Liquid::Raw)
-    Liquid::Template.register_tag('javascript', Liquid::Raw)
-    Liquid::Template.register_tag('stylesheet', Liquid::Raw)
+    Liquid::Template.register_tag('style', Style)
+    Liquid::Template.register_tag('schema', Schema)
+    Liquid::Template.register_tag('javascript', Javascript)
+    Liquid::Template.register_tag('stylesheet', Stylesheet)
   end
 end

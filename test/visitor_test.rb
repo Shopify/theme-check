@@ -90,4 +90,25 @@ class VisitorTest < Minitest::Test
       :after_document,
     ], @tracer.calls)
   end
+
+  def test_schema
+    template = parse_liquid(<<~END)
+      {% schema %}
+        {
+          "muffin": true
+        }
+      {% endschema %}
+    END
+    @visitor.visit_template(template)
+    assert_equal([
+      :on_document,
+      :on_tag,
+      :on_schema,
+      :on_string,
+      :after_schema,
+      :after_tag,
+      :on_string,
+      :after_document,
+    ], @tracer.calls)
+  end
 end
