@@ -10,11 +10,9 @@ Think RuboCop, or eslint, but for Liquid, and designed specifically to be used o
 
 ## Installation
 
-You need Ruby & Bundler installed.
-
 ```
-bundle install
-bundle exec theme-check /path/to/your/theme
+dev up
+dev lint /path/to/your/theme
 ```
 
 ## Usage
@@ -100,4 +98,4 @@ end
 
 Add a corresponding test file under `test/checks`.
 
-When done, run the tests with `bundle exec rake`.
+When done, run the tests with `dev test`.

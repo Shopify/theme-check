@@ -1,0 +1,19 @@
+name: theme-check
+
+type: ruby
+
+up:
+  - ruby: 2.7.1
+  - bundler
+
+commands:
+  check:
+    desc: 'Lint theme'
+    syntax:
+      argument: file
+    run: bundle exec theme-check
+  test:
+    syntax:
+      argument: file
+      optional: args...
+    run: bundle exec rake test
