@@ -22,11 +22,15 @@ module ThemeCheck
     end
 
     def location
-      [template.relative_path, line_number].compact.join(":")
+      [template&.relative_path, line_number].compact.join(":")
     end
 
     def to_s
-      "#{message} at #{location}"
+      if template
+        "#{message} at #{location}"
+      else
+        message
+      end
     end
   end
 end
