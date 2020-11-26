@@ -1,6 +1,13 @@
 inherit_from:
   - 'https://shopify.github.io/ruby-style-guide/rubocop.yml'
 
+require: rubocop-performance
+
+AllCops:
+  TargetRubyVersion: 2.5
+  Exclude:
+    - 'vendor/bundle/**/*'
+
 Metrics/MethodLength:
   Enabled: false
 
