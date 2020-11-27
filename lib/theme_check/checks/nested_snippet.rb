@@ -7,7 +7,7 @@ module ThemeCheck
     class TemplateInfo < Struct.new(:includes)
       def with_deep_nested(templates, max, current_level = 0)
         includes.each do |node|
-          if current_level == max
+          if current_level >= max
             yield node
           else
             template_name = "snippets/#{node.value.template_name_expr}"
