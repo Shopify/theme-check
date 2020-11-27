@@ -34,8 +34,12 @@ module ThemeCheck
       @source ||= @path.read
     end
 
+    def lines
+      @lines ||= source.split("\n")
+    end
+
     def excerpt(line)
-      source.split("\n")[line - 1].strip
+      lines[line - 1].strip
     end
 
     def parse

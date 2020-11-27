@@ -12,7 +12,11 @@ module ThemeCheck
     end
 
     def on_tag(node)
-      unless node.comment?
+      # Already inside {% liquid ... %} ?
+      if !node.template.excerpt(node.line_number).start_with?("{%")
+        reset_consecutive_statements
+      # Ignore comments
+      elsif !node.comment?
         increment_consecutive_statements(node)
       end
     end
