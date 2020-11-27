@@ -8,31 +8,24 @@ Think RuboCop, or eslint, but for Liquid, and designed specifically to be used o
 
 ![](docs/preview.png)
 
-## Installation
+## Usage
 
 ```
 dev up
-dev lint /path/to/your/theme
-```
-
-## Usage
-
-If you don't have a local copy of your theme, download it using [themekit](https://shopify.github.io/themekit/).
-
-```
-cd your/theme/path
-theme-check
+dev check /path/to/your/theme
 ```
 
 ## Supported Checks
 
-Theme Check is built around the concept of Checks. Each one checks for only one thing:
+Theme Check currently checks for the following:
 
 ✅ Liquid parsing errors  
 ✅ Unused `{% assign ... %}`  
 ✅ Unused `snippets/` templates  
 ✅ Template length is under 200 lines  
 ✅ Use of `{% liquid ... %}` instead of several `{% ... %}`
+✅ Deprecated tags: `include`
+✅ Nesting too many snippets
 
 And many more to come! Suggestions welcome (create an issue).
 
@@ -63,6 +56,9 @@ module ThemeCheck
 
     def after_tag(node)
       # Called after the tag children have been visited
+      
+      # If you find an issue, add an offense:
+      add_offense("Describe the problem...", node: node)
     end
 
     def on_assign(node)
