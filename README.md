@@ -23,8 +23,8 @@ Theme Check currently checks for the following:
 ✅ Unused `{% assign ... %}`  
 ✅ Unused `snippets/` templates  
 ✅ Template length is under 200 lines  
-✅ Use of `{% liquid ... %}` instead of several `{% ... %}`
-✅ Deprecated tags: `include`
+✅ Use of `{% liquid ... %}` instead of several `{% ... %}`  
+✅ Deprecated tags: `include`  
 ✅ Nesting too many snippets
 
 And many more to come! Suggestions welcome (create an issue).
