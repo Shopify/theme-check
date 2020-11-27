@@ -15,7 +15,9 @@ module ThemeCheck
     def children
       @children ||= begin
         nodes =
-          if defined?(@value.class::ParseTreeVisitor)
+          if comment?
+            []
+          elsif defined?(@value.class::ParseTreeVisitor)
             @value.class::ParseTreeVisitor.new(@value, {}).children
           elsif @value.respond_to?(:nodelist)
             Array(@value.nodelist)
