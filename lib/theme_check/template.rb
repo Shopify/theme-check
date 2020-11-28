@@ -42,8 +42,8 @@ module ThemeCheck
       @ast ||= self.class.parse(source)
     end
 
-    def errors
-      @ast.errors
+    def warnings
+      @ast.warnings
     end
 
     def root
@@ -54,7 +54,7 @@ module ThemeCheck
       Liquid::Template.parse(
         source,
         line_numbers: true,
-        error_mode: :strict,
+        error_mode: :warn,
       )
     end
   end
