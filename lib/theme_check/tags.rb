@@ -38,6 +38,8 @@ module ThemeCheck
         (?<attributes>(?:\s*,\s*(?:#{TAG_ATTRIBUTES}))*)\s*\Z
       }xo
 
+      attr_reader :type_expr, :variable_name_expr, :tag_attributes
+
       def initialize(tag_name, markup, options)
         super
         @match = FORM_FORMAT.match(markup)
@@ -50,13 +52,18 @@ module ThemeCheck
         end
         @tag_attributes = tag_attributes
       end
+
+      class ParseTreeVisitor < Liquid::ParseTreeVisitor
+        def children
+          super + [@node.type_expr, @node.variable_name_expr] + @node.tag_attributes
+        end
+      end
     end
 
     class Paginate < Liquid::Block
       SYNTAX = /(?<liquid_variable_name>#{Liquid::QuotedFragment})\s*((?<by>by)\s*(?<page_size>#{Liquid::QuotedFragment}))?/
 
-      SEOLinksRegister = Struct.new(:prev_url, :next_url)
-      LiquidVariableIdentifier = Struct.new(:source_drop, :method_name)
+      attr_reader :page_size
 
       def initialize(tag_name, markup, options)
         super
@@ -82,12 +89,20 @@ module ThemeCheck
           raise(Liquid::SyntaxError, "in tag 'paginate' - Valid syntax: paginate [collection] by number")
         end
       end
+
+      class ParseTreeVisitor < Liquid::ParseTreeVisitor
+        def children
+          super + [@node.page_size]
+        end
+      end
     end
 
     class Layout < Liquid::Tag
       SYNTAX = /(?<layout>#{Liquid::QuotedFragment})/
 
       NO_LAYOUT_KEYS = %w(false nil none).freeze
+
+      attr_reader :layout_expr
 
       def initialize(tag_name, markup, tokens)
         super
@@ -101,6 +116,12 @@ module ThemeCheck
           false
         else
           parse_expression(layout_markup)
+        end
+      end
+
+      class ParseTreeVisitor < Liquid::ParseTreeVisitor
+        def children
+          [@node.layout_expr]
         end
       end
     end
