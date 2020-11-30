@@ -8,7 +8,11 @@ gemspec
 
 gem 'bundler'
 gem 'rake'
-gem 'minitest'
+
+group :test do
+  gem 'minitest'
+  gem 'pry-byebug'
+end
 
 gem 'rubocop', '~> 0.93.1', require: false
 gem 'rubocop-performance', '~> 1.8.1', require: false
