@@ -8,7 +8,7 @@ up:
 
 commands:
   check:
-    desc: 'Lint theme'
+    desc: 'Check a theme'
     syntax:
       argument: file
     run: bundle exec theme-check
@@ -17,3 +17,5 @@ commands:
       argument: file
       optional: args...
     run: bundle exec rake test
+  style:
+    run: bundle exec rake rubocop

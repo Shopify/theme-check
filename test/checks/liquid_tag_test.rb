@@ -34,4 +34,21 @@ class LiquidTagTest < Minitest::Test
     )
     assert_equal("", offenses.join)
   end
+
+  def test_ignores_inside_liquid_tag
+    offenses = analyze_theme(
+      ThemeCheck::LiquidTag.new(min_consecutive_statements: 4),
+      "templates/index.liquid" => <<~END,
+        {% liquid
+          assign x = 1
+          if x == 1
+            assign y = 2
+          else
+            assign z = 2
+          endif
+        %}
+      END
+    )
+    assert_equal("", offenses.join)
+  end
 end
