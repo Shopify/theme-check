@@ -13,12 +13,14 @@ module ThemeCheck
     end
 
     def visit(node)
+      call_checks(:on_node, node)
       call_checks(:on_tag, node) if node.tag?
       call_checks(:"on_#{node.type_name}", node)
       node.children.each { |child| visit(child) }
       unless node.literal?
         call_checks(:"after_#{node.type_name}", node)
         call_checks(:after_tag, node) if node.tag?
+        call_checks(:after_node, node)
       end
     end
 

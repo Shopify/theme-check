@@ -1,6 +1,10 @@
 # frozen_string_literal: true
+require_relative "parsing_helpers"
+
 module ThemeCheck
   class Check
+    include ParsingHelpers
+
     attr_accessor :theme
     attr_accessor :offenses
 

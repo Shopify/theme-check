@@ -12,6 +12,14 @@ module ThemeCheck
       @template = template
     end
 
+    def markup
+      if tag?
+        @value.raw
+      elsif @value.instance_variable_defined?(:@markup)
+        @value.instance_variable_get(:@markup)
+      end
+    end
+
     def children
       @children ||= begin
         nodes =
@@ -73,6 +81,14 @@ module ThemeCheck
 
     def type_name
       @type_name ||= @value.class.name.demodulize.underscore.to_sym
+    end
+
+    def inside_liquid_tag?
+      if line_number
+        template.excerpt(line_number).start_with?("{%")
+      else
+        false
+      end
     end
   end
 end
