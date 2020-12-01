@@ -2,6 +2,7 @@
 require 'active_support/core_ext/string/inflections'
 
 module ThemeCheck
+  # A node from the Liquid AST, the result of parsing a template.
   class Node
     attr_reader :value, :parent, :template
 
@@ -12,6 +13,7 @@ module ThemeCheck
       @template = template
     end
 
+    # The original source code of the node. Doesn't contain wrapping braces.
     def markup
       if tag?
         @value.raw
@@ -20,6 +22,7 @@ module ThemeCheck
       end
     end
 
+    # Array of children nodes.
     def children
       @children ||= begin
         nodes =
@@ -46,43 +49,54 @@ module ThemeCheck
       end
     end
 
+    # Literals are hard-coded values in the template.
     def literal?
       @value.is_a?(String) || @value.is_a?(Integer)
     end
 
+    # A {% tag %} node?
     def tag?
       @value.is_a?(Liquid::Tag)
     end
 
+    # A {% comment %} block node?
     def comment?
       @value.is_a?(Liquid::Comment)
     end
 
+    # Top level node of every template.
     def document?
       @value.is_a?(Liquid::Document)
     end
     alias_method :root?, :document?
 
+    # A {% tag %}...{% endtag %} node?
     def block_tag?
       @value.is_a?(Liquid::Block)
     end
 
-    def block?
-      block_tag? || block_body? || document?
-    end
-
+    # The body of blocks
     def block_body?
       @value.is_a?(Liquid::BlockBody)
     end
 
+    # A block of type of node?
+    def block?
+      block_tag? || block_body? || document?
+    end
+
+    # Most nodes have a line number, but it's not guaranteed.
     def line_number
       @value.line_number if @value.respond_to?(:line_number)
     end
 
+    # The `:under_score_name` of this type of node. Used to dispatch to the `on_<type_name>`
+    # and `after_<type_name>` check methods.
     def type_name
       @type_name ||= @value.class.name.demodulize.underscore.to_sym
     end
 
+    # Is this node inside a `{% liquid ... %}` block?
     def inside_liquid_tag?
       if line_number
         template.excerpt(line_number).start_with?("{%")
