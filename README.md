@@ -21,13 +21,15 @@ Theme Check currently checks for the following:
 
 ✅ Liquid parsing errors  
 ✅ Unused `{% assign ... %}`  
-✅ Unused `snippets/` templates  
+✅ Unused snippet templates  
+✅ Rendering missing snippet or section templates  
 ✅ Template length is under 200 lines  
-✅ Use of `{% liquid ... %}` instead of several `{% ... %}`  
 ✅ Deprecated tags: `include`  
-✅ Nesting too many snippets
+✅ Nesting too many snippets  
+✅ Missing or extra spaces inside `{% ... %}` and `{{ ... }}`  
+✅ Use of `{% liquid ... %}` instead of several `{% ... %}`  
 
-And many more to come! Suggestions welcome (create an issue).
+And many more to come! Suggestions welcome ([create an issue](https://github.com/Shopify/theme-check/issues)).
 
 ## Creating a new "Check"
 
@@ -50,6 +52,10 @@ module ThemeCheck
       theme # Gives you access to all the templates in the theme. See lib/theme_check/theme.rb.
     end
 
+    def on_node(node)
+      # Called for every node
+    end
+
     def on_tag(node)
       # Called for each tag (if, include, for, assign, etc.)
     end
@@ -59,10 +65,20 @@ module ThemeCheck
       
       # If you find an issue, add an offense:
       add_offense("Describe the problem...", node: node)
+      # Or, if the offense is related to the whole template:
+      add_offense("Describe the problem...", template: node.template)
     end
 
     def on_assign(node)
       # Called only for {% assign ... %} tags
+    end
+
+    def on_string(node)
+      # Called for every `String` (including inside if conditions).
+      if node.parent.block?
+        # If parent is a block, `node.value` is a String written directly to the output when
+        # the template is rendered.
+      end
     end
 
     def on_error(exception)
@@ -75,19 +91,29 @@ module ThemeCheck
 
     # Each type of node has a corresponding `on_node_class_name` & `after_node_class_name`
     # A few common examples:
+    # on_block_body(node)
+    # on_capture(node)
+    # on_case(node)
+    # on_comment(node)
+    # on_condition(node)
+    # on_document(node)
+    # on_else_condition(node)
+    # on_for(node)
+    # on_form(node)
     # on_if(node)
     # on_include(node)
+    # on_integer(node)
+    # on_layout(node)
+    # on_method_literal(node)
+    # on_paginate(node)
+    # on_range(node)
     # on_render(node)
-    # on_condition(node)
-    # on_variable(node)
-    # on_variable_lookup(node)
-    # on_string(node)
-    # on_block_body(node)
-    # on_form(node)
+    # on_schema(node)
     # on_section(node)
     # on_style(node)
-    # on_schema(node)
-    # ...
+    # on_unless(node)
+    # on_variable(node)
+    # on_variable_lookup(node)
   end
 end
 ```
