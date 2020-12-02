@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module ThemeCheck
   module ParsingHelpers
     # Yield each chunk outside of "...", '...'
