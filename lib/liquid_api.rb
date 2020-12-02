@@ -5,6 +5,8 @@ module LiquidAPI
   module Filters
     extend self
 
+    UNDOCUMENTED_FILTERS = ["t", "translate"]
+
     def labels
       @labels ||= begin
         label_set = Set.new
@@ -15,7 +17,7 @@ module LiquidAPI
           end
         end
 
-        label_set.to_a
+        label_set.to_a + UNDOCUMENTED_FILTERS
       end
     end
   end
