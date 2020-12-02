@@ -104,5 +104,14 @@ module ThemeCheck
         false
       end
     end
+
+    # Is this node inside a `{%- ... -%}`
+    def whitespace_trimmed?
+      if line_number
+        template.excerpt(line_number).start_with?("{%-")
+      else
+        false
+      end
+    end
   end
 end

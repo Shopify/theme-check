@@ -59,8 +59,8 @@ module ThemeCheck
       defined?(@ignored) && @ignored
     end
 
-    def add_offense(message, node: nil, template: node&.template)
-      offenses << Offense.new(self, template, node, message)
+    def add_offense(message, node: nil, template: node&.template, markup: nil, line_number: nil)
+      offenses << Offense.new(check: self, message: message, template: template, node: node, markup: markup, line_number: line_number)
     end
   end
 end

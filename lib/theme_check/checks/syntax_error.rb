@@ -6,12 +6,23 @@ module ThemeCheck
 
     def on_document(node)
       node.template.warnings.each do |warning|
-        add_offense(warning.to_s(false), node: warning, template: node.template)
+        add_exception_as_offense(warning, template: node.template)
       end
     end
 
     def on_error(exception)
-      add_offense(exception.to_s(false), node: exception, template: theme[exception.template_name])
+      add_exception_as_offense(exception, template: theme[exception.template_name])
+    end
+
+    private
+
+    def add_exception_as_offense(exception, template:)
+      add_offense(
+        exception.to_s(false).sub(/ in ".*"$/, ''),
+        line_number: exception.line_number,
+        markup: exception.markup_context&.sub(/^in "(.*)"$/, '\1'),
+        template: template,
+      )
     end
   end
 end

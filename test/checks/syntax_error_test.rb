@@ -37,8 +37,8 @@ class SyntaxErrorTest < Minitest::Test
       END
     )
     assert_equal(<<~END.chomp, offenses.join("\n"))
-      Expected end_of_string but found pipe in "collection | size > 0" at templates/index.liquid:1
-      Expected end_of_string but found pipe in "collection | > 0" at templates/index.liquid:3
+      Expected end_of_string but found pipe at templates/index.liquid:1
+      Expected end_of_string but found pipe at templates/index.liquid:3
     END
   end
 end
