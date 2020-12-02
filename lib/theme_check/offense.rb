@@ -48,6 +48,20 @@ module ThemeCheck
       end
     end
 
+    def start_column
+      return 0 unless line_number
+      template.full_line(line_number).index(markup)
+    end
+
+    def end_column
+      return 0 unless line_number
+      template.full_line(line_number).index(markup) + markup.size
+    end
+
+    def code
+      check.code
+    end
+
     def markup_start_in_excerpt
       source_excerpt.index(markup) if markup
     end

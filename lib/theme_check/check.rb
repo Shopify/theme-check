@@ -41,6 +41,13 @@ module ThemeCheck
       self.class.doc
     end
 
+    def code
+      self.class.name
+        .sub(/ThemeCheck::/, '')
+        .gsub(/(\w)([A-Z])/) { "#{$1}-#{$2}" }
+        .downcase
+    end
+
     def ignore!
       @ignored = true
     end

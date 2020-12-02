@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+$LOAD_PATH << File.join(__dir__, '..', 'lib')
+
+require 'liquid_language_server'
+
+application = LiquidLanguageServer::Application.new
+application.start

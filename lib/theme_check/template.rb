@@ -42,6 +42,10 @@ module ThemeCheck
       lines[line - 1].strip
     end
 
+    def full_line(line)
+      lines[line - 1]
+    end
+
     def parse
       @ast ||= self.class.parse(source)
     end
