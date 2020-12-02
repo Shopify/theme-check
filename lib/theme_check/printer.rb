@@ -16,10 +16,11 @@ module ThemeCheck
         colorized_severity(offense.severity) + ": " +
         yellow(offense.check_name) + ": " +
         offense.message + "."
-      if offense.line_number
-        puts "\t#{offense.code}"
-        # TODO: only underline the affected markup?
-        puts "\t" + ("^" * offense.code.size)
+      if offense.source_excerpt
+        puts "\t#{offense.source_excerpt}"
+        if offense.markup_start_in_excerpt
+          puts "\t" + (" " * offense.markup_start_in_excerpt) + ("^" * offense.markup.size)
+        end
       end
     end
 
