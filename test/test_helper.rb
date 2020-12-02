@@ -2,6 +2,7 @@
 $LOAD_PATH.unshift(File.expand_path("../../lib", __FILE__))
 require "theme_check"
 require "minitest/autorun"
+require "pry-byebug"
 require "tmpdir"
 
 module Minitest
