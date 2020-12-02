@@ -12,11 +12,9 @@ module ThemeCheck
   class UnknownFilter < Check
     severity :error
 
-    KNOWN_FILTERS = LiquidAPI::Filters.labels + ["t"]
-
     def on_variable(node)
       used_filters = node.value.filters.map { |name, *_rest| name }
-      undefined_filters = used_filters - KNOWN_FILTERS
+      undefined_filters = used_filters - LiquidAPI::Filters.labels
 
       undefined_filters.each do |undefined_filter|
         add_offense("Undefined filter `#{undefined_filter}`", node: node)
