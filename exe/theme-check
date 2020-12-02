@@ -8,7 +8,8 @@ theme = ThemeCheck::Theme.new(path)
 if theme.all.empty?
   abort("No templates found.\nusage: theme-check /path/to/your/theme")
 end
-analyzer = ThemeCheck::Analyzer.new(theme)
+config = ThemeCheck::Config.load_file(path)
+analyzer = ThemeCheck::Analyzer.new(theme, config.enabled_checks)
 analyzer.analyze_theme
 ThemeCheck::Printer.new.print(theme, analyzer.offenses)
 abort if analyzer.offenses.any?
