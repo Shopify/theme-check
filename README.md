@@ -19,15 +19,17 @@ dev check /path/to/your/theme
 
 Theme Check currently checks for the following:
 
-✅ Liquid parsing errors  
+✅ Liquid syntax errors  
 ✅ Unused `{% assign ... %}`  
 ✅ Unused snippet templates  
 ✅ Rendering missing snippet or section templates  
-✅ Template length is under 200 lines  
-✅ Deprecated tags: `include`  
+✅ Template length over 200 lines  
+✅ Deprecated tags  
+✅ Deprecated filters  
+✅ Missing `{{ content_for_* }}` in `theme.liquid`  
 ✅ Nesting too many snippets  
 ✅ Missing or extra spaces inside `{% ... %}` and `{{ ... }}`  
-✅ Use of `{% liquid ... %}` instead of several `{% ... %}`  
+✅ Using several `{% ... %}` instead of `{% liquid ... %}`  
 
 And many more to come! Suggestions welcome ([create an issue](https://github.com/Shopify/theme-check/issues)).
 
