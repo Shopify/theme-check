@@ -21,8 +21,6 @@ module ThemeCheck
         @template = node.template
       elsif template
         @template = template
-      else
-        raise ArgumentError, "template or node required"
       end
 
       @markup = if markup

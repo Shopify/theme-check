@@ -17,6 +17,12 @@ module ThemeCheck
       @json ||= @root.glob("**/*.json").map { |path| JsonFile.new(path, @root) }
     end
 
+    def default_locale_json
+      @default_locale_json ||= json.find do |json_file|
+        json_file.relative_path.to_s.match(%r{locales/.*\.default})
+      end
+    end
+
     def all
       @all ||= json + liquid
     end

@@ -39,4 +39,8 @@ class ThemeTest < Minitest::Test
   def test_sections
     assert_equal(["sections/article-template/template"], @theme.sections.map(&:name))
   end
+
+  def test_default_locale_json
+    assert_equal(@theme["locales/en.default"], @theme.default_locale_json)
+  end
 end
