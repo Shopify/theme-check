@@ -55,3 +55,6 @@ ValidSchema:
 
 MissingRequiredTemplateFiles:
   enabled: true
+
+UndefinedObject:
+  enabled: true
