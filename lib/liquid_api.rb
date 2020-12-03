@@ -5,7 +5,15 @@ module LiquidAPI
   module Filters
     extend self
 
-    UNDOCUMENTED_FILTERS = ["t", "translate"]
+    UNDOCUMENTED_FILTERS = [
+      "customer_logout_link",
+      "customer_register_link",
+      "format_code",
+      "handle",
+      "product_img_url",
+      "t",
+      "translate",
+    ]
 
     def labels
       @labels ||= begin
