@@ -69,6 +69,22 @@ class ConfigTest < Minitest::Test
     assert_equal(theme.root.join("dist"), config.root)
   end
 
+  def test_picks_nearest_config
+    theme = make_theme(
+      ".theme-check.yml" => <<~END,
+        TemplateLength:
+          enabled: false
+      END
+      "src/.theme-check.yml" => <<~END,
+        TemplateLength:
+          enabled: true
+      END
+    )
+    config = ThemeCheck::Config.load_file(theme.root.join("src"))
+    assert_equal(theme.root.join("src"), config.root)
+    assert(check_enabled?(config, ThemeCheck::TemplateLength))
+  end
+
   def test_blank_root
     config = ThemeCheck::Config.new(".")
     assert_equal(Pathname.new("."), config.root)

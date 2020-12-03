@@ -17,10 +17,11 @@ module ThemeCheck
       end
 
       def find(root)
-        Pathname.new(root).descend do |path|
+        Pathname.new(root).descend.reverse_each do |path|
           filename = path.join(DOTFILE)
           return filename if filename.file?
         end
+        nil
       end
     end
 
