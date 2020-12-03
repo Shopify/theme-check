@@ -9,7 +9,7 @@ module ThemeCheck
         new(YAML.load_file(File.join(path, DOTFILE)))
       rescue Errno::ENOENT
         # Configuration file is optional
-        nil
+        new({})
       end
     end
 
