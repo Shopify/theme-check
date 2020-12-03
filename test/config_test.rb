@@ -3,9 +3,30 @@ require "test_helper"
 
 class ConfigTest < Minitest::Test
   def test_load_file_uses_provided_config
-    YAML.expects(:load_file).with('theme/.theme-check.yml').returns(config_hash)
-    ThemeCheck::Config.expects(:new).with(config_hash)
-    ThemeCheck::Config.load_file('theme/')
+    theme = make_theme(".theme-check.yml" => <<~END)
+      TemplateLength:
+        enabled: false
+    END
+    config = ThemeCheck::Config.load_file(theme.root).to_h
+    assert_equal({ "TemplateLength" => { "enabled" => false } }, config)
+  end
+
+  def test_load_file_in_parent_dir
+    theme = make_theme(
+      ".theme-check.yml" => <<~END,
+        TemplateLength:
+          enabled: false
+      END
+      "dist/templates/index.liquid" => "",
+    )
+    config = ThemeCheck::Config.load_file(theme.root.join("dist")).to_h
+    assert_equal({ "TemplateLength" => { "enabled" => false } }, config)
+  end
+
+  def test_missing_file
+    theme = make_theme
+    config = ThemeCheck::Config.load_file(theme.root).to_h
+    assert_equal({}, config)
   end
 
   def test_load_file_uses_empty_config_when_config_file_is_missing
@@ -32,13 +53,6 @@ class ConfigTest < Minitest::Test
   end
 
   private
-
-  def config_hash
-    @config_hash ||= YAML.parse(<<~YAML)
-      MissingTemplate:
-        enabled: true
-    YAML
-  end
 
   def check_enabled?(config, klass)
     config.enabled_checks.map(&:class).include?(klass)
