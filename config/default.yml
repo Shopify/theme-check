@@ -1,0 +1,33 @@
+ConvertIncludeToRender:
+  enabled: true
+
+LiquidTag:
+  enabled: true
+
+MissingTemplate:
+  enabled: true
+
+NestedSnippet:
+  enabled: true
+
+RequiredLayoutThemeObject:
+  enabled: true
+
+SpaceInsideBraces:
+  enabled: true
+
+SyntaxError:
+  enabled: true
+
+TemplateLength:
+  enabled: true
+  max_length: 200
+
+UnknownFilter:
+  enabled: true
+
+UnusedAssign:
+  enabled: true
+
+UnusedSnippet:
+  enabled: true

@@ -4,7 +4,7 @@
 require "theme_check"
 
 path = ARGV[0] || "."
-config = ThemeCheck::Config.load_file(path)
+config = ThemeCheck::Config.from_path(path)
 puts "Checking #{config.root} ..."
 theme = ThemeCheck::Theme.new(config.root)
 if theme.all.empty?

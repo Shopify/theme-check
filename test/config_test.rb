@@ -7,7 +7,7 @@ class ConfigTest < Minitest::Test
       TemplateLength:
         enabled: false
     END
-    config = ThemeCheck::Config.load_file(theme.root).to_h
+    config = ThemeCheck::Config.from_path(theme.root).to_h
     assert_equal({ "TemplateLength" => { "enabled" => false } }, config)
   end
 
@@ -19,37 +19,24 @@ class ConfigTest < Minitest::Test
       END
       "dist/templates/index.liquid" => "",
     )
-    config = ThemeCheck::Config.load_file(theme.root.join("dist")).to_h
+    config = ThemeCheck::Config.from_path(theme.root.join("dist")).to_h
     assert_equal({ "TemplateLength" => { "enabled" => false } }, config)
   end
 
   def test_missing_file
     theme = make_theme
-    config = ThemeCheck::Config.load_file(theme.root).to_h
+    config = ThemeCheck::Config.from_path(theme.root).to_h
     assert_equal({}, config)
   end
 
-  def test_load_file_uses_empty_config_when_config_file_is_missing
+  def test_from_path_uses_empty_config_when_config_file_is_missing
     ThemeCheck::Config.expects(:new).with('theme/')
-    ThemeCheck::Config.load_file('theme/')
+    ThemeCheck::Config.from_path('theme/')
   end
 
   def test_enabled_checks_excludes_disabled_checks
     config = ThemeCheck::Config.new(".", "MissingTemplate" => { "enabled" => false })
     refute(check_enabled?(config, ThemeCheck::MissingTemplate))
-  end
-
-  def test_enabled_checks_excludes_checks_without_enabled_key
-    config = ThemeCheck::Config.new(".", "MissingTemplate" => {})
-    refute(check_enabled?(config, ThemeCheck::MissingTemplate))
-  end
-
-  def test_enabled_checks_has_all_check
-    config = ThemeCheck::Config.new(".")
-    assert_equal(
-      ThemeCheck::Check.all.to_set,
-      config.enabled_checks.map(&:class).to_set
-    )
   end
 
   def test_root
@@ -65,7 +52,7 @@ class ConfigTest < Minitest::Test
       END
       "dist/templates/index.liquid" => "",
     )
-    config = ThemeCheck::Config.load_file(theme.root)
+    config = ThemeCheck::Config.from_path(theme.root)
     assert_equal(theme.root.join("dist"), config.root)
   end
 
@@ -80,7 +67,7 @@ class ConfigTest < Minitest::Test
           enabled: true
       END
     )
-    config = ThemeCheck::Config.load_file(theme.root.join("src"))
+    config = ThemeCheck::Config.from_path(theme.root.join("src"))
     assert_equal(theme.root.join("src"), config.root)
     assert(check_enabled?(config, ThemeCheck::TemplateLength))
   end
@@ -88,6 +75,18 @@ class ConfigTest < Minitest::Test
   def test_blank_root
     config = ThemeCheck::Config.new(".")
     assert_equal(Pathname.new("."), config.root)
+  end
+
+  def test_enabled_checks_returns_default_checks_for_empty_config
+    YAML.expects(:load_file).with('config/default.yml').returns("SyntaxError" => { "enabled" => true })
+    config = ThemeCheck::Config.new(".")
+    assert(check_enabled?(config, ThemeCheck::SyntaxError))
+  end
+
+  def test_config_overrides_default_config
+    YAML.expects(:load_file).with('config/default.yml').returns("SyntaxError" => { "enabled" => true })
+    config = ThemeCheck::Config.new(".", "SyntaxError" => { "enabled" => false })
+    refute(check_enabled?(config, ThemeCheck::SyntaxError))
   end
 
   private
