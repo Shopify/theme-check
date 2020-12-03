@@ -14,7 +14,7 @@ class LiquidTagTest < Minitest::Test
         {% endif %}
       END
     )
-    assert_equal(<<~END.chomp, offenses.join)
+    assert_offenses(<<~END, offenses)
       Use {% liquid ... %} to write multiple tags at templates/index.liquid:1
     END
   end
@@ -32,7 +32,7 @@ class LiquidTagTest < Minitest::Test
         {% endif %}
       END
     )
-    assert_equal("", offenses.join)
+    assert_offenses("", offenses)
   end
 
   def test_ignores_inside_liquid_tag
@@ -49,6 +49,6 @@ class LiquidTagTest < Minitest::Test
         %}
       END
     )
-    assert_equal("", offenses.join)
+    assert_offenses("", offenses)
   end
 end

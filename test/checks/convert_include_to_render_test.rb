@@ -9,7 +9,7 @@ class ConvertIncludeToRenderTest < Minitest::Test
         {% include 'templates/foo.liquid' %}
       END
     )
-    assert_equal(<<~END.chomp, offenses.join)
+    assert_offenses(<<~END, offenses)
       `include` is deprecated - convert it to `render` at templates/index.liquid:1
     END
   end
@@ -21,6 +21,6 @@ class ConvertIncludeToRenderTest < Minitest::Test
         {% render 'templates/foo.liquid' %}
       END
     )
-    assert_equal("", offenses.join)
+    assert_offenses("", offenses)
   end
 end

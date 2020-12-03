@@ -15,7 +15,7 @@ class UnusedSnippetTest < Minitest::Test
         This is not used
       END
     )
-    assert_equal(<<~END.chomp, offenses.join)
+    assert_offenses(<<~END, offenses)
       This template is not used at snippets/unused.liquid
     END
   end
@@ -34,6 +34,6 @@ class UnusedSnippetTest < Minitest::Test
         This is not used
       END
     )
-    assert_equal("", offenses.join)
+    assert_offenses("", offenses)
   end
 end

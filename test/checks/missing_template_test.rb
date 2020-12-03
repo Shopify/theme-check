@@ -10,7 +10,7 @@ class MissingTemplateTest < Minitest::Test
         {% render 'two' %}
       END
     )
-    assert_equal(<<~END.chomp, offenses.join("\n"))
+    assert_offenses(<<~END, offenses)
       'snippets/one.liquid' is not found at templates/index.liquid:1
       'snippets/two.liquid' is not found at templates/index.liquid:2
     END
@@ -30,7 +30,7 @@ class MissingTemplateTest < Minitest::Test
         there
       END
     )
-    assert_equal("", offenses.join)
+    assert_offenses("", offenses)
   end
 
   def test_reports_missing_section
@@ -40,7 +40,7 @@ class MissingTemplateTest < Minitest::Test
         {% section 'one' %}
       END
     )
-    assert_equal(<<~END.chomp, offenses.join("\n"))
+    assert_offenses(<<~END, offenses)
       'sections/one.liquid' is not found at templates/index.liquid:1
     END
   end
@@ -55,6 +55,6 @@ class MissingTemplateTest < Minitest::Test
         hey
       END
     )
-    assert_equal("", offenses.join)
+    assert_offenses("", offenses)
   end
 end

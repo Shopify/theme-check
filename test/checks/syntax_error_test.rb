@@ -9,7 +9,7 @@ class SyntaxErrorTest < Minitest::Test
         {% include 'muffin'
       END
     )
-    assert_equal(<<~END.chomp, offenses.join)
+    assert_offenses(<<~END, offenses)
       Tag '{%' was not properly terminated with regexp: /\\%\\}/ at templates/index.liquid:1
     END
   end
@@ -21,7 +21,7 @@ class SyntaxErrorTest < Minitest::Test
         {% unknown %}
       END
     )
-    assert_equal(<<~END.chomp, offenses.join)
+    assert_offenses(<<~END, offenses)
       Unknown tag 'unknown' at templates/index.liquid:1
     END
   end
@@ -36,7 +36,7 @@ class SyntaxErrorTest < Minitest::Test
         {% endif %}
       END
     )
-    assert_equal(<<~END.chomp, offenses.join("\n"))
+    assert_offenses(<<~END, offenses)
       Expected end_of_string but found pipe at templates/index.liquid:1
       Expected end_of_string but found pipe at templates/index.liquid:3
     END

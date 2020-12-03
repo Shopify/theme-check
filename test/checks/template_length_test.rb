@@ -12,7 +12,7 @@ class TemplateLengthTest < Minitest::Test
         #{"\n" * 9}
       END
     )
-    assert_equal(<<~END.chomp, offenses.join)
+    assert_offenses(<<~END, offenses)
       Template has too many lines [11/10] at templates/long.liquid
     END
   end

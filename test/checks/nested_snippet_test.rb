@@ -21,7 +21,7 @@ class NestedSnippetTest < Minitest::Test
         ok
       END
     )
-    assert_equal(<<~END.chomp, offenses.join("\n"))
+    assert_offenses(<<~END, offenses)
       Too many nested snippets at snippets/one.liquid:1
       Too many nested snippets at templates/index.liquid:1
     END
@@ -40,6 +40,6 @@ class NestedSnippetTest < Minitest::Test
         ok
       END
     )
-    assert_equal("", offenses.join)
+    assert_offenses("", offenses)
   end
 end
