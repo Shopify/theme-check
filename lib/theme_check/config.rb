@@ -4,28 +4,33 @@ module ThemeCheck
   class Config
     DOTFILE = '.theme-check.yml'
 
+    attr_reader :root
+
     class << self
       def load_file(path)
         if (filename = find(path))
-          new(YAML.load_file(filename))
+          new(filename.dirname, YAML.load_file(filename))
         else
           # Configuration file is optional
-          new({})
+          new(path)
         end
       end
 
       def find(root)
-        path = Pathname(root)
-        until path.expand_path.root?
+        Pathname.new(root).descend do |path|
           filename = path.join(DOTFILE)
           return filename if filename.file?
-          path = path.parent
         end
       end
     end
 
-    def initialize(configuration)
+    def initialize(root, configuration = {})
       @configuration = configuration
+      @checks = configuration.dup
+      @root = Pathname.new(root)
+      if @checks.key?("root")
+        @root = @root.join(@checks.delete("root"))
+      end
     end
 
     def to_h
@@ -33,13 +38,11 @@ module ThemeCheck
     end
 
     def enabled_checks
-      return [] unless @configuration
-
       checks = []
 
       Check.all.each do |check|
         class_name = check.name.split('::').last
-        if !@configuration.key?(class_name) || @configuration[class_name]["enabled"] == true
+        if !@checks.key?(class_name) || @checks[class_name]["enabled"] == true
           checks << check.new
         end
       end
