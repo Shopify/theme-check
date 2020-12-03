@@ -3,8 +3,8 @@
 module LiquidLanguageServer
   class Application
     def start
-      server = LiquidLanguageServer::Server.new
-      LiquidLanguageServer::IO.new(server)
+      router = LiquidLanguageServer::Router.new
+      LiquidLanguageServer::Server.new(router)
     end
   end
 end

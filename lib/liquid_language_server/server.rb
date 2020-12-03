@@ -1,133 +1,149 @@
 # frozen_string_literal: true
-require "theme_check"
+
+require 'json'
 
 module LiquidLanguageServer
   class Server
-    def initialize
-      # do we need anything?
-    end
+    def initialize(router:, 
+      in_stream: STDIN, 
+      out_stream: STDOUT,
+      err_stream: STDERR)
 
-    def on_initialize(id, params)
-      {
-        type: "response",
-        id: id,
-        result: {
-          capabilities: {
-            textDocumentSync: 1
-            # hoverProvider: false,
-            # signatureHelpProvider: {
-            #   triggerCharacters: ['(', ',']
-            # },
-            # definitionProvider: true,
-            # referencesProvider: true,
-            # documentSymbolProvider: true,
-            # workspaceSymbolProvider: true,
-            # xworkspaceReferencesProvider: true,
-            # xdefinitionProvider: true,
-            # xdependenciesProvider: true,
-            # completionProvider: {
-            #   resolveProvider: true,
-            #   triggerCharacters: ['.', '::']
-            # },
-            # codeActionProvider: true,
-            # renameProvider: true,
-            # executeCommandProvider: {
-            #   commands: []
-            # },
-            # xpackagesProvider: true
-          }
-        }
-      }
+      @router = router
+      @in = in_stream
+      @out = out_stream
+      @err = err_stream
     end
+    
+    def listen
+      loop do
+        response = process_request
+        type = response[:type]
+        case type
+        when "notification"
+          ## type NotificationMessage
+          respond_with(prepare_notification(
+            response[:message],
+            response[:params]
+          ))
+        when "response"
+          respond_with(prepare_response(
+            response[:id],
+            response[:result]
+          ))
+        when "log"
+          log(response[:message])
+        when "exit"
+          cleanup
+          exit(true)
+        end
 
-    def on_initialized(id, params)
-      {
-        type: "log",
-        message: "initialized!"
-      }
-    end
+      # support ctrl+c and stuff
+      rescue SignalException
+        exit(true)
 
-    def on_exit()
-      {
-        type: "exit"
-      }
-    end
-
-    def on_textDocument_didOpen(id, params)
-      textDocument = params['textDocument']
-      uri = textDocument['uri']
-      text = textDocument['text']
-      offences = analyze(uri.sub('file://', ''))
-      prepare_diagnostics(uri, text, offences)
-    end
-
-    def on_textDocument_didSave(id, params)
-      {}
+      rescue Exception => e
+        error(e, e.backtrace)
+      end
     end
 
     private
 
-    def prepare_diagnostics(uri, text, offences)
-      # hash = @project_manager.update_document_content(uri, text)
+    # https://microsoft.github.io/language-server-protocol/specifications/specification-current/#responseMessage
+    def prepare_response(id, result)
       {
-        type: "notification",
-        message: 'textDocument/publishDiagnostics',
-        params: {
-          uri: uri,
-          diagnostics: offences.map { |offence| offence_to_diagnostic(offence) },
-        },
+        jsonrpc: '2.0',
+        id: id,
+        result: result,
       }
     end
 
-    def analyze(file_path)
-      theme = ThemeCheck::Theme.new(
-        # Assuming file is in project/folder/file, we want project.
-        File.dirname(File.dirname(file_path))
-      )
-
-      if theme.all.empty?
-        abort("No templates found for #{file_path} \nusage: theme-check /path/to/your/project-64k")
-      end
-
-      analyzer = ThemeCheck::Analyzer.new(theme)
-      analyzer.analyze_theme
-      analyzer.offenses.reject! { |offense| offense.template.path.to_s != file_path }
-    end
-
-    def offence_to_diagnostic(offence)
+    # https://microsoft.github.io/language-server-protocol/specifications/specification-current/#notificationMessage
+    def prepare_notification(message, params)
       {
-        range: range(offence),
-        severity: severity(offence),
-        code: offence.code,
-        source: "theme-check",
-        message: offence.message,
+        jsonrpc: '2.0',
+        method: message,
+        params: params,
       }
     end
 
-    def severity(offence)
-      case offence.severity
-      when :error
-        1
-      when :suggestion
-        2
-      when :style
-        3
+    def respond_with(response)
+      response_body = JSON.unparse(response)
+      log_json(response_body)
+
+      @out.write("Content-Length: #{response_body.length + 0}\r\n")
+      @out.write("\r\n")
+      @out.write(response_body)
+      @out.flush
+    end
+
+    def process_request
+      request_body = get_request
+      request_json = JSON.parse(request_body)
+      log_json(request_body)
+
+      id = request_json['id']
+      method_name = request_json['method']
+      params = request_json['params']
+
+      method_name = "on_#{method_name.gsub(/[^\w]/, '_')}"
+
+      if @router.respond_to?(method_name)
+        @router.send(method_name, id, params)
       else
-        4
+        err.puts("ROUTER DOES NOT RESPOND TO #{method_name}")
+        nil
       end
     end
 
-    def range(offence)
-      {
-        start: {
-          line: offence.line_number - 1,
-          character: offence.start_column,
-        },
-        end: {
-          line: offence.line_number - 1,
-          character: offence.end_column - 1,
-        },
-      }
+    def get_request
+      initial_line = @in.gets
+
+      # gets returning nil means the stream was closed.
+      # It means we're done.
+      return '{ "method": "exit" }' if initial_line.nil?
+
+      length = initial_line.match(/Content-Length: (\d+)/)[1].to_i
+      content = ''
+      while content.length < length + 2
+        begin
+          # Why + 2? Because \r\n
+          content += @in.read(length + 2)
+        rescue Exception => e
+          error(e, e.backtrace)
+          # We have almost certainly been disconnected from the server
+          cleanup
+          exit!(1)
+        end
+      end
+
+      content
+    end
+
+    def cleanup
+      begin
+        @err.close
+        @out.close
+      rescue
+        # I did my best
+      end
+    end
+
+    def log_json(json)
+      @err.puts(json)
+    end
+
+    def log(message)
+      @err.puts(JSON.unparse({
+        message: message,
+      }))
+    end
+
+    def error(message, backtrace = nil)
+      @err.puts(JSON.unparse({
+        error: message,
+        backtrace: backtrace,
+      }))
     end
   end
 end

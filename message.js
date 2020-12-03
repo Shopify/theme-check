@@ -4,7 +4,7 @@ const str = JSON.stringify({
   "jsonrpc": "2.0",
   "params": {
     "textDocument": {
-      "uri": "file:///Users/charles/src/github.com/Shopify/project-64k/src/snippets/product-card.liquid",
+      "uri": "file:///Users/alexandresobolevski/src/github.com/Shopify/project-64k/src/snippets/product-card.liquid",
       "version": 2,
       "languageId": "liquid",
       "text": "<html></html>"
