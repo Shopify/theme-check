@@ -22,7 +22,7 @@ module LiquidLanguageServer
     def listen
       loop do
         response = process_request
-        type = response[:type]
+        type = response.fetch(:type, "")
         case type
         when "notification"
           ## type NotificationMessage
@@ -40,11 +40,13 @@ module LiquidLanguageServer
         when "exit"
           cleanup
           return 0
+        else
+          # do nothing
         end
 
       # support ctrl+c and stuff
       rescue SignalException, DoneStreaming
-        error("Done streamin'!")
+        log("Done streamin'!")
         return 0
 
       rescue Exception => e
@@ -58,7 +60,8 @@ module LiquidLanguageServer
     def process_request
       request_body = get_request
       request_json = JSON.parse(request_body)
-      log_json(request_body)
+      # DEBUG
+      # log_json(request_body)
 
       id = request_json['id']
       method_name = request_json['method']
@@ -70,7 +73,7 @@ module LiquidLanguageServer
         @router.send(method_name, id, params)
       else
         @err.puts("ROUTER DOES NOT RESPOND TO #{method_name}")
-        nil
+        {}
       end
     end
 
