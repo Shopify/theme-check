@@ -25,8 +25,15 @@ module Minitest
         path.parent.mkpath
         path.write(content)
       end
-      at_exit { dir.rmtree }
+      @temp_themes ||= []
+      @temp_themes << dir
       ThemeCheck::Theme.new(dir)
+    end
+
+    def teardown
+      if defined?(@temp_themes)
+        @temp_themes.each(&:rmtree)
+      end
     end
   end
 end
