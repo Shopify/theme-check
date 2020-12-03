@@ -18,9 +18,9 @@ module Minitest
       analyzer.offenses
     end
 
-    def make_theme(templates)
+    def make_theme(files = {})
       dir = Pathname.new(Dir.mktmpdir)
-      templates.each_pair do |name, content|
+      files.each_pair do |name, content|
         path = dir.join(name)
         path.parent.mkpath
         path.write(content)

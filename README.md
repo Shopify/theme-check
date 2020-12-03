@@ -15,6 +15,21 @@ dev up
 dev check /path/to/your/theme
 ```
 
+## Configuration
+
+Add a `.theme-check.yml` file at the root of your theme to configure:
+
+```yaml
+# If your theme is not using the supported directory structure, provide the root path
+# where to find the `templates/`, `sections/`, `snippets/` directories as they would
+# be uploaded to Shopify.
+root: dist
+
+# Disable some checks
+TemplateLength:
+  enabled: false
+```
+
 ## Supported Checks
 
 Theme Check currently checks for the following:

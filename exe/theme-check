@@ -4,11 +4,12 @@
 require "theme_check"
 
 path = ARGV[0] || "."
-theme = ThemeCheck::Theme.new(path)
+config = ThemeCheck::Config.load_file(path)
+puts "Checking #{config.root} ..."
+theme = ThemeCheck::Theme.new(config.root)
 if theme.all.empty?
   abort("No templates found.\nusage: theme-check /path/to/your/theme")
 end
-config = ThemeCheck::Config.load_file(path)
 analyzer = ThemeCheck::Analyzer.new(theme, config.enabled_checks)
 analyzer.analyze_theme
 ThemeCheck::Printer.new.print(theme, analyzer.offenses)
