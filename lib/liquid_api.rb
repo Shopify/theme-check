@@ -7,7 +7,7 @@ module LiquidAPI
 
     def labels
       @labels ||= begin
-        YAML.load(File.read('data/liquid_api/filters.yml'))
+        YAML.load(File.read("#{__dir__}/../data/liquid_api/filters.yml"))
           .values
           .flatten
       end
