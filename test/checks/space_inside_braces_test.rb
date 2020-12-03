@@ -11,7 +11,7 @@ class SpaceInsideBracesTest < Minitest::Test
         {{x }}
       END
     )
-    assert_equal(<<~END.chomp, offenses.join("\n"))
+    assert_offenses(<<~END, offenses)
       Space missing before '%}' at templates/index.liquid:1
       Space missing before '}}' at templates/index.liquid:2
       Space missing after '{{' at templates/index.liquid:3
@@ -27,7 +27,7 @@ class SpaceInsideBracesTest < Minitest::Test
         {{ x  }}
       END
     )
-    assert_equal(<<~END.chomp, offenses.join("\n"))
+    assert_offenses(<<~END, offenses)
       Too many spaces after '{{' at templates/index.liquid:1
       Too many spaces before '%}' at templates/index.liquid:2
       Too many spaces before '}}' at templates/index.liquid:3
@@ -42,7 +42,7 @@ class SpaceInsideBracesTest < Minitest::Test
         {% endform %}
       END
     )
-    assert_equal(<<~END.chomp, offenses.join("\n"))
+    assert_offenses(<<~END, offenses)
       Too many spaces after ',' at templates/index.liquid:1
       Space missing after ':' at templates/index.liquid:1
     END

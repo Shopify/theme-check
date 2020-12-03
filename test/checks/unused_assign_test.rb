@@ -9,7 +9,7 @@ class UnusedAssignTest < Minitest::Test
         {% assign x = 1 %}
       END
     )
-    assert_equal(<<~END.chomp, offenses.join)
+    assert_offenses(<<~END, offenses)
       `x` is never used at templates/index.liquid:1
     END
   end
@@ -26,7 +26,7 @@ class UnusedAssignTest < Minitest::Test
         {{ 'a' | t: tags: c }}
       END
     )
-    assert_equal("", offenses.join)
+    assert_offenses("", offenses)
   end
 
   def test_do_not_report_assigns_used_before_defined
@@ -38,7 +38,7 @@ class UnusedAssignTest < Minitest::Test
         {% endunless %}
       END
     )
-    assert_equal("", offenses.join)
+    assert_offenses("", offenses)
   end
 
   def test_do_not_report_assigns_used_in_includes
@@ -52,6 +52,6 @@ class UnusedAssignTest < Minitest::Test
         {{ a }}
       END
     )
-    assert_equal("", offenses.join)
+    assert_offenses("", offenses)
   end
 end

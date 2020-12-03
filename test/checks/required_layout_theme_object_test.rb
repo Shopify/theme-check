@@ -10,7 +10,7 @@ class RequiredLayoutThemeObjectTest < Minitest::Test
       END
     )
 
-    assert_equal("", offenses.join)
+    assert_offenses("", offenses)
   end
 
   def test_picks_up_variable_lookups_only
@@ -24,24 +24,24 @@ class RequiredLayoutThemeObjectTest < Minitest::Test
       END
     )
 
-    assert_equal("", offenses.join)
+    assert_offenses("", offenses)
   end
 
   def test_report_offense_on_missing_content_for_header
     offenses = analyze_layout_theme("{{content_for_layout}}")
 
-    assert_equal(
+    assert_offenses(
       "layout/theme must include {{content_for_header}} at layout/theme.liquid",
-      offenses.join
+      offenses
     )
   end
 
   def test_report_offense_on_missing_content_for_layout
     offenses = analyze_layout_theme("{{content_for_header}}")
 
-    assert_equal(
+    assert_offenses(
       "layout/theme must include {{content_for_layout}} at layout/theme.liquid",
-      offenses.join
+      offenses
     )
   end
 

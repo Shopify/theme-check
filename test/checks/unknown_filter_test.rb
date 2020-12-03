@@ -9,7 +9,7 @@ class UnknownFilterTest < Minitest::Test
         {{ "foo" | bar }}
       END
     )
-    assert_equal(<<~END.chomp, offenses.join)
+    assert_offenses(<<~END, offenses)
       Undefined filter `bar` at templates/index.liquid:1
     END
   end
@@ -21,7 +21,7 @@ class UnknownFilterTest < Minitest::Test
         {{ "foo" | append: ".js" | bar }}
       END
     )
-    assert_equal(<<~END.chomp, offenses.join)
+    assert_offenses(<<~END, offenses)
       Undefined filter `bar` at templates/index.liquid:1
     END
   end
@@ -33,7 +33,7 @@ class UnknownFilterTest < Minitest::Test
         {{ "foo" | upcase }}
       END
     )
-    assert_empty(offenses.join)
+    assert_empty(offenses)
   end
 
   def test_reports_does_not_report_on_chain_of_known_filter
@@ -43,6 +43,6 @@ class UnknownFilterTest < Minitest::Test
         {{ "foo" | append: ".js" | upcase }}
       END
     )
-    assert_empty(offenses.join)
+    assert_empty(offenses)
   end
 end

@@ -28,5 +28,9 @@ module Minitest
       at_exit { dir.rmtree }
       ThemeCheck::Theme.new(dir)
     end
+
+    def assert_offenses(output, offenses)
+      assert_equal(output.chomp, offenses.sort_by(&:location).join("\n"))
+    end
   end
 end
