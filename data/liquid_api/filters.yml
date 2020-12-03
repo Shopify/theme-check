@@ -1,1295 +1,174 @@
 ---
-- category: filters
-  group_name: General Filters
-  group_description: 'General filters serve many different purposes including formatting,
-    converting, and applying CSS classes.
-
-    '
-  group_path: https://help.shopify.com/themes/liquid/filters/additional-filters
-  items:
-  - label: date
-    description: Converts a timestamp into another date format.
-    snippet: '{{ article.published_at | date: "%a, %b %d, %y" }}
-
-      '
-    return_value: 'Tue, Apr 22, 14
-
-      '
-    anchor: date
-  - label: default
-    description: 'Sets a default value for any variable with no assigned value. Can
-      be used with strings, arrays, and hashes. The default value is returned if the
-      variable resolves to <code>nil</code> or an empty string <code>""</code>. A
-      string containing whitespace characters will not resolve to the default value.
-
-      '
-    snippet: 'Dear {{ customer.name | default: "customer" }}
-
-      '
-    return_value: |
-      <!-- If customer.name is nil -->
-      Dear customer
-
-      <!-- If customer.name is "" -->
-      Dear customer
-
-      <!-- If customer.name is "   " -->
-      Dear
-    anchor: default
-  - label: default_errors
-    description: 'Outputs default error messages for the <code>form.errors</code>
-      variable. The messages returned are dependent on the strings returned by <code>form.errors</code>.
-
-      '
-    snippet: |
-      {% if form.errors %}
-        {{ form.errors | default_errors }}
-      {% endif %}
-    return_value: |
-      <!-- if form.errors returned "email" -->
-      Please enter a valid email address.
-    anchor: default_errors
-  - label: default_pagination
-    description: 'Creates a set of links for paginated results. Used in conjunction
-      with the paginate variable.
-
-      '
-    snippet: "{{ paginate | default_pagination }}\n"
-    return_value: |
-      <span class="page current">1</span>
-      <span class="page"><a href="/collections/all?page=2" title="">2</a></span>
-      <span class="page"><a href="/collections/all?page=3" title="">3</a></span>
-      <span class="deco">&hellip;</span>
-      <span class="page"><a href="/collections/all?page=17" title="">17</a></span>
-      <span class="next"><a href="/collections/all?page=2" title="">Next &raquo;</a></span>
-    anchor: default_pagination
-  - label: format_address
-    description: 'Use the <code>format_address</code> filter on an address to print
-      the elements of the address in order according to their locale. The filter will
-      only print the parts of the address that have been provided. This filter works
-      on the addresses page for customers who have accounts in your store, or on your
-      store''s address.
-
-      '
-    snippet: "{{ address | format_address }}\n"
-    return_value: |
-      <p>
-        Elizabeth Gonzalez<br>
-        1507 Wayside Lane<br>
-        San Francisco<br>
-        CA<br>
-        94103<br>
-        United States
-      </p>
-    anchor: format_address
-  - label: highlight
-    description: 'Wraps words inside search results with an HTML <code>&lt;strong&gt;</code>
-      tag with the class <code>highlight</code> if it matches the submitted search
-      terms.
-
-      '
-    snippet: "{{ item.content | highlight: search.terms }}\n"
-    return_value: |
-      <!-- If the search term was "Yellow" -->
-      <strong class="highlight">Yellow</strong> shirts are the best!
-    anchor: highlight
-  - label: highlight_active
-    description: 'Wraps a tag link in a <code>&lt;span&gt;</code> with the class <code>active</code>
-      if that tag is being used to filter a collection.
-
-      '
-    snippet: |
-      <!-- collection.tags = ["Cotton", "Crew Neck", "Jersey"] -->
-      {% for tag in collection.tags %}
-          {{ tag | highlight_active | link_to_tag: tag }}
-      {% endfor %}
-    return_value: |
-      <a title="Show products matching tag Cotton" href="/collections/all/cotton"><span class="active">Cotton</span></a>
-      <a title="Show products matching tag Crew Neck" href="/collections/all/crew-neck">Crew Neck</a>
-      <a title="Show products matching tag Jersey" href="/collections/all/jersey">Jersey</a>
-    anchor: highlight_active
-  - label: json
-    description: Converts a string into JSON format.
-    snippet: 'var content = {{ pages.page-handle.content | json }};
-
-      '
-    return_value: 'var content = "\u003Cp\u003E\u003Cstrong\u003EYou made it! Congratulations
-      on starting your own e-commerce store!\u003C/strong\u003E\u003C/p\u003E\n\u003Cp\u003EThis
-      is your shop\u0026#8217;s \u003Cstrong\u003Efrontpage\u003C/strong\u003E, and
-      it\u0026#8217;s the first thing your customers will see when they arrive. You\u0026#8217;ll
-      be able to organize and style this page however you like.\u003C/p\u003E\n\u003Cp\u003E\u003Cstrong\u003ETo
-      get started adding products to your shop, head over to the \u003Ca href=\"/admin\"\u003EAdmin
-      Area\u003C/a\u003E.\u003C/strong\u003E\u003C/p\u003E\n\u003Cp\u003EEnjoy the
-      software,  \u003Cbr /\u003E\nYour Shopify Team.\u003C/p\u003E";
-
-      '
-    anchor: json
-  - label: placeholder_svg_tag
-    description: 'Takes a placeholder name and outputs a placeholder SVG illustration.
-      An optional argument can be supplied to include a custom class attribute on
-      the SVG tag.
-
-      '
-    snippet: "{{ 'collection-1' | placeholder_svg_tag }}\n"
-    return_value: |
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 525.5 525.5">
-        ...
-      </svg>
-    anchor: placeholder_svg_tag
-  - label: time_tag
-    description: 'The <code>time_tag</code> filter converts a timestamp into an HTML
-      <code>&lt;time&gt;</code> tag. The output format can be customized by passing
-      deta parameters to the <code>time_tag</code> filter.
-
-      '
-    snippet: |
-      {{ article.published_at | time_tag }}
-      {{ article.published_at | time_tag: '%a, %b %d, %Y' }}
-    return_value: |
-      <time datetime="2016-02-24T14:47:51Z">Wed, 24 Feb 2016 09:47:51 -0500</time>
-      <time datetime="2016-02-24T14:47:51Z">Wed, Feb 24, 2016</time>
-    anchor: time_tag
-  - label: weight_with_unit
-    description: Formats the product variant’s weight.
-    snippet: "{{ product.variants.first.weight | weight_with_unit }}\n"
-    return_value: '24.0 kg
-
-      '
-    anchor: weight_with_unit
-- category: filters
-  group_name: Array Filters
-  group_description: Array filters are used to modify the output of arrays.
-  group_path: https://help.shopify.com/themes/liquid/filters/array-filters
-  items:
-  - label: concat
-    description: 'Concatenates (combines) an array with another array. The resulting
-      array contains all the elements of the original arrays.
-
-      '
-    snippet: |
-      {% assign fruits = "apples, oranges" | split: ", " %}
-      {% assign vegetables = "broccoli, carrots" | split: ", " %}
-      {% assign plants = fruits | concat: vegetables %}
-      {{ plants | join: ", " }}
-    return_value: 'apples, oranges, brocolli, carrots
-
-      '
-    anchor: concat
-  - label: join
-    description: 'Joins the elements of an array with the character passed as the
-      parameter. The result is a single string.
-
-      '
-    snippet: "{{ product.tags | join: ', ' }}\n"
-    return_value: tag1, tag2, tag3
-    anchor: 
-  - label: first
-    description: Returns the first element of an array.
-    snippet: |
-      <!-- product.tags = "sale", "mens", "womens", "awesome" -->
-      {{ product.tags | first }}
-    return_value: sale
-    anchor: first
-  - label: index
-    description: 'Returns the item at the specified index in an array. Note that array
-      numbering starts from zero, so the first item in an array is referenced with
-      <code>[0]</code>.
-
-      '
-    snippet: |
-      <!-- product.tags = "sale", "mens", "womens", "awesome" -->
-      {{ product.tags[2] }}
-    return_value: womens
-    anchor: 
-  - label: last
-    description: Gets the last element in an array.
-    snippet: |
-      <!-- product.tags = "sale", "mens", "womens", "awesome" -->
-      {{ product.tags | last }}
-    return_value: awesome
-    anchor: last
-  - label: map
-    description: 'Accepts an array element’s attribute as a parameter and creates
-      a string out of each array element’s value.
-
-      '
-    snippet: |
-      <!-- collections = {title: "Spring"}, {title: "Summer"} -->
-      {{ collections | map: 'title' }}
-    return_value: SpringSummer
-    anchor: 
-  - label: reverse
-    description: Reverses the order of the items in an array.
-    snippet: |
-      {% assign my_array = "a, b, c, d" | split: ", " %}
-      {{ my_array | reverse | join: ", " }}
-    return_value: 'd, c, b, a
-
-      '
-    anchor: reverse
-  - label: size
-    description: Returns the length of a string or an array.
-    snippet: "{{ 'is this a 30 character string?' | size }}\n"
-    return_value: 30
-    anchor: size
-  - label: sort
-    description: 'Sorts the elements of an array by a given attribute.
-
-      '
-    snippet: |
-      <!-- products = "a", "b", "A", "B" -->
-      {% assign products = collection.products | sort: 'title' %}
-      {% for product in products %}
-         {{ product.title }}
-      {% endfor %}
-    return_value: A B a b
-    anchor: sort
-  - label: uniq
-    description: Removes any duplicate instances of elements in an array.
-    snippet: |
-      {% assign fruits = "orange apple banana apple orange" %}
-      {{ fruits | split: ' ' | uniq | join: ' ' }}
-    return_value: orange apple banana
-    anchor: uniq
-  - label: where
-    description: 'Creates an array including only the objects with a given property
-      value, or any truthy value by default.
-
-      '
-    snippet: |
-      All products:
-      {% for product in collection.products %}
-      - {{ product.title }}
-      {% endfor %}
-
-      {% assign kitchen_products = collection.products | where: "type", "kitchen" %}
-
-      Kitchen products:
-      {% for product in kitchen_products %}
-      - {{ product.title }}
-      {% endfor %}
-    return_value: |
-      All products:
-      - Vacuum
-      - Spatula
-      - Television
-      - Garlic press
-
-      Kitchen products:
-      - Spatula
-      - Garlic press
-    anchor: where
-- category: filters
-  group_name: Color Filters
-  group_description: 
-  group_path: https://help.shopify.com/themes/liquid/filters/color-filters
-  items:
-  - label: brightness_difference
-    description: 'Calculates the perceived brightness difference between two colors.
-      With regards to accessibility, the W3C suggests that the brightness difference
-      should be greater than 125.
-
-      '
-    snippet: "{{ '#fff00f' | brightness_difference: '#0b72ab' }}\n"
-    return_value: '129
-
-      '
-    anchor: brightness_difference
-  - label: color_brightness
-    description: Calculates the perceived brightness of the given color.
-    snippet: "{{ '#7ab55c' | color_brightness }}\n"
-    return_value: '153.21
-
-      '
-    anchor: color_brightness
-  - label: color_contrast
-    description: 'Calculates the contrast ratio between two colors. Returns the numerator
-      part of the ratio, which has a denominator of 1. For example, for a contrast
-      ratio of 3.5:1, the filter returns 3.5.
-
-      '
-    snippet: "{{ '#495859' | color_contrast: '#fffffb' }}\n"
-    return_value: '7.4
-
-      '
-    anchor: color_contrast
-  - label: color_darken
-    description: Darkens the input color. Takes a value between 0 and 100 percent.
-    snippet: "{{ '#7ab55c' | color_darken: 30 }}\n"
-    return_value: "#355325\n"
-    anchor: color_darken
-  - label: color_desaturate
-    description: Desaturates the input color. Takes a value between 0 and 100 percent.
-    snippet: "{{ '#7ab55c' | color_desaturate: 30 }}\n"
-    return_value: "#869180\n"
-    anchor: color_desaturate
-  - label: color_difference
-    description: 'Calculates the color difference or distance between two colors.
-      With regards to accessibility, the W3C suggests that the color difference should
-      be greater than 500.
-
-      '
-    snippet: "{{ '#ff0000' | color_difference: '#abcdef' }}\n"
-    return_value: '528
-
-      '
-    anchor: color_difference
-  - label: color_extract
-    description: 'Extracts a component from the color. Valid components are alpha,
-      red, green, blue, hue, saturation and lightness.
-
-      '
-    snippet: "{{ '#7ab55c' | color_extract: 'red' }}\n"
-    return_value: '122
-
-      '
-    anchor: color_extract
-  - label: color_lighten
-    description: Lightens the input color. Takes a value between 0 and 100 percent.
-    snippet: "{{ '#7ab55c' | color_lighten: 30 }}\n"
-    return_value: "#d0e5c5\n"
-    anchor: color_lighten
-  - label: color_mix
-    description: Blends together two colors. Blend factor should be a value between
-      0 and 100 percent.
-    snippet: "{{ '#7ab55c' | color_mix: '#ffc0cb', 50 }}\n"
-    return_value: "#bdbb94\n"
-    anchor: color_mix
-  - label: color_modify
-    description: 'Modifies the given component of a color (rgb, alpha, hue and saturation).
-      The filter will return a color type that includes the modified format — for
-      example, if you modify the alpha channel, the filter will return the color in
-      <code>rgba()</code> format, even if your input color was in hex format.
-
-      '
-    snippet: |
-      {{ '#7ab55c' | color_modify: 'red', 255 }}
-      {{ '#7ab55c' | color_modify: 'alpha', 0.85 }}
-    return_value: |
-      #ffb55c
-      rgba(122, 181, 92, 0.85)
-    anchor: color_modify
-  - label: color_saturate
-    description: Saturates the input color. Takes a value between 0 and 100 percent.
-    snippet: "{{ '#7ab55c' | color_saturate: 30 }}\n"
-    return_value: "#6ed938\n"
-    anchor: color_saturate
-  - label: color_to_rgb
-    description: 'Converts a CSS color string to CSS <code>rgb()</code> format. If
-      the input color has an alpha component, then the output will be in CSS <code>rgba()</code>
-      format.
-
-      '
-    snippet: |
-      {{ '#7ab55c' | color_to_rgb }}
-      {{ 'hsla(100, 38%, 54%, 0.5)' | color_to_rgb }}
-    return_value: |
-      rgb(122, 181, 92)
-      rgba(122, 181, 92, 0.5)
-    anchor: color_to_rgb
-  - label: color_to_hsl
-    description: 'Converts a CSS color string to CSS <code>hsl()</code> format. If
-      the input color has an alpha component, then the output will be in CSS <code>hsla()</code>
-      format.
-
-      '
-    snippet: |
-      {{ '#7ab55c' | color_to_hsl }}
-      {{ 'rgba(122, 181, 92, 0.5)' | color_to_hsl }}
-    return_value: |
-      hsl(100, 38%, 54%)
-      hsla(100, 38%, 54%, 0.5)
-    anchor: color_to_hsl
-  - label: color_to_hex
-    description: 'Converts a CSS color string to <code>hex6</code> format. Hex output
-      is always in <code>hex6</code> format. If there is an alpha channel in the input
-      color, it will not appear in the output.
-
-      '
-    snippet: |
-      {{ 'rgb(122, 181, 92)' | color_to_hex }}
-      {{ 'rgba(122, 181, 92, 0.5)' | color_to_hex }}
-    return_value: |
-      #7ab55c
-      #7ab55c
-    anchor: color_to_hex
-- category: filters
-  group_name: Font Filters
-  group_description: Font filters are called on <code>font</code> objects. You can
-    use font filters to load fonts or to obtain font variants.
-  group_path: https://help.shopify.com/themes/liquid/filters/font-filters
-  items:
-  - label: font_face
-    description: Returns a CSS <code>@font-face</code> declaration to load the chosen
-      font.
-    snippet: |
-      <style>
-        {{ settings.heading_font | font_face }}
-      </style>
-    return_value: |
-      <style>
-        @font-face {
-          font-family: "Neue Haas Unica";
-          font-weight: 400;
-          font-style: normal;
-          src: url("https://fonts.shopifycdn.com/neue_haas_unica/neuehaasunica_n4.8a2375506d3dfc7b1867f78ca489e62638136be6.woff2?hmac=d5feff0f2e6b37fedb3ec099688181827df4a97f98d2336515503215e8d1ff55&host=c2hvcDEubXlzaG9waWZ5Lmlv") format("woff2"),
-              url("https://fonts.shopifycdn.com/neue_haas_unica/neuehaasunica_n4.06cdfe33b4db0659278e9b5837a3e8bc0a9d4025.woff?hmac=d5feff0f2e6b37fedb3ec099688181827df4a97f98d2336515503215e8d1ff55&host=c2hvcDEubXlzaG9waWZ5Lmlv") format("woff");
-        }
-      </style>
-    anchor: font_face
-  - label: font_modify
-    description: |
-      <code>font_modify</code> takes two arguments. The first indicates which property should be modified and the second is the modification to be made.
-      While you can access every variant of the chosen font's family by using <code>font.variants</code>, you can more easily access specific styles and weights by using the font_modify filter.
-    snippet: |
-      {% assign bold_font = settings.body_font | font_modify: 'weight', 'bold' %}
-      h2 {
-        font-weight: {{ bolder_font.weight }};
-      }
-    return_value: |
-      h2 {
-        font-weight: 900;
-      }
-    anchor: font_modify
-  - label: font_url
-    description: 'Returns a CDN URL for the chosen font. By default, <code>font_url</code>
-      returns the woff2 version, but it can also be called with an additional parameter
-      to specify the format. Both woff and woff2 are supported.
-
-      '
-    snippet: |
-      {{ settings.type_header_font | font_url }}
-      {{ settings.type_base_font | font_url: 'woff' }}
-    return_value: |
-      https://fonts.shopifycdn.com/neue_haas_unica/neuehaasunica_n4.8a2375506d3dfc7b1867f78ca489e62638136be6.woff2?...9waWZ5Lmlv
-      https://fonts.shopifycdn.com/work_sans/worksans_n6.399ae4c4dd52d38e3f3214ec0cc9c61a0a67ea08.woff?...b63d5ca77de58c7a23ece904
-    anchor: font_url
-- category: filters
-  group_name: HTML Filters
-  group_description: HTML filters wrap assets in HTML tags.
-  group_path: https://help.shopify.com/themes/liquid/filters/html-filters
-  items:
-  - label: currency_selector
-    description: 'Generates a drop-down list that customers can use to select an accepted
-      currency on your storefront. This filter must be used on the <code>form</code>
-      object within a currency form.
-
-      '
-    snippet: |
-      {% form 'currency' %}
-        {{ form | currency_selector: class: 'my_special_class', id: 'Submit'  }}
-      {% endform %}
-    return_value: 
-    anchor: currency_selector
-  - label: img_tag
-    description: Generates an image tag.
-    snippet: "{{ 'smirking_gnome.gif' | asset_url | img_tag }}\n"
-    return_value: '<img src="//cdn.shopify.com/s/files/1/0147/8382/t/15/assets/smirking_gnome.gif?v=1384022871"
-      alt="" />
-
-      '
-    anchor: img_tag
-  - label: payment_button
-    description: Creates a dynamic checkout button for a product. This filter must
-      be used on the form object within a product form.
-    snippet: "{{ form | payment_button }}\n"
-    return_value: |
-      <div data-shopify="payment-button" class="shopify-payment-button">
-        ...
-      </div>
-    anchor: payment_button
-  - label: payment_type_svg_tag
-    description: 'Returns the <code>&lt;svg&gt;</code> tag of the requested payment
-      type image for inlining purposes. Used in conjunction with the <code>shop.enabled_payment_types
-      variable</code>
-
-      '
-    snippet: |
-      {% for type in shop.enabled_payment_types %}
-        {{ type | payment_type_svg_tag, class: 'custom-class' }}
-      {% endfor %}
-    return_value: |
-      <!-- If the shop accepts Mastercard -->
-      <svg class="custom-class" xmlns="http://www.w3.org/2000/svg">
-        <circle fill="#EB001B" cx="15" cy="12" r="7"></circle>
-        <circle fill="#F79E1B" cx="23" cy="12" r="7"></circle>
-        ...
-      </svg>
-    anchor: payment_type_svg_tag
-  - label: script_tag
-    description: Generates a script tag.
-    snippet: "{{ 'shop.js' | asset_url | script_tag }}\n"
-    return_value: '<script src="//cdn.shopify.com/s/files/1/0087/0462/t/394/assets/shop.js?28178"
-      type="text/javascript"></script>
-
-      '
-    anchor: script_tag
-  - label: stylesheet_tag
-    description: Generates a link tag that points to the given stylesheet.
-    snippet: "{{ 'shop.css' | asset_url | stylesheet_tag }}\n"
-    return_value: '<link href="//cdn.shopify.com/s/files/1/0087/0462/t/394/assets/shop.css?28178"
-      rel="stylesheet" type="text/css" media="all" />
-
-      '
-    anchor: stylesheet_tag
-- category: filters
-  group_name: Media Filters
-  group_description: 'Media filters let you generate URLs for a product''s media.
-
-    '
-  group_path: https://shopify.dev/docs/themes/liquid/reference/filters/media-filters
-  items:
-  - label: external_video_tag
-    description: Generates an IFrame that contains a YouTube video player.
-    snippet: |
-      {% if product.featured_media.media_type == "external_video" %}
-        {{ product.featured_media | external_video_tag }}
-      {% endif %}
-    return_value: |
-      <iframe frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen="allowfullscreen" src="https://www.youtube.com/embed/neFK-pv2sKY?controls=1&amp;enablejsapi=1&amp;modestbranding=1&amp;playsinline=1&amp;rel=0">
-        ...
-      </iframe>
-    anchor: external_video_tag
-  - label: external_video_url
-    description: Used to set parameters for the YouTube player rendered by external_video_tag.
-    snippet: |
-      {% if product.featured_media.media_type == "external_video" %}
-        {{ product.featured_media | external_video_url: color: "white" |  external_video_tag }}
-      {% endif %}
-    return_value: |
-      <iframe frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen="allowfullscreen" src="https://www.youtube.com/embed/neFK-pv2sKY?color=white&amp;controls=1&amp;enablejsapi=1&amp;modestbranding=1&amp;playsinline=1&amp;rel=0">
-        ...
-      </iframe>
-    anchor: external_video_url
-  - label: img_tag
-    description: When used with a model or a video object, the <code>img_tag</code>
-      filter generates an image tag for the media's preview image.
-    snippet: |
-      {% if product.featured_media.media_type == "model" %}
-        {{ product.featured_media | img_tag }}
-      {% endif %}
-    return_value: '<img src="//cdn.shopify.com/s/files/1/1425/8696/products/b15ddb43cbac45b1ae2685223fa3536d_small.jpg?v=1560284062">
-
-      '
-    anchor: img_tag
-  - label: img_url
-    description: When used with a media object, the <code>img_url</code> filter generates
-      an image URL for the media's preview image.
-    snippet: |
-      {% if product.featured_media.media_type == "video" %}
-        {{ product.featured_media | img_url: '500x500' }}
-        {{ product.featured_media | img_url }}
-      {% endif %}
-    return_value: |
-      //cdn.shopify.com/s/files/1/1425/8696/products/b15ddb43cbac45b1ae2685223fa3536d_500x500.jpg?v=1560284062
-      //cdn.shopify.com/s/files/1/1425/8696/products/b15ddb43cbac45b1ae2685223fa3536d_small.jpg?v=1560284062
-    anchor: img_url
-  - label: media_tag
-    description: Generates an appropriate tag for the media.
-    snippet: |
-      {% if product.featured_media.media_type == "model" %}
-        {{ product.featured_media | media_tag }}
-      {% endif %}
-    return_value: |
-      <model-viewer src="https://model3d.shopifycdn.com/models/o/0029ee870c5c3cdd/stroller.glb" ios-src="https://model3d.shopifycdn.com/models/o/0029ee870c5c3cdd/stroller.usdz" poster="//cdn.shopify.com/s/files/1/1425/8696/products/placeholder_image_small.jpg?v=1560284071" camera-controls="true">
-        ...
-      </model-viewer>
-    anchor: media_tag
-  - label: model_viewer_tag
-    description: Generates a Google model viewer component tag for the given 3D model.
-    snippet: |
-      {% if product.featured_media.media_type == "model" %}
-        {{ product.featured_media | model_viewer_tag }}
-      {% endif %}
-    return_value: |
-      <model-viewer src="https://model3d.shopifycdn.com/models/o/0029ee870c5c3cdd/stroller.glb" ios-src="https://model3d.shopifycdn.com/models/o/0029ee870c5c3cdd/stroller.usdz" poster="//cdn.shopify.com/s/files/1/1425/8696/products/placeholder_image_small.jpg?v=1560284071" camera-controls="true">
-        ...
-      </model-viewer>
-    anchor: model_viewer_tag
-  - label: video_tag
-    description: Generates a video tag.
-    snippet: |
-      {% if product.featured_media.media_type == "video" %}
-        {{ product.featured_media | video_tag }}
-      {% endif %}
-    return_value: |
-      <video playsinline="true" controls="">
-        <source src="https://videos.shopifycdn.com/c/vp/afe4b8a92ca944e49bc4b888927b7ec3/master.m3u8?Expires=1560458164&amp;KeyName=core-signing-key-1&amp;Signature=BIQQpuyEVnyt9HUw4o9QOmQ1z2c=" type="application/x-mpegURL">
-        <source src="https://videos.shopifycdn.com/c/vp/afe4b8a92ca944e49bc4b888927b7ec3/SD-360p.mp4?Expires=1560458164&amp;KeyName=core-signing-key-1&amp;Signature=1kEi8GmNIssxVvjyzy7AOuGP-E0=" type="video/mp4">
-        <source src="https://videos.shopifycdn.com/c/vp/afe4b8a92ca944e49bc4b888927b7ec3/SD-480p.mp4?Expires=1560458164&amp;KeyName=core-signing-key-1&amp;Signature=8Lt74XmFWP6hOF1WRdqNkDWRm2U=" type="video/mp4">
-        <source src="https://videos.shopifycdn.com/c/vp/afe4b8a92ca944e49bc4b888927b7ec3/HD-720p.mp4?Expires=1560458164&amp;KeyName=core-signing-key-1&amp;Signature=vlNXWpvgRT2bghrWovJPrN8w3mc=" type="video/mp4"><p>Sorry html5 video is not supported in this browser</p>
-      </video>
-    anchor: video_tag
-- category: filters
-  group_name: Math Filters
-  group_description: 'Math filters can be linked and are applied in order from left
-    to right, as with all other filters
-
-    '
-  group_path: https://help.shopify.com/themes/liquid/filters/math-filters
-  items:
-  - label: abs
-    description: Returns the absolute value of a number or string that onnly contains
-      a number.
-    snippet: |
-      {{ -24 | abs }}
-      {{ "-1.23" | abs }}
-    return_value: |
-      24
-      1.23
-    anchor: abs
-  - label: at_least
-    description: Limits a number to a minimum value.
-    snippet: |
-      {{ 2 | at_least: 5 }}
-      {{ 2 | at_least: 1 }}
-    return_value: |
-      5
-      2
-    anchor: at_least
-  - label: at_most
-    description: Limits a number to a maximum value.
-    snippet: |
-      {{ 2 | at_most: 5 }}
-      {{ 2 | at_most: 1 }}
-    return_value: |
-      2
-      1
-    anchor: at_most
-  - label: ceil
-    description: Rounds an output up to the nearest integer.
-    snippet: |
-      {{ 4.6 | ceil }}
-      {{ 4.3 | ceil }}
-    return_value: |
-      5
-      5
-    anchor: 
-  - label: divided_by
-    description: 'Divides an output by a number. The output is rounded down to the
-      nearest integer.
-
-      '
-    snippet: |
-      <!-- product.price = 200 -->
-      {{ product.price | divided_by: 10 }}
-    return_value: 20
-    anchor: 
-  - label: floor
-    description: Rounds an output down to the nearest integer.
-    snippet: |
-      {{ 4.6 | floor }}
-      {{ 4.3 | floor }}
-    return_value: |
-      4
-      4
-    anchor: 
-  - label: minus
-    description: Subtracts a number from an input.
-    snippet: |
-      <!-- product.price = 200 -->
-      {{ product.price | minus: 15 }}
-    return_value: 185
-    anchor: 
-  - label: plus
-    description: Adds a number to an output.
-    snippet: |
-      <!-- product.price = 200 -->
-      {{ product.price | plus: 15 }}
-    return_value: 215
-    anchor: 
-  - label: round
-    description: Rounds the output to the nearest integer or specified number of decimals.
-    snippet: |
-      {{ 4.6 | round }}
-      {{ 4.3 | round }}
-      {{ 4.5612 | round: 2 }}
-    return_value: |
-      5
-      4
-      4.56
-    anchor: 
-  - label: times
-    description: Multiplies an output by a number.
-    snippet: |
-      <!-- product.price = 200 -->
-      {{ product.price | times: 1.15 }}
-    return_value: 230
-    anchor: 
-  - label: modulo
-    description: Divides an output by a number and returns the remainder.
-    snippet: "{{ 12 | modulo:5 }}\n"
-    return_value: 2
-    anchor: 
-- category: filters
-  group_name: Money Filters
-  group_description: 'Money filters format prices based on the Currency Formatting
-    found in General Settings.
-
-    '
-  group_path: https://help.shopify.com/themes/liquid/filters/money-filters
-  items:
-  - label: money
-    description: Formats the price based on the shop’s ‘HTML without currency’ setting.
-    snippet: "{{ 145 | money }}\n"
-    return_value: |
-      <!-- if "HTML without currency" is ${{ amount }} -->
-      $1.45
-      <!-- if "HTML without currency" is €{{ amount_no_decimals }} -->
-      $1
-    anchor: 
-  - label: money_with_currency
-    description: Formats the price based on the shop’s ‘HTML with currency’ setting.
-    snippet: "{{ 1.45 | money_with_currency }}\n"
-    return_value: <!-- if "HTML with currency" is ${{ amount }} CAD --> $1.45 CAD
-    anchor: 
-  - label: money_without_trailing_zeros
-    description: 'Formats the price based on the shop’s ‘HTML with currency’ setting
-      and excludes the decimal point and trailing zeros.
-
-      '
-    snippet: |
-      <!-- if "HTML with currency" is ${{ amount }} CAD -->
-      {{ 20.00 | money_without_trailing_zeros }}
-    return_value: "$20\n"
-    anchor: money_without_trailing_zeros
-  - label: money_without_currency
-    description: Formats the price using a decimal.
-    snippet: "{{ 1.45 | money_without_currency }}\n"
-    return_value: 1.45
-    anchor: 
-- category: filters
-  group_name: String Filters
-  group_description: 'String filters are used to manipulate outputs and variables
-    of the string type.
-
-    '
-  group_path: https://help.shopify.com/themes/liquid/filters/string-filters
-  items:
-  - label: append
-    description: Appends characters to a string.
-    snippet: "{{ 'sales' | append: '.jpg' }}\n"
-    return_value: sales.jpg
-    anchor: 
-  - label: camelcase
-    description: Converts a dash-separated string into CamelCase.
-    snippet: "{{ 'coming-soon' | camelcase }}\n"
-    return_value: ComingSoon
-    anchor: append
-  - label: capitalize
-    description: Capitalizes the first word in a string.
-    snippet: "{{ 'capitalize me' | capitalize }}\n"
-    return_value: 'Capitalize me
-
-      '
-    anchor: capitalize
-  - label: downcase
-    description: Converts a string into lowercase.
-    snippet: "{{ 'UPPERCASE' | downcase }}\n"
-    return_value: uppercase
-    anchor: downcase
-  - label: escape
-    description: Escapes a string.
-    snippet: '{{ "<p>test</p>" | escape }}
-
-      '
-    return_value: "<p>test</p>\n"
-    anchor: escape
-  - label: handleize
-    description: Formats a string into a handle.
-    snippet: "{{ '100% M & Ms!!!' | handleize }}\n"
-    return_value: '100-m-ms
-
-      '
-    anchor: handle-handleize
-  - label: hmac_sha1
-    description: 'Converts a string into a SHA-1 hash using a hash message authentication
-      code (HMAC). Pass the secret key for the message as a parameter to the filter.
-
-      '
-    snippet: |
-      {% assign my_secret_string = "ShopifyIsAwesome!" | hmac_sha1: "secret_key" %}
-       My encoded string is: {{ my_secret_string }}
-    return_value: 'My encoded string is: 30ab3459e46e7b209b45dba8378fcbba67297304
-
-      '
-    anchor: hmac_sha1
-  - label: hmac_sha256
-    description: 'Converts a string into a SHA-256 hash using a hash message authentication
-      code (HMAC). Pass the secret key for the message as a parameter to the filter.
-
-      '
-    snippet: |
-      {% assign my_secret_string = "ShopifyIsAwesome!" | hmac_sha256: "secret_key" %}
-      My encoded string is: {{ my_secret_string }}
-    return_value: 'My encoded string is: 30ab3459e46e7b209b45dba8378fcbba67297304
-
-      '
-    anchor: hmac_sha256
-  - label: md5
-    description: Converts a string into an MD5 hash.
-    snippet: '<img src="https://www.gravatar.com/avatar/{{ comment.email | remove:
-      '' '' | strip_newlines | downcase | md5 }}" />
-
-      '
-    return_value: '<img src="https://www.gravatar.com/avatar/2a95ab7c950db9693c2ceb767784c201"
-      />
-
-      '
-    anchor: md5
-  - label: newline_to_br
-    description: 'Inserts a <code>&lt;br&gt;</code> linebreak HTML tag in front of
-      each line break in a string.
-
-      '
-    snippet: |
-      {% capture var %}
-      One
-      Two
-      Three
-      {% endcapture %}
-      {{ var | newline_to_br }}
-    return_value: |
-      One<br>
-      Two<br>
-      Three<br>
-    anchor: newline_to_br
-  - label: pluralize
-    description: 'Outputs the singular or plural version of a string based on the
-      value of a number. The first parameter is the singular string and the second
-      parameter is the plural string.
-
-      '
-    snippet: "{{ cart.item_count | pluralize: 'item', 'items' }}\n"
-    return_value: '3 items
-
-      '
-    anchor: pluralize
-  - label: prepend
-    description: Prepends characters to a string.
-    snippet: "{{ 'sale' | prepend: 'Made a great ' }}\n"
-    return_value: 'Made a great sale
-
-      '
-    anchor: prepend
-  - label: remove
-    description: Removes all occurrences of a substring from a string.
-    snippet: '{{ "Hello, world. Goodbye, world." | remove: "world" }}
-
-      '
-    return_value: 'Hello, . Goodbye, .
-
-      '
-    anchor: remove
-  - label: remove_first
-    description: Removes only the first occurrence of a substring from a string.
-    snippet: '{{ "Hello, world. Goodbye, world." | remove_first: "world" }}
-
-      '
-    return_value: 'Hello, . Goodbye, world.
-
-      '
-    anchor: remove_first
-  - label: replace
-    description: Replaces all occurrences of a substring with a string.
-    snippet: |
-      <!-- product.title = "Awesome Shoes" -->
-      {{ product.title | replace: 'Awesome', 'Mega' }}
-    return_value: 'Mega Shoes
-
-      '
-    anchor: replace
-  - label: replace_first
-    description: Replaces the first occurrence of a substring with a string.
-    snippet: |
-      <!-- product.title = "Awesome Awesome Shoes" -->
-      {{ product.title | replace_first: 'Awesome', 'Mega' }}
-    return_value: 'Mega Awesome Shoes
-
-      '
-    anchor: replace_first
-  - label: slice
-    description: 'The slice filter returns a substring, starting at the specified
-      index. An optional second parameter can be passed to specify the length of the
-      substring. If no second parameter is given, a substring of one character will
-      be returned.
-
-      '
-    snippet: |
-      {{ "hello" | slice: 0 }}
-      {{ "hello" | slice: 1 }}
-      {{ "hello" | slice: 1, 3 }}
-    return_value: |
-      h
-      e
-      ell
-    anchor: slice
-  - label: split
-    description: 'The split filter takes on a substring as a parameter. The substring
-      is used as a delimiter to divide a string into an array. You can output different
-      parts of an array using array filters.
-
-      '
-    snippet: |
-      {% assign words = "Hi, how are you today?" | split: ' ' %}
-      {% for word in words %}
-      {{ word }}
-      {% endfor %}
-    return_value: |
-      Hi,
-      how
-      are
-      you
-      today?
-    anchor: split
-  - label: strip
-    description: 'Strips tabs, spaces, and newlines (all whitespace) from the left
-      and right side of a string.
-
-      '
-    snippet: "{{ '   too many spaces      ' | strip }}\n"
-    return_value: 'too many spaces
-
-      '
-    anchor: strip
-  - label: lstrip
-    description: 'Strips tabs, spaces, and newlines (all whitespace) from the left
-      side of a string.
-
-      '
-    snippet: '"{{ ''   too many spaces           '' | lstrip }}"
-
-      '
-    return_value: |
-      <!-- Notice the empty spaces to the right of the string -->
-      "too many spaces           "
-    anchor: lstrip
-  - label: reverse
-    description: "<code>reverse</code> cannot be used directly on a string, but you
-      can split a string into an array, reverse the array, and rejoin it by chaining
-      together other filters.\n"
-    snippet: '{{ "Ground control to Major Tom." | split: "" | reverse | join: "" }}
-
-      '
-    return_value: ".moT rojaM ot lortnoc dnuorG\n"
-    anchor: reversing-strings
-  - label: rstrip
-    description: 'Strips tabs, spaces, and newlines (all whitespace) from the right
-      side of a string.
-
-      '
-    snippet: "{{ '              too many spaces      ' | rstrip }}\n"
-    return_value: '"                too many spaces"
-
-      '
-    anchor: rstrip
-  - label: sha1
-    description: Converts a string into a SHA-1 hash.
-    snippet: |
-      {% assign my_secret_string = "ShopifyIsAwesome!" | sha1 %}
-      My encoded string is: {{ my_secret_string }}
-    return_value: 'My encoded string is: c7322e3812d3da7bc621300ca1797517c34f63b6
-
-      '
-    anchor: sha1
-  - label: sha256
-    description: Converts a string into a SHA-256 hash.
-    snippet: |
-      {% assign my_secret_string = "ShopifyIsAwesome!" | sha256 %}
-      My encoded string is: {{ my_secret_string }}
-    return_value: 'My encoded string is: c29cce758876791f34b8a1543f0ec3f8e886b5271004d473cfe75ac3148463cb
-
-      '
-    anchor: sha256
-  - label: strip_html
-    description: Strips all HTML tags from a string.
-    snippet: '{{ "<h1>Hello</h1> World" | strip_html }}
-
-      '
-    return_value: 'Hello World
-
-      '
-    anchor: strip_html
-  - label: strip_newlines
-    description: Removes any line breaks/newlines from a string.
-    snippet: |
-      <!-- product.description = "This is a multiline\nproduct description."
-      {{ product.description | strip_newlines }}
-    return_value: 'This is a multiline product description.
-
-      '
-    anchor: strip_newlines
-  - label: truncate
-    description: 'Truncates a string down to ‘x’ characters, where x is the number
-      passed as a parameter. An ellipsis (...) is appended to the string and is included
-      in the character count.
-
-      '
-    snippet: '{{ "The cat came back the very next day" | truncate: 10 }}
-
-      '
-    return_value: 'The cat...
-
-      '
-    anchor: truncate
-  - label: truncatewords
-    description: 'Truncates a string down to ‘x’ words, where x is the number passed
-      as a parameter. An ellipsis (...) is appended to the truncated string.
-
-      '
-    snippet: '{{ "The cat came back the very next day" | truncatewords: 4 }}
-
-      '
-    return_value: 'The cat came back...
-
-      '
-    anchor: truncatewords
-  - label: upcase
-    description: Converts a string into uppercase.
-    snippet: "{{ 'i want this to be uppercase' | upcase }}\n"
-    return_value: 'I WANT THIS TO BE UPPERCASE
-
-      '
-    anchor: upcase
-  - label: url_encode
-    description: 'Converts any URL-unsafe characters in a string into percent-encoded
-      characters.
-
-      '
-    snippet: '{{ "john@liquid.com" | url_encode }}
-
-      '
-    return_value: 'john%40liquid.com
-
-      '
-    anchor: url_encode
-  - label: url_escape
-    description: 'Identifies all characters in a string that are not allowed in URLS,
-      and replaces the characters with their escaped variants.
-
-      '
-    snippet: '{{ "<hello> & <shopify>" | url_escape }}
-
-      '
-    return_value: "%3Chello%3E%20&%20%3Cshopify%3E\n"
-    anchor: url_escape
-  - label: url_param_escape
-    description: 'Replaces all characters in a string that are not allowed in URLs
-      with their escaped variants, including the ampersand (&).
-
-      '
-    snippet: '{{ "<hello> & <shopify>" | url_param_escape }}
-
-      '
-    return_value: "%3Chello%3E%20%26%20%3Cshopify%3E\n"
-    anchor: url_param_escape
-- category: filters
-  group_name: URL Filters
-  group_description: 'URL filters output links to assets on Shopify’s Content Delivery
-    Network (CDN). They are also used to create links for filtering collections and
-    blogs.
-
-    '
-  group_path: https://help.shopify.com/themes/liquid/filters/url-filters
-  items:
-  - label: asset_img_url
-    description: Returns the asset URL of an image in the ‘assets’ folder of a theme.
-    snippet: "{{ 'logo.png' | asset_img_url: '300x' }}\n"
-    return_value: "//cdn.shopify.com/s/files/1/0087/0462/t/394/assets/logo_300x.png?28253\n"
-    anchor: asset_img_url
-  - label: asset_url
-    description: Returns the URL of a file in the ‘assets’ folder of a theme.
-    snippet: "{{ 'shop.css' | asset_url }}\n"
-    return_value: "//cdn.shopify.com/s/files/1/0087/0462/t/394/assets/shop.css?28253\n"
-    anchor: asset_url
-  - label: file_img_url
-    description: Returns the URL of an image in the Files page of the admin.
-    snippet: "{{ 'logo.png' | file_img_url: '300x' }}\n"
-    return_value: "//cdn.shopify.com/s/files/1/0087/0462/files/logo_300x.png?28261\n"
-    anchor: file_img_url
-  - label: file_url
-    description: Returns the URL of a file in the Files page of the admin.
-    snippet: "{{ 'size-chart.pdf' | file_url }}\n"
-    return_value: "//cdn.shopify.com/s/files/1/0087/0462/files/size-chart.pdf?28261\n"
-    anchor: file_url
-  - label: customer_login_link
-    description: Generates a link to the customer login page.
-    snippet: "{{ 'Log in' | customer_login_link }}\n"
-    return_value: '<a href="/account/login" id="customer_login_link">Log in</a>
-
-      '
-    anchor: customer_login_link
-  - label: global_asset_url
-    description: 'Returns the URL of a global asset. Global assets are kept in a central
-      directory on Shopify’s servers. Using global assets can improve the load times
-      of your pages.
-
-      '
-    snippet: "{{ 'prototype.js' | global_asset_url | script_tag }}\n"
-    return_value: '<script src="//cdn.shopify.com/s/global/prototype.js?1" type="text/javascript"></script>
-
-      '
-    anchor: global_asset_url
-  - label: img_url
-    description: Returns the URL of an image. Accepts an image size as a parameter.
-    snippet: |
-      {{ product | img_url: '100x100' }}
-      {{ variant | img_url: '720x720' }}
-      {{ line_item | img_url: '1024x' }}
-      {{ image | img_url: '400x400' }}
-      {{ collection | img_url: '500x500' }}
-    return_value: |
-      //cdn.shopify.com/s/files/1/0159/3350/products/red_shirt_100x100.jpg?v=1398706734
-      //cdn.shopify.com/s/files/1/0159/3350/products/red_shirt_720x720.jpg?v=1398706734
-      //cdn.shopify.com/s/files/1/0159/3350/products/red_shirt_1024x.jpg?v=1398706734
-      //cdn.shopify.com/s/files/1/0159/3350/products/red_shirt_400x400.jpg?v=1398706734
-      //cdn.shopify.com/s/files/1/0159/3350/products/shirts_collection_500x500.jpg?v=1338563745
-    anchor: img_url
-  - label: link_to
-    description: 'Generates an HTML link. The first parameter is the URL of the link,
-      and the optional second parameter is the title of the link.
-
-      '
-    snippet: "{{ 'shopify' | link_to: 'https://www.shopify.com', 'A link to Shopify'
-      }}\n"
-    return_value: '<a href="https://www.shopify.com" title="A link to Shopify">Shopify</a>
-
-      '
-    anchor: link_to
-  - label: link_to_vendor
-    description: 'Creates an HTML link to a collection page that lists all products
-      belonging to a vendor.
-
-      '
-    snippet: '{{ "Shopify" | link_to_vendor }}
-
-      '
-    return_value: '<a href="/collections/vendors?q=Shopify" title="Shopify">Shopify</a>
-
-      '
-    anchor: link_to_vendor
-  - label: link_to_type
-    description: 'Creates an HTML link to a collection page that lists all products
-      belonging to a product type.
-
-      '
-    snippet: '{{ "jeans" | link_to_type }}
-
-      '
-    return_value: '<a href="/collections/types?q=jeans" title="jeans">jeans</a>
-
-      '
-    anchor: link_to_type
-  - label: link_to_tag
-    description: 'Creates a link to all products in a collection that have a given
-      tag.
-
-      '
-    snippet: |
-      <!-- collection.tags = ["Mens", "Womens", "Sale"] -->
-      {% for tag in collection.tags %}
-        {{ tag | link_to_tag: tag }}
-      {% endfor %}
-    return_value: |
-      <a title="Show products matching tag Mens" href="/collections/frontpage/mens">Mens</a>
-      <a title="Show products matching tag Womens" href="/collections/frontpage/womens">Womens</a>
-      <a title="Show products matching tag Sale" href="/collections/frontpage/sale">Sale</a>
-    anchor: link_to_tag
-  - label: link_to_add_tag
-    description: 'Creates a link to all products in a collection that have a given
-      tag as well as any tags that have been already selected.
-
-      '
-    snippet: |
-      <!-- collection.tags = ["Mens", "Womens", "Sale"] -->
-      {% for tag in collection.tags %}
-        {{ tag | link_to_add_tag: tag }}
-      {% endfor %}
-    return_value: |
-      <!-- If you're on "/collections/frontpage/mens": -->
-      <a title="Show products matching tag Mens" href="/collections/frontpage/mens">Mens</a>
-      <a title="Show products matching tag Womens" href="/collections/frontpage/womens+mens">Womens</a>
-      <a title="Show products matching tag Sale" href="/collections/frontpage/sale+mens">Sale</a>
-    anchor: link_to_add_tag
-  - label: link_to_remove_tag
-    description: 'Generates a link to all products in a collection that have the given
-      tag and all the previous tags that might have been added already.
-
-      '
-    snippet: |
-      <!-- collection.tags = ["Mens", "Womens", "Sale"] -->
-      {% for tag in collection.tags %}
-        {{ tag | link_to_add_tag: tag }}
-      {% endfor %}
-    return_value: |
-      <!-- If you're on "/collections/frontpage/mens": -->
-      <a title="Remove tag Mens" href="/collections/frontpage">Mens</a>
-      <a title="Remove tag Womens" href="/collections/frontpage/mens">Womens</a>
-      <a title="Remove tag Sale" href="/collections/frontpage/mens">Sale</a>
-    anchor: link_to_remove_tag
-  - label: payment_type_img_url
-    description: 'Returns the URL of the payment type’s SVG image. Used in conjunction
-      with the <code>shop.enabled_payment_types</code> variable.
-
-      '
-    snippet: |
-      {% for type in shop.enabled_payment_types %}
-        <img src="{{ type | payment_type_img_url }}" />
-      {% endfor %}
-    return_value: |
-      <!-- If shop accepts American Express, Mastercard and Visa -->
-      <img src="//cdn.shopify.com/s/global/payment_types/creditcards_american_express.svg?3cdcd185ab8e442b12edc11c2cd13655f56b0bb1">
-      <img src="//cdn.shopify.com/s/global/payment_types/creditcards_master.svg?3cdcd185ab8e442b12edc11c2cd13655f56b0bb1">
-      <img src="//cdn.shopify.com/s/global/payment_types/creditcards_visa.svg?3cdcd185ab8e442b12edc11c2cd13655f56b0bb1">
-    anchor: payment_type_img_url
-  - label: shopify_asset_url
-    description: Returns the URL of a global assets that are found on Shopify’s servers.
-    snippet: "{{ 'option_selection.js' | shopify_asset_url | script_tag }}\n"
-    return_value: '<script src="//cdn.shopify.com/s/shopify/option_selection.js?20cf2ffc74856c1f49a46f6e0abc4acf6ae5bb34"
-      type="text/javascript"></script>
-
-      '
-    anchor: shopify_asset_url
-  - label: sort_by
-    description: 'Creates a URL to a collection page with the provided <code>sort_by</code>
-      parameter. This filter must be applied to a collection URL.
-
-      '
-    snippet: "{{ collection.url | sort_by: 'best-selling' }}\n"
-    return_value: "/collections/widgets?sort_by=best-selling\n"
-    anchor: sort_by
-  - label: url_for_type
-    description: 'Creates a URL that links to a collection page containing products
-      with a specific product type.
-
-      '
-    snippet: '{{ "T-shirt" | url_for_type }}
-
-      '
-    return_value: 'collections/types?q=T-shirt
-
-      '
-    anchor: url_for_type
-  - label: url_for_vendor
-    description: 'Creates a URL that links to a collection page containing products
-      with a specific product vendor.
-
-      '
-    snippet: '{{ "Shopify" | url_for_vendor }}
-
-      '
-    return_value: "/collections/vendors?q=Shopify\n"
-    anchor: url_for_vendor
-  - label: within
-    description: 'Creates a collection-aware product URL by prepending <code>/collections/collection-handle</code>
-      to a product URL, where <code>collection-handle</code> is the handle of the
-      collection that is currently being viewed.
-
-      '
-    snippet: '<a href="{{ product.url | within: collection }}">{{ product.title }}</a>
-
-      '
-    return_value: '<a href="/collections/frontpage/products/alien-poster">Alien Poster</a>
-
-      '
-    anchor: 
+Liquid::StandardFilters:
+- url_encode
+- where
+- uniq
+- escape
+- replace
+- remove
+- h
+- upcase
+- downcase
+- capitalize
+- date
+- last
+- split
+- size
+- append
+- reverse
+- join
+- concat
+- prepend
+- escape_once
+- url_decode
+- truncatewords
+- strip_html
+- strip
+- lstrip
+- rstrip
+- strip_newlines
+- plus
+- sort_natural
+- compact
+- replace_first
+- remove_first
+- newline_to_br
+- minus
+- divided_by
+- at_least
+- at_most
+- sort
+- default
+- modulo
+- slice
+- abs
+- map
+- floor
+- ceil
+- round
+- truncate
+- first
+- times
+FormFilter:
+- payment_button
+- payment_terms
+- installments_pricing
+- default_errors
+DateFilter:
+- date
+I18nFilter:
+- translate
+- t
+- date
+- sentence
+- time_tag
+UrlFilter:
+- image_url
+- stylesheet_tag
+- script_tag
+- img_tag
+- shopify_asset_url
+- payment_type_img_url
+- payment_type_svg_tag
+- placeholder_svg_tag
+- link_to
+- asset_url
+- img_url
+- asset_img_url
+- global_asset_url
+- file_url
+- file_img_url
+- product_img_url
+- collection_img_url
+- article_img_url
+JsonFilter:
+- json
+ColorFilter:
+- color_contrast
+- color_difference
+- brightness_difference
+- hex_to_rgba
+- color_to_rgb
+- color_to_hsl
+- color_to_hex
+- color_extract
+- color_brightness
+- color_modify
+- color_lighten
+- color_darken
+- color_saturate
+- color_desaturate
+- color_mix
+MoneyFilter:
+- money_without_currency
+- money_without_trailing_zeros
+- money
+- money_with_currency
+StringFilter:
+- handleize
+- url_param_escape
+- url_escape
+- camelcase
+- camelize
+- encode_url_component
+- format_code
+- md5
+- handle
+CollectionFilter:
+- within
+- link_to_vendor
+- url_for_vendor
+- link_to_type
+- url_for_type
+- sort_by
+TagFilter:
+- link_to_add_tag
+- link_to_remove_tag
+- link_to_tag
+- highlight_active_tag
+CryptoFilter:
+- hmac_sha1
+- sha256
+- hmac_sha256
+- md5
+- sha1
+CustomerAccountFilter:
+- customer_login_link
+- customer_logout_link
+- customer_register_link
+- recover_password_link
+- delete_customer_address_link
+- edit_customer_address_link
+- cancel_customer_order_link
+CurrencyFormFilter:
+- currency_selector
+PaginationFilter:
+- default_pagination
+WeightFilter:
+- weight
+- weight_with_unit
+- unit
+TextFilter:
+- pad_spaces
+- paragraphize
+- highlight
+- format_address
+- excerpt
+- pluralize
+FontFilter:
+- font_face
+- font_url
+- font_modify
+DistanceFilter:
+- distance_from
+MediaFilter:
+- external_video_url
+- external_video_tag
+- video_tag
+- model_viewer_tag
+- media_tag
+ThemeFilter:
+- theme_url
+- link_to_theme
+DebugFilter:
+- debug
