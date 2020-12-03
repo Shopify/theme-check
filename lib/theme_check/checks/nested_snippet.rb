@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module ThemeCheck
   # Reports deeply nested {% include ... %} or {% render ... %}
-  class NestedSnippet < Check
+  class NestedSnippet < LiquidCheck
     severity :suggestion
 
     class TemplateInfo < Struct.new(:includes)

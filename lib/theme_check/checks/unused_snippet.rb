@@ -2,7 +2,7 @@
 require "set"
 
 module ThemeCheck
-  class UnusedSnippet < Check
+  class UnusedSnippet < LiquidCheck
     severity :suggestion
 
     def initialize

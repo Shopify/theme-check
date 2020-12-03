@@ -3,8 +3,6 @@ require_relative "parsing_helpers"
 
 module ThemeCheck
   class Check
-    include ParsingHelpers
-
     attr_accessor :theme
     attr_accessor :offenses
 
@@ -17,10 +15,6 @@ module ThemeCheck
     class << self
       def all
         @all ||= []
-      end
-
-      def inherited(klass)
-        all << klass
       end
 
       def severity(severity = nil)
@@ -57,10 +51,6 @@ module ThemeCheck
 
     def ignored?
       defined?(@ignored) && @ignored
-    end
-
-    def add_offense(message, node: nil, template: node&.template, markup: nil, line_number: nil)
-      offenses << Offense.new(check: self, message: message, template: template, node: node, markup: markup, line_number: line_number)
     end
   end
 end

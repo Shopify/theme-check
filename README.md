@@ -55,7 +55,7 @@ Under `lib/theme_check/checks`, create new Ruby file with a unique name describi
 ```ruby
 module ThemeCheck
   # Does one thing, and does it well!
-  class MyCheckName < Check
+  class MyCheckName < LiquidCheck
     severity :suggestion # :error or :style
     doc "https://..."    # Optional link to doc
 

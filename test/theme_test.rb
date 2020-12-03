@@ -7,11 +7,20 @@ class ThemeTest < Minitest::Test
       "templates/index.liquid" => "",
       "snippets/product.liquid" => "",
       "sections/article-template/template.liquid" => "",
+      "locales/en.default.json" => "",
     )
   end
 
   def test_all
-    assert_equal(3, @theme.all.size)
+    assert_equal(4, @theme.all.size)
+  end
+
+  def test_liquid
+    assert_equal(3, @theme.liquid.size)
+  end
+
+  def test_json
+    assert_equal(1, @theme.json.size)
   end
 
   def test_by_name

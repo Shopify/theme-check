@@ -9,7 +9,7 @@ module ThemeCheck
   #
   # {{ x | upcase }}
   #
-  class UnknownFilter < Check
+  class UnknownFilter < LiquidCheck
     severity :error
 
     def on_variable(node)

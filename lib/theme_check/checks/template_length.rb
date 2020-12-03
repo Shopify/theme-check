@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 module ThemeCheck
-  class TemplateLength < Check
+  class TemplateLength < LiquidCheck
     severity :suggestion
 
     def initialize(max_length: 200)

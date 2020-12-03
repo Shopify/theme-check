@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module ThemeCheck
   # Ensure {% ... %} & {{ ... }} have consistent spaces.
-  class SpaceInsideBraces < Check
+  class SpaceInsideBraces < LiquidCheck
     severity :style
 
     def initialize
