@@ -3,18 +3,22 @@
 require 'json'
 
 module LiquidLanguageServer
-  class Server
-    def initialize(router:, 
-      in_stream: STDIN, 
-      out_stream: STDOUT,
-      err_stream: STDERR)
+  class DoneStreaming < StandardError; end
+  class LSPProtocolError < StandardError; end
 
+  class Server
+    def initialize(
+      router:,
+      in_stream: STDIN,
+      out_stream: STDOUT,
+      err_stream: STDERR
+    )
       @router = router
       @in = in_stream
       @out = out_stream
       @err = err_stream
     end
-    
+
     def listen
       loop do
         response = process_request
@@ -23,7 +27,7 @@ module LiquidLanguageServer
         when "notification"
           ## type NotificationMessage
           respond_with(prepare_notification(
-            response[:message],
+            response[:method],
             response[:params]
           ))
         when "response"
@@ -35,47 +39,21 @@ module LiquidLanguageServer
           log(response[:message])
         when "exit"
           cleanup
-          exit(true)
+          return 0
         end
 
       # support ctrl+c and stuff
-      rescue SignalException
-        exit(true)
+      rescue SignalException, DoneStreaming
+        error("Done streamin'!")
+        return 0
 
       rescue Exception => e
         error(e, e.backtrace)
+        return 1
       end
     end
 
     private
-
-    # https://microsoft.github.io/language-server-protocol/specifications/specification-current/#responseMessage
-    def prepare_response(id, result)
-      {
-        jsonrpc: '2.0',
-        id: id,
-        result: result,
-      }
-    end
-
-    # https://microsoft.github.io/language-server-protocol/specifications/specification-current/#notificationMessage
-    def prepare_notification(message, params)
-      {
-        jsonrpc: '2.0',
-        method: message,
-        params: params,
-      }
-    end
-
-    def respond_with(response)
-      response_body = JSON.unparse(response)
-      log_json(response_body)
-
-      @out.write("Content-Length: #{response_body.length + 0}\r\n")
-      @out.write("\r\n")
-      @out.write(response_body)
-      @out.flush
-    end
 
     def process_request
       request_body = get_request
@@ -91,18 +69,26 @@ module LiquidLanguageServer
       if @router.respond_to?(method_name)
         @router.send(method_name, id, params)
       else
-        err.puts("ROUTER DOES NOT RESPOND TO #{method_name}")
+        @err.puts("ROUTER DOES NOT RESPOND TO #{method_name}")
         nil
       end
     end
 
+    def initial_line
+      # Scanning for lines that fit the protocol.
+      while true
+        initial_line = @in.gets
+        # gets returning nil means the stream was closed.
+        raise DoneStreaming if initial_line.nil?
+
+        if initial_line.match(/Content-Length: (\d+)/)
+          break
+        end
+      end
+      initial_line
+    end
+
     def get_request
-      initial_line = @in.gets
-
-      # gets returning nil means the stream was closed.
-      # It means we're done.
-      return '{ "method": "exit" }' if initial_line.nil?
-
       length = initial_line.match(/Content-Length: (\d+)/)[1].to_i
       content = ''
       while content.length < length + 2
@@ -113,11 +99,39 @@ module LiquidLanguageServer
           error(e, e.backtrace)
           # We have almost certainly been disconnected from the server
           cleanup
-          exit!(1)
+          raise DoneStreaming
         end
       end
 
       content
+    end
+
+    def respond_with(response)
+      response_body = JSON.dump(response)
+      log_json(response_body)
+
+      @out.write("Content-Length: #{response_body.length + 0}\r\n")
+      @out.write("\r\n")
+      @out.write(response_body)
+      @out.flush
+    end
+
+    # https://microsoft.github.io/language-server-protocol/specifications/specification-current/#responseMessage
+    def prepare_response(id, result)
+      {
+        jsonrpc: '2.0',
+        id: id,
+        result: result,
+      }
+    end
+
+    # https://microsoft.github.io/language-server-protocol/specifications/specification-current/#notificationMessage
+    def prepare_notification(method, params)
+      {
+        jsonrpc: '2.0',
+        method: method,
+        params: params,
+      }
     end
 
     def cleanup

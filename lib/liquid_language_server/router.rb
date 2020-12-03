@@ -14,27 +14,6 @@ module LiquidLanguageServer
         result: {
           capabilities: {
             textDocumentSync: 1
-            # hoverProvider: false,
-            # signatureHelpProvider: {
-            #   triggerCharacters: ['(', ',']
-            # },
-            # definitionProvider: true,
-            # referencesProvider: true,
-            # documentSymbolProvider: true,
-            # workspaceSymbolProvider: true,
-            # xworkspaceReferencesProvider: true,
-            # xdefinitionProvider: true,
-            # xdependenciesProvider: true,
-            # completionProvider: {
-            #   resolveProvider: true,
-            #   triggerCharacters: ['.', '::']
-            # },
-            # codeActionProvider: true,
-            # renameProvider: true,
-            # executeCommandProvider: {
-            #   commands: []
-            # },
-            # xpackagesProvider: true
           }
         }
       }
@@ -43,7 +22,7 @@ module LiquidLanguageServer
     def on_initialized(id, params)
       {
         type: "log",
-        message: "initialized!"
+        method: "initialized!"
       }
     end
 
@@ -71,7 +50,7 @@ module LiquidLanguageServer
       # hash = @project_manager.update_document_content(uri, text)
       {
         type: "notification",
-        message: 'textDocument/publishDiagnostics',
+        method: 'textDocument/publishDiagnostics',
         params: {
           uri: uri,
           diagnostics: offences.map { |offence| offence_to_diagnostic(offence) },
