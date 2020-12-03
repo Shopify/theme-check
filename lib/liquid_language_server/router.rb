@@ -7,53 +7,53 @@ module LiquidLanguageServer
       # do we need anything?
     end
 
-    def on_initialize(id, params)
+    def on_initialize(id, _params)
       {
         type: "response",
         id: id,
         result: {
           capabilities: {
-            textDocumentSync: 1
-          }
-        }
+            textDocumentSync: 1,
+          },
+        },
       }
     end
 
-    def on_initialized(id, params)
+    def on_initialized(_id, _params)
       {
         type: "log",
-        method: "initialized!"
+        method: "initialized!",
       }
     end
 
-    def on_exit()
+    def on_exit
       {
-        type: "exit"
+        type: "exit",
       }
     end
 
-    def on_textDocument_didOpen(id, params)
-      textDocument = params['textDocument']
-      uri = textDocument['uri']
-      text = textDocument['text']
-      offences = analyze(uri.sub('file://', ''))
-      prepare_diagnostics(uri, text, offences)
+    def on_textDocument_didOpen(_id, params)
+      text_document = params['textDocument']
+      uri = text_document['uri']
+      text = text_document['text']
+      offenses = analyze(uri.sub('file://', ''))
+      prepare_diagnostics(uri, text, offenses)
     end
 
-    def on_textDocument_didSave(id, params)
+    def on_textDocument_didSave(_id, _params)
       {}
     end
 
     private
 
-    def prepare_diagnostics(uri, text, offences)
+    def prepare_diagnostics(uri, _text, offenses)
       # hash = @project_manager.update_document_content(uri, text)
       {
         type: "notification",
         method: 'textDocument/publishDiagnostics',
         params: {
           uri: uri,
-          diagnostics: offences.map { |offence| offence_to_diagnostic(offence) },
+          diagnostics: offenses.map { |offense| offense_to_diagnostic(offense) },
         },
       }
     end
@@ -70,21 +70,22 @@ module LiquidLanguageServer
 
       analyzer = ThemeCheck::Analyzer.new(theme)
       analyzer.analyze_theme
-      analyzer.offenses.reject! { |offense| offense.template.path.to_s != file_path }
+      analyzer.offenses
+      # offenses.reject! { |offense| offense.template.path.to_s != file_path }
     end
 
-    def offence_to_diagnostic(offence)
+    def offense_to_diagnostic(offense)
       {
-        range: range(offence),
-        severity: severity(offence),
-        code: offence.code,
+        range: range(offense),
+        severity: severity(offense),
+        code: offense.code,
         source: "theme-check",
-        message: offence.message,
+        message: offense.message,
       }
     end
 
-    def severity(offence)
-      case offence.severity
+    def severity(offense)
+      case offense.severity
       when :error
         1
       when :suggestion
@@ -96,15 +97,15 @@ module LiquidLanguageServer
       end
     end
 
-    def range(offence)
+    def range(offense)
       {
         start: {
-          line: offence.line_number - 1,
-          character: offence.start_column,
+          line: offense.line_number - 1,
+          character: offense.start_column,
         },
         end: {
-          line: offence.line_number - 1,
-          character: offence.end_column - 1,
+          line: offense.line_number - 1,
+          character: offense.end_column - 1,
         },
       }
     end

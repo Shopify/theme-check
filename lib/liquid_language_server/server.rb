@@ -40,8 +40,6 @@ module LiquidLanguageServer
         when "exit"
           cleanup
           return 0
-        else
-          # do nothing
         end
 
       # support ctrl+c and stuff
@@ -49,7 +47,7 @@ module LiquidLanguageServer
         log("Done streamin'!")
         return 0
 
-      rescue Exception => e
+      rescue => e
         error(e, e.backtrace)
         return 1
       end
@@ -58,7 +56,7 @@ module LiquidLanguageServer
     private
 
     def process_request
-      request_body = get_request
+      request_body = read_new_content
       request_json = JSON.parse(request_body)
       # DEBUG
       # log_json(request_body)
@@ -91,14 +89,14 @@ module LiquidLanguageServer
       initial_line
     end
 
-    def get_request
+    def read_new_content
       length = initial_line.match(/Content-Length: (\d+)/)[1].to_i
       content = ''
       while content.length < length + 2
         begin
           # Why + 2? Because \r\n
           content += @in.read(length + 2)
-        rescue Exception => e
+        rescue => e
           error(e, e.backtrace)
           # We have almost certainly been disconnected from the server
           cleanup
@@ -138,12 +136,10 @@ module LiquidLanguageServer
     end
 
     def cleanup
-      begin
-        @err.close
-        @out.close
-      rescue
-        # I did my best
-      end
+      @err.close
+      @out.close
+    rescue
+      # I did my best
     end
 
     def log_json(json)

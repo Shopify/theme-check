@@ -62,7 +62,7 @@ describe LiquidLanguageServer::Server do
         type: 'log',
         id: nil,
         result: nil,
-        message: 'initialized!'
+        message: 'initialized!',
       },
       [nil, Hash],
     )
@@ -82,7 +82,7 @@ describe LiquidLanguageServer::Server do
         type: 'log',
         id: nil,
         result: nil,
-        message: 'initialized!'
+        message: 'initialized!',
       },
       [nil, Hash],
     )
@@ -118,7 +118,7 @@ describe LiquidLanguageServer::Server do
     as_lsp_protocol_message({
       method: args[:method] || "textDocument/didOpen",
       jsonrpc: "2.0",
-      params: args[:params] || default_params
+      params: args[:params] || default_params,
     })
   end
 
