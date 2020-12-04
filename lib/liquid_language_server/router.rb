@@ -30,7 +30,7 @@ module LiquidLanguageServer
         id: id,
         result: {
           capabilities: {
-            textDocumentSync: 0,
+            textDocumentSync: 1,
           },
         },
       }
@@ -43,7 +43,14 @@ module LiquidLanguageServer
       }
     end
 
-    def on_exit
+    def on_shutdown(_id, _params)
+      {
+        type: 'log',
+        message: 'shutting down',
+      }
+    end
+
+    def on_exit(_id, _params)
       {
         type: "exit",
       }

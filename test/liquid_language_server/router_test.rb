@@ -14,7 +14,7 @@ describe LiquidLanguageServer::Router do
       id: 1,
       result: {
         capabilities: {
-          textDocumentSync: 0,
+          textDocumentSync: 1,
         },
       },
     }
@@ -33,7 +33,7 @@ describe LiquidLanguageServer::Router do
   end
 
   it 'implements on_exit' do
-    call = @router.on_exit
+    call = @router.on_exit(1, {})
     expected = {
       type: "exit",
     }
