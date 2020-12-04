@@ -31,3 +31,6 @@ UnusedAssign:
 
 UnusedSnippet:
   enabled: true
+
+MatchingTranslations:
+  enabled: true

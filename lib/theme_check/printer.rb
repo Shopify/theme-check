@@ -12,7 +12,13 @@ module ThemeCheck
     end
 
     def print_offense(offense)
-      puts blue(offense.location) + ": " +
+      location = if offense.location
+        blue(offense.location) + ": "
+      else
+        ""
+      end
+
+      puts location +
         colorized_severity(offense.severity) + ": " +
         yellow(offense.check_name) + ": " +
         offense.message + "."
