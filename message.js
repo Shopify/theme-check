@@ -15,7 +15,7 @@ const str = JSON.stringify({
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 async function run() {
-  const lsp = child_process.spawn('bundle', ['exec', 'liquid-server']);
+  const lsp = child_process.spawn('bin/liquid-server');
   let start, end;
   lsp.stdout.on('data', data => {
     const end = Date.now();

@@ -100,12 +100,12 @@ module LiquidLanguageServer
     def range(offense)
       {
         start: {
-          line: offense.line_number - 1,
+          line: offense.start_line,
           character: offense.start_column,
         },
         end: {
-          line: offense.line_number - 1,
-          character: offense.end_column - 1,
+          line: offense.end_line,
+          character: offense.end_column,
         },
       }
     end
