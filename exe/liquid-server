@@ -6,6 +6,8 @@ require 'liquid_language_server'
 if ENV["LIQUID_LSP_DEBUG"] == "true"
   $DEBUG = true
 end
+# Force encoding to UTF-8 to fix VSCode
+Encoding.default_external = Encoding::UTF_8
 application = LiquidLanguageServer::Application.new
 status_code = application.start
 exit! status_code
