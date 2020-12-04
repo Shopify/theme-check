@@ -11,6 +11,7 @@ gem 'rake'
 
 group :test do
   gem 'minitest'
+  gem 'minitest-focus'
   gem 'mocha'
   gem 'pry-byebug'
 end
