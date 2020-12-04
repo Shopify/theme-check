@@ -78,13 +78,17 @@ class ConfigTest < Minitest::Test
   end
 
   def test_enabled_checks_returns_default_checks_for_empty_config
-    YAML.expects(:load_file).with('config/default.yml').returns("SyntaxError" => { "enabled" => true })
+    YAML.expects(:load_file)
+      .with { |path| path.end_with?('config/default.yml') }
+      .returns("SyntaxError" => { "enabled" => true })
     config = ThemeCheck::Config.new(".")
     assert(check_enabled?(config, ThemeCheck::SyntaxError))
   end
 
   def test_config_overrides_default_config
-    YAML.expects(:load_file).with('config/default.yml').returns("SyntaxError" => { "enabled" => true })
+    YAML.expects(:load_file)
+      .with { |path| path.end_with?('config/default.yml') }
+      .returns("SyntaxError" => { "enabled" => true })
     config = ThemeCheck::Config.new(".", "SyntaxError" => { "enabled" => false })
     refute(check_enabled?(config, ThemeCheck::SyntaxError))
   end
