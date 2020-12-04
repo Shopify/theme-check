@@ -85,8 +85,7 @@ module LiquidLanguageServer
       id = request_json['id']
       method_name = request_json['method']
       params = request_json['params']
-
-      method_name = "on_#{snake_case(method_name)}"
+      method_name = "on_#{to_snake_case(method_name)}"
 
       if @router.respond_to?(method_name)
         @router.send(method_name, id, params)
@@ -180,10 +179,8 @@ module LiquidLanguageServer
       }))
     end
 
-    def snake_case(method_name)
-      method_name
-        .gsub(/[^\w]/, '_')
-        .gsub(/(\w)([A-Z])/) { "#{Regexp.last_match(1)}_#{Regexp.last_match(2).downcase}" }
+    def to_snake_case(method_name)
+      method_name.gsub(/[^\w]/, '_').underscore
     end
   end
 end
