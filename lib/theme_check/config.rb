@@ -24,7 +24,7 @@ module ThemeCheck
       def find(root, needle = DOTFILE)
         Pathname.new(root).descend.reverse_each do |path|
           filename = path.join(needle)
-          return filename if filename.file? || filename.directory?
+          return filename if filename.exist?
         end
         nil
       end
