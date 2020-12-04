@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module ThemeCheck
   # Checks unused {% assign x = ... %}
-  class UnusedAssign < Check
+  class UnusedAssign < LiquidCheck
     severity :suggestion
 
     class TemplateInfo < Struct.new(:used_assigns, :assign_nodes, :includes)

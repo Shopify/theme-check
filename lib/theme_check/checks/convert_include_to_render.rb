@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module ThemeCheck
   # Recommends replacing `include` for `render`
-  class ConvertIncludeToRender < Check
+  class ConvertIncludeToRender < LiquidCheck
     severity :suggestion
     doc "https://shopify.dev/docs/themes/liquid/reference/tags/deprecated-tags#include"
 

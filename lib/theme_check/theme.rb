@@ -9,8 +9,22 @@ module ThemeCheck
       @root = Pathname.new(root)
     end
 
+    def liquid
+      @liquid ||= @root.glob("**/*.liquid").map { |path| Template.new(path, @root) }
+    end
+
+    def json
+      @json ||= @root.glob("**/*.json").map { |path| JsonFile.new(path, @root) }
+    end
+
+    def default_locale_json
+      @default_locale_json ||= json.find do |json_file|
+        json_file.relative_path.to_s.match(%r{locales/.*\.default})
+      end
+    end
+
     def all
-      @all ||= @root.glob("**/*.liquid").map { |path| Template.new(path, @root) }
+      @all ||= json + liquid
     end
 
     def [](name)
@@ -18,15 +32,15 @@ module ThemeCheck
     end
 
     def templates
-      all.select(&:template?)
+      liquid.select(&:template?)
     end
 
     def sections
-      all.select(&:section?)
+      liquid.select(&:section?)
     end
 
     def snippets
-      all.select(&:snippet?)
+      liquid.select(&:snippet?)
     end
   end
 end

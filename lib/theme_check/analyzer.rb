@@ -7,19 +7,29 @@ module ThemeCheck
       @theme = theme
       @offenses = []
 
-      @checks = Checks.new
+      @liquid_checks = Checks.new
+      @json_checks = Checks.new
+
       checks.each do |check|
         check.theme = @theme
         check.offenses = @offenses
-        @checks << check
+
+        case check
+        when LiquidCheck
+          @liquid_checks << check
+        when JsonCheck
+          @json_checks << check
+        end
       end
 
-      @visitor = Visitor.new(@checks)
+      @visitor = Visitor.new(@liquid_checks)
     end
 
     def analyze_theme
-      @theme.all.each { |template| analyze_template(template) }
-      @checks.call(:on_end)
+      @theme.liquid.each { |template| analyze_template(template) }
+      @theme.json.each { |json_file| @json_checks.call(:on_file, json_file) }
+      @liquid_checks.call(:on_end)
+      @json_checks.call(:on_end)
     end
 
     def analyze_template(template)

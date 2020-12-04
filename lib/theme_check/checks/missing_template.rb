@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module ThemeCheck
   # Reports missing include/render/section template
-  class MissingTemplate < Check
+  class MissingTemplate < LiquidCheck
     severity :suggestion
 
     def on_include(node)

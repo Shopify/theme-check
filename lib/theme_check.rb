@@ -5,6 +5,9 @@ require_relative "liquid_api"
 
 require_relative "theme_check/analyzer"
 require_relative "theme_check/check"
+require_relative "theme_check/checks_tracking"
+require_relative "theme_check/liquid_check"
+require_relative "theme_check/json_check"
 require_relative "theme_check/checks"
 require_relative "theme_check/config"
 require_relative "theme_check/node"
@@ -14,5 +17,6 @@ require_relative "theme_check/tags"
 require_relative "theme_check/template"
 require_relative "theme_check/theme"
 require_relative "theme_check/visitor"
+require_relative "theme_check/json_file"
 
 Dir[__dir__ + "/theme_check/checks/*.rb"].each { |file| require file }

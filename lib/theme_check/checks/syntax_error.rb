@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module ThemeCheck
   # Report Liquid syntax errors
-  class SyntaxError < Check
+  class SyntaxError < LiquidCheck
     severity :error
 
     def on_document(node)
