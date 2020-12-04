@@ -34,3 +34,6 @@ UnusedSnippet:
 
 MatchingTranslations:
   enabled: true
+
+DefaultLocale:
+  enabled: true
