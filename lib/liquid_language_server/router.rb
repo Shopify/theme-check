@@ -70,8 +70,7 @@ module LiquidLanguageServer
 
       analyzer = ThemeCheck::Analyzer.new(theme)
       analyzer.analyze_theme
-      analyzer.offenses
-      # offenses.reject! { |offense| offense.template.path.to_s != file_path }
+      analyzer.offenses.reject! { |offense| offense.template.path.to_s != file_path }
     end
 
     def offense_to_diagnostic(offense)
