@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+dev="/opt/dev/bin/dev"
+cd "$($dev project-path theme-check)"
+"$dev" liquid-server

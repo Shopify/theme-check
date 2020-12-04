@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'liquid_language_server'
+
+if ENV["LIQUID_LSP_DEBUG"] == "true"
+  $DEBUG = true
+end
+application = LiquidLanguageServer::Application.new
+status_code = application.start
+exit! status_code

@@ -41,6 +41,13 @@ module ThemeCheck
       self.class.doc
     end
 
+    def code_name
+      self.class.name
+        .sub(/ThemeCheck::/, '')
+        .gsub(/(\w)([A-Z])/) { "#{Regexp.last_match(1)}-#{Regexp.last_match(2)}" }
+        .downcase
+    end
+
     def ignore!
       @ignored = true
     end

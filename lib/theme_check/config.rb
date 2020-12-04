@@ -3,6 +3,7 @@
 module ThemeCheck
   class Config
     DOTFILE = '.theme-check.yml'
+    GIT_ROOT = '.git'
     DEFAULT_CONFIG = 'config/default.yml'
 
     attr_reader :root
@@ -11,16 +12,19 @@ module ThemeCheck
       def from_path(path)
         if (filename = find(path))
           new(filename.dirname, load_file(filename))
+        elsif (filename = find(path, GIT_ROOT))
+          # Educated guess that the nearest root has a .git folder
+          new(filename.dirname)
         else
           # Configuration file is optional
           new(path)
         end
       end
 
-      def find(root)
+      def find(root, needle = DOTFILE)
         Pathname.new(root).descend.reverse_each do |path|
-          filename = path.join(DOTFILE)
-          return filename if filename.file?
+          filename = path.join(needle)
+          return filename if filename.exist?
         end
         nil
       end
