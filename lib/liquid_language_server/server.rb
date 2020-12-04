@@ -11,7 +11,7 @@ module LiquidLanguageServer
       router:,
       in_stream: STDIN,
       out_stream: STDOUT,
-      err_stream: STDERR
+      err_stream: $DEBUG ? File.open('/tmp/lsp.log', 'a') : STDERR
     )
       validate!([in_stream, out_stream, err_stream])
 
@@ -80,8 +80,7 @@ module LiquidLanguageServer
     def process_request
       request_body = read_new_content
       request_json = JSON.parse(request_body)
-      # DEBUG
-      # log_json(request_body)
+      log_json(request_body) if $DEBUG
 
       id = request_json['id']
       method_name = request_json['method']
@@ -131,7 +130,7 @@ module LiquidLanguageServer
 
     def respond_with(response)
       response_body = JSON.dump(response)
-      log_json(response_body)
+      log_json(response_body) if $DEBUG
 
       @out.write("Content-Length: #{response_body.length + 0}\r\n")
       @out.write("\r\n")
