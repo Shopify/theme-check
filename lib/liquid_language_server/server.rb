@@ -1,10 +1,10 @@
 # frozen_string_literal: true
-
 require 'json'
+require 'stringio'
 
 module LiquidLanguageServer
   class DoneStreaming < StandardError; end
-  class LSPProtocolError < StandardError; end
+  class IncompatibleStream < StandardError; end
 
   class Server
     def initialize(
@@ -13,10 +13,13 @@ module LiquidLanguageServer
       out_stream: STDOUT,
       err_stream: STDERR
     )
+      validate!([in_stream, out_stream, err_stream])
+      
       @router = router
       @in = in_stream
       @out = out_stream
       @err = err_stream
+
       @out.sync = true # do not buffer
       @err.sync = true # do not buffer
     end
@@ -56,6 +59,23 @@ module LiquidLanguageServer
     end
 
     private
+
+    def supported_io_classes
+      [IO, StringIO]
+    end
+
+    def validate!(streams = [])
+      streams.each do |stream|
+        unless supported_io_classes.find{ |klass| stream.is_a?(klass) }
+          raise IncompatibleStream.new(incompatible_stream_message)
+        end
+      end
+    end
+
+    def incompatible_stream_message
+      'if provided, in_stream, out_stream, and err_stream must be a kind of ' +
+      "one of the following: #{supported_io_classes.join(', ')}"
+    end
 
     def process_request
       request_body = read_new_content
