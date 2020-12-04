@@ -111,7 +111,7 @@ module LiquidLanguageServer
       {
         range: range(offense),
         severity: severity(offense),
-        code: offense.code,
+        code: offense.code_name,
         source: "theme-check",
         message: offense.message,
       }

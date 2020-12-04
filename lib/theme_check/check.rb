@@ -41,7 +41,7 @@ module ThemeCheck
       self.class.doc
     end
 
-    def code
+    def code_name
       self.class.name
         .sub(/ThemeCheck::/, '')
         .gsub(/(\w)([A-Z])/) { "#{Regexp.last_match(1)}-#{Regexp.last_match(2)}" }

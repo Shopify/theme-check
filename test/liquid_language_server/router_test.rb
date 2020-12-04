@@ -53,7 +53,7 @@ describe LiquidLanguageServer::Router do
     TemplateMock = Struct.new(:path)
     template_mock = TemplateMock.new(path)
     OffenseMock = Struct.new(
-      :code,
+      :code_name,
       :severity,
       :message,
       :template,

@@ -68,8 +68,8 @@ module ThemeCheck
       template.full_line(line_number).index(markup) + markup.size
     end
 
-    def code
-      check.code
+    def code_name
+      check.code_name
     end
 
     def markup_start_in_excerpt
