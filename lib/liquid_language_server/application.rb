@@ -5,8 +5,7 @@ module LiquidLanguageServer
     def start
       router = LiquidLanguageServer::Router.new
       server = LiquidLanguageServer::Server.new(router: router)
-      status_code = server.listen
-      exit!(status_code)
+      server.listen
     end
   end
 end
