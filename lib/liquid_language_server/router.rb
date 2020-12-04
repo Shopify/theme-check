@@ -3,14 +3,22 @@ require "theme_check"
 
 module LiquidLanguageServer
   class OffenseFactory
+    def initialize
+      @config = nil
+    end
+
+    def config(file_path)
+      if @config.nil?
+        @config = ThemeCheck::Config.from_path(file_path)
+      end
+      @config
+    end
+
     def offenses(file_path)
-      theme = ThemeCheck::Theme.new(
-        # Assuming file is in project/folder/file, we want project.
-        File.dirname(File.dirname(file_path))
-      )
+      theme = ThemeCheck::Theme.new(config(file_path).root)
 
       if theme.all.empty?
-        abort("No templates found for #{file_path} \nusage: theme-check /path/to/your/project-64k")
+        return []
       end
 
       analyzer = ThemeCheck::Analyzer.new(theme)
