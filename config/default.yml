@@ -31,3 +31,9 @@ UnusedAssign:
 
 UnusedSnippet:
   enabled: true
+
+MatchingTranslations:
+  enabled: true
+
+DefaultLocale:
+  enabled: true
