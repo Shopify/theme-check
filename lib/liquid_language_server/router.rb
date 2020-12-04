@@ -23,7 +23,7 @@ module LiquidLanguageServer
 
       analyzer = ThemeCheck::Analyzer.new(theme)
       analyzer.analyze_theme
-      analyzer.offenses.reject! { |offense| offense.template.path.to_s != file_path }
+      analyzer.offenses.reject { |offense| offense.template.path.to_s != file_path }
     end
   end
 
@@ -93,7 +93,6 @@ module LiquidLanguageServer
     private
 
     def prepare_diagnostics(uri)
-      # hash = @project_manager.update_document_content(uri, text)
       {
         type: "notification",
         method: 'textDocument/publishDiagnostics',
