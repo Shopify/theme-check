@@ -8,6 +8,8 @@ Think RuboCop, or eslint, but for Liquid, and designed specifically to be used o
 
 ![](docs/preview.png)
 
+VSCode support is also in the works at https://github.com/shopify/theme-check-vscode.
+
 ## Usage
 
 ```
