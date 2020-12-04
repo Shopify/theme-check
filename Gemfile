@@ -16,6 +16,11 @@ group :test do
   gem 'pry-byebug'
 end
 
+group :development do
+  gem 'guard'
+  gem 'guard-minitest'
+end
+
 gem 'rubocop', '~> 0.93.1', require: false
 gem 'rubocop-performance', '~> 1.8.1', require: false
 gem 'rubocop-shopify', '~> 1.0.6', require: false
