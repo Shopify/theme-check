@@ -37,3 +37,6 @@ MatchingTranslations:
 
 DefaultLocale:
   enabled: true
+
+TranslationKeyExists:
+  enabled: true

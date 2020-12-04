@@ -18,7 +18,8 @@ module ThemeCheck
     end
 
     def default_locale_json
-      @default_locale_json ||= json.find do |json_file|
+      return @default_locale_json if defined?(@default_locale_json)
+      @default_locale_json = json.find do |json_file|
         json_file.relative_path.to_s.match(%r{locales/.*\.default})
       end
     end
