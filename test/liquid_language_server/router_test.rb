@@ -40,7 +40,7 @@ describe LiquidLanguageServer::Router do
     assert_equal(call, expected)
   end
 
-  it 'implements on_textDocument_didOpen that returns diagnistics' do
+  it 'implements on_text_document_did_open that returns diagnistics' do
     path = '/Users/alexandresobolevski/src/github.com/Shopify/project-64k/src/snippets/product-card.liquid'
     params = {
       'textDocument' => {
@@ -66,7 +66,7 @@ describe LiquidLanguageServer::Router do
     ThemeCheck::Analyzer.any_instance.expects(:analyze_theme).returns(nil)
     ThemeCheck::Analyzer.any_instance.expects(:offenses).returns([offense])
 
-    call = @router.on_textDocument_didOpen(1, params)
+    call = @router.on_text_document_did_open(1, params)
 
     expected = {
       type: "notification",

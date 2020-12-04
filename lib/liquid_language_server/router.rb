@@ -13,7 +13,7 @@ module LiquidLanguageServer
         id: id,
         result: {
           capabilities: {
-            textDocumentSync: 1,
+            textDocumentSync: 0,
           },
         },
       }
@@ -22,7 +22,7 @@ module LiquidLanguageServer
     def on_initialized(_id, _params)
       {
         type: "log",
-        method: "initialized!",
+        message: "initialized!",
       }
     end
 
@@ -32,21 +32,37 @@ module LiquidLanguageServer
       }
     end
 
-    def on_textDocument_didOpen(_id, params)
-      text_document = params['textDocument']
-      uri = text_document['uri']
-      text = text_document['text']
-      offenses = analyze(uri.sub('file://', ''))
-      prepare_diagnostics(uri, text, offenses)
+    def on_text_document_did_close(_id, params)
+      {
+        type: "log",
+        message: "Document closed. #{params['textDocument']['uri']}",
+      }
     end
 
-    def on_textDocument_didSave(_id, _params)
-      {}
+    def on_text_document_did_change(_id, params)
+      {
+        type: "log",
+        message: "Did change sent. #{params['textDocument']['uri']}",
+      }
+    end
+
+    def on_text_document_did_open(_id, params)
+      text_document = params['textDocument']
+      uri = text_document['uri']
+      offenses = analyze(uri.sub('file://', ''))
+      prepare_diagnostics(uri, offenses)
+    end
+
+    def on_text_document_did_save(_id, params)
+      text_document = params['textDocument']
+      uri = text_document['uri']
+      offenses = analyze(uri.sub('file://', ''))
+      prepare_diagnostics(uri, offenses)
     end
 
     private
 
-    def prepare_diagnostics(uri, _text, offenses)
+    def prepare_diagnostics(uri, offenses)
       # hash = @project_manager.update_document_content(uri, text)
       {
         type: "notification",

@@ -17,6 +17,8 @@ module LiquidLanguageServer
       @in = in_stream
       @out = out_stream
       @err = err_stream
+      @out.sync = true # do not buffer
+      @err.sync = true # do not buffer
     end
 
     def listen
@@ -65,12 +67,12 @@ module LiquidLanguageServer
       method_name = request_json['method']
       params = request_json['params']
 
-      method_name = "on_#{method_name.gsub(/[^\w]/, '_')}"
+      method_name = "on_#{snake_case(method_name)}"
 
       if @router.respond_to?(method_name)
         @router.send(method_name, id, params)
       else
-        @err.puts("ROUTER DOES NOT RESPOND TO #{method_name}")
+        log("ROUTER DOES NOT RESPOND TO #{method_name}")
         {}
       end
     end
@@ -146,9 +148,10 @@ module LiquidLanguageServer
       @err.puts(json)
     end
 
-    def log(message)
+    def log(message, level = 'debug')
       @err.puts(JSON.unparse({
         message: message,
+        level: level,
       }))
     end
 
@@ -157,6 +160,12 @@ module LiquidLanguageServer
         error: message,
         backtrace: backtrace,
       }))
+    end
+
+    def snake_case(method_name)
+      method_name
+        .gsub(/[^\w]/, '_')
+        .gsub(/(\w)([A-Z])/) { "#{Regexp.last_match(1)}_#{Regexp.last_match(2).downcase}" }
     end
   end
 end

@@ -19,7 +19,7 @@ describe LiquidLanguageServer::Server do
 
   it 'turns responses into valid responses' do
     @router.expect(
-      :on_textDocument_didOpen,
+      :on_text_document_did_open,
       {
         type: 'notification',
         method: 'hello_world',
@@ -38,7 +38,7 @@ describe LiquidLanguageServer::Server do
 
   it 'turns notifications into valid notifications' do
     @router.expect(
-      :on_textDocument_didOpen,
+      :on_text_document_did_open,
       {
         type: 'response',
         id: 1,
