@@ -14,7 +14,7 @@ module LiquidLanguageServer
       err_stream: STDERR
     )
       validate!([in_stream, out_stream, err_stream])
-      
+
       @router = router
       @in = in_stream
       @out = out_stream
@@ -66,14 +66,14 @@ module LiquidLanguageServer
 
     def validate!(streams = [])
       streams.each do |stream|
-        unless supported_io_classes.find{ |klass| stream.is_a?(klass) }
-          raise IncompatibleStream.new(incompatible_stream_message)
+        unless supported_io_classes.find { |klass| stream.is_a?(klass) }
+          raise IncompatibleStream, incompatible_stream_message
         end
       end
     end
 
     def incompatible_stream_message
-      'if provided, in_stream, out_stream, and err_stream must be a kind of ' +
+      'if provided, in_stream, out_stream, and err_stream must be a kind of '\
       "one of the following: #{supported_io_classes.join(', ')}"
     end
 

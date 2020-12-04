@@ -19,11 +19,11 @@ describe LiquidLanguageServer::Server do
 
   it 'raises an exception if one of the provided io steams is incompatible' do
     [
-      Proc.new { LiquidLanguageServer::Server.new(router: @router, in_stream: :not_io) },
-      Proc.new { LiquidLanguageServer::Server.new(router: @router, out_stream: :not_io) },
-      Proc.new { LiquidLanguageServer::Server.new(router: @router, err_stream: :not_io) },
+      proc { LiquidLanguageServer::Server.new(router: @router, in_stream: :not_io) },
+      proc { LiquidLanguageServer::Server.new(router: @router, out_stream: :not_io) },
+      proc { LiquidLanguageServer::Server.new(router: @router, err_stream: :not_io) },
     ].each do |invalid_instantiation|
-      assert_raises(LiquidLanguageServer::IncompatibleStream) do 
+      assert_raises(LiquidLanguageServer::IncompatibleStream) do
         invalid_instantiation.call
       end.message.match?(/in_stream, out_stream, and err_stream must be a kind of/)
     end
