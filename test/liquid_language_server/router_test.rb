@@ -3,7 +3,8 @@ require 'test_helper'
 
 describe LiquidLanguageServer::Router do
   before do
-    @router = LiquidLanguageServer::Router.new
+    @offense_factory = Minitest::Mock.new
+    @router = LiquidLanguageServer::Router.new(@offense_factory)
   end
 
   it 'implements on_initialize' do
@@ -13,7 +14,7 @@ describe LiquidLanguageServer::Router do
       id: 1,
       result: {
         capabilities: {
-          textDocumentSync: 1,
+          textDocumentSync: 0,
         },
       },
     }
@@ -25,7 +26,7 @@ describe LiquidLanguageServer::Router do
     call = @router.on_initialized(1, {})
     expected = {
       type: "log",
-      method: 'initialized!',
+      message: 'initialized!',
     }
 
     assert_equal(call, expected)
@@ -40,8 +41,8 @@ describe LiquidLanguageServer::Router do
     assert_equal(call, expected)
   end
 
-  it 'implements on_text_document_did_open that returns diagnistics' do
-    path = '/Users/alexandresobolevski/src/github.com/Shopify/project-64k/src/snippets/product-card.liquid'
+  it 'implements on_text_document_did_open that returns diagnostics' do
+    path = '/some/path'
     params = {
       'textDocument' => {
         'uri' => "file://#{path}",
@@ -51,20 +52,18 @@ describe LiquidLanguageServer::Router do
 
     TemplateMock = Struct.new(:path)
     template_mock = TemplateMock.new(path)
-
     OffenseMock = Struct.new(
       :code,
       :severity,
       :message,
       :template,
-      :line_number,
       :start_column,
-      :end_column
+      :end_column,
+      :start_line,
+      :end_line,
     )
-    offense = OffenseMock.new('LiquidTag', :style, 'Wrong', template_mock, 10, 5, 15)
-
-    ThemeCheck::Analyzer.any_instance.expects(:analyze_theme).returns(nil)
-    ThemeCheck::Analyzer.any_instance.expects(:offenses).returns([offense])
+    offense = OffenseMock.new('LiquidTag', :style, 'Wrong', template_mock, 5, 14, 9, 9)
+    @offense_factory.expect(:offenses, [offense], [path])
 
     call = @router.on_text_document_did_open(1, params)
 

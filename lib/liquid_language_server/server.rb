@@ -148,10 +148,9 @@ module LiquidLanguageServer
       @err.puts(json)
     end
 
-    def log(message, level = 'debug')
+    def log(message)
       @err.puts(JSON.unparse({
         message: message,
-        level: level,
       }))
     end
 

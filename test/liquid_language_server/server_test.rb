@@ -90,7 +90,7 @@ describe LiquidLanguageServer::Server do
     send_message(build_payload({ method: 'zipf law' }))
 
     assert_equal(
-      "ROUTER DOES NOT RESPOND TO on_zipf_law\n#{JSON.dump({ message: 'Done streamin\'!' })}\n",
+      "#{JSON.dump({ message: 'ROUTER DOES NOT RESPOND TO on_zipf_law' })}\n#{JSON.dump({ message: 'Done streamin\'!' })}\n",
       @err.string,
     )
   end

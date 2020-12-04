@@ -2,9 +2,26 @@
 require "theme_check"
 
 module LiquidLanguageServer
+  class OffenseFactory
+    def offenses(file_path)
+      theme = ThemeCheck::Theme.new(
+        # Assuming file is in project/folder/file, we want project.
+        File.dirname(File.dirname(file_path))
+      )
+
+      if theme.all.empty?
+        abort("No templates found for #{file_path} \nusage: theme-check /path/to/your/project-64k")
+      end
+
+      analyzer = ThemeCheck::Analyzer.new(theme)
+      analyzer.analyze_theme
+      analyzer.offenses.reject! { |offense| offense.template.path.to_s != file_path }
+    end
+  end
+
   class Router
-    def initialize
-      # do we need anything?
+    def initialize(offense_factory = OffenseFactory.new)
+      @offense_factory = offense_factory
     end
 
     def on_initialize(id, _params)
@@ -49,44 +66,31 @@ module LiquidLanguageServer
     def on_text_document_did_open(_id, params)
       text_document = params['textDocument']
       uri = text_document['uri']
-      offenses = analyze(uri.sub('file://', ''))
-      prepare_diagnostics(uri, offenses)
+      prepare_diagnostics(uri)
     end
 
     def on_text_document_did_save(_id, params)
       text_document = params['textDocument']
       uri = text_document['uri']
-      offenses = analyze(uri.sub('file://', ''))
-      prepare_diagnostics(uri, offenses)
+      prepare_diagnostics(uri)
     end
 
     private
 
-    def prepare_diagnostics(uri, offenses)
+    def prepare_diagnostics(uri)
       # hash = @project_manager.update_document_content(uri, text)
       {
         type: "notification",
         method: 'textDocument/publishDiagnostics',
         params: {
           uri: uri,
-          diagnostics: offenses.map { |offense| offense_to_diagnostic(offense) },
+          diagnostics: offenses(uri).map { |offense| offense_to_diagnostic(offense) },
         },
       }
     end
 
-    def analyze(file_path)
-      theme = ThemeCheck::Theme.new(
-        # Assuming file is in project/folder/file, we want project.
-        File.dirname(File.dirname(file_path))
-      )
-
-      if theme.all.empty?
-        abort("No templates found for #{file_path} \nusage: theme-check /path/to/your/project-64k")
-      end
-
-      analyzer = ThemeCheck::Analyzer.new(theme)
-      analyzer.analyze_theme
-      analyzer.offenses.reject! { |offense| offense.template.path.to_s != file_path }
+    def offenses(uri)
+      @offense_factory.offenses(uri.sub('file://', ''))
     end
 
     def offense_to_diagnostic(offense)
