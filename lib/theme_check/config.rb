@@ -3,13 +3,14 @@
 module ThemeCheck
   class Config
     DOTFILE = '.theme-check.yml'
+    DEFAULT_CONFIG = 'config/default.yml'
 
     attr_reader :root
 
     class << self
-      def load_file(path)
+      def from_path(path)
         if (filename = find(path))
-          new(filename.dirname, YAML.load_file(filename))
+          new(filename.dirname, load_file(filename))
         else
           # Configuration file is optional
           new(path)
@@ -22,6 +23,10 @@ module ThemeCheck
           return filename if filename.file?
         end
         nil
+      end
+
+      def load_file(absolute_path)
+        YAML.load_file(absolute_path)
       end
     end
 
@@ -41,14 +46,41 @@ module ThemeCheck
     def enabled_checks
       checks = []
 
-      Check.all.each do |check|
-        class_name = check.name.split('::').last
-        if !@checks.key?(class_name) || @checks[class_name]["enabled"] == true
-          checks << check.new
+      default_configuration.each do |check_name, properties|
+        if @checks&.key?(check_name)
+          valid_properties = valid_check_configuration(check_name)
+          properties = properties.merge(valid_properties)
         end
+
+        next if properties['enabled'] == false
+
+        properties.delete('enabled')
+        check = ThemeCheck.const_get(check_name).new(**properties.transform_keys(&:to_sym))
+        checks << check
       end
 
       checks
+    end
+
+    private
+
+    def default_configuration
+      @default_configuration ||= Config.load_file(DEFAULT_CONFIG)
+    end
+
+    def valid_check_configuration(check_name)
+      default_properties = default_configuration[check_name]
+      valid = {}
+
+      @configuration[check_name].each do |property, value|
+        if !default_properties.key?(property)
+          warn("#{check_name} does not support #{property} parameter.")
+        else
+          valid[property] = value
+        end
+      end
+
+      valid
     end
   end
 end

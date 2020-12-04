@@ -135,6 +135,13 @@ module ThemeCheck
 end
 ```
 
+Add the new check to `config/default.yml` to enable it.
+
+```yaml
+MyCheckName:
+  enabled: true
+```
+
 Add a corresponding test file under `test/checks`.
 
 When done, run the tests with `dev test`.
