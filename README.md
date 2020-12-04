@@ -2,17 +2,18 @@
 
 _This is a [HackDays project](https://hackdays.shopify.io/projects/13720)_
 
-Theme Check is a command line tool that helps you follow Shopify Themes & Liquid best practices by analyzing the Liquid code inside the templates of your theme.
+Theme Check is a command line tool that helps you follow Shopify Themes & Liquid best practices by analyzing the Liquid & JSON inside your theme.
 
-Think RuboCop, or eslint, but for Liquid, and designed specifically to be used on themes.
+Think RuboCop, or eslint, but for Shopify themes.
+
+Theme Check is also available [inside some code editors](https://github.com/Shopify/theme-check/wiki).
 
 ![](docs/preview.png)
-
-VSCode support is also in the works at https://github.com/shopify/theme-check-vscode.
 
 ## Usage
 
 ```
+dev clone theme-check
 dev up
 dev check /path/to/your/theme
 ```
@@ -32,20 +33,24 @@ TemplateLength:
   enabled: false
 ```
 
+See [config/default.yml](config/default.yml) for available options & defaults.
+
 ## Supported Checks
 
 Theme Check currently checks for the following:
 
 ✅ Liquid syntax errors  
+✅ Missing snippet & section templates  
 ✅ Unused `{% assign ... %}`  
 ✅ Unused snippet templates  
-✅ Rendering missing snippet or section templates  
-✅ Template length over 200 lines  
+✅ Template length  
 ✅ Deprecated tags  
-✅ Deprecated filters  
+✅ Unknown tags  
+✅ Unknown filters  
 ✅ Missing `{{ content_for_* }}` in `theme.liquid`  
-✅ Nesting too many snippets  
+✅ Excessive nesting of snippets  
 ✅ Missing or extra spaces inside `{% ... %}` and `{{ ... }}`  
+✅ Missing default locale file  
 ✅ Using several `{% ... %}` instead of `{% liquid ... %}`  
 
 And many more to come! Suggestions welcome ([create an issue](https://github.com/Shopify/theme-check/issues)).
