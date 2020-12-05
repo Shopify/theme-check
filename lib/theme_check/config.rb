@@ -4,7 +4,7 @@ module ThemeCheck
   class Config
     DOTFILE = '.theme-check.yml'
     GIT_ROOT = '.git'
-    DEFAULT_CONFIG = 'config/default.yml'
+    DEFAULT_CONFIG = "#{__dir__}/../../config/default.yml"
 
     attr_reader :root
 
