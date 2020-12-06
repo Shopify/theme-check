@@ -40,3 +40,6 @@ DefaultLocale:
 
 TranslationKeyExists:
   enabled: true
+
+ValidJson:
+  enabled: true
