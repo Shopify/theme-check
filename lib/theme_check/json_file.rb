@@ -4,6 +4,8 @@ require "pathname"
 
 module ThemeCheck
   class JsonFile
+    attr_reader :path
+
     def initialize(path, root)
       @path = Pathname(path)
       @root = Pathname(root)

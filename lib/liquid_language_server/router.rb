@@ -26,8 +26,7 @@ module LiquidLanguageServer
       end
 
       analyzer = ThemeCheck::Analyzer.new(theme, config.enabled_checks)
-      analyzer.analyze_theme
-      analyzer.offenses.reject { |offense| offense.template.path.to_s != file_path }
+      analyzer.analyze_file(file_path)
     end
   end
 

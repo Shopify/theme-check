@@ -26,14 +26,16 @@ module ThemeCheck
     end
 
     def analyze_theme
-      @theme.liquid.each { |template| analyze_template(template) }
+      @theme.liquid.each { |template| @visitor.visit_template(template) }
       @theme.json.each { |json_file| @json_checks.call(:on_file, json_file) }
       @liquid_checks.call(:on_end)
       @json_checks.call(:on_end)
     end
 
-    def analyze_template(template)
-      @visitor.visit_template(template)
+    def analyze_file(path)
+      path = Pathname.new(path)
+      analyze_theme
+      @offenses.reject! { |offense| offense.template.path != path }
     end
   end
 end
