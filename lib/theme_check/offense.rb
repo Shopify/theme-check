@@ -89,7 +89,8 @@ module ThemeCheck
     end
 
     def location
-      [template&.relative_path, line_number].compact.join(":")
+      tokens = [template&.relative_path, line_number].compact
+      tokens.join(":") if tokens.any?
     end
 
     def to_s
