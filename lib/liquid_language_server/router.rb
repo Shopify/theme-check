@@ -7,21 +7,25 @@ module LiquidLanguageServer
       @config = nil
     end
 
-    def config(file_path)
+    def load_config(file_path)
       if @config.nil?
-        @config = ThemeCheck::Config.from_path(file_path)
+        # Try to find the root folder
+        config_path = ThemeCheck::Config.find(file_path) || ThemeCheck::Config.find(file_path, ".git") || file_path
+        @config = ThemeCheck::Config.from_path(config_path)
       end
       @config
     end
 
     def offenses(file_path)
-      theme = ThemeCheck::Theme.new(config(file_path).root)
+      config = load_config(file_path)
+
+      theme = ThemeCheck::Theme.new(config.root)
 
       if theme.all.empty?
         return []
       end
 
-      analyzer = ThemeCheck::Analyzer.new(theme)
+      analyzer = ThemeCheck::Analyzer.new(theme, config.enabled_checks)
       analyzer.analyze_theme
       analyzer.offenses.reject { |offense| offense.template.path.to_s != file_path }
     end
