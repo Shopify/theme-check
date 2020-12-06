@@ -93,6 +93,25 @@ class ConfigTest < Minitest::Test
     refute(check_enabled?(config, ThemeCheck::SyntaxError))
   end
 
+  def test_custom_check
+    theme = make_theme(
+      ".theme-check.yml" => <<~END,
+        require:
+          - ./checks/custom_check.rb
+        CustomCheck:
+          enabled: true
+      END
+      "checks/custom_check.rb" => <<~END,
+        module ThemeCheck
+          class CustomCheck
+          end
+        end
+      END
+    )
+    config = ThemeCheck::Config.from_path(theme.root)
+    assert(check_enabled?(config, ThemeCheck::CustomCheck))
+  end
+
   private
 
   def check_enabled?(config, klass)

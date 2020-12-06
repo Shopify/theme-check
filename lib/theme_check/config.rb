@@ -37,6 +37,7 @@ module ThemeCheck
       if @checks.key?("root")
         @root = @root.join(@checks.delete("root"))
       end
+      resolve_requires
     end
 
     def to_h
@@ -46,15 +47,14 @@ module ThemeCheck
     def enabled_checks
       checks = []
 
-      default_configuration.each do |check_name, properties|
-        if @checks&.key?(check_name)
+      default_configuration.merge(@checks).each do |check_name, properties|
+        if @checks[check_name] && !default_configuration[check_name].nil?
           valid_properties = valid_check_configuration(check_name)
           properties = properties.merge(valid_properties)
         end
 
-        next if properties['enabled'] == false
+        next if properties.delete('enabled') == false
 
-        properties.delete('enabled')
         check = ThemeCheck.const_get(check_name).new(**properties.transform_keys(&:to_sym))
         checks << check
       end
@@ -68,11 +68,24 @@ module ThemeCheck
       @default_configuration ||= Config.load_file(DEFAULT_CONFIG)
     end
 
+    def resolve_requires
+      if @checks.key?("require")
+        @checks.delete("require").tap do |paths|
+          paths.each do |path|
+            if path.start_with?('.')
+              require(File.join(@root, path))
+            end
+          end
+        end
+      end
+    end
+
     def valid_check_configuration(check_name)
       default_properties = default_configuration[check_name]
+
       valid = {}
 
-      @configuration[check_name].each do |property, value|
+      @checks[check_name].each do |property, value|
         if !default_properties.key?(property)
           warn("#{check_name} does not support #{property} parameter.")
         else
