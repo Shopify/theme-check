@@ -1,6 +1,13 @@
 # frozen_string_literal: true
 require 'test_helper'
 
+describe LiquidLanguageServer::OffenseFactory do
+  it 'finds root using .git' do
+    f = LiquidLanguageServer::OffenseFactory.new
+    assert_equal(Pathname.new(".git").expand_path, f.load_config(__dir__).root.expand_path)
+  end
+end
+
 describe LiquidLanguageServer::Router do
   before do
     @offense_factory = Minitest::Mock.new

@@ -45,7 +45,7 @@ class ConfigTest < Minitest::Test
     refute(check_enabled?(config, ThemeCheck::MissingTemplate))
   end
 
-  def test_root_from_config_in_parent
+  def test_root_from_config
     theme = make_theme(
       ".theme-check.yml" => <<~END,
         root: dist
@@ -72,9 +72,9 @@ class ConfigTest < Minitest::Test
     assert(check_enabled?(config, ThemeCheck::TemplateLength))
   end
 
-  def test_blank_root
-    config = ThemeCheck::Config.new(".")
-    assert_equal(Pathname.new("."), config.root)
+  def test_respects_provided_root
+    config = ThemeCheck::Config.from_path(__dir__)
+    assert_equal(Pathname.new(__dir__), config.root)
   end
 
   def test_enabled_checks_returns_default_checks_for_empty_config
