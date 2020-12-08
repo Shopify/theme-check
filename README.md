@@ -10,6 +10,8 @@ Theme Check is also available [inside some code editors](https://github.com/Shop
 
 ![](docs/preview.png)
 
+_Disclaimer: This tool is not supported as part of the Partners program._
+
 ## Supported Checks
 
 Theme Check currently checks for the following:
