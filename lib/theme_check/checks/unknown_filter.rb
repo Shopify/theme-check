@@ -11,6 +11,7 @@ module ThemeCheck
   #
   class UnknownFilter < LiquidCheck
     severity :error
+    category :liquid
 
     def on_variable(node)
       used_filters = node.value.filters.map { |name, *_rest| name }

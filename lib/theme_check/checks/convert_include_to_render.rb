@@ -3,6 +3,7 @@ module ThemeCheck
   # Recommends replacing `include` for `render`
   class ConvertIncludeToRender < LiquidCheck
     severity :suggestion
+    category :liquid
     doc "https://shopify.dev/docs/themes/liquid/reference/tags/deprecated-tags#include"
 
     def on_include(node)

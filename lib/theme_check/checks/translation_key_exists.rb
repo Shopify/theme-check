@@ -2,6 +2,7 @@
 module ThemeCheck
   class TranslationKeyExists < LiquidCheck
     severity :error
+    category :translation
 
     def on_variable(node)
       return unless @theme.default_locale_json&.content&.is_a?(Hash)

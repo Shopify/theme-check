@@ -3,6 +3,7 @@ module ThemeCheck
   # Reports missing include/render/section template
   class MissingTemplate < LiquidCheck
     severity :suggestion
+    category :liquid
 
     def on_include(node)
       template = node.value.template_name_expr

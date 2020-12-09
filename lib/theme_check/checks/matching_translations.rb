@@ -3,6 +3,7 @@
 module ThemeCheck
   class MatchingTranslations < JsonCheck
     severity :suggestion
+    category :translation
 
     def initialize
       @files = []

@@ -5,11 +5,18 @@ module ThemeCheck
   class Check
     attr_accessor :theme
     attr_accessor :offenses
+    attr_accessor :options
 
     SEVERITIES = [
       :error,
       :suggestion,
       :style,
+    ]
+
+    CATEGORIES = [
+      :liquid,
+      :translation,
+      :json,
     ]
 
     class << self
@@ -24,12 +31,22 @@ module ThemeCheck
           end
           @severity = severity
         end
-        @severity
+        @severity if defined?(@severity)
+      end
+
+      def category(category = nil)
+        if category
+          unless CATEGORIES.include?(category)
+            raise ArgumentError, "unknown category. Use: #{CATEGORIES.join(', ')}"
+          end
+          @category = category
+        end
+        @category if defined?(@category)
       end
 
       def doc(doc = nil)
         @doc = doc if doc
-        @doc
+        @doc if defined?(@doc)
       end
     end
 
@@ -37,15 +54,16 @@ module ThemeCheck
       self.class.severity
     end
 
+    def category
+      self.class.category
+    end
+
     def doc
       self.class.doc
     end
 
     def code_name
-      self.class.name
-        .sub(/ThemeCheck::/, '')
-        .gsub(/(\w)([A-Z])/) { "#{Regexp.last_match(1)}-#{Regexp.last_match(2)}" }
-        .downcase
+      self.class.name.demodulize
     end
 
     def ignore!
@@ -58,6 +76,15 @@ module ThemeCheck
 
     def ignored?
       defined?(@ignored) && @ignored
+    end
+
+    def to_s
+      s = +"#{code_name}:\n"
+      properties = { severity: severity, category: category, doc: doc }.merge(options)
+      properties.each_pair do |name, value|
+        s << "  #{name}: #{value}\n" if value
+      end
+      s
     end
   end
 end

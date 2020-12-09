@@ -3,6 +3,7 @@ module ThemeCheck
   # Ensure {% ... %} & {{ ... }} have consistent spaces.
   class SpaceInsideBraces < LiquidCheck
     severity :style
+    category :liquid
 
     def initialize
       @ignore = false

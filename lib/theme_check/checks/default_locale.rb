@@ -2,6 +2,7 @@
 module ThemeCheck
   class DefaultLocale < JsonCheck
     severity :suggestion
+    category :translation
 
     def on_end
       return if @theme.default_locale_json
