@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'nokogiri'
+require 'nokogumbo'
 
 module ThemeCheck
   class ValidHTMLTranslation < JsonCheck
@@ -15,7 +15,7 @@ module ThemeCheck
 
     private
 
-    def key_is_html(keys)
+    def html_key?(keys)
       pluralized_key = keys[-2] if keys.length > 1
       keys[-1].end_with?('_html') || pluralized_key.end_with?('_html')
     end
@@ -23,19 +23,20 @@ module ThemeCheck
     def parse_and_add_offence(key, value)
       return unless value.is_a?(String)
 
-      html = Nokogiri::XML.parse(value)
+      html = Nokogiri::HTML5.fragment(value, max_errors: -1)
       unless html.errors.empty?
-        add_offense("'#{key}' contains invalid HTML: #{html.errors.join(', ')}")
+        err_msg = html.errors.join("\n")
+        add_offense("'#{key}' contains invalid HTML:\n#{err_msg}")
       end
     end
 
     def visit_nested(value, keys = [])
       if value.is_a?(Hash)
         value.each do |k, v|
-          visit_nested(v, keys << k)
+          visit_nested(v, keys + [k])
         end
-      elsif key_is_html(keys)
-        parse_and_add_offence(keys.join(': '), value)
+      elsif html_key?(keys)
+        parse_and_add_offence(keys.join('.'), value)
       end
     end
   end

@@ -20,7 +20,10 @@ class ValidHTMLTranslationTest < Minitest::Test
        ),
     )
     assert_offenses(<<~END, offenses)
-      'hello_html' contains invalid HTML: 1:17: FATAL: EndTag: '</' not found
+      'hello_html' contains invalid HTML:
+      1:17: ERROR: Premature end of file  Currently open tags: html, h1.
+      <h1>Hello, world
+                      ^
     END
   end
 
@@ -40,7 +43,10 @@ class ValidHTMLTranslationTest < Minitest::Test
        ),
     )
     assert_offenses(<<~END, offenses)
-      'hello: world: today: good: day_html' contains invalid HTML: 1:17: FATAL: EndTag: '</' not found
+      'hello.world.today.good.day_html' contains invalid HTML:
+      1:17: ERROR: Premature end of file  Currently open tags: html, h1.
+      <h1>Hello, world
+                      ^
     END
   end
 
@@ -52,7 +58,10 @@ class ValidHTMLTranslationTest < Minitest::Test
        ),
     )
     assert_offenses(<<~END, offenses)
-      'hello_html: one' contains invalid HTML: 1:17: FATAL: EndTag: '</' not found
+      'hello_html.one' contains invalid HTML:
+      1:17: ERROR: Premature end of file  Currently open tags: html, h1.
+      <h1>Hello, world
+                      ^
     END
   end
 end

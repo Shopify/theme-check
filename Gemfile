@@ -27,4 +27,4 @@ gem 'rubocop-shopify', '~> 1.0.6', require: false
 
 gem 'liquid', github: 'Shopify/liquid', branch: 'master'
 
-gem 'nokogiri'
+gem 'nokogumbo'
