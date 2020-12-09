@@ -6,7 +6,10 @@ class ValidHTMLTranslationTest < Minitest::Test
     offenses = analyze_theme(
       ThemeCheck::ValidHTMLTranslation.new,
        "locales/en.default.json" => JSON.dump(
-         hello_html: "<h1>Hello, world</h1>"
+         hello_html: "<h1>Hello, world</h1>",
+         image_html: "<img src='spongebob.png'>",
+         line_break_html: "<br>",
+         self_closing_svg_html: "<svg />"
        ),
     )
     assert_offenses("", offenses)
