@@ -6,6 +6,7 @@ module ThemeCheck
     DEFAULT_CONFIG = "#{__dir__}/../../config/default.yml"
 
     attr_reader :root
+    attr_accessor :only_categories, :exclude_categories
 
     class << self
       def from_path(path)
@@ -37,6 +38,8 @@ module ThemeCheck
       if @checks.key?("root")
         @root = @root.join(@checks.delete("root"))
       end
+      @only_categories = []
+      @exclude_categories = []
       resolve_requires
     end
 
@@ -55,7 +58,13 @@ module ThemeCheck
 
         next if properties.delete('enabled') == false
 
-        check = ThemeCheck.const_get(check_name).new(**properties.transform_keys(&:to_sym))
+        options = properties.transform_keys(&:to_sym)
+        check_class = ThemeCheck.const_get(check_name)
+        next if exclude_categories.include?(check_class.category)
+        next if only_categories.any? && !only_categories.include?(check_class.category)
+
+        check = check_class.new(**options)
+        check.options = options
         checks << check
       end
 

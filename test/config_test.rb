@@ -103,13 +103,27 @@ class ConfigTest < Minitest::Test
       END
       "checks/custom_check.rb" => <<~END,
         module ThemeCheck
-          class CustomCheck
+          class CustomCheck < Check
           end
         end
       END
     )
     config = ThemeCheck::Config.from_path(theme.root)
     assert(check_enabled?(config, ThemeCheck::CustomCheck))
+  end
+
+  def test_only_category
+    config = ThemeCheck::Config.new(".")
+    config.only_categories = [:liquid]
+    assert(config.enabled_checks.any?)
+    assert(config.enabled_checks.all? { |c| c.category == :liquid })
+  end
+
+  def test_exclude_category
+    config = ThemeCheck::Config.new(".")
+    config.exclude_categories = [:liquid]
+    assert(config.enabled_checks.any?)
+    assert(config.enabled_checks.none? { |c| c.category == :liquid })
   end
 
   private
