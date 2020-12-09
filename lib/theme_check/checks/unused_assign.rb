@@ -3,6 +3,7 @@ module ThemeCheck
   # Checks unused {% assign x = ... %}
   class UnusedAssign < LiquidCheck
     severity :suggestion
+    category :liquid
 
     class TemplateInfo < Struct.new(:used_assigns, :assign_nodes, :includes)
       def collect_used_assigns(templates)

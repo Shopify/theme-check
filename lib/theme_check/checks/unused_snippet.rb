@@ -4,6 +4,7 @@ require "set"
 module ThemeCheck
   class UnusedSnippet < LiquidCheck
     severity :suggestion
+    category :liquid
 
     def initialize
       @used_templates = Set.new

@@ -2,6 +2,7 @@
 module ThemeCheck
   class TemplateLength < LiquidCheck
     severity :suggestion
+    category :liquid
 
     def initialize(max_length: 200)
       @max_length = max_length

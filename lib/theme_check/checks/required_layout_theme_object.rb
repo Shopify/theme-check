@@ -3,6 +3,7 @@ module ThemeCheck
   # Reports missing content_for_header and content_for_layout in theme.liquid
   class RequiredLayoutThemeObject < LiquidCheck
     severity :error
+    category :liquid
     doc "https://shopify.dev/docs/themes/theme-templates/theme-liquid"
 
     LAYOUT_FILENAME = "layout/theme"

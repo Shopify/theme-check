@@ -3,6 +3,7 @@ module ThemeCheck
   # Recommends using {% liquid ... %} if 3 or more consecutive {% ... %} are found.
   class LiquidTag < LiquidCheck
     severity :suggestion
+    category :liquid
     doc "https://shopify.dev/docs/themes/liquid/reference/tags/theme-tags#liquid"
 
     def initialize(min_consecutive_statements: 10)

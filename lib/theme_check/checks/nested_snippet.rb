@@ -3,6 +3,7 @@ module ThemeCheck
   # Reports deeply nested {% include ... %} or {% render ... %}
   class NestedSnippet < LiquidCheck
     severity :suggestion
+    category :liquid
 
     class TemplateInfo < Struct.new(:includes)
       def with_deep_nested(templates, max, current_level = 0)

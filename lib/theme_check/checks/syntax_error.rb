@@ -3,6 +3,7 @@ module ThemeCheck
   # Report Liquid syntax errors
   class SyntaxError < LiquidCheck
     severity :error
+    category :liquid
 
     def on_document(node)
       node.template.warnings.each do |warning|

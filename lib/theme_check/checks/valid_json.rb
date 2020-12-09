@@ -2,6 +2,7 @@
 module ThemeCheck
   class ValidJson < JsonCheck
     severity :error
+    category :json
 
     def on_file(file)
       if file.parse_error
