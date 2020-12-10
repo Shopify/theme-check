@@ -6,8 +6,8 @@ module ThemeCheck
 
     def on_file(file)
       if file.parse_error
-        message = file.parse_error.message[/\d+: (.+) at/, 1] || 'Invalid syntax'
-        add_offense("#{message} in JSON", template: file)
+        message = format_json_parse_error(file.parse_error)
+        add_offense(message, template: file)
       end
     end
   end

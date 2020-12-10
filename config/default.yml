@@ -32,6 +32,10 @@ UnusedAssign:
 UnusedSnippet:
   enabled: true
 
+MatchingSchemaTranslations:
+  enabled: true
+  default_locale: en
+
 MatchingTranslations:
   enabled: true
 
@@ -41,8 +45,11 @@ DefaultLocale:
 TranslationKeyExists:
   enabled: true
 
+ValidHTMLTranslation:
+  enabled: true
+
 ValidJson:
   enabled: true
 
-ValidHTMLTranslation:
+ValidSchema:
   enabled: true
