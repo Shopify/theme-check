@@ -29,7 +29,12 @@ module ThemeCheck
     private
 
     def add_keys_offense(check, cause, keys, key_prefix:, node: nil, template: nil)
-      check.add_offense("#{cause}: #{format_keys(key_prefix, keys)}", node: node, template: template)
+      message = "#{cause}: #{format_keys(key_prefix, keys)}"
+      if node
+        check.add_offense(message, node: node)
+      else
+        check.add_offense(message, template: template)
+      end
     end
 
     def format_keys(key_prefix, keys)
