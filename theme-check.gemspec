@@ -11,6 +11,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = "A Shopify Theme Linter"
   spec.homepage      = "https://github.com/Shopify/theme-check"
+  spec.license       = "MIT"
 
   spec.files         = Dir.chdir(File.expand_path('..', __FILE__)) do
     %x{git ls-files -z}.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
