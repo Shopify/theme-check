@@ -43,3 +43,6 @@ TranslationKeyExists:
 
 ValidJson:
   enabled: true
+
+ValidHTMLTranslation:
+  enabled: true
