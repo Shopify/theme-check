@@ -1,8 +1,10 @@
 # frozen_string_literal: true
-require_relative "parsing_helpers"
+require_relative "json_helpers"
 
 module ThemeCheck
   class Check
+    include JsonHelpers
+
     attr_accessor :theme
     attr_accessor :offenses
     attr_accessor :options

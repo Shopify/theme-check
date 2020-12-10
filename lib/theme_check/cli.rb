@@ -53,7 +53,11 @@ module ThemeCheck
     def run!(argv)
       run(argv)
     rescue Abort => e
-      abort(e.message)
+      if e.message.empty?
+        exit(1)
+      else
+        abort(e.message)
+      end
     end
 
     def list
@@ -69,7 +73,7 @@ module ThemeCheck
       analyzer = ThemeCheck::Analyzer.new(theme, @config.enabled_checks)
       analyzer.analyze_theme
       ThemeCheck::Printer.new.print(theme, analyzer.offenses)
-      raise Abort if analyzer.offenses.any?
+      raise Abort, "" if analyzer.offenses.any?
     end
   end
 end

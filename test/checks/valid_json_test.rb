@@ -8,7 +8,7 @@ class ValidJsonTest < Minitest::Test
       "locales/en.json" => "{",
     )
     assert_offenses(<<~END, offenses)
-      unexpected token in JSON at locales/en.json
+      unexpected token at '{' in JSON at locales/en.json
     END
   end
 
