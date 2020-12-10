@@ -43,4 +43,8 @@ class ThemeTest < Minitest::Test
   def test_default_locale_json
     assert_equal(@theme["locales/en.default"], @theme.default_locale_json)
   end
+
+  def test_default_locale
+    assert_equal("en", @theme.default_locale)
+  end
 end

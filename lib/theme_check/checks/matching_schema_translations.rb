@@ -4,35 +4,47 @@ module ThemeCheck
     severity :suggestion
     category :translation
 
-    def initialize(default_locale: "en")
-      # Strictly used to detect localized keys in the schema
-      @default_locale = default_locale
-    end
-
     def on_schema(node)
       schema = JSON.parse(node.value.nodelist.join)
 
       # Get all locales used in the schema
-      used_locales = Set.new
-      visit_locales(schema) do |_, locales|
+      used_locales = Set.new([theme.default_locale])
+      visit_object(schema) do |_, locales|
         used_locales += locales
       end
       used_locales = used_locales.to_a
 
       # Check all used locales are defined in each localized keys
-      visit_locales(schema) do |key, locales|
+      visit_object(schema) do |key, locales|
         missing = used_locales - locales
         if missing.any?
           add_offense("#{key} missing translations for #{missing.join(', ')}", node: node)
         end
       end
+
+      check_locales(schema["locales"], node: node)
+
     rescue JSON::ParserError
       # Ignored, handled in ValidSchema.
     end
 
     private
 
-    def visit_locales(object, top_path = [], &block)
+    def check_locales(locales, node:)
+      return unless locales.is_a?(Hash)
+
+      default_locale = locales[theme.default_locale]
+      if default_locale
+        locales.each_pair do |name, content|
+          diff = LocaleDiff.new(default_locale, content)
+          diff.add_as_offenses(self, key_prefix: ["locales", name], node: node)
+        end
+      else
+        add_offense("Missing default locale in key: locales", node: node)
+      end
+    end
+
+    def visit_object(object, top_path = [], &block)
       return unless object.is_a?(Hash)
       top_path += [object["id"]] if object["id"].is_a?(String)
 
@@ -42,16 +54,16 @@ module ThemeCheck
         case value
         when Array
           value.each do |item|
-            visit_locales(item, path, &block)
+            visit_object(item, path, &block)
           end
 
         when Hash
           # Localized key
-          if value[@default_locale].is_a?(String)
+          if value[theme.default_locale].is_a?(String)
             block.call(path.join("."), value.keys)
           # Nested keys
           else
-            visit_locales(value, path, &block)
+            visit_object(value, path, &block)
           end
 
         end

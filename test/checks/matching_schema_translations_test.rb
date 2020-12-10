@@ -54,4 +54,30 @@ class MatchingSchemaTranslationsTest < Minitest::Test
       settings.product.label missing translations for fr at sections/product.liquid:1
     END
   end
+
+  def test_locales
+    offenses = analyze_theme(
+      ThemeCheck::MatchingSchemaTranslations.new,
+      "sections/product.liquid" => <<~END,
+        {% schema %}
+          {
+            "locales": {
+              "en": {
+                "title": "Welcome",
+                "missing": "Product"
+              },
+              "fr": {
+                "title": "Bienvenue",
+                "extra": "Extra"
+              }
+            }
+          }
+        {% endschema %}
+      END
+    )
+    assert_offenses(<<~END, offenses)
+      Extra translation keys: locales.fr.extra at sections/product.liquid:1
+      Missing translation keys: locales.fr.missing at sections/product.liquid:1
+    END
+  end
 end

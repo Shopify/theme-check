@@ -3,6 +3,7 @@ require "pathname"
 
 module ThemeCheck
   class Theme
+    DEFAULT_LOCALE_REGEXP = %r{^locales/(.*)\.default$}
     attr_reader :root
 
     def initialize(root)
@@ -20,7 +21,15 @@ module ThemeCheck
     def default_locale_json
       return @default_locale_json if defined?(@default_locale_json)
       @default_locale_json = json.find do |json_file|
-        json_file.relative_path.to_s.match(%r{locales/.*\.default})
+        json_file.name.match?(DEFAULT_LOCALE_REGEXP)
+      end
+    end
+
+    def default_locale
+      if default_locale_json
+        default_locale_json.name[DEFAULT_LOCALE_REGEXP, 1]
+      else
+        "en"
       end
     end
 

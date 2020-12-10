@@ -34,7 +34,6 @@ UnusedSnippet:
 
 MatchingSchemaTranslations:
   enabled: true
-  default_locale: en
 
 MatchingTranslations:
   enabled: true
