@@ -41,7 +41,12 @@ module LiquidLanguageServer
         id: id,
         result: {
           capabilities: {
-            textDocumentSync: 1,
+            textDocumentSync: {
+              openClose: true,
+              change: false,
+              willSave: false,
+              save: true,
+            },
           },
         },
       }
@@ -82,18 +87,20 @@ module LiquidLanguageServer
     end
 
     def on_text_document_did_open(_id, params)
-      text_document = params['textDocument']
-      uri = text_document['uri']
-      prepare_diagnostics(uri)
+      prepare_diagnostics_for_params(params)
     end
 
     def on_text_document_did_save(_id, params)
+      prepare_diagnostics_for_params(params)
+    end
+
+    private
+
+    def prepare_diagnostics_for_params(params)
       text_document = params['textDocument']
       uri = text_document['uri']
       prepare_diagnostics(uri)
     end
-
-    private
 
     def prepare_diagnostics(uri)
       {
