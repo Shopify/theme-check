@@ -58,6 +58,10 @@ module ThemeCheck
       parse.root
     end
 
+    def ==(other)
+      other.is_a?(Template) && @path == other.path
+    end
+
     def self.parse(source)
       Liquid::Template.parse(
         source,

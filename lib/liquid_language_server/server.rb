@@ -1,21 +1,25 @@
 # frozen_string_literal: true
 require 'json'
 require 'stringio'
+require 'active_support/core_ext/string/inflections'
 
 module LiquidLanguageServer
   class DoneStreaming < StandardError; end
   class IncompatibleStream < StandardError; end
 
   class Server
+    def self.start
+      Server.new.listen
+    end
+
     def initialize(
-      router:,
       in_stream: STDIN,
       out_stream: STDOUT,
       err_stream: $DEBUG ? File.open('/tmp/lsp.log', 'a') : STDERR
     )
       validate!([in_stream, out_stream, err_stream])
 
-      @router = router
+      @handler = Handler.new(self)
       @in = in_stream
       @out = out_stream
       @err = err_stream
@@ -26,36 +30,33 @@ module LiquidLanguageServer
 
     def listen
       loop do
-        response = process_request
-        type = response.fetch(:type, "")
-        case type
-        when "notification"
-          ## type NotificationMessage
-          respond_with(prepare_notification(
-            response[:method],
-            response[:params]
-          ))
-        when "response"
-          respond_with(prepare_response(
-            response[:id],
-            response[:result]
-          ))
-        when "log"
-          log(response[:message])
-        when "exit"
-          cleanup
-          return 0
-        end
+        process_request
 
       # support ctrl+c and stuff
       rescue SignalException, DoneStreaming
-        log("Done streamin'!")
+        cleanup
         return 0
 
-      rescue => e
-        error(e, e.backtrace)
+      rescue Exception => e
+        log(e)
+        log(e.backtrace)
         return 1
       end
+    end
+
+    def send_response(response)
+      response_body = JSON.dump(response)
+      log(response_body) if $DEBUG
+
+      @out.write("Content-Length: #{response_body.size}\r\n")
+      @out.write("\r\n")
+      @out.write(response_body)
+      @out.flush
+    end
+
+    def log(message)
+      @err.puts(message)
+      @err.flush
     end
 
     private
@@ -80,18 +81,17 @@ module LiquidLanguageServer
     def process_request
       request_body = read_new_content
       request_json = JSON.parse(request_body)
-      log_json(request_body) if $DEBUG
+      log(request_body) if $DEBUG
 
       id = request_json['id']
       method_name = request_json['method']
       params = request_json['params']
-      method_name = "on_#{to_snake_case(method_name)}"
+      method_name = "on_#{method_name.underscore}"
 
-      if @router.respond_to?(method_name)
-        @router.send(method_name, id, params)
+      if @handler.respond_to?(method_name)
+        @handler.send(method_name, id, params)
       else
-        log("ROUTER DOES NOT RESPOND TO #{method_name}")
-        {}
+        log("Handler does not respond to #{method_name}")
       end
     end
 
@@ -117,7 +117,8 @@ module LiquidLanguageServer
           # Why + 2? Because \r\n
           content += @in.read(length + 2)
         rescue => e
-          error(e, e.backtrace)
+          log(e)
+          log(e.backtrace)
           # We have almost certainly been disconnected from the server
           cleanup
           raise DoneStreaming
@@ -127,60 +128,11 @@ module LiquidLanguageServer
       content
     end
 
-    def respond_with(response)
-      response_body = JSON.dump(response)
-      log_json(response_body) if $DEBUG
-
-      @out.write("Content-Length: #{response_body.length + 0}\r\n")
-      @out.write("\r\n")
-      @out.write(response_body)
-      @out.flush
-    end
-
-    # https://microsoft.github.io/language-server-protocol/specifications/specification-current/#responseMessage
-    def prepare_response(id, result)
-      {
-        jsonrpc: '2.0',
-        id: id,
-        result: result,
-      }
-    end
-
-    # https://microsoft.github.io/language-server-protocol/specifications/specification-current/#notificationMessage
-    def prepare_notification(method, params)
-      {
-        jsonrpc: '2.0',
-        method: method,
-        params: params,
-      }
-    end
-
     def cleanup
       @err.close
       @out.close
     rescue
       # I did my best
-    end
-
-    def log_json(json)
-      @err.puts(json)
-    end
-
-    def log(message)
-      @err.puts(JSON.unparse({
-        message: message,
-      }))
-    end
-
-    def error(message, backtrace = nil)
-      @err.puts(JSON.unparse({
-        error: message,
-        backtrace: backtrace,
-      }))
-    end
-
-    def to_snake_case(method_name)
-      method_name.gsub(/[^\w]/, '_').underscore
     end
   end
 end

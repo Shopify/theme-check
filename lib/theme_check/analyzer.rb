@@ -26,10 +26,12 @@ module ThemeCheck
     end
 
     def analyze_theme
+      @offenses.clear
       @theme.liquid.each { |template| @visitor.visit_template(template) }
       @theme.json.each { |json_file| @json_checks.call(:on_file, json_file) }
       @liquid_checks.call(:on_end)
       @json_checks.call(:on_end)
+      @offenses
     end
 
     def analyze_file(path)
