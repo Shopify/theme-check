@@ -21,7 +21,12 @@ describe LiquidLanguageServer::Router do
       id: 1,
       result: {
         capabilities: {
-          textDocumentSync: 1,
+          textDocumentSync: {
+            openClose: true,
+            change: false,
+            willSave: false,
+            save: true,
+          },
         },
       },
     }
