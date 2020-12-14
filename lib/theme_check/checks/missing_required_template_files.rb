@@ -10,13 +10,13 @@ module ThemeCheck
     doc "https://shopify.dev/docs/themes/theme-templates"
 
     LAYOUT_FILENAME = "layout/theme"
-    REQUIRED_TEMPLATES_FILES = %w(index product collection cart blog article page list-collections search
-      404 gift_card customers/account customers/activate_account customers/addresses customers/login customers/order
-      customers/register customers/reset_password password)
+    REQUIRED_TEMPLATES_FILES = %w(index product collection cart blog article page list-collections search 404
+                                  gift_card customers/account customers/activate_account customers/addresses
+                                  customers/login customers/order customers/register customers/reset_password password)
 
     def initialize
       @layout_theme_file_found = false
-      @template_files = REQUIRED_TEMPLATES_FILES.map{ |file| "templates/#{file}"}
+      @template_files = REQUIRED_TEMPLATES_FILES.map { |file| "templates/#{file}" }
     end
 
     def on_document(node)
@@ -26,7 +26,7 @@ module ThemeCheck
 
     def on_end
       add_missing_file_offense(LAYOUT_FILENAME) unless @layout_theme_file_found
-      @template_files.each{ |template| add_missing_file_offense(template)}
+      @template_files.each { |template| add_missing_file_offense(template) }
     end
 
     private
