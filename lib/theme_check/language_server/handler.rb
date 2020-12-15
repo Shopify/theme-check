@@ -30,11 +30,7 @@ module ThemeCheck
       end
 
       def on_initialized(_id, _params)
-        log("Checking #{@config.root}")
-        log("Found #{@theme.all.size} templates")
-        @analyzer.analyze_theme
-        log("Found #{@analyzer.offenses.size} offenses")
-        send_offenses
+        analyze_and_send_offenses
       end
 
       def on_exit(_id, _params)
@@ -42,11 +38,17 @@ module ThemeCheck
       end
 
       def on_text_document_did_save(_id, _params)
-        @analyzer.analyze_theme
-        send_offenses
+        analyze_and_send_offenses
       end
 
       private
+
+      def analyze_and_send_offenses
+        log("Checking #{@config.root}")
+        @analyzer.analyze_theme
+        log("Found #{@theme.all.size} templates, and #{@analyzer.offenses.size} offenses")
+        send_offenses
+      end
 
       def send_offenses
         @analyzer.offenses.group_by(&:template).each do |template, offenses|
