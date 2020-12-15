@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 $LOAD_PATH.unshift(File.expand_path("../../lib", __FILE__))
 require "theme_check"
-require "liquid_language_server"
 require "minitest/autorun"
 require "minitest/focus"
 require "mocha/minitest"

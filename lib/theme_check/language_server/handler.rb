@@ -41,7 +41,7 @@ module ThemeCheck
         close!
       end
 
-      def on_text_document_did_save(_id, params)
+      def on_text_document_did_save(_id, _params)
         @analyzer.analyze_theme
         send_offenses
       end

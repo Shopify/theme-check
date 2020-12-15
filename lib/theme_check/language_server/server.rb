@@ -34,7 +34,7 @@ module ThemeCheck
           cleanup
           return 0
 
-        rescue Exception => e
+        rescue Exception => e # rubocop:disable Lint/RescueException
           log(e)
           log(e.backtrace)
           return 1

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "language_server/handler"
 require_relative "language_server/server"
 
