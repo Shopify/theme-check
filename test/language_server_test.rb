@@ -13,8 +13,6 @@ class LanguageServerTest < Minitest::Test
       out_stream: @out,
       err_stream: @err
     )
-
-    @theme = make_theme("layout/theme.liquid" => "")
   end
 
   OffenseMock = Struct.new(
@@ -29,34 +27,42 @@ class LanguageServerTest < Minitest::Test
   )
   TemplateMock = Struct.new(:path)
 
-  def test_sends_offenses_on_initialized
+  def test_sends_offenses_on_open
+    theme = make_theme("layout/theme.liquid" => "")
     ThemeCheck::Analyzer.any_instance.stubs(:offenses).returns([
       OffenseMock.new('LiquidTag', :style, 'Wrong', TemplateMock.new('path'), 5, 14, 9, 9),
     ])
+
     send_messages({
+      jsonrpc: "2.0",
       id: "123",
       method: "initialize",
       params: {
-        rootPath: @theme.root,
+        rootPath: theme.root,
       },
     }, {
+      jsonrpc: "2.0",
       id: "123",
       method: "initialized",
     }, {
+      jsonrpc: "2.0",
+      method: "textDocument/didOpen",
+      params: {
+        textDocument: {
+          uri: "file://layout/theme.liquid",
+          version: 1,
+        },
+      },
+    }, {
+      jsonrpc: "2.0",
       method: "exit",
     })
+
     assert_responses({
       jsonrpc: "2.0",
       id: "123",
       result: {
-        capabilities: {
-          textDocumentSync: {
-            openClose: false,
-            change: false,
-            willSave: false,
-            save: true,
-          },
-        },
+        capabilities: ThemeCheck::LanguageServer::Handler::CAPABILITIES,
       },
     }, {
       jsonrpc: "2.0",
@@ -84,33 +90,37 @@ class LanguageServerTest < Minitest::Test
   end
 
   def test_sends_offenses_on_text_document_did_save
+    theme = make_theme("layout/theme.liquid" => "")
     ThemeCheck::Analyzer.any_instance.stubs(:offenses).returns([
       OffenseMock.new('LiquidTag', :style, 'Wrong', TemplateMock.new('path'), 5, 14, 9, 9),
     ])
+
     send_messages({
+      jsonrpc: "2.0",
       id: "123",
       method: "initialize",
       params: {
-        rootPath: @theme.root,
+        rootPath: theme.root,
       },
     }, {
-      id: "123",
-      method: "text_document_did_save",
+      jsonrpc: "2.0",
+      method: "textDocument/didSave",
+      params: {
+        textDocument: {
+          uri: "file://layout/theme.liquid",
+          version: 1,
+        },
+      },
     }, {
+      jsonrpc: "2.0",
       method: "exit",
     })
+
     assert_responses({
       jsonrpc: "2.0",
       id: "123",
       result: {
-        capabilities: {
-          textDocumentSync: {
-            openClose: false,
-            change: false,
-            willSave: false,
-            save: true,
-          },
-        },
+        capabilities: ThemeCheck::LanguageServer::Handler::CAPABILITIES,
       },
     }, {
       jsonrpc: "2.0",
@@ -135,6 +145,37 @@ class LanguageServerTest < Minitest::Test
         }],
       },
     })
+  end
+
+  def test_finds_root_from_file
+    theme = make_theme(
+      "src/layout/theme.liquid" => "",
+      "src/.theme-check.yml" => "",
+      ".theme-check.yml" => "",
+    )
+
+    send_messages({
+      jsonrpc: "2.0",
+      id: "123",
+      method: "initialize",
+      params: {
+        rootPath: theme.root,
+      },
+    }, {
+      jsonrpc: "2.0",
+      method: "textDocument/didOpen",
+      params: {
+        textDocument: {
+          uri: "file://" + theme.root.join("src/layout/theme.liquid").to_s,
+          version: 1,
+        },
+      },
+    }, {
+      jsonrpc: "2.0",
+      method: "exit",
+    })
+
+    assert_includes(@err.string, "Checking #{theme.root.join('src')}")
   end
 
   private

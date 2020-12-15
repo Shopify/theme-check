@@ -3,62 +3,62 @@
 module ThemeCheck
   module LanguageServer
     class Handler
+      CAPABILITIES = {
+        textDocumentSync: {
+          openClose: true,
+          change: false,
+          willSave: false,
+          save: true,
+        },
+      }
+
       def initialize(server)
         @server = server
       end
 
       def on_initialize(id, params)
-        root_path = params["rootPath"]
-        @config = ThemeCheck::Config.from_path(root_path)
-        @theme = ThemeCheck::Theme.new(@config.root)
-        @analyzer = ThemeCheck::Analyzer.new(@theme, @config.enabled_checks)
-
+        @root_path = params["rootPath"]
         # https://microsoft.github.io/language-server-protocol/specifications/specification-current/#responseMessage
         send_response(
           id: id,
           result: {
-            capabilities: {
-              textDocumentSync: {
-                openClose: false,
-                change: false,
-                willSave: false,
-                save: true,
-              },
-            },
+            capabilities: CAPABILITIES,
           }
         )
-      end
-
-      def on_initialized(_id, _params)
-        analyze_and_send_offenses
       end
 
       def on_exit(_id, _params)
         close!
       end
 
-      def on_text_document_did_save(_id, _params)
-        analyze_and_send_offenses
+      def on_text_document_did_open(_id, params)
+        analyze_and_send_offenses(params.dig('textDocument', 'uri').sub('file://', ''))
       end
+      alias_method :on_text_document_did_save, :on_text_document_did_open
 
       private
 
-      def analyze_and_send_offenses
-        log("Checking #{@config.root}")
-        @analyzer.analyze_theme
-        log("Found #{@theme.all.size} templates, and #{@analyzer.offenses.size} offenses")
-        send_offenses
+      def analyze_and_send_offenses(file_path)
+        root = ThemeCheck::Config.find(file_path) || @root_path
+        config = ThemeCheck::Config.from_path(root)
+        theme = ThemeCheck::Theme.new(config.root)
+        analyzer = ThemeCheck::Analyzer.new(theme, config.enabled_checks)
+
+        log("Checking #{config.root}")
+        analyzer.analyze_theme
+        log("Found #{theme.all.size} templates, and #{analyzer.offenses.size} offenses")
+        send_offenses(analyzer.offenses)
       end
 
-      def send_offenses
-        @analyzer.offenses.group_by(&:template).each do |template, offenses|
+      def send_offenses(offenses)
+        offenses.group_by(&:template).each do |template, template_offenses|
           next unless template
           # https://microsoft.github.io/language-server-protocol/specifications/specification-current/#notificationMessage
           send_response(
             method: 'textDocument/publishDiagnostics',
             params: {
               uri: "file:#{template.path}",
-              diagnostics: offenses.map { |offense| offense_to_diagnostic(offense) },
+              diagnostics: template_offenses.map { |offense| offense_to_diagnostic(offense) },
             },
           )
         end

@@ -78,18 +78,22 @@ module ThemeCheck
       def process_request
         request_body = read_new_content
         request_json = JSON.parse(request_body)
-        log(request_body) if $DEBUG
+        log(JSON.pretty_generate(request_json)) if $DEBUG
 
         id = request_json['id']
         method_name = request_json['method']
         params = request_json['params']
-        method_name = "on_#{method_name.underscore}"
+        method_name = "on_#{to_snake_case(method_name)}"
 
         if @handler.respond_to?(method_name)
           @handler.send(method_name, id, params)
         else
           log("Handler does not respond to #{method_name}")
         end
+      end
+
+      def to_snake_case(method_name)
+        method_name.gsub(/[^\w]/, '_').underscore
       end
 
       def initial_line

@@ -31,9 +31,9 @@ module ThemeCheck
       end
     end
 
-    def initialize(root, configuration = {})
-      @configuration = configuration
-      @checks = configuration.dup
+    def initialize(root, configuration = nil)
+      @configuration = configuration || {}
+      @checks = @configuration.dup
       @root = Pathname.new(root)
       if @checks.key?("root")
         @root = @root.join(@checks.delete("root"))
