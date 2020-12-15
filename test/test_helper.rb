@@ -34,5 +34,9 @@ module Minitest
     def assert_offenses(output, offenses)
       assert_equal(output.chomp, offenses.sort_by(&:location).join("\n"))
     end
+
+    def assert_includes_offense(offenses, output)
+      assert_includes(offenses.sort_by(&:location).join("\n"), output.chomp)
+    end
   end
 end
