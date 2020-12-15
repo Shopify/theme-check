@@ -9,7 +9,7 @@ class MissingRequiredTemplateFilesTest < Minitest::Test
       "templates/product.liquid" => "",
     )
 
-    assert_includes(offenses.sort_by(&:location).join("\n"), "Theme is missing 'layout/theme.liquid' file")
+    assert_includes_offense(offenses, "Theme is missing 'layout/theme.liquid' file")
   end
 
   def test_reports_missing_template_files
@@ -18,11 +18,8 @@ class MissingRequiredTemplateFilesTest < Minitest::Test
       "layout/theme.liquid" => "",
     )
 
-    assert_includes(offenses.sort_by(&:location).join("\n"),
-      "Theme is missing 'templates/index.liquid' file")
-
-    assert_includes(offenses.sort_by(&:location).join("\n"),
-      "Theme is missing 'templates/product.liquid' file")
+    assert_includes_offense(offenses, "Theme is missing 'templates/index.liquid' file")
+    assert_includes_offense(offenses, "Theme is missing 'templates/product.liquid' file")
   end
 
   def test_does_not_report_missing_template_files

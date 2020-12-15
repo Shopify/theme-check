@@ -13,20 +13,11 @@ module ThemeCheck
     REQUIRED_TEMPLATES_FILES = %w(index product collection cart blog article page list-collections search 404
                                   gift_card customers/account customers/activate_account customers/addresses
                                   customers/login customers/order customers/register customers/reset_password password)
-
-    def initialize
-      @layout_theme_file_found = false
-      @template_files = REQUIRED_TEMPLATES_FILES.map { |file| "templates/#{file}" }
-    end
-
-    def on_document(node)
-      @layout_theme_file_found = true if node.template.name == LAYOUT_FILENAME
-      @template_files.delete(node.template.name) if node.template.template?
-    end
+      .map { |file| "templates/#{file}" }
 
     def on_end
-      add_missing_file_offense(LAYOUT_FILENAME) unless @layout_theme_file_found
-      @template_files.each { |template| add_missing_file_offense(template) }
+      missing_files = (REQUIRED_TEMPLATES_FILES + [LAYOUT_FILENAME]) - theme.liquid.map(&:name)
+      missing_files.each { |file| add_missing_file_offense(file) }
     end
 
     private
