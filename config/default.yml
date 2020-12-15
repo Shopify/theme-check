@@ -52,3 +52,6 @@ ValidJson:
 
 ValidSchema:
   enabled: true
+
+MissingRequiredTemplateFiles:
+  enabled: true
