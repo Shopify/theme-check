@@ -19,5 +19,5 @@ commands:
     run: bundle exec rake test
   style:
     run: bundle exec rake rubocop
-  liquid-server:
-    run: bundle exec liquid-server
+  language-server:
+    run: bundle exec theme-check-language-server

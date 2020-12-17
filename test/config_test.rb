@@ -45,6 +45,12 @@ class ConfigTest < Minitest::Test
     refute(check_enabled?(config, ThemeCheck::MissingTemplate))
   end
 
+  def test_empty_file
+    theme = make_theme(".theme-check.yml" => "")
+    config = ThemeCheck::Config.from_path(theme.root)
+    assert_equal({}, config.to_h)
+  end
+
   def test_root_from_config
     theme = make_theme(
       ".theme-check.yml" => <<~END,

@@ -1,13 +1,12 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'liquid_language_server'
+require 'theme_check'
 
-if ENV["LIQUID_LSP_DEBUG"] == "true"
+if ENV["THEME_CHECK_DEBUG"] == "true"
   $DEBUG = true
 end
 # Force encoding to UTF-8 to fix VSCode
 Encoding.default_external = Encoding::UTF_8
-application = LiquidLanguageServer::Application.new
-status_code = application.start
+status_code = ThemeCheck::LanguageServer.start
 exit! status_code
