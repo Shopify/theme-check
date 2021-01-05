@@ -54,7 +54,7 @@ module ThemeCheck
     end
 
     def directories
-      @directories ||= @root.glob('*').select {|f| File.directory? f}.map { |f| f.relative_path_from(@root) }
+      @directories ||= @root.glob('*').select { |f| File.directory?(f) }.map { |f| f.relative_path_from(@root) }
     end
   end
 end
