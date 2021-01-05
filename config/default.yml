@@ -58,3 +58,6 @@ MissingRequiredTemplateFiles:
 
 UndefinedObject:
   enabled: true
+
+RequiredDirectories:
+  enabled: true
