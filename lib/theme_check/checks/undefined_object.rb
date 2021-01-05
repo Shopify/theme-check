@@ -11,76 +11,140 @@ module ThemeCheck
         @all_assigns = {}
         @all_captures = {}
         @all_forloops = {}
+        @all_renders = {}
       end
 
-      attr_reader :all_variable_lookups, :all_assigns, :all_captures, :all_forloops
-      def all
+      attr_reader :all_assigns, :all_captures, :all_forloops
+
+      def add_render(name:, node:)
+        @all_renders[name] = node
+      end
+
+      def add_variable_lookup(name:, node:)
+        line_number = node.parent.line_number
+        key = [name, line_number]
+        @all_variable_lookups[key] = node
+      end
+
+      def all_variables
         all_assigns.keys + all_captures.keys + all_forloops.keys
       end
-    end
 
-    def initialize
-      @templates = {}
-      @used_snippets = {}
-    end
+      def each_snippet
+        @all_renders.each do |(name, info)|
+          yield [name, info]
+        end
+      end
 
-    def on_document(node)
-      @templates[node.template.name] = TemplateInfo.new
-    end
+      def each_variable_lookup(unique_keys = false)
+        seen = Set.new
+        @all_variable_lookups.each do |(key, info)|
+          name, _line_number = key
 
-    def on_assign(node)
-      @templates[node.template.name].all_assigns[node.value.to] = node
-    end
+          next if unique_keys && seen.include?(name)
+          seen << name
 
-    def on_capture(node)
-      @templates[node.template.name].all_captures[node.value.instance_variable_get('@to')] = node
-    end
-
-    def on_for(node)
-      @templates[node.template.name].all_forloops[node.value.variable_name] = node
-    end
-
-    def on_include(node)
-      return unless node.value.template_name_expr.is_a?(String)
-      name = "snippets/#{node.value.template_name_expr}"
-      @used_snippets[name] ||= Set.new
-      @used_snippets[name] << node.template.name
-    end
-
-    def on_variable_lookup(node)
-      @templates[node.template.name].all_variable_lookups[node.value.name] = node
-    end
-
-    def on_end
-      foster_snippets = theme.snippets
-        .reject { |t| @used_snippets.include?(t.name) }
-        .map(&:name)
-
-      @templates.each do |(template_name, info)|
-        next if foster_snippets.include?(template_name)
-        if (all_including_templates = @used_snippets[template_name])
-          all_including_templates.each do |including_template|
-            including_template_info = @templates[including_template]
-            check_object(info.all_variable_lookups, including_template_info.all)
-          end
-        else
-          all = info.all
-          all += ['email'] if 'templates/customers/reset_password' == template_name
-          check_object(info.all_variable_lookups, all)
+          yield [key, info]
         end
       end
     end
 
-    def check_object(variable_lookups, all)
-      variable_lookups.each do |(name, node)|
-        next if all.include?(name)
-        next if ThemeCheck::ShopifyLiquid::Object.labels.include?(name)
+    def initialize
+      @files = {}
+    end
 
-        parent = node.parent
-        parent = parent.parent if :variable_lookup == parent.type_name
-        add_offense("Undefined object `#{name}`", node: parent)
+    def on_document(node)
+      @files[node.template.name] = TemplateInfo.new
+    end
+
+    def on_assign(node)
+      @files[node.template.name].all_assigns[node.value.to] = node
+    end
+
+    def on_capture(node)
+      @files[node.template.name].all_captures[node.value.instance_variable_get('@to')] = node
+    end
+
+    def on_for(node)
+      @files[node.template.name].all_forloops[node.value.variable_name] = node
+    end
+
+    def on_include(_node)
+      # NOOP: we purposely do nothing on `include` since it is deprecated
+      #   https://shopify.dev/docs/themes/liquid/reference/tags/deprecated-tags#include
+    end
+
+    def on_render(node)
+      return unless node.value.template_name_expr.is_a?(String)
+
+      snippet_name = "snippets/#{node.value.template_name_expr}"
+      @files[node.template.name].add_render(
+        name: snippet_name,
+        node: node,
+      )
+    end
+
+    def on_variable_lookup(node)
+      @files[node.template.name].add_variable_lookup(
+        name: node.value.name,
+        node: node,
+      )
+    end
+
+    def on_end
+      all_global_objects = ThemeCheck::ShopifyLiquid::Object.labels
+      all_global_objects.freeze
+
+      each_template do |(name, info)|
+        if 'templates/customers/reset_password' == name
+          # NOTE: `email` is exceptionally exposed as a theme object in
+          #       the customers' reset password template
+          check_object(info, all_global_objects + ['email'])
+        else
+          check_object(info, all_global_objects)
+        end
+      end
+    end
+
+    def each_template
+      @files.each do |(name, info)|
+        next if name.starts_with?('snippets/')
+        yield [name, info]
+      end
+    end
+    private :each_template
+
+    def check_object(info, all_global_objects, render_node = nil)
+      check_undefined(info, all_global_objects, render_node)
+
+      info.each_snippet do |(snippet_name, node)|
+        snippet_info = @files[snippet_name]
+        next unless snippet_info # NOTE: undefined snippet
+
+        snippet_variables = node.value.attributes.keys
+        check_object(snippet_info, all_global_objects + snippet_variables, node)
       end
     end
     private :check_object
+
+    def check_undefined(info, all_global_objects, render_node)
+      all_variables = info.all_variables
+
+      info.each_variable_lookup(!!render_node) do |(key, node)|
+        name, _line_number = key
+        next if all_variables.include?(name)
+        next if all_global_objects.include?(name)
+
+        node = node.parent
+        node = node.parent if %i(condition variable_lookup).include?(node.type_name)
+
+        if render_node
+          add_offense("Missing argument `#{name}`", node: render_node)
+        else
+          add_offense("Undefined object `#{name}`", node: node)
+        end
+      end
+    end
+    private :check_undefined
   end
 end
