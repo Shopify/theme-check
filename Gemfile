@@ -24,7 +24,3 @@ end
 gem 'rubocop', '~> 0.93.1', require: false
 gem 'rubocop-performance', '~> 1.8.1', require: false
 gem 'rubocop-shopify', '~> 1.0.6', require: false
-
-gem 'liquid', github: 'Shopify/liquid', branch: 'master'
-
-gem 'nokogumbo'
