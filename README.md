@@ -1,7 +1,5 @@
 # Theme Check ✅ - A linter for Themes
 
-_This is a [HackDays project](https://hackdays.shopify.io/projects/13720)_
-
 Think RuboCop, or eslint, but for Shopify themes.
 
 Theme Check is a command line tool that helps you follow Shopify Themes & Liquid best practices by analyzing the Liquid & JSON inside your theme.
