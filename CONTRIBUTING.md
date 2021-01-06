@@ -21,8 +21,16 @@ We love receiving pull requests!
 
 ## Running Tests
 
-> bundle install
-> bundle exec rake
+```
+bundle install # Or `dev up` if you're from Shopify
+bundle exec rake
+```
+
+## Checking a theme
+
+```
+bundle exec theme-check /path/to/your/theme
+```
 
 ## Creating a new "Check"
 
