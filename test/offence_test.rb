@@ -44,4 +44,17 @@ class OffenseTest < Minitest::Test
     assert_equal("include 'icon-error'", offense.markup)
     assert_equal(31, offense.markup_start_in_excerpt)
   end
+
+  def test_correct
+    node = stub(
+      template: @theme["templates/index"],
+      line_number: 2,
+      markup: "1 + 2",
+      range: [4, 10]
+    )
+    offense = ThemeCheck::Offense.new(check: Bogus.new, node: node, correction: proc { |c| c.insert_after(node, "abc") })
+    offense.correct
+
+    assert_equal("{{ 1 + 2 abc}}", node.template.excerpt(node.line_number))
+  end
 end

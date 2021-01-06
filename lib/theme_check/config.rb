@@ -6,7 +6,7 @@ module ThemeCheck
     DEFAULT_CONFIG = "#{__dir__}/../../config/default.yml"
 
     attr_reader :root
-    attr_accessor :only_categories, :exclude_categories
+    attr_accessor :only_categories, :exclude_categories, :auto_correct
 
     class << self
       def from_path(path)
@@ -40,6 +40,7 @@ module ThemeCheck
       end
       @only_categories = []
       @exclude_categories = []
+      @auto_correct = false
       resolve_requires
     end
 

@@ -42,6 +42,11 @@ module ThemeCheck
       lines[line - 1].strip
     end
 
+    def source_excerpt(line)
+      original_lines = source.split("\n")
+      original_lines[line - 1].strip
+    end
+
     def full_line(line)
       lines[line - 1]
     end
@@ -56,6 +61,16 @@ module ThemeCheck
 
     def root
       parse.root
+    end
+
+    def update!
+      @updated = true
+    end
+
+    def write
+      if @updated
+        File.write(path, lines.join("\n"))
+      end
     end
 
     def ==(other)

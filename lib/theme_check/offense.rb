@@ -3,10 +3,11 @@ module ThemeCheck
   class Offense
     MAX_SOURCE_EXCERPT_SIZE = 120
 
-    attr_reader :check, :message, :template, :node, :markup, :line_number
+    attr_reader :check, :message, :template, :node, :markup, :line_number, :correction
 
-    def initialize(check:, message: nil, template: nil, node: nil, markup: nil, line_number: nil)
+    def initialize(check:, message: nil, template: nil, node: nil, markup: nil, line_number: nil, correction: nil)
       @check = check
+      @correction = correction
 
       if message
         @message = message
@@ -39,7 +40,7 @@ module ThemeCheck
     def source_excerpt
       return unless line_number
       @source_excerpt ||= begin
-        excerpt = template.excerpt(line_number)
+        excerpt = template.source_excerpt(line_number)
         if excerpt.size > MAX_SOURCE_EXCERPT_SIZE
           excerpt[0, MAX_SOURCE_EXCERPT_SIZE - 3] + '...'
         else
@@ -91,6 +92,17 @@ module ThemeCheck
     def location
       tokens = [template&.relative_path, line_number].compact
       tokens.join(":") if tokens.any?
+    end
+
+    def correctable?
+      line_number && correction
+    end
+
+    def correct
+      if correctable?
+        corrector = Corrector.new(template: template)
+        correction.call(corrector)
+      end
     end
 
     def to_s
