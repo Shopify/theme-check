@@ -9,7 +9,7 @@ class MissingRequiredTemplateFilesTest < Minitest::Test
       "templates/product.liquid" => "",
     )
 
-    assert_includes_offense(offenses, "Theme is missing 'layout/theme.liquid' file")
+    assert_includes_offense(offenses, "'layout/theme.liquid' is missing")
   end
 
   def test_reports_missing_template_files
@@ -18,8 +18,8 @@ class MissingRequiredTemplateFilesTest < Minitest::Test
       "layout/theme.liquid" => "",
     )
 
-    assert_includes_offense(offenses, "Theme is missing 'templates/index.liquid' file")
-    assert_includes_offense(offenses, "Theme is missing 'templates/product.liquid' file")
+    assert_includes_offense(offenses, "'templates/index.liquid' or 'templates/index.json' is missing")
+    assert_includes_offense(offenses, "'templates/product.liquid' or 'templates/product.json' is missing")
   end
 
   def test_does_not_report_missing_template_files
@@ -48,5 +48,33 @@ class MissingRequiredTemplateFilesTest < Minitest::Test
     )
 
     assert_empty(offenses)
+  end
+
+  def test_does_not_report_missing_template_files_with_json_templates
+    offenses = analyze_theme(
+      ThemeCheck::MissingRequiredTemplateFiles.new,
+      "layout/theme.liquid" => "",
+      "templates/index.json" => "",
+      "templates/product.json" => "",
+      "templates/collection.json" => "",
+      "templates/cart.json" => "",
+      "templates/blog.json" => "",
+      "templates/article.json" => "",
+      "templates/page.json" => "",
+      "templates/list-collections.json" => "",
+      "templates/search.liquid" => "",
+      "templates/404.liquid" => "",
+      "templates/gift_card.liquid" => "",
+      "templates/customers/account.liquid" => "",
+      "templates/customers/activate_account.liquid" => "",
+      "templates/customers/addresses.liquid" => "",
+      "templates/customers/login.liquid" => "",
+      "templates/customers/order.liquid" => "",
+      "templates/customers/register.liquid" => "",
+      "templates/customers/reset_password.liquid" => "",
+      "templates/password.liquid" => "",
+    )
+
+    assert_offenses("", offenses)
   end
 end
