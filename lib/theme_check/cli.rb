@@ -13,11 +13,10 @@ module ThemeCheck
         -h, [--help]              # Show this. Hi!
 
       Description:
-        Theme Check that helps you follow Shopify Themes & Liquid best practices
-        by analyzing the Liquid & JSON inside your theme.
+        Theme Check helps you follow Shopify Themes & Liquid best practices by analyzing the
+        Liquid & JSON inside your theme.
 
-        You can configure checks in the .theme-check.yml file of your theme root
-        directory.
+        You can configure checks in the .theme-check.yml file of your theme root directory.
     END
 
     def run(argv)

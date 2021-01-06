@@ -1,7 +1,5 @@
 # Theme Check ✅ - A linter for Themes
 
-_This is a [HackDays project](https://hackdays.shopify.io/projects/13720)_
-
 Think RuboCop, or eslint, but for Shopify themes.
 
 Theme Check is a command line tool that helps you follow Shopify Themes & Liquid best practices by analyzing the Liquid & JSON inside your theme.
@@ -36,13 +34,22 @@ Theme Check currently checks for the following:
 
 And many more to come! Suggestions welcome ([create an issue](https://github.com/Shopify/theme-check/issues)).
 
+## Installation
+
+```
+gem install theme-check
+```
+
 ## Usage
 
 ```
-dev clone theme-check
-dev up
-dev check /path/to/your/theme
+theme-check /path/to/your/theme
+
+# or from /path/to/your/theme
+theme-check
 ```
+
+Run `theme-check --help` to get full usage.
 
 ## Configuration
 
