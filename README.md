@@ -34,6 +34,10 @@ Theme Check currently checks for the following:
 
 And many more to come! Suggestions welcome ([create an issue](https://github.com/Shopify/theme-check/issues)).
 
+## Requirements
+
+- Ruby 2.7+
+
 ## Installation
 
 ```
