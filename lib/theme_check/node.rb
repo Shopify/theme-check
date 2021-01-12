@@ -113,5 +113,10 @@ module ThemeCheck
         false
       end
     end
+
+    def range
+      start = template.full_line(line_number).index(markup)
+      [start, start + markup.length - 1]
+    end
   end
 end

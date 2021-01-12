@@ -10,6 +10,7 @@ module ThemeCheck
         -c, [--category]          # Only run this category of checks
         -x, [--exclude-category]  # Exclude this category of checks
         -l, [--list]              # List enabled checks
+        -a, [--auto-correct]      # Automatically fix offenses
         -h, [--help]              # Show this. Hi!
 
       Description:
@@ -25,6 +26,7 @@ module ThemeCheck
       command = :check
       only_categories = []
       exclude_categories = []
+      auto_correct = false
 
       args = argv.dup
       while (arg = args.shift)
@@ -37,6 +39,8 @@ module ThemeCheck
           exclude_categories << args.shift.to_sym
         when "--list", "-l"
           command = :list
+        when "--auto-correct", "-a"
+          auto_correct = true
         else
           path = arg
         end
@@ -45,6 +49,7 @@ module ThemeCheck
       @config = ThemeCheck::Config.from_path(path)
       @config.only_categories = only_categories
       @config.exclude_categories = exclude_categories
+      @config.auto_correct = auto_correct
 
       send(command)
     end
@@ -69,10 +74,10 @@ module ThemeCheck
       if theme.all.empty?
         raise Abort, "No templates found.\n#{USAGE}"
       end
-      analyzer = ThemeCheck::Analyzer.new(theme, @config.enabled_checks)
+      analyzer = ThemeCheck::Analyzer.new(theme, @config.enabled_checks, @config.auto_correct)
       analyzer.analyze_theme
-      ThemeCheck::Printer.new.print(theme, analyzer.offenses)
-      raise Abort, "" if analyzer.offenses.any?
+      ThemeCheck::Printer.new.print(theme, analyzer.offenses, @config.auto_correct)
+      raise Abort, "" if analyzer.uncorrectable_offenses.any?
     end
   end
 end

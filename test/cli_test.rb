@@ -58,4 +58,14 @@ class CliTest < Minitest::Test
     end
     assert_includes(out, "LiquidTag:")
   end
+
+  def test_auto_correct
+    cli = ThemeCheck::Cli.new
+    out = capture(:stdout) do
+      assert_raises(ThemeCheck::Cli::Abort) do
+        cli.run([__dir__ + "/theme", "-a"])
+      end
+    end
+    assert_includes(out, "corrected")
+  end
 end

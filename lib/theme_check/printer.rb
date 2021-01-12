@@ -2,18 +2,26 @@
 
 module ThemeCheck
   class Printer
-    def print(theme, offenses)
+    def print(theme, offenses, auto_correct)
       offenses.each do |offense|
-        print_offense(offense)
+        print_offense(offense, auto_correct)
         puts
       end
 
-      puts "#{theme.all.size} files inspected, #{red(offenses.size.to_s + ' offenses')} detected"
+      correctable = offenses.select(&:correctable?)
+      puts "#{theme.all.size} files inspected, #{red(offenses.size.to_s + ' offenses')} detected, \
+#{yellow(correctable.size.to_s + ' offenses')} #{auto_correct ? 'corrected' : 'auto-correctable'}"
     end
 
-    def print_offense(offense)
+    def print_offense(offense, auto_correct)
       location = if offense.location
         blue(offense.location) + ": "
+      else
+        ""
+      end
+
+      corrected = if auto_correct && offense.correctable?
+        green("[Corrected] ")
       else
         ""
       end
@@ -21,6 +29,7 @@ module ThemeCheck
       puts location +
         colorized_severity(offense.severity) + ": " +
         yellow(offense.check_name) + ": " +
+        corrected +
         offense.message + "."
       if offense.source_excerpt
         puts "\t#{offense.source_excerpt}"
