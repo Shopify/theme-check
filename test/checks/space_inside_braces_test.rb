@@ -74,4 +74,42 @@ class SpaceInsideBracesTest < Minitest::Test
     )
     assert_equal("", offenses.join("\n"))
   end
+
+  def test_corrects_missing_space
+    expected_sources = {
+      "templates/index.liquid" => <<~END,
+        {{ x }}
+        {{ x }}
+      END
+    }
+    sources = fix_theme(
+      ThemeCheck::SpaceInsideBraces.new,
+      "templates/index.liquid" => <<~END,
+        {{ x}}
+        {{x }}
+      END
+    )
+    sources.each do |path, source|
+      assert_equal(source, expected_sources[path])
+    end
+  end
+
+  def test_corrects_extra_space
+    expected_sources = {
+      "templates/index.liquid" => <<~END,
+        {{ x }}
+        {{ x }}
+      END
+    }
+    sources = fix_theme(
+      ThemeCheck::SpaceInsideBraces.new,
+      "templates/index.liquid" => <<~END,
+        {{ x  }}
+        {{  x }}
+      END
+    )
+    sources.each do |path, source|
+      assert_equal(source, expected_sources[path])
+    end
+  end
 end

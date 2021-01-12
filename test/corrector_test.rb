@@ -40,7 +40,8 @@ class CorrectorTest < Minitest::Test
     node = stub(
       template: @theme["templates/index"],
       line_number: 2,
-      range: [4, 8]
+      range: [4, 8],
+      :markup= => ()
     )
     corrector = ThemeCheck::Corrector.new(template: node.template)
 

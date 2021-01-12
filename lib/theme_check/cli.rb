@@ -76,6 +76,7 @@ module ThemeCheck
       end
       analyzer = ThemeCheck::Analyzer.new(theme, @config.enabled_checks, @config.auto_correct)
       analyzer.analyze_theme
+      analyzer.correct_offenses
       ThemeCheck::Printer.new.print(theme, analyzer.offenses, @config.auto_correct)
       raise Abort, "" if analyzer.uncorrectable_offenses.any?
     end
