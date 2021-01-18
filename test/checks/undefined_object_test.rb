@@ -118,6 +118,34 @@ class UndefinedObjectTest < Minitest::Test
     assert_offenses("", offenses)
   end
 
+  def test_does_not_report_on_render_using_the_with_parameter
+    offenses = analyze_theme(
+      ThemeCheck::UndefinedObject.new,
+      "templates/index.liquid" => <<~END,
+        {% assign featured_product = all_products['product_handle'] %}
+        {% render 'product' with featured_product as my_product %}
+      END
+      "snippets/product.liquid" => <<~END,
+        {{ my_product.available }}
+      END
+    )
+    assert_offenses("", offenses)
+  end
+
+  def test_does_not_report_on_render_using_the_for_parameter
+    offenses = analyze_theme(
+      ThemeCheck::UndefinedObject.new,
+      "templates/index.liquid" => <<~END,
+        {% assign variants = product.variants %}
+        {% render 'variant' for variants as my_variant %}
+      END
+      "snippets/variant.liquid" => <<~END,
+        {{ my_variant.price }}
+      END
+    )
+    assert_offenses("", offenses)
+  end
+
   def test_report_on_render_with_variable_from_parent_context
     offenses = analyze_theme(
       ThemeCheck::UndefinedObject.new,

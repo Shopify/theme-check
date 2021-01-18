@@ -121,7 +121,8 @@ module ThemeCheck
         snippet_info = @files[snippet_name]
         next unless snippet_info # NOTE: undefined snippet
 
-        snippet_variables = node.value.attributes.keys
+        snippet_variables = node.value.attributes.keys +
+          Array[node.value.instance_variable_get("@alias_name")]
         check_object(snippet_info, all_global_objects + snippet_variables, node)
       end
     end
