@@ -31,6 +31,7 @@ Theme Check currently checks for the following:
 ✅ Using unknown translation keys in `{{ 'missing_key' | t }}`  
 ✅ Using several `{% ... %}` instead of `{% liquid ... %}`  
 ✅ Undefined [objects](https://shopify.dev/docs/themes/liquid/reference/objects)
+✅ Deprecated filters  
 
 And many more to come! Suggestions welcome ([create an issue](https://github.com/Shopify/theme-check/issues)).
 

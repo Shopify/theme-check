@@ -1,0 +1,10 @@
+---
+Liquid::ColorFilter:
+  hex_to_rgba:
+    - color_to_rgb
+    - color_modify
+Liquid::UrlFilter:
+  collection_img_url:
+    - img_url
+  product_img_url:
+    - img_url

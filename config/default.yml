@@ -61,3 +61,6 @@ UndefinedObject:
 
 RequiredDirectories:
   enabled: true
+
+DeprecatedFilter:
+  enabled: true
