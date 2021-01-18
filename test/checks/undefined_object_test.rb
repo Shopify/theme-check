@@ -2,7 +2,34 @@
 require "test_helper"
 
 class UndefinedObjectTest < Minitest::Test
-  def test_report_on_undefined_object
+  def test_report_on_undefined_variable
+    offenses = analyze_theme(
+      ThemeCheck::UndefinedObject.new,
+      "templates/index.liquid" => <<~END,
+        {{ price }}
+      END
+    )
+    assert_offenses(<<~END, offenses)
+      Undefined object `price` at templates/index.liquid:1
+    END
+  end
+
+  def test_report_on_repeated_undefined_variable_on_different_lines
+    offenses = analyze_theme(
+      ThemeCheck::UndefinedObject.new,
+      "templates/index.liquid" => <<~END,
+        {{ price }}
+
+        {{ price }}
+      END
+    )
+    assert_offenses(<<~END, offenses)
+      Undefined object `price` at templates/index.liquid:1
+      Undefined object `price` at templates/index.liquid:3
+    END
+  end
+
+  def test_report_on_undefined_global_object
     offenses = analyze_theme(
       ThemeCheck::UndefinedObject.new,
       "templates/index.liquid" => <<~END,
@@ -14,7 +41,7 @@ class UndefinedObjectTest < Minitest::Test
     END
   end
 
-  def test_report_on_undefined_object_argument
+  def test_report_on_undefined_global_object_argument
     offenses = analyze_theme(
       ThemeCheck::UndefinedObject.new,
       "templates/index.liquid" => <<~END,
@@ -26,7 +53,7 @@ class UndefinedObjectTest < Minitest::Test
     END
   end
 
-  def test_does_not_report_on_string_argument
+  def test_does_not_report_on_string_argument_to_global_object
     offenses = analyze_theme(
       ThemeCheck::UndefinedObject.new,
       "templates/index.liquid" => <<~END,
@@ -36,7 +63,7 @@ class UndefinedObjectTest < Minitest::Test
     assert_offenses("", offenses)
   end
 
-  def test_does_not_report_on_defined_object_argument
+  def test_does_not_report_on_defined_variable
     offenses = analyze_theme(
       ThemeCheck::UndefinedObject.new,
       "templates/index.liquid" => <<~END,
@@ -47,7 +74,7 @@ class UndefinedObjectTest < Minitest::Test
     assert_offenses("", offenses)
   end
 
-  def test_does_not_report_on_defined_object
+  def test_does_not_report_on_defined_global_object
     offenses = analyze_theme(
       ThemeCheck::UndefinedObject.new,
       "templates/index.liquid" => <<~END,
@@ -91,45 +118,150 @@ class UndefinedObjectTest < Minitest::Test
     assert_offenses("", offenses)
   end
 
-  def test_does_not_report_on_render
+  def test_report_on_render_with_variable_from_parent_context
     offenses = analyze_theme(
       ThemeCheck::UndefinedObject.new,
       "templates/index.liquid" => <<~END,
-        {% assign price_class = "price--large" %}
-        {% render 'price', price_class: price_class %}
+        {% assign price = "$3.00" %}
+        {% render 'product' %}
       END
-      "snippets/price.liquid" => <<~END,
-        {%- if price_class %}
-          {{ price_class }}
-        {% endif -%}
+      "snippets/product.liquid" => <<~END,
+        {{ price }}
+      END
+    )
+    assert_offenses(<<~END, offenses)
+      Missing argument `price` at templates/index.liquid:2
+    END
+  end
+
+  def test_report_on_render_with_undefined_variable_as_argument
+    offenses = analyze_theme(
+      ThemeCheck::UndefinedObject.new,
+      "templates/index.liquid" => <<~END,
+        {% render 'product', price: adjusted_price %}
+      END
+    )
+    assert_offenses(<<~END, offenses)
+      Undefined object `adjusted_price` at templates/index.liquid:1
+    END
+  end
+
+  def test_does_not_report_on_render_with_variable_as_argument
+    offenses = analyze_theme(
+      ThemeCheck::UndefinedObject.new,
+      "templates/index.liquid" => <<~END,
+        {% assign adjusted_price = "$3.00" %}
+        {% render 'product', price: adjusted_price %}
+      END
+      "snippets/product.liquid" => <<~END,
+        {{ price }}
       END
     )
     assert_offenses("", offenses)
   end
 
-  def test_does_not_report_on_include
+  def test_does_not_report_on_render_with_argument
     offenses = analyze_theme(
       ThemeCheck::UndefinedObject.new,
       "templates/index.liquid" => <<~END,
-        {% assign price_class = "price--large" %}
-        {% include 'price' %}
+        {% render 'product', price: '$3.00' %}
       END
-      "snippets/price.liquid" => <<~END,
-        {%- if price_class %}
-          {{ price_class }}
-        {% endif -%}
+      "snippets/product.liquid" => <<~END,
+        {{ price }}
       END
     )
     assert_offenses("", offenses)
   end
 
-  def test_does_not_report_on_foster_snippet
+  def test_report_on_render_with_undefined_argument
     offenses = analyze_theme(
       ThemeCheck::UndefinedObject.new,
-      "snippets/price.liquid" => <<~END,
-        {%- if price_class %}
-          {{ price_class }}
-        {% endif -%}
+      "templates/index.liquid" => <<~END,
+        {% render 'product' %}
+      END
+      "snippets/product.liquid" => <<~END,
+        {{ price }}
+      END
+    )
+    assert_offenses(<<~END, offenses)
+      Missing argument `price` at templates/index.liquid:1
+    END
+  end
+
+  def test_report_on_render_with_repeated_undefined_attribute
+    offenses = analyze_theme(
+      ThemeCheck::UndefinedObject.new,
+      "templates/index.liquid" => <<~END,
+        {% render 'product' %}
+      END
+      "snippets/product.liquid" => <<~END,
+        {{ price }}
+
+        {{ price }}
+      END
+    )
+    assert_offenses(<<~END, offenses)
+      Missing argument `price` at templates/index.liquid:1
+    END
+  end
+
+  def test_report_on_render_with_undefined_argument_in_one_of_multiple_locations
+    offenses = analyze_theme(
+      ThemeCheck::UndefinedObject.new,
+      "templates/index.liquid" => <<~END,
+        {% render 'product' %}
+      END
+      "templates/collection.liquid" => <<~END,
+        {% render 'product', price: "$3.00" %}
+      END
+      "snippets/product.liquid" => <<~END,
+        {{ price }}
+      END
+    )
+    assert_offenses(<<~END, offenses)
+      Missing argument `price` at templates/index.liquid:1
+    END
+  end
+
+  def test_report_on_nested_render_with_undefined_argument
+    offenses = analyze_theme(
+      ThemeCheck::UndefinedObject.new,
+      "templates/index.liquid" => <<~END,
+        {% render 'collection' %}
+      END
+      "snippets/collection.liquid" => <<~END,
+        {% render 'product' %}
+      END
+      "snippets/product.liquid" => <<~END,
+        {{ price }}
+      END
+    )
+    assert_offenses(<<~END, offenses)
+      Missing argument `price` at snippets/collection.liquid:1
+    END
+  end
+
+  def test_does_not_report_on_nested_render_with_argument
+    offenses = analyze_theme(
+      ThemeCheck::UndefinedObject.new,
+      "templates/index.liquid" => <<~END,
+        {% render 'collection' %}
+      END
+      "snippets/collection.liquid" => <<~END,
+        {% render 'product', price: "$3.00" %}
+      END
+      "snippets/product.liquid" => <<~END,
+        {{ price }}
+      END
+    )
+    assert_offenses("", offenses)
+  end
+
+  def test_does_not_report_on_unused_snippet
+    offenses = analyze_theme(
+      ThemeCheck::UndefinedObject.new,
+      "snippets/product.liquid" => <<~END,
+        {{ price }}
       END
     )
     assert_offenses("", offenses)
@@ -145,7 +277,7 @@ class UndefinedObjectTest < Minitest::Test
     assert_offenses("", offenses)
   end
 
-  def test_reportss_on_email_other_than_customers_reset_password
+  def test_reports_on_email_other_than_customers_reset_password
     offenses = analyze_theme(
       ThemeCheck::UndefinedObject.new,
       "templates/index.liquid" => <<~END,
