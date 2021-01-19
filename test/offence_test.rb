@@ -12,6 +12,12 @@ class OffenseTest < Minitest::Test
       "templates/long.liquid" => <<~END,
         <span class="form__message">{% include 'icon-error' %}{{ form.errors.translated_fields['email'] | capitalize }} {{ form.errors.messages['email'] }}.</span>
       END
+      "templates/multiline.liquid" => <<~END,
+        {% render 'product-card',
+          product: product,
+          show: true
+        %}
+      END
     )
   end
 
@@ -56,5 +62,44 @@ class OffenseTest < Minitest::Test
     offense.correct
 
     assert_equal("{{ 1 + 2 abc}}", node.template.excerpt(node.line_number))
+  end
+
+  def test_location
+    node = stub(
+      template: @theme["templates/index"],
+      line_number: 2,
+      markup: "1 + 2",
+    )
+    offense = ThemeCheck::Offense.new(check: Bogus.new, node: node)
+    assert_equal(1, offense.start_line)
+    assert_equal(1, offense.end_line)
+    assert_equal(5, offense.start_column)
+    assert_equal(10, offense.end_column)
+  end
+
+  def test_multiline_markup_location
+    node = stub(
+      template: @theme["templates/multiline"],
+      line_number: 1,
+      markup: "render 'product-card',\n  product: product,\n  show: true",
+    )
+    offense = ThemeCheck::Offense.new(check: Bogus.new, node: node)
+    assert_equal(0, offense.start_line)
+    assert_equal(2, offense.end_line)
+    assert_equal(3, offense.start_column)
+    assert_equal(12, offense.end_column)
+  end
+
+  def test_location_without_markup
+    node = stub(
+      template: @theme["templates/index"],
+      line_number: 1,
+      markup: nil,
+    )
+    offense = ThemeCheck::Offense.new(check: Bogus.new, node: node)
+    assert_equal(0, offense.start_line)
+    assert_equal(0, offense.end_line)
+    assert_equal(0, offense.start_column)
+    assert_equal(0, offense.end_column)
   end
 end
