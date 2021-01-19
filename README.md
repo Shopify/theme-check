@@ -40,7 +40,20 @@ And many more to come! Suggestions welcome ([create an issue](https://github.com
 
 ## Installation
 
+Theme Check is available through Homebrew _or_ RubyGems.
+
+**Homebrew**
+
+You’ll need to run `brew tap` first to add Shopify’s third-party repositories to Homebrew.
+
+```sh
+brew tap shopify/shopify
+brew install theme-check
 ```
+
+**RubyGems**
+
+```sh
 gem install theme-check
 ```
 
