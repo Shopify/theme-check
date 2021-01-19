@@ -55,18 +55,22 @@ module ThemeCheck
     end
 
     def end_line
-      return 0 unless line_number
-      line_number - 1
+      if markup
+        start_line + markup.count("\n")
+      else
+        start_line
+      end
     end
 
     def start_column
-      return 0 unless line_number
-      template.full_line(line_number).index(markup)
+      return 0 unless line_number && markup
+      template.full_line(start_line + 1).index(markup.split("\n", 2).first)
     end
 
     def end_column
-      return 0 unless line_number
-      template.full_line(line_number).index(markup) + markup.size
+      return 0 unless line_number && markup
+      markup_end = markup.split("\n").last
+      template.full_line(end_line + 1).index(markup_end) + markup_end.size
     end
 
     def code_name
