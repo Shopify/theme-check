@@ -12,3 +12,17 @@ end
 RuboCop::RakeTask.new
 
 task default: [:test, :rubocop]
+
+namespace :package do
+  require 'theme_check/packager'
+
+  task all: [:homebrew]
+
+  desc("Builds a Homebrew package of the CLI")
+  task :homebrew do
+    ThemeCheck::Packager.new.build_homebrew
+  end
+end
+
+desc("Builds all distribution packages of the CLI")
+task(package: 'package:all')
