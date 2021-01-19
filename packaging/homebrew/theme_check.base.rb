@@ -73,14 +73,14 @@ class ThemeCheck < Formula
     bin.rmtree if bin.exist?
     bin.mkpath
 
-    brew_gem_prefix = "#{prefix}gems/theme-check-#{version}"
+    brew_gem_prefix = "#{prefix}/gems/theme-check-#{version}"
 
     gemspec = Gem::Specification.load("#{prefix}/specifications/theme-check-#{version}.gemspec")
     ruby_libs = Dir.glob("#{prefix}/gems/*/lib")
     gemspec.executables.each do |exe|
       file = Pathname.new("#{brew_gem_prefix}/#{gemspec.bindir}/#{exe}")
       (bin + file.basename).open('w') do |f|
-        f << <<-RUBY
+        f << <<~RUBY
           #!#{ruby_bin}/ruby --disable-gems
           ENV['GEM_HOME']="#{prefix}"
           ENV['GEM_PATH']="#{prefix}"
