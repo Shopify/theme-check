@@ -45,13 +45,24 @@ module ThemeCheck
     def on_variable(node)
       return if @ignore
       if node.markup[0] != " "
-        add_offense("Space missing after '{{'", node: node)
-      elsif node.markup[-1] != " "
-        add_offense("Space missing before '}}'", node: node)
-      elsif node.markup[1] == " "
-        add_offense("Too many spaces after '{{'", node: node)
-      elsif node.markup[-2] == " "
-        add_offense("Too many spaces before '}}'", node: node)
+        add_offense("Space missing after '{{'", node: node) do |corrector|
+          corrector.insert_before(node, " ")
+        end
+      end
+      if node.markup[-1] != " "
+        add_offense("Space missing before '}}'", node: node) do |corrector|
+          corrector.insert_after(node, " ")
+        end
+      end
+      if node.markup[0] == " " && node.markup[1] == " "
+        add_offense("Too many spaces after '{{'", node: node) do |corrector|
+          corrector.replace(node, " #{node.markup.lstrip}")
+        end
+      end
+      if node.markup[-1] == " " && node.markup[-2] == " "
+        add_offense("Too many spaces before '}}'", node: node) do |corrector|
+          corrector.replace(node, "#{node.markup.rstrip} ")
+        end
       end
     end
   end

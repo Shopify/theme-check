@@ -30,6 +30,15 @@ module Minitest
       ThemeCheck::Theme.new(dir)
     end
 
+    def fix_theme(*check_classes, templates)
+      theme = make_theme(templates)
+      analyzer = ThemeCheck::Analyzer.new(theme, check_classes, true)
+      analyzer.analyze_theme
+      analyzer.correct_offenses
+      sources = theme.liquid.map { |template| [template.relative_path.to_s, template.path.read] }
+      Hash[*sources.flatten]
+    end
+
     def assert_offenses(output, offenses)
       assert_equal(output.chomp, offenses.sort_by(&:location).join("\n"))
     end

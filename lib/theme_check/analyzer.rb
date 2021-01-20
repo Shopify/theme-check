@@ -32,7 +32,6 @@ module ThemeCheck
       @theme.json.each { |json_file| @json_checks.call(:on_file, json_file) }
       @liquid_checks.call(:on_end)
       @json_checks.call(:on_end)
-      fix_offenses
       @offenses
     end
 
@@ -50,7 +49,7 @@ module ThemeCheck
       @offenses.select { |offense| !offense.correctable? }
     end
 
-    def fix_offenses
+    def correct_offenses
       if @auto_correct
         @offenses.each(&:correct)
         @theme.liquid.each(&:write)

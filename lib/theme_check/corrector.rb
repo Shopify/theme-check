@@ -21,6 +21,7 @@ module ThemeCheck
     def replace(node, content)
       line = @template.full_line(node.line_number)
       line[node.range[0]..node.range[1]] = content
+      node.markup = content
       @template.update!
     end
 

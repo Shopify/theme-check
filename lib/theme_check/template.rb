@@ -8,6 +8,7 @@ module ThemeCheck
     def initialize(path, root)
       @path = Pathname(path)
       @root = Pathname(root)
+      @updated = false
     end
 
     def relative_path
@@ -35,7 +36,8 @@ module ThemeCheck
     end
 
     def lines
-      @lines ||= source.split("\n")
+      # Retain trailing newline character
+      @lines ||= source.split("\n", -1)
     end
 
     def excerpt(line)
@@ -69,7 +71,7 @@ module ThemeCheck
 
     def write
       if @updated
-        File.write(path, lines.join("\n"))
+        @path.write(lines.join("\n"))
       end
     end
 
