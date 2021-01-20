@@ -61,12 +61,12 @@ module ThemeCheck
 
     def start_column
       return 0 unless line_number
-      template.full_line(line_number).index(markup)
+      template.full_line(line_number).index(markup) || 0
     end
 
     def end_column
       return 0 unless line_number
-      template.full_line(line_number).index(markup) + markup.size
+      start_column + markup.size
     end
 
     def code_name
