@@ -30,7 +30,7 @@ class LanguageServerTest < Minitest::Test
   def test_sends_offenses_on_open
     theme = make_theme("layout/theme.liquid" => "")
     ThemeCheck::Analyzer.any_instance.stubs(:offenses).returns([
-      OffenseMock.new('LiquidTag', :style, 'Wrong', TemplateMock.new('path'), 5, 14, 9, 9),
+      OffenseMock.new('LiquidTag', :style, 'Wrong', TemplateMock.new(theme.all[0].path), 5, 14, 9, 9),
     ])
 
     send_messages({
@@ -68,7 +68,7 @@ class LanguageServerTest < Minitest::Test
       jsonrpc: "2.0",
       method: "textDocument/publishDiagnostics",
       params: {
-        uri: "file:path",
+        uri: "file:#{theme.all[0].path}",
         diagnostics: [{
           range: {
             start: {
@@ -92,7 +92,7 @@ class LanguageServerTest < Minitest::Test
   def test_sends_offenses_on_text_document_did_save
     theme = make_theme("layout/theme.liquid" => "")
     ThemeCheck::Analyzer.any_instance.stubs(:offenses).returns([
-      OffenseMock.new('LiquidTag', :style, 'Wrong', TemplateMock.new('path'), 5, 14, 9, 9),
+      OffenseMock.new('LiquidTag', :style, 'Wrong', TemplateMock.new(theme.all[0].path), 5, 14, 9, 9),
     ])
 
     send_messages({
@@ -126,7 +126,7 @@ class LanguageServerTest < Minitest::Test
       jsonrpc: "2.0",
       method: "textDocument/publishDiagnostics",
       params: {
-        uri: "file:path",
+        uri: "file:#{theme.all[0].path}",
         diagnostics: [{
           range: {
             start: {

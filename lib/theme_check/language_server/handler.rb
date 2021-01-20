@@ -47,21 +47,33 @@ module ThemeCheck
         log("Checking #{config.root}")
         analyzer.analyze_theme
         log("Found #{theme.all.size} templates, and #{analyzer.offenses.size} offenses")
-        send_offenses(analyzer.offenses)
+        send_diagnostics(analyzer.offenses, theme.all)
       end
 
-      def send_offenses(offenses)
+      def send_diagnostics(offenses, templates)
+        contains_offenses = []
+
         offenses.group_by(&:template).each do |template, template_offenses|
           next unless template
-          # https://microsoft.github.io/language-server-protocol/specifications/specification-current/#notificationMessage
-          send_response(
-            method: 'textDocument/publishDiagnostics',
-            params: {
-              uri: "file:#{template.path}",
-              diagnostics: template_offenses.map { |offense| offense_to_diagnostic(offense) },
-            },
-          )
+          send_diagnostic(template.path, template_offenses)
+          contains_offenses.push(template.path)
         end
+
+        # Publish diagnostics with empty array if template does not contain error
+        templates.select { |t| !contains_offenses.include?(t.path) }.each do |template|
+          send_diagnostic(template.path, [])
+        end
+      end
+
+      def send_diagnostic(path, offenses)
+        # https://microsoft.github.io/language-server-protocol/specifications/specification-current/#notificationMessage
+        send_response(
+          method: 'textDocument/publishDiagnostics',
+          params: {
+            uri: "file:#{path}",
+            diagnostics: offenses.map { |offense| offense_to_diagnostic(offense) },
+          },
+        )
       end
 
       def offense_to_diagnostic(offense)
