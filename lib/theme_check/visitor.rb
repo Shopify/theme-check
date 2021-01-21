@@ -1,16 +1,9 @@
 # frozen_string_literal: true
 module ThemeCheck
   class Visitor
-    DISABLE_START = 'theme-check-disable'
-    DISABLE_END = 'theme-check-enable'
-
     def initialize(checks)
       @checks = checks
-
-      # nil for no ignored checks
-      # [] for every check ignored
-      # ['CheckName'] for individual ignored checks
-      @ignored_checks = nil
+      @disabled_checks = DisabledChecks.new
     end
 
     def visit_template(template)
@@ -31,7 +24,7 @@ module ThemeCheck
         call_checks(:after_node, node)
       end
 
-      updated_ignored_checks(node) if node.comment?
+      @disabled_checks.update(node) if node.comment?
     end
 
     private
@@ -45,30 +38,11 @@ module ThemeCheck
     end
 
     def checks
-      return @checks if @ignored_checks.nil?
+      return @checks unless @disabled_checks.any?
 
-      return Checks.new if @ignored_checks.empty?
+      return Checks.new if @disabled_checks.all_disabled?
 
-      Checks.new(@checks.reject { |check| @ignored_checks.include?(check.code_name) })
-    end
-
-    def updated_ignored_checks(node)
-      value = node.value.nodelist.join
-
-      if value.starts_with?(DISABLE_START)
-        @ignored_checks = value.gsub(DISABLE_START, '').strip.split(',').map(&:strip)
-      elsif value.starts_with?(DISABLE_END)
-        # Ignore everything, regardless of what was passed
-        @ignored_checks = nil
-      end
-    end
-
-    def start_ignoring_comment?(node)
-      node.comment? && node.value.nodelist.join.starts_with?(DISABLE_START)
-    end
-
-    def stop_ignoring_comment?(node)
-      node.comment? && node.value.nodelist.join.starts_with?(DISABLE_END)
+      @checks.except_disabled(@disabled_checks)
     end
   end
 end

@@ -8,5 +8,9 @@ module ThemeCheck
         end
       end
     end
+
+    def except_disabled(disabled_checks)
+      self.class.new(reject { |check| disabled_checks.all.include?(check.code_name) })
+    end
   end
 end
