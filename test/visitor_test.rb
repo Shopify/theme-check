@@ -161,4 +161,22 @@ class VisitorTest < Minitest::Test
       :after_document
     ], @tracer.calls)
   end
+
+  def test_theme_check_ignore_all_checks
+    template = parse_liquid(<<~END)
+      {% comment %}theme-check-disable{% endcomment %}
+      {% assign x = 'hello' %}
+      {% comment %}theme-check-enable{% endcomment %}
+    END
+    @visitor.visit_template(template)
+    assert_equal([
+      :on_document,
+      :on_tag,
+      :on_comment,
+      :after_comment,
+      :after_tag,
+      :on_string, "\n",
+      :after_document
+    ], @tracer.calls)
+  end
 end
