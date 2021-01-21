@@ -91,7 +91,11 @@ module ThemeCheck
 
         options_for_check = options.transform_keys(&:to_sym)
         options_for_check.delete(:enabled)
-        check = check_class.new(**options_for_check)
+        check = if options_for_check.empty?
+          check_class.new
+        else
+          check_class.new(**options_for_check)
+        end
         check.options = options_for_check
         check
       end.compact
@@ -104,7 +108,7 @@ module ThemeCheck
     private
 
     def check_name?(name)
-      name.start_with?(/[A-Z]/)
+      name.to_s.start_with?(/[A-Z]/)
     end
 
     def validate_configuration(configuration, default_configuration = self.class.default, parent_keys = [])

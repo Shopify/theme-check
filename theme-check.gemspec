@@ -13,6 +13,8 @@ Gem::Specification.new do |spec|
   spec.homepage      = "https://github.com/Shopify/theme-check"
   spec.license       = "MIT"
 
+  spec.required_ruby_version = ">= 2.6"
+
   spec.metadata['allowed_push_host'] = 'https://rubygems.org'
 
   spec.files = Dir.chdir(File.expand_path('..', __FILE__)) do
