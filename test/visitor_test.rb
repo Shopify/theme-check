@@ -179,4 +179,71 @@ class VisitorTest < Minitest::Test
       :after_document
     ], @tracer.calls)
   end
+
+  def test_theme_check_ignore_certain_checks_including_tracer
+    template = parse_liquid(<<~END)
+      {% comment %}theme-check-disable TracerCheck{% endcomment %}
+      {% assign x = 'hello' %}
+      {% comment %}theme-check-enable TracerCheck{% endcomment %}
+    END
+    @visitor.visit_template(template)
+    assert_equal([
+      :on_document,
+      :on_tag,
+      :on_comment,
+      :after_comment,
+      :after_tag,
+      :on_string, "\n",
+      :after_document
+    ], @tracer.calls)
+  end
+
+  def test_theme_check_ignore_certain_checks_excluding_tracer
+    template = parse_liquid(<<~END)
+      {% comment %}theme-check-disable SomeOtherCheck{% endcomment %}
+      {% assign x = 'hello' %}
+      {% comment %}theme-check-enable SomeOtherCheck{% endcomment %}
+    END
+    @visitor.visit_template(template)
+    assert_equal([
+      :on_document,
+      :on_tag,
+      :on_comment,
+      :after_comment,
+      :after_tag,
+      :on_string, "\n",
+      :on_tag,
+      :on_assign,
+      :on_variable,
+      :on_string, "hello",
+      :after_variable,
+      :after_assign,
+      :after_tag,
+      :on_string, "\n",
+      :on_tag,
+      :on_comment,
+      :after_comment,
+      :after_tag,
+      :on_string, "\n",
+      :after_document
+    ], @tracer.calls)
+  end
+
+  def test_theme_check_ignore_multiple_checks_including_tracer
+    template = parse_liquid(<<~END)
+      {% comment %}theme-check-disable TracerCheck, SomeOtherCheck{% endcomment %}
+      {% assign x = 'hello' %}
+      {% comment %}theme-check-enable TracerCheck, SomeOtherCheck{% endcomment %}
+    END
+    @visitor.visit_template(template)
+    assert_equal([
+      :on_document,
+      :on_tag,
+      :on_comment,
+      :after_comment,
+      :after_tag,
+      :on_string, "\n",
+      :after_document
+    ], @tracer.calls)
+  end
 end

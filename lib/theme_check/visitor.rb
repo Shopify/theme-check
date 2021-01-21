@@ -6,7 +6,11 @@ module ThemeCheck
 
     def initialize(checks)
       @checks = checks
-      @ignoring = false
+
+      # nil for no ignored checks
+      # [] for every check ignored
+      # ['CheckName'] for individual ignored checks
+      @ignored_checks = nil
     end
 
     def visit_template(template)
@@ -27,8 +31,7 @@ module ThemeCheck
         call_checks(:after_node, node)
       end
 
-      start_ignoring if start_ignoring_comment?(node)
-      stop_ignoring if stop_ignoring_comment?(node)
+      updated_ignored_checks(node) if node.comment?
     end
 
     private
@@ -38,17 +41,26 @@ module ThemeCheck
     end
 
     def call_checks(method, *args)
-      return if @ignoring
-
-      @checks.call(method, *args)
+      checks.call(method, *args)
     end
 
-    def start_ignoring
-      @ignoring = true
+    def checks
+      return @checks if @ignored_checks.nil?
+
+      return Checks.new if @ignored_checks.empty?
+
+      Checks.new(@checks.reject { |check| @ignored_checks.include?(check.code_name) })
     end
 
-    def stop_ignoring
-      @ignoring = false
+    def updated_ignored_checks(node)
+      value = node.value.nodelist.join
+
+      if value.starts_with?(DISABLE_START)
+        @ignored_checks = value.gsub(DISABLE_START, '').strip.split(',').map(&:strip)
+      elsif value.starts_with?(DISABLE_END)
+        # Ignore everything, regardless of what was passed
+        @ignored_checks = nil
+      end
     end
 
     def start_ignoring_comment?(node)
