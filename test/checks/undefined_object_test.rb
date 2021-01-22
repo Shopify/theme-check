@@ -316,4 +316,26 @@ class UndefinedObjectTest < Minitest::Test
       Undefined object `email` at templates/index.liquid:1
     END
   end
+
+  def test_does_not_report_on_shopify_plus_objects_in_checkout
+    offenses = analyze_theme(
+      ThemeCheck::UndefinedObject.new,
+      "layout/checkout.liquid" => <<~END,
+        <p>{{ checkout_html_classes }}</p>
+      END
+    )
+    assert_offenses("", offenses)
+  end
+
+  def test_reports_on_shopify_plus_objects_other_than_checkout
+    offenses = analyze_theme(
+      ThemeCheck::UndefinedObject.new,
+      "templates/index.liquid" => <<~END,
+        <p>{{ checkout_html_classes }}</p>
+      END
+    )
+    assert_offenses(<<~END, offenses)
+      Undefined object `checkout_html_classes` at templates/index.liquid:1
+    END
+  end
 end

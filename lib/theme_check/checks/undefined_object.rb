@@ -95,11 +95,19 @@ module ThemeCheck
       all_global_objects = ThemeCheck::ShopifyLiquid::Object.labels
       all_global_objects.freeze
 
+      shopify_plus_objects = ThemeCheck::ShopifyLiquid::Object.plus_labels
+      shopify_plus_objects.freeze
+
       each_template do |(name, info)|
         if 'templates/customers/reset_password' == name
           # NOTE: `email` is exceptionally exposed as a theme object in
           #       the customers' reset password template
           check_object(info, all_global_objects + ['email'])
+        elsif 'layout/checkout' == name
+          # NOTE: Shopify Plus has exceptionally exposed objects in
+          #       the checkout template
+          # https://shopify.dev/docs/themes/theme-templates/checkout-liquid#optional-objects
+          check_object(info, all_global_objects + shopify_plus_objects)
         else
           check_object(info, all_global_objects)
         end
