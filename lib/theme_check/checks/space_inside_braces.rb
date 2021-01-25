@@ -11,6 +11,7 @@ module ThemeCheck
 
     def on_node(node)
       return unless node.markup
+      return if :assign == node.type_name
 
       outside_of_strings(node.markup) do |chunk|
         chunk.scan(/([,:])  +/) do |_match|

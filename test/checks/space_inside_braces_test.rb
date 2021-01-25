@@ -48,6 +48,18 @@ class SpaceInsideBracesTest < Minitest::Test
     END
   end
 
+  def test_reports_extra_space_after_colon_in_assign_tag
+    offenses = analyze_theme(
+      ThemeCheck::SpaceInsideBraces.new,
+      "templates/index.liquid" => <<~END,
+        {% assign max_width = height | times:  image.aspect_ratio %}
+      END
+    )
+    assert_offenses(<<~END, offenses)
+      Too many spaces after ':' at templates/index.liquid:1
+    END
+  end
+
   def test_dont_report_with_proper_spaces
     offenses = analyze_theme(
       ThemeCheck::SpaceInsideBraces.new,
