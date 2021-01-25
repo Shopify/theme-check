@@ -110,4 +110,41 @@ class DisabledChecksTest < Minitest::Test
       :after_document
     ], @tracer_two.calls)
   end
+
+  def test_enable_specific_checks_individually
+    template = parse_liquid(<<~END)
+      {% comment %}theme-check-disable TracerOneCheck, TracerTwoCheck{% endcomment %}
+      {% assign x = 'hello' %}
+      {% comment %}theme-check-enable TracerOneCheck{% endcomment %}
+      Hello
+      {% comment %}theme-check-enable TracerTwoCheck{% endcomment %}
+      Everybody
+    END
+    @visitor.visit_template(template)
+
+    assert_equal([
+      :on_document,
+      :on_tag,
+      :on_comment,
+      :after_comment,
+      :after_tag,
+      :on_string, "\nHello\n",
+      :on_tag,
+      :on_comment,
+      :after_comment,
+      :after_tag,
+      :on_string, "\nEverybody\n",
+      :after_document
+    ], @tracer_one.calls)
+
+    assert_equal([
+      :on_document,
+      :on_tag,
+      :on_comment,
+      :after_comment,
+      :after_tag,
+      :on_string, "\nEverybody\n",
+      :after_document
+    ], @tracer_two.calls)
+  end
 end

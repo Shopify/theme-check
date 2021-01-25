@@ -5,6 +5,8 @@ module ThemeCheck
     DISABLE_START = 'theme-check-disable'
     DISABLE_END = 'theme-check-enable'
 
+    DISABLE_PREFIX_PATTERN = /^#{DISABLE_START}|#{DISABLE_END}/
+
     def initialize
       @disabled = []
       @all_disabled = false
@@ -17,7 +19,9 @@ module ThemeCheck
         @disabled = checks_from_text(text)
         @all_disabled = @disabled.empty?
       elsif stop_disabling?(text)
-        @disabled = []
+        checks = checks_from_text(text)
+        @disabled = checks.empty? ? [] : @disabled - checks
+
         @all_disabled = false
       end
     end
@@ -47,7 +51,6 @@ module ThemeCheck
       text.starts_with?(DISABLE_START)
     end
 
-    # Clear out disabled checks, regardless of what individual checks are specified
     def stop_disabling?(text)
       text.starts_with?(DISABLE_END)
     end
@@ -55,7 +58,7 @@ module ThemeCheck
     # Return a list of checks from a theme-check-disable comment
     # Returns [] if all checks are meant to be disabled
     def checks_from_text(text)
-      text.gsub(DISABLE_START, '').strip.split(',').map(&:strip)
+      text.gsub(DISABLE_PREFIX_PATTERN, '').strip.split(',').map(&:strip)
     end
   end
 end
