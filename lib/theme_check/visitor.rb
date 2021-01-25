@@ -3,15 +3,17 @@ module ThemeCheck
   class Visitor
     def initialize(checks)
       @checks = checks
-      @disabled_checks = DisabledChecks.new
     end
 
     def visit_template(template)
+      @disabled_checks = DisabledChecks.new
       visit(Node.new(template.root, nil, template))
     rescue Liquid::Error => exception
       exception.template_name = template.name
       call_checks(:on_error, exception)
     end
+
+    private
 
     def visit(node)
       call_checks(:on_node, node)
@@ -26,8 +28,6 @@ module ThemeCheck
 
       @disabled_checks.update(node) if node.comment?
     end
-
-    private
 
     def visit_children(node)
       node.children.each { |child| visit(child) }
