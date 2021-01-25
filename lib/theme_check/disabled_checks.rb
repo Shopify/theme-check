@@ -4,7 +4,6 @@ module ThemeCheck
   class DisabledChecks
     DISABLE_START = 'theme-check-disable'
     DISABLE_END = 'theme-check-enable'
-
     DISABLE_PREFIX_PATTERN = /^#{DISABLE_START}|#{DISABLE_END}/
 
     def initialize
