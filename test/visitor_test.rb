@@ -167,6 +167,7 @@ class VisitorTest < Minitest::Test
       {% comment %}theme-check-disable{% endcomment %}
       {% assign x = 'hello' %}
       {% comment %}theme-check-enable{% endcomment %}
+      hello
     END
     @visitor.visit_template(template)
     assert_equal([
@@ -175,7 +176,7 @@ class VisitorTest < Minitest::Test
       :on_comment,
       :after_comment,
       :after_tag,
-      :on_string, "\n",
+      :on_string, "\nhello\n",
       :after_document
     ], @tracer.calls)
   end
