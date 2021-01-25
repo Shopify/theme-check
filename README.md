@@ -14,24 +14,24 @@ _Disclaimer: This tool is not supported as part of the Partners program._
 
 Theme Check currently checks for the following:
 
-✅ Liquid syntax errors
-✅ JSON syntax errors
-✅ Missing snippet & section templates
-✅ Unused `{% assign ... %}`
-✅ Unused snippet templates
-✅ Template length
-✅ Deprecated tags
-✅ Unknown tags
-✅ Unknown filters
-✅ Missing `{{ content_for_* }}` in `theme.liquid`
-✅ Excessive nesting of snippets
-✅ Missing or extra spaces inside `{% ... %}` and `{{ ... }}`
-✅ Missing default locale file
-✅ Unmatching translation keys in locale files
-✅ Using unknown translation keys in `{{ 'missing_key' | t }}`
-✅ Using several `{% ... %}` instead of `{% liquid ... %}`
-✅ Undefined [objects](https://shopify.dev/docs/themes/liquid/reference/objects)
-✅ Deprecated filters
+✅ Liquid syntax errors  
+✅ JSON syntax errors  
+✅ Missing snippet & section templates  
+✅ Unused `{% assign ... %}`  
+✅ Unused snippet templates  
+✅ Template length  
+✅ Deprecated tags  
+✅ Unknown tags  
+✅ Unknown filters  
+✅ Missing `{{ content_for_* }}` in `theme.liquid`  
+✅ Excessive nesting of snippets  
+✅ Missing or extra spaces inside `{% ... %}` and `{{ ... }}`  
+✅ Missing default locale file  
+✅ Unmatching translation keys in locale files  
+✅ Using unknown translation keys in `{{ 'missing_key' | t }}`  
+✅ Using several `{% ... %}` instead of `{% liquid ... %}`  
+✅ Undefined [objects](https://shopify.dev/docs/themes/liquid/reference/objects)  
+✅ Deprecated filters  
 ✅ Missing `theme-check-enable` comment
 
 And many more to come! Suggestions welcome ([create an issue](https://github.com/Shopify/theme-check/issues)).
