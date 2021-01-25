@@ -2,35 +2,6 @@
 require "test_helper"
 
 class VisitorTest < Minitest::Test
-  class TracerCheck < ThemeCheck::Check
-    attr_reader :calls
-
-    def initialize
-      @calls = []
-    end
-
-    def respond_to?(method)
-      method.start_with?("on_") || method.start_with?("after_") || super
-    end
-
-    def method_missing(method, node)
-      @calls << method
-      @calls << node.value if node.literal?
-    end
-
-    def respond_to_missing?(_method_name, _include_private = false)
-      true
-    end
-
-    def on_node(node)
-      # Ignore, too noisy
-    end
-
-    def after_node(node)
-      # Ignore, too noisy
-    end
-  end
-
   def setup
     @tracer = TracerCheck.new
     @visitor = ThemeCheck::Visitor.new(ThemeCheck::Checks.new([@tracer]))
@@ -156,92 +127,6 @@ class VisitorTest < Minitest::Test
       :on_variable_lookup,
       :after_variable_lookup,
       :after_form,
-      :after_tag,
-      :on_string, "\n",
-      :after_document
-    ], @tracer.calls)
-  end
-
-  def test_theme_check_ignore_all_checks
-    template = parse_liquid(<<~END)
-      {% comment %}theme-check-disable{% endcomment %}
-      {% assign x = 'hello' %}
-      {% comment %}theme-check-enable{% endcomment %}
-      hello
-    END
-    @visitor.visit_template(template)
-    assert_equal([
-      :on_document,
-      :on_tag,
-      :on_comment,
-      :after_comment,
-      :after_tag,
-      :on_string, "\nhello\n",
-      :after_document
-    ], @tracer.calls)
-  end
-
-  def test_theme_check_ignore_certain_checks_including_tracer
-    template = parse_liquid(<<~END)
-      {% comment %}theme-check-disable TracerCheck{% endcomment %}
-      {% assign x = 'hello' %}
-      {% comment %}theme-check-enable TracerCheck{% endcomment %}
-    END
-    @visitor.visit_template(template)
-    assert_equal([
-      :on_document,
-      :on_tag,
-      :on_comment,
-      :after_comment,
-      :after_tag,
-      :on_string, "\n",
-      :after_document
-    ], @tracer.calls)
-  end
-
-  def test_theme_check_ignore_certain_checks_excluding_tracer
-    template = parse_liquid(<<~END)
-      {% comment %}theme-check-disable SomeOtherCheck{% endcomment %}
-      {% assign x = 'hello' %}
-      {% comment %}theme-check-enable SomeOtherCheck{% endcomment %}
-    END
-    @visitor.visit_template(template)
-    assert_equal([
-      :on_document,
-      :on_tag,
-      :on_comment,
-      :after_comment,
-      :after_tag,
-      :on_string, "\n",
-      :on_tag,
-      :on_assign,
-      :on_variable,
-      :on_string, "hello",
-      :after_variable,
-      :after_assign,
-      :after_tag,
-      :on_string, "\n",
-      :on_tag,
-      :on_comment,
-      :after_comment,
-      :after_tag,
-      :on_string, "\n",
-      :after_document
-    ], @tracer.calls)
-  end
-
-  def test_theme_check_ignore_multiple_checks_including_tracer
-    template = parse_liquid(<<~END)
-      {% comment %}theme-check-disable TracerCheck, SomeOtherCheck{% endcomment %}
-      {% assign x = 'hello' %}
-      {% comment %}theme-check-enable TracerCheck, SomeOtherCheck{% endcomment %}
-    END
-    @visitor.visit_template(template)
-    assert_equal([
-      :on_document,
-      :on_tag,
-      :on_comment,
-      :after_comment,
       :after_tag,
       :on_string, "\n",
       :after_document
