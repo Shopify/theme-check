@@ -2,6 +2,8 @@
 
 We love receiving pull requests!
 
+For your contribution to be accepted you will need to sign the [Shopify Contributor License Agreement (CLA)](https://cla.shopify.com/).
+
 ## Standards
 
 * Checks should do one thing, and do it well.
