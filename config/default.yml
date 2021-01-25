@@ -64,3 +64,6 @@ RequiredDirectories:
 
 DeprecatedFilter:
   enabled: true
+
+MissingEnableComment:
+  enabled: true

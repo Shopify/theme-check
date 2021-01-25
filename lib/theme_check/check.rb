@@ -50,6 +50,14 @@ module ThemeCheck
         @doc = doc if doc
         @doc if defined?(@doc)
       end
+
+      def always_enable!
+        @always_enabled = true
+      end
+
+      def always_enabled
+        defined?(@always_enabled) || false
+      end
     end
 
     def severity
@@ -78,6 +86,10 @@ module ThemeCheck
 
     def ignored?
       defined?(@ignored) && @ignored
+    end
+
+    def always_enabled?
+      self.class.always_enabled
     end
 
     def to_s

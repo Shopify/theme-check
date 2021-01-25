@@ -40,7 +40,7 @@ module ThemeCheck
     def checks
       return @checks unless @disabled_checks.any?
 
-      return Checks.new if @disabled_checks.all_disabled?
+      return @checks.except_disabled if @disabled_checks.all_disabled?
 
       @checks.except_disabled(@disabled_checks)
     end
