@@ -55,7 +55,7 @@ module ThemeCheck
         @always_enabled = true
       end
 
-      def always_enabled
+      def always_enabled?
         defined?(@always_enabled) || false
       end
     end
@@ -89,7 +89,7 @@ module ThemeCheck
     end
 
     def always_enabled?
-      self.class.always_enabled
+      self.class.always_enabled?
     end
 
     def to_s
