@@ -6,9 +6,14 @@ module ThemeCheck
     DISABLE_END = 'theme-check-enable'
     DISABLE_PREFIX_PATTERN = /^#{DISABLE_START}|#{DISABLE_END}/
 
+    ACTION_DISABLE_CHECKS = :disable
+    ACTION_ENABLE_CHECKS = :enable
+    ACTION_UNRELATED_COMMENT = :unrelated
+
     def initialize
       @disabled = []
       @all_disabled = false
+      @full_document_disabled = false
     end
 
     def update(node)
@@ -17,6 +22,10 @@ module ThemeCheck
       if start_disabling?(text)
         @disabled = checks_from_text(text)
         @all_disabled = @disabled.empty?
+
+        if node&.line_number == 1
+          @full_document_disabled = true
+        end
       elsif stop_disabling?(text)
         checks = checks_from_text(text)
         @disabled = checks.empty? ? [] : @disabled - checks
@@ -38,6 +47,11 @@ module ThemeCheck
     # Get a list of all the individual disabled checks
     def all
       @disabled
+    end
+
+    # If the first line of the document is a theme-check-disable comment
+    def full_document_disabled?
+      @full_document_disabled
     end
 
     private

@@ -114,3 +114,11 @@ Disable multiple checks by including them as a comma-separated list:
 {%assign x = 1%}
 {% comment %}theme-check-enable UnusedAssign,SpaceInsideBraces{% endcomment %}
 ```
+
+Disable checks for the _entire document_ by placing the comment on the first line:
+
+```liquid
+{% comment %}theme-check-disable SpaceInsideBraces{% endcomment %}
+
+{%assign x = 1%}
+```

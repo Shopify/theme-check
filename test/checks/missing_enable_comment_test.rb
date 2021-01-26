@@ -19,10 +19,22 @@ class MissingEnableCommentTest < Minitest::Test
     assert_offenses("", offenses)
   end
 
-  def test_all_checks_disabled
+  def test_first_line_comment_disables_entire_file
     offenses = analyze_theme(
       ThemeCheck::MissingEnableComment.new,
       "templates/index.liquid" => <<~END,
+        {% comment %}theme-check-disable{% endcomment %}
+        {% assign x = 1 %}
+      END
+    )
+    assert_offenses("", offenses)
+  end
+
+  def test_non_first_line_comment_triggers_offense
+    offenses = analyze_theme(
+      ThemeCheck::MissingEnableComment.new,
+      "templates/index.liquid" => <<~END,
+        <p>Hello, world</p>
         {% comment %}theme-check-disable{% endcomment %}
         {% assign x = 1 %}
       END
@@ -37,6 +49,7 @@ class MissingEnableCommentTest < Minitest::Test
       ThemeCheck::MissingEnableComment.new,
       Minitest::Test::TracerCheck.new,
       "templates/index.liquid" => <<~END,
+        <p>Hello, world</p>
         {% comment %}theme-check-disable TracerCheck{% endcomment %}
         {% assign x = 1 %}
       END
@@ -51,6 +64,7 @@ class MissingEnableCommentTest < Minitest::Test
       ThemeCheck::MissingEnableComment.new,
       Minitest::Test::TracerCheck.new,
       "templates/index.liquid" => <<~END,
+        <p>Hello, world</p>
         {% comment %}theme-check-disable TracerCheck, AnotherCheck{% endcomment %}
         {% assign x = 1 %}
       END

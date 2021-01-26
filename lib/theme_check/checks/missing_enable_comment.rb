@@ -16,6 +16,7 @@ module ThemeCheck
     end
 
     def after_document(node)
+      return if @disabled_checks.full_document_disabled?
       return unless @disabled_checks.any?
 
       message = if @disabled_checks.all_disabled?
