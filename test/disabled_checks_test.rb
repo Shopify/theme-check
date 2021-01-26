@@ -71,4 +71,18 @@ class DisabledChecksTest < Minitest::Test
     refute_includes(@tracer_two.calls, "\nHello\n")
     assert_includes(@tracer_two.calls, "\nEverybody\n")
   end
+
+  def test_comments_can_have_spaces
+    template = parse_liquid(<<~END)
+      {% comment %} theme-check-disable {% endcomment %}
+      {% assign x = 'hello' %}
+      {% comment %} theme-check-enable {% endcomment %}
+      hello
+    END
+    @visitor.visit_template(template)
+
+    refute_includes(@tracer_one.calls, :on_assign)
+
+    refute_includes(@tracer_two.calls, :on_assign)
+  end
 end

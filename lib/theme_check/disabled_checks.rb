@@ -4,7 +4,7 @@ module ThemeCheck
   class DisabledChecks
     DISABLE_START = 'theme-check-disable'
     DISABLE_END = 'theme-check-enable'
-    DISABLE_PREFIX_PATTERN = /^#{DISABLE_START}|#{DISABLE_END}/
+    DISABLE_PREFIX_PATTERN = /#{DISABLE_START}|#{DISABLE_END}/
 
     ACTION_DISABLE_CHECKS = :disable
     ACTION_ENABLE_CHECKS = :enable
@@ -61,11 +61,11 @@ module ThemeCheck
     end
 
     def start_disabling?(text)
-      text.starts_with?(DISABLE_START)
+      text.strip.starts_with?(DISABLE_START)
     end
 
     def stop_disabling?(text)
-      text.starts_with?(DISABLE_END)
+      text.strip.starts_with?(DISABLE_END)
     end
 
     # Return a list of checks from a theme-check-disable comment
