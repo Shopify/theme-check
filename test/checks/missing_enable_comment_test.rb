@@ -11,9 +11,9 @@ class MissingEnableCommentTest < Minitest::Test
     offenses = analyze_theme(
       ThemeCheck::MissingEnableComment.new,
       "templates/index.liquid" => <<~END,
-        {% theme-check-disable %}
+        {% comment %}theme-check-disable{% endcomment %}
         {% assign x = 1 %}
-        {% theme-check-enable %}
+        {% comment %}theme-check-enable{% endcomment %}
       END
     )
     assert_offenses("", offenses)
