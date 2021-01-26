@@ -40,9 +40,9 @@ module ThemeCheck
     def checks
       return @checks unless @disabled_checks.any?
 
-      return @checks.except_disabled if @disabled_checks.all_disabled?
+      return @checks.always_enabled if @disabled_checks.all_disabled?
 
-      @checks.except_disabled(@disabled_checks)
+      @checks.except_for(@disabled_checks)
     end
   end
 end

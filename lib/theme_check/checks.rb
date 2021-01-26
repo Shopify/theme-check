@@ -9,14 +9,11 @@ module ThemeCheck
       end
     end
 
-    # Return a collection of checks except for disabled checks represented
-    # as a DisabledChecks instance — or `nil`, if all checks are meant to be disabled.
-    # Still returns checks marked as `always_enabled!`
-    def except_disabled(disabled_checks = nil)
-      always_enabled = reject(&:can_disable?)
+    def always_enabled
+      self.class.new(reject(&:can_disable?))
+    end
 
-      return self.class.new(always_enabled) if disabled_checks.nil?
-
+    def except_for(disabled_checks)
       still_enabled = reject { |check| disabled_checks.all.include?(check.code_name) }
 
       self.class.new((always_enabled + still_enabled).uniq)
