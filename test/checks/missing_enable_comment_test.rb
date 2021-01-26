@@ -4,7 +4,7 @@ require "minitest/focus"
 
 class MissingEnableCommentTest < Minitest::Test
   def test_always_enabled_by_default
-    assert(ThemeCheck::MissingEnableComment.new.always_enabled?)
+    refute(ThemeCheck::MissingEnableComment.new.can_disable?)
   end
 
   def test_no_default_noops

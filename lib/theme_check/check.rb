@@ -51,12 +51,11 @@ module ThemeCheck
         @doc if defined?(@doc)
       end
 
-      def always_enable!
-        @always_enabled = true
-      end
-
-      def always_enabled?
-        defined?(@always_enabled) || false
+      def can_disable(disableable = nil)
+        unless disableable.nil?
+          @can_disable = disableable
+        end
+        defined?(@can_disable) ? @can_disable : true
       end
     end
 
@@ -88,8 +87,8 @@ module ThemeCheck
       defined?(@ignored) && @ignored
     end
 
-    def always_enabled?
-      self.class.always_enabled?
+    def can_disable?
+      self.class.can_disable
     end
 
     def to_s

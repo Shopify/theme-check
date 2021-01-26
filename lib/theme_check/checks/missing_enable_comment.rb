@@ -5,7 +5,7 @@ module ThemeCheck
 
     # Don't allow this check to be disabled with a comment,
     # as we need to be able to check for disabled checks.
-    always_enable!
+    can_disable false
 
     def on_document(_node)
       @disabled_checks = DisabledChecks.new
