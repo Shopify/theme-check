@@ -4,6 +4,7 @@ module ThemeCheck
   class Config
     DOTFILE = '.theme-check.yml'
     DEFAULT_CONFIG = "#{__dir__}/../../config/default.yml"
+    BOOLEAN = [true, false]
 
     attr_reader :root
     attr_accessor :only_categories, :exclude_categories, :auto_correct
@@ -29,81 +30,123 @@ module ThemeCheck
       def load_file(absolute_path)
         YAML.load_file(absolute_path)
       end
+
+      def default
+        @default ||= load_file(DEFAULT_CONFIG)
+      end
     end
 
     def initialize(root, configuration = nil)
-      @configuration = configuration || {}
-      @checks = @configuration.dup
-      @root = Pathname.new(root)
-      if @checks.key?("root")
-        @root = @root.join(@checks.delete("root"))
+      @configuration = if configuration
+        validate_configuration(configuration)
+      else
+        {}
       end
+      merge_with_default_configuration!(@configuration)
+
+      @root = Pathname.new(root)
+      if @configuration.key?("root")
+        @root = @root.join(@configuration["root"])
+      end
+
       @only_categories = []
       @exclude_categories = []
       @auto_correct = false
+
       resolve_requires
+    end
+
+    def [](name)
+      @configuration[name]
     end
 
     def to_h
       @configuration
     end
 
+    def check_configurations
+      @check_configurations ||= @configuration.select { |name, _| check_name?(name) }
+    end
+
     def enabled_checks
-      checks = []
+      @enabled_checks ||= check_configurations.map do |check_name, options|
+        next unless options["enabled"]
 
-      default_configuration.merge(@checks).each do |check_name, properties|
-        if @checks[check_name] && !default_configuration[check_name].nil?
-          valid_properties = valid_check_configuration(check_name)
-          properties = properties.merge(valid_properties)
-        end
-
-        next if properties.delete('enabled') == false
-
-        options = properties.transform_keys(&:to_sym)
         check_class = ThemeCheck.const_get(check_name)
+
         next if exclude_categories.include?(check_class.category)
         next if only_categories.any? && !only_categories.include?(check_class.category)
 
-        check = check_class.new(**options)
-        check.options = options
-        checks << check
-      end
+        options_for_check = options.transform_keys(&:to_sym)
+        options_for_check.delete(:enabled)
+        check = check_class.new(**options_for_check)
+        check.options = options_for_check
+        check
+      end.compact
+    end
 
-      checks
+    def ignored_patterns
+      self["ignore"] || []
     end
 
     private
 
-    def default_configuration
-      @default_configuration ||= Config.load_file(DEFAULT_CONFIG)
+    def check_name?(name)
+      name.start_with?(/[A-Z]/)
+    end
+
+    def validate_configuration(configuration, default_configuration = self.class.default, parent_keys = [])
+      valid_configuration = {}
+
+      configuration.each do |key, value|
+        # No validation possible unless we have a default to compare to
+        unless default_configuration
+          valid_configuration[key] = value
+          next
+        end
+
+        default = default_configuration[key]
+        keys = parent_keys + [key]
+        name = keys.join(".")
+
+        if check_name?(key)
+          if value.is_a?(Hash)
+            valid_configuration[key] = validate_configuration(value, default, keys)
+          else
+            warn("bad configuration type for #{name}: expected a Hash, got #{value.inspect}")
+          end
+        elsif default.nil?
+          warn("unknown configuration: #{name}")
+        elsif BOOLEAN.include?(default) && !BOOLEAN.include?(value)
+          warn("bad configuration type for #{name}: expected true or false, got #{value.inspect}")
+        elsif !BOOLEAN.include?(default) && default.class != value.class
+          warn("bad configuration type for #{name}: expected a #{default.class}, got #{value.inspect}")
+        else
+          valid_configuration[key] = value
+        end
+      end
+
+      valid_configuration
+    end
+
+    def merge_with_default_configuration!(configuration, default_configuration = self.class.default)
+      default_configuration.each do |key, default|
+        value = configuration[key]
+
+        case value
+        when Hash
+          merge_with_default_configuration!(value, default)
+        when nil
+          configuration[key] = default
+        end
+      end
+      configuration
     end
 
     def resolve_requires
-      if @checks.key?("require")
-        @checks.delete("require").tap do |paths|
-          paths.each do |path|
-            if path.start_with?('.')
-              require(File.join(@root, path))
-            end
-          end
-        end
+      self["require"]&.each do |path|
+        require(File.join(@root, path))
       end
-    end
-
-    def valid_check_configuration(check_name)
-      default_properties = default_configuration[check_name]
-
-      valid = {}
-
-      @checks[check_name].each do |property, value|
-        if !default_properties.key?(property)
-          warn("#{check_name} does not support #{property} parameter.")
-        else
-          valid[property] = value
-        end
-      end
-
-      valid
     end
   end
 end
