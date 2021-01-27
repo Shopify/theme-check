@@ -79,11 +79,19 @@ Add a `.theme-check.yml` file at the root of your theme to configure:
 # be uploaded to Shopify.
 root: dist
 
+# It is possible to extend theme-check with custom checks
+require:
+  - ./path/to/my_custom_check.rb
+
 # Disable some checks
 TemplateLength:
   enabled: false
   # Or configure options
   max_length: 300
+  
+# Enable a custom check
+MyCustomCheck
+  enabled: true
 ```
 
 See [config/default.yml](config/default.yml) for available options & defaults.
