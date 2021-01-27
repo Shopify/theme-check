@@ -49,8 +49,9 @@ module ThemeCheck
       end
     end
 
-    def initialize
+    def initialize(optional_prefix: nil)
       @files = {}
+      @optional_prefix = optional_prefix
     end
 
     def on_document(node)
@@ -85,8 +86,11 @@ module ThemeCheck
     end
 
     def on_variable_lookup(node)
+      variable_name = node.value.name
+      return if @optional_prefix && variable_name.starts_with?(@optional_prefix)
+
       @files[node.template.name].add_variable_lookup(
-        name: node.value.name,
+        name: variable_name,
         node: node,
       )
     end

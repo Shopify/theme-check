@@ -58,6 +58,8 @@ MissingRequiredTemplateFiles:
 
 UndefinedObject:
   enabled: true
+  # Objects with this prefix will be ignored
+  optional_prefix: o_
 
 RequiredDirectories:
   enabled: true

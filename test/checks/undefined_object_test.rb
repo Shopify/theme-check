@@ -316,4 +316,17 @@ class UndefinedObjectTest < Minitest::Test
       Undefined object `email` at templates/index.liquid:1
     END
   end
+
+  def test_ignores_optional
+    offenses = analyze_theme(
+      ThemeCheck::UndefinedObject.new(optional_prefix: "o_"),
+      "templates/index.liquid" => <<~END,
+        {% render 'product' %}
+      END
+      "snippets/product.liquid" => <<~END,
+        {{ o_undefined }}
+      END
+    )
+    assert_offenses("", offenses)
+  end
 end
