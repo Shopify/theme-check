@@ -6,11 +6,14 @@ module ThemeCheck
     end
 
     def visit_template(template)
+      @disabled_checks = DisabledChecks.new
       visit(Node.new(template.root, nil, template))
     rescue Liquid::Error => exception
       exception.template_name = template.name
       call_checks(:on_error, exception)
     end
+
+    private
 
     def visit(node)
       call_checks(:on_node, node)
@@ -22,16 +25,24 @@ module ThemeCheck
         call_checks(:after_tag, node) if node.tag?
         call_checks(:after_node, node)
       end
-    end
 
-    private
+      @disabled_checks.update(node) if node.comment?
+    end
 
     def visit_children(node)
       node.children.each { |child| visit(child) }
     end
 
     def call_checks(method, *args)
-      @checks.call(method, *args)
+      checks.call(method, *args)
+    end
+
+    def checks
+      return @checks unless @disabled_checks.any?
+
+      return @checks.always_enabled if @disabled_checks.all_disabled?
+
+      @checks.except_for(@disabled_checks)
     end
   end
 end

@@ -32,6 +32,7 @@ Theme Check currently checks for the following:
 ✅ Using several `{% ... %}` instead of `{% liquid ... %}`  
 ✅ Undefined [objects](https://shopify.dev/docs/themes/liquid/reference/objects)  
 ✅ Deprecated filters  
+✅ Missing `theme-check-enable` comment  
 
 And many more to come! Suggestions welcome ([create an issue](https://github.com/Shopify/theme-check/issues)).
 
@@ -95,3 +96,37 @@ MyCustomCheck
 ```
 
 See [config/default.yml](config/default.yml) for available options & defaults.
+
+## Disable checks with comments
+
+Use Liquid comments to disable and re-enable all checks for a section of your template:
+
+```liquid
+{% comment %}theme-check-disable{% endcomment %}
+{% assign x = 1 %}
+{% comment %}theme-check-enable{% endcomment %}
+```
+
+Disable a specific check by including it in the comment:
+
+```liquid
+{% comment %}theme-check-disable UnusedAssign{% endcomment %}
+{% assign x = 1 %}
+{% comment %}theme-check-enable UnusedAssign{% endcomment %}
+```
+
+Disable multiple checks by including them as a comma-separated list:
+
+```liquid
+{% comment %}theme-check-disable UnusedAssign,SpaceInsideBraces{% endcomment %}
+{%assign x = 1%}
+{% comment %}theme-check-enable UnusedAssign,SpaceInsideBraces{% endcomment %}
+```
+
+Disable checks for the _entire document_ by placing the comment on the first line:
+
+```liquid
+{% comment %}theme-check-disable SpaceInsideBraces{% endcomment %}
+
+{%assign x = 1%}
+```

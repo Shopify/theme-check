@@ -8,5 +8,15 @@ module ThemeCheck
         end
       end
     end
+
+    def always_enabled
+      self.class.new(reject(&:can_disable?))
+    end
+
+    def except_for(disabled_checks)
+      still_enabled = reject { |check| disabled_checks.all.include?(check.code_name) }
+
+      self.class.new((always_enabled + still_enabled).uniq)
+    end
   end
 end

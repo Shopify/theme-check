@@ -50,6 +50,13 @@ module ThemeCheck
         @doc = doc if doc
         @doc if defined?(@doc)
       end
+
+      def can_disable(disableable = nil)
+        unless disableable.nil?
+          @can_disable = disableable
+        end
+        defined?(@can_disable) ? @can_disable : true
+      end
     end
 
     def severity
@@ -78,6 +85,10 @@ module ThemeCheck
 
     def ignored?
       defined?(@ignored) && @ignored
+    end
+
+    def can_disable?
+      self.class.can_disable
     end
 
     def to_s

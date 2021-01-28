@@ -2,35 +2,6 @@
 require "test_helper"
 
 class VisitorTest < Minitest::Test
-  class TracerCheck < ThemeCheck::Check
-    attr_reader :calls
-
-    def initialize
-      @calls = []
-    end
-
-    def respond_to?(method)
-      method.start_with?("on_") || method.start_with?("after_") || super
-    end
-
-    def method_missing(method, node)
-      @calls << method
-      @calls << node.value if node.literal?
-    end
-
-    def respond_to_missing?(_method_name, _include_private = false)
-      true
-    end
-
-    def on_node(node)
-      # Ignore, too noisy
-    end
-
-    def after_node(node)
-      # Ignore, too noisy
-    end
-  end
-
   def setup
     @tracer = TracerCheck.new
     @visitor = ThemeCheck::Visitor.new(ThemeCheck::Checks.new([@tracer]))
