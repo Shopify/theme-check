@@ -47,4 +47,20 @@ class ThemeTest < Minitest::Test
   def test_default_locale
     assert_equal("en", @theme.default_locale)
   end
+
+  def test_ignore
+    theme = ThemeCheck::Theme.new(make_theme(
+      "templates/index.liquid" => "",
+      "ignored/product.liquid" => "",
+      "ignored/nested/product.liquid" => "",
+      "locales/en.default.json" => "",
+      "locales/nested/en.default.json" => "",
+    ).root, ignored_patterns: [
+      "ignored/*",
+      "*.json",
+    ])
+
+    assert_equal([], theme.json.map(&:name))
+    assert_equal(["templates/index"], theme.liquid.map(&:name))
+  end
 end

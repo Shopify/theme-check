@@ -41,7 +41,7 @@ module ThemeCheck
       def analyze_and_send_offenses(file_path)
         root = ThemeCheck::Config.find(file_path) || @root_path
         config = ThemeCheck::Config.from_path(root)
-        theme = ThemeCheck::Theme.new(config.root)
+        theme = ThemeCheck::Theme.new(config.root, ignored_patterns: config.ignored_patterns)
         analyzer = ThemeCheck::Analyzer.new(theme, config.enabled_checks)
 
         log("Checking #{config.root}")
