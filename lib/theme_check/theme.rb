@@ -6,16 +6,17 @@ module ThemeCheck
     DEFAULT_LOCALE_REGEXP = %r{^locales/(.*)\.default$}
     attr_reader :root
 
-    def initialize(root)
+    def initialize(root, ignored_patterns: [])
       @root = Pathname.new(root)
+      @ignored_patterns = ignored_patterns
     end
 
     def liquid
-      @liquid ||= @root.glob("**/*.liquid").map { |path| Template.new(path, @root) }
+      @liquid ||= glob("**/*.liquid").map { |path| Template.new(path, @root) }
     end
 
     def json
-      @json ||= @root.glob("**/*.json").map { |path| JsonFile.new(path, @root) }
+      @json ||= glob("**/*.json").map { |path| JsonFile.new(path, @root) }
     end
 
     def default_locale_json
@@ -54,7 +55,16 @@ module ThemeCheck
     end
 
     def directories
-      @directories ||= @root.glob('*').select { |f| File.directory?(f) }.map { |f| f.relative_path_from(@root) }
+      @directories ||= glob('*').select { |f| File.directory?(f) }.map { |f| f.relative_path_from(@root) }
+    end
+
+    private
+
+    def glob(pattern)
+      @root.glob(pattern).reject do |path|
+        relative_path = path.relative_path_from(@root)
+        @ignored_patterns.any? { |ignored| relative_path.fnmatch?(ignored) }
+      end
     end
   end
 end

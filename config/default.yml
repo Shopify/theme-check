@@ -3,7 +3,7 @@ root: .
 require: []
 
 ignore:
-  - node_modules
+  - node_modules/*
 
 ConvertIncludeToRender:
   enabled: true
