@@ -3,9 +3,9 @@ module ThemeCheck
   class Offense
     MAX_SOURCE_EXCERPT_SIZE = 120
 
-    attr_reader :check, :message, :template, :node, :markup, :line_number, :correction
+    attr_reader :check, :message, :template, :node, :markup, :line_number, :position, :correction
 
-    def initialize(check:, message: nil, template: nil, node: nil, markup: nil, line_number: nil, correction: nil)
+    def initialize(check:, message: nil, template: nil, node: nil, markup: nil, line_number: nil, position: nil, correction: nil)
       @check = check
       @correction = correction
 
@@ -35,6 +35,8 @@ module ThemeCheck
       elsif @node
         @node.line_number
       end
+
+      @position = position
     end
 
     def source_excerpt
@@ -63,11 +65,13 @@ module ThemeCheck
     end
 
     def start_column
+      return position if position
       return 0 unless line_number && markup
       template.full_line(start_line + 1).index(markup.split("\n", 2).first)
     end
 
     def end_column
+      return position + markup.size if position
       return 0 unless line_number && markup
       markup_end = markup.split("\n").last
       template.full_line(end_line + 1).index(markup_end) + markup_end.size

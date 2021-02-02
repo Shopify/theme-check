@@ -9,6 +9,11 @@ class OffenseTest < Minitest::Test
           {{ 1 + 2 }}
         </p>
       END
+      "templates/repeated.liquid" => <<~END,
+        <p>
+          {{ render 'something',  arg1,  arg2 }}
+        </p>
+      END
       "templates/long.liquid" => <<~END,
         <span class="form__message">{% include 'icon-error' %}{{ form.errors.translated_fields['email'] | capitalize }} {{ form.errors.messages['email'] }}.</span>
       END
@@ -75,6 +80,19 @@ class OffenseTest < Minitest::Test
     assert_equal(1, offense.end_line)
     assert_equal(5, offense.start_column)
     assert_equal(10, offense.end_column)
+  end
+
+  def test_location_with_postion
+    node = stub(
+      template: @theme["templates/repeated"],
+      line_number: 2,
+      markup: ",  ",
+    )
+    offense = ThemeCheck::Offense.new(check: Bogus.new, node: node, position: 31)
+    assert_equal(1, offense.start_line)
+    assert_equal(1, offense.end_line)
+    assert_equal(31, offense.start_column)
+    assert_equal(34, offense.end_column)
   end
 
   def test_multiline_markup_location
