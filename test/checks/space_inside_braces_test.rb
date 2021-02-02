@@ -60,6 +60,23 @@ class SpaceInsideBracesTest < Minitest::Test
     END
   end
 
+  def test_reports_extra_space_in_multiline
+    offenses = analyze_theme(
+      ThemeCheck::SpaceInsideBraces.new,
+      "templates/multiline.liquid" => <<~END,
+        {% include 'image-style' with image: featured.featured_image, width: product_width, height: 480,  wrapper_id: wrapper_id,  img_id: img_id %}
+      END
+    )
+    assert_offenses(<<~END, offenses)
+      Too many spaces after ',' at templates/multiline.liquid:1
+      Too many spaces after ',' at templates/multiline.liquid:1
+    END
+    assert_equal([
+      [97, 100],
+      [122, 125],
+    ], offenses.map { |o| [o.start_column, o.end_column] })
+  end
+
   def test_dont_report_with_proper_spaces
     offenses = analyze_theme(
       ThemeCheck::SpaceInsideBraces.new,

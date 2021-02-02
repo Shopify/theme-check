@@ -124,7 +124,7 @@ module ThemeCheck
 
     def range
       start = template.full_line(line_number).index(markup)
-      [start, start + markup.length - 1]
+      [start, start + markup.length - 1] if start
     end
   end
 end

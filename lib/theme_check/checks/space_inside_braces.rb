@@ -13,9 +13,15 @@ module ThemeCheck
       return unless node.markup
       return if :assign == node.type_name
 
-      outside_of_strings(node.markup) do |chunk|
+      node_start = if node.range
+        node.range[0] + 2
+      else
+        0
+      end
+
+      outside_of_strings(node.markup) do |chunk, start|
         chunk.scan(/([,:])  +/) do |_match|
-          add_offense("Too many spaces after '#{Regexp.last_match(1)}'", node: node, markup: Regexp.last_match(0))
+          add_offense("Too many spaces after '#{Regexp.last_match(1)}'", node: node, markup: Regexp.last_match(0), position: node_start + start + Regexp.last_match.offset(0).first)
         end
         chunk.scan(/([,:])\S/) do |_match|
           add_offense("Space missing after '#{Regexp.last_match(1)}'", node: node, markup: Regexp.last_match(0))

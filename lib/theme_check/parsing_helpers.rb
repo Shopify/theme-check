@@ -6,12 +6,13 @@ module ThemeCheck
       scanner = StringScanner.new(markup)
 
       while scanner.scan(/.*?("|')/)
-        yield scanner.matched[..-2]
+        chunk = scanner.matched[..-2]
+        yield chunk, scanner.charpos - scanner.matched.size
         # Skip to the end of the string
         scanner.skip_until(scanner.matched[-1] == "'" ? /[^\\]'/ : /[^\\]"/)
       end
 
-      yield scanner.rest if scanner.rest?
+      yield scanner.rest, scanner.charpos if scanner.rest?
     end
   end
 end
