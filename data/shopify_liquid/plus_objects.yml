@@ -1,0 +1,15 @@
+---
+- alternative_payment_methods
+- breadcrumb
+- checkout_html_classes
+- checkout_scripts
+- checkout_stylesheets
+- content_for_footer
+- content_for_logo
+- content_for_order_summary
+- direction
+- locale
+- order_summary_toggle
+- page_title
+- skip_to_content_link
+- tracking_code
