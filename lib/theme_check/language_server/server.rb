@@ -9,6 +9,8 @@ module ThemeCheck
     class IncompatibleStream < StandardError; end
 
     class Server
+      attr_reader :handler
+
       def initialize(
         in_stream: STDIN,
         out_stream: STDOUT,

@@ -14,6 +14,7 @@ module ThemeCheck
 
       def initialize(server)
         @server = server
+        @previously_reported_files = Set.new
       end
 
       def on_initialize(id, params)
@@ -42,27 +43,35 @@ module ThemeCheck
         root = ThemeCheck::Config.find(file_path) || @root_path
         config = ThemeCheck::Config.from_path(root)
         theme = ThemeCheck::Theme.new(config.root, ignored_patterns: config.ignored_patterns)
-        analyzer = ThemeCheck::Analyzer.new(theme, config.enabled_checks)
 
-        log("Checking #{config.root}")
-        analyzer.analyze_theme
-        log("Found #{theme.all.size} templates, and #{analyzer.offenses.size} offenses")
-        send_diagnostics(analyzer.offenses, theme.all)
+        offenses = analyze(theme, config)
+        log("Found #{theme.all.size} templates, and #{offenses.size} offenses")
+        send_diagnostics(offenses)
       end
 
-      def send_diagnostics(offenses, templates)
-        contains_offenses = []
+      def analyze(theme, config)
+        analyzer = ThemeCheck::Analyzer.new(theme, config.enabled_checks)
+        log("Checking #{config.root}")
+        analyzer.analyze_theme
+        analyzer.offenses
+      end
+
+      def send_diagnostics(offenses)
+        reported_files = Set.new
 
         offenses.group_by(&:template).each do |template, template_offenses|
           next unless template
           send_diagnostic(template.path, template_offenses)
-          contains_offenses.push(template.path)
+          reported_files << template.path
         end
 
-        # Publish diagnostics with empty array if template does not contain error
-        templates.select { |t| !contains_offenses.include?(t.path) }.each do |template|
-          send_diagnostic(template.path, [])
+        # Publish diagnostics with empty array if all issues on a previously reported template
+        # have been solved.
+        (@previously_reported_files - reported_files).each do |path|
+          send_diagnostic(path, [])
         end
+
+        @previously_reported_files = reported_files
       end
 
       def send_diagnostic(path, offenses)
