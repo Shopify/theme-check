@@ -9,6 +9,8 @@ module ThemeCheck
     class IncompatibleStream < StandardError; end
 
     class Server
+      attr_reader :handler
+
       def initialize(
         in_stream: STDIN,
         out_stream: STDOUT,
@@ -87,8 +89,6 @@ module ThemeCheck
 
         if @handler.respond_to?(method_name)
           @handler.send(method_name, id, params)
-        else
-          log("Handler does not respond to #{method_name}")
         end
       end
 

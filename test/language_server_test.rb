@@ -24,13 +24,26 @@ class LanguageServerTest < Minitest::Test
     :end_column,
     :start_line,
     :end_line,
-  )
+  ) do
+    def self.build(path)
+      new(
+        'LiquidTag',
+        :style,
+        'Wrong',
+        TemplateMock.new(path),
+        5,
+        14,
+        9,
+        9,
+      )
+    end
+  end
   TemplateMock = Struct.new(:path)
 
   def test_sends_offenses_on_open
     theme = make_theme("layout/theme.liquid" => "")
     ThemeCheck::Analyzer.any_instance.stubs(:offenses).returns([
-      OffenseMock.new('LiquidTag', :style, 'Wrong', TemplateMock.new(theme.all[0].path), 5, 14, 9, 9),
+      OffenseMock.build(theme.all[0].path),
     ])
 
     send_messages({
@@ -91,8 +104,9 @@ class LanguageServerTest < Minitest::Test
 
   def test_sends_offenses_on_text_document_did_save
     theme = make_theme("layout/theme.liquid" => "")
-    ThemeCheck::Analyzer.any_instance.stubs(:offenses).returns([
-      OffenseMock.new('LiquidTag', :style, 'Wrong', TemplateMock.new(theme.all[0].path), 5, 14, 9, 9),
+
+    @server.handler.stubs(:analyze).returns([
+      OffenseMock.build(theme.all[0].path),
     ])
 
     send_messages({
@@ -176,6 +190,88 @@ class LanguageServerTest < Minitest::Test
     })
 
     assert_includes(@err.string, "Checking #{theme.root.join('src')}")
+  end
+
+  def test_sends_empty_diagnostic_for_fixed_offences
+    theme = make_theme(
+      "layout/theme.liquid" => "",
+      "templates/perfect.liquid" => "",
+    )
+    @server.handler.stubs(:analyze)
+      .returns([
+        OffenseMock.build(theme["layout/theme"].path),
+      ])
+      # On second analysis, no more offenses
+      .then.returns([])
+
+    send_messages({
+      jsonrpc: "2.0",
+      id: "123",
+      method: "initialize",
+      params: {
+        rootPath: theme.root,
+      },
+    }, {
+      jsonrpc: "2.0",
+      method: "textDocument/didSave",
+      params: {
+        textDocument: {
+          uri: "file://layout/theme.liquid",
+          version: 1,
+        },
+      },
+    }, {
+      jsonrpc: "2.0",
+      method: "textDocument/didSave",
+      params: {
+        textDocument: {
+          uri: "file://layout/theme.liquid",
+          version: 1,
+        },
+      },
+    }, {
+      jsonrpc: "2.0",
+      method: "exit",
+    })
+
+    assert_responses({
+      jsonrpc: "2.0",
+      id: "123",
+      result: {
+        capabilities: ThemeCheck::LanguageServer::Handler::CAPABILITIES,
+      },
+    }, {
+      # After first save, one offense
+      jsonrpc: "2.0",
+      method: "textDocument/publishDiagnostics",
+      params: {
+        uri: "file:#{theme.all[0].path}",
+        diagnostics: [{
+          range: {
+            start: {
+              line: 9,
+              character: 5,
+            },
+            end: {
+              line: 9,
+              character: 14,
+            },
+          },
+          severity: 3,
+          code: "LiquidTag",
+          source: "theme-check",
+          message: "Wrong",
+        }],
+      },
+    }, {
+      # After second save, no more offenses, we return [] to clean up
+      jsonrpc: "2.0",
+      method: "textDocument/publishDiagnostics",
+      params: {
+        uri: "file:#{theme.all[0].path}",
+        diagnostics: [],
+      },
+    })
   end
 
   private
