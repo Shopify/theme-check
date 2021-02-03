@@ -87,8 +87,6 @@ module ThemeCheck
 
         if @handler.respond_to?(method_name)
           @handler.send(method_name, id, params)
-        else
-          log("Handler does not respond to #{method_name}")
         end
       end
 
