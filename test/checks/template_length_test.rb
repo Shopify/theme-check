@@ -16,4 +16,16 @@ class TemplateLengthTest < Minitest::Test
       Template has too many lines [11/10] at templates/long.liquid
     END
   end
+
+  def test_excludes_lines_inside_schema
+    offenses = analyze_theme(
+      ThemeCheck::TemplateLength.new(max_length: 10, exclude_schema: true),
+      "sections/long.liquid" => <<~END,
+        {% schema %}
+          #{"\n" * 10}
+        {% endschema %}
+      END
+    )
+    assert_offenses("", offenses)
+  end
 end

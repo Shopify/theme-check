@@ -4,12 +4,20 @@ module ThemeCheck
     severity :suggestion
     category :liquid
 
-    def initialize(max_length: 200)
+    def initialize(max_length: 200, exclude_schema: true)
       @max_length = max_length
+      @exclude_schema = exclude_schema
+      @excluded_lines = 0
     end
 
-    def on_document(node)
-      lines = node.template.source.count("\n")
+    def on_schema(node)
+      if @exclude_schema
+        @excluded_lines += node.value.nodelist.join.count("\n")
+      end
+    end
+
+    def after_document(node)
+      lines = node.template.source.count("\n") - @excluded_lines
       if lines > @max_length
         add_offense("Template has too many lines [#{lines}/#{@max_length}]", template: node.template)
       end

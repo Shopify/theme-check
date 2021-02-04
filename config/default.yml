@@ -29,6 +29,8 @@ SyntaxError:
 TemplateLength:
   enabled: true
   max_length: 200
+  # Exclude content of {% schema %} in line count
+  exclude_schema: true
 
 UnknownFilter:
   enabled: true
