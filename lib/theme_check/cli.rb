@@ -12,6 +12,7 @@ module ThemeCheck
         -l, [--list]              # List enabled checks
         -a, [--auto-correct]      # Automatically fix offenses
         -h, [--help]              # Show this. Hi!
+        -v, [--version]           # Print Theme Check version
 
       Description:
         Theme Check helps you follow Shopify Themes & Liquid best practices by analyzing the
@@ -33,6 +34,8 @@ module ThemeCheck
         case arg
         when "--help", "-h"
           raise Abort, USAGE
+        when "--version", "-v"
+          command = :version
         when "--category", "-c"
           only_categories << args.shift.to_sym
         when "--exclude-category", "-x"
@@ -66,6 +69,10 @@ module ThemeCheck
 
     def list
       puts @config.enabled_checks
+    end
+
+    def version
+      puts ThemeCheck::VERSION
     end
 
     def check
