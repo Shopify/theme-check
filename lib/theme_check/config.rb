@@ -12,11 +12,19 @@ module ThemeCheck
     class << self
       def from_path(path)
         if (filename = find(path))
-          new(filename.dirname, load_file(filename))
+          new(root: filename.dirname, configuration: load_file(filename))
         else
           # No configuration file
-          new(path)
+          new(root: path)
         end
+      end
+
+      def from_string(config)
+        new(configuration: YAML.load(config), should_resolve_requires: false)
+      end
+
+      def from_hash(config)
+        new(configuration: config, should_resolve_requires: false)
       end
 
       def find(root, needle = DOTFILE)
@@ -36,7 +44,7 @@ module ThemeCheck
       end
     end
 
-    def initialize(root, configuration = nil)
+    def initialize(root: nil, configuration: nil, should_resolve_requires: true)
       @configuration = if configuration
         validate_configuration(configuration)
       else
@@ -44,16 +52,17 @@ module ThemeCheck
       end
       merge_with_default_configuration!(@configuration)
 
-      @root = Pathname.new(root)
-      if @configuration.key?("root")
-        @root = @root.join(@configuration["root"])
+      @root = if root && @configuration.key?("root")
+        Pathname.new(root).join(@configuration["root"])
+      elsif root
+        Pathname.new(root)
       end
 
       @only_categories = []
       @exclude_categories = []
       @auto_correct = false
 
-      resolve_requires
+      resolve_requires if @root && should_resolve_requires
     end
 
     def [](name)
