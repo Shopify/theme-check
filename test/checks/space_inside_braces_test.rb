@@ -102,7 +102,7 @@ class SpaceInsideBracesTest < Minitest::Test
       END
     )
     sources.each do |path, source|
-      assert_equal(source, expected_sources[path])
+      assert_equal(expected_sources[path], source)
     end
   end
 
@@ -121,7 +121,7 @@ class SpaceInsideBracesTest < Minitest::Test
       END
     )
     sources.each do |path, source|
-      assert_equal(source, expected_sources[path])
+      assert_equal(expected_sources[path], source)
     end
   end
 end
