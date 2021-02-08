@@ -30,6 +30,10 @@ module Minitest
       ThemeCheck::Theme.new(dir)
     end
 
+    def make_in_memory_theme(files = {})
+      ThemeCheck::InMemoryTheme.new(files)
+    end
+
     def fix_theme(*check_classes, templates)
       theme = make_theme(templates)
       analyzer = ThemeCheck::Analyzer.new(theme, check_classes, true)
