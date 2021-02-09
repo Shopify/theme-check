@@ -42,7 +42,10 @@ module ThemeCheck
       def analyze_and_send_offenses(file_path)
         root = ThemeCheck::Config.find(file_path) || @root_path
         config = ThemeCheck::Config.from_path(root)
-        theme = ThemeCheck::Theme.new(config.root, ignored_patterns: config.ignored_patterns)
+        theme = ThemeCheck::FileSystemTheme.new(
+          config.root,
+          ignored_patterns: config.ignored_patterns
+        )
 
         offenses = analyze(theme, config)
         log("Found #{theme.all.size} templates, and #{offenses.size} offenses")

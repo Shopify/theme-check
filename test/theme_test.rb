@@ -4,7 +4,7 @@ require "test_helper"
 class ThemeTest < Minitest::Test
   def setup
     @themes = [
-      make_theme(
+      make_file_system_theme(
         "templates/index.liquid" => "",
         "snippets/product.liquid" => "",
         "sections/article-template/template.liquid" => "",
@@ -75,7 +75,7 @@ class ThemeTest < Minitest::Test
   end
 
   def test_ignore
-    theme = ThemeCheck::Theme.new(make_theme(
+    theme = ThemeCheck::FileSystemTheme.new(make_file_system_theme(
       "templates/index.liquid" => "",
       "ignored/product.liquid" => "",
       "ignored/nested/product.liquid" => "",

@@ -41,7 +41,7 @@ class LanguageServerTest < Minitest::Test
   TemplateMock = Struct.new(:path)
 
   def test_sends_offenses_on_open
-    theme = make_theme("layout/theme.liquid" => "")
+    theme = make_file_system_theme("layout/theme.liquid" => "")
     ThemeCheck::Analyzer.any_instance.stubs(:offenses).returns([
       OffenseMock.build(theme.all[0].path),
     ])
@@ -103,7 +103,7 @@ class LanguageServerTest < Minitest::Test
   end
 
   def test_sends_offenses_on_text_document_did_save
-    theme = make_theme("layout/theme.liquid" => "")
+    theme = make_file_system_theme("layout/theme.liquid" => "")
 
     @server.handler.stubs(:analyze).returns([
       OffenseMock.build(theme.all[0].path),
@@ -162,7 +162,7 @@ class LanguageServerTest < Minitest::Test
   end
 
   def test_finds_root_from_file
-    theme = make_theme(
+    theme = make_file_system_theme(
       "src/layout/theme.liquid" => "",
       "src/.theme-check.yml" => "",
       ".theme-check.yml" => "",
@@ -193,7 +193,7 @@ class LanguageServerTest < Minitest::Test
   end
 
   def test_sends_empty_diagnostic_for_fixed_offences
-    theme = make_theme(
+    theme = make_file_system_theme(
       "layout/theme.liquid" => "",
       "templates/perfect.liquid" => "",
     )

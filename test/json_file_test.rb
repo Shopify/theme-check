@@ -3,10 +3,7 @@ require "test_helper"
 
 class JsonFileTest < Minitest::Test
   def setup
-    @json_files = [
-      make_json_file("locales/en.json", "{}"),
-      make_in_memory_json_file("locales/en.json", "{}"),
-    ]
+    @json_files = make_json_files("locales/en.json", "{}")
   end
 
   def test_name
@@ -49,9 +46,9 @@ class JsonFileTest < Minitest::Test
 
   private
 
-  def make_json_file(name, content)
-    theme = make_theme(name => content)
-    ThemeCheck::JsonFile.new(theme.root.join(name), theme.root)
+  def make_file_system_json_file(name, content)
+    theme = make_file_system_theme(name => content)
+    ThemeCheck::FileSystemJsonFile.new(theme.root.join(name), theme.root)
   end
 
   def make_in_memory_json_file(name, content)
@@ -60,7 +57,7 @@ class JsonFileTest < Minitest::Test
 
   def make_json_files(name, content)
     [
-      make_json_file(name, content),
+      make_file_system_json_file(name, content),
       make_in_memory_json_file(name, content),
     ]
   end

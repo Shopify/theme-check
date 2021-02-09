@@ -14,8 +14,6 @@ module ThemeCheck
       @path
     end
 
-    def write
-      @source = lines.join("\n")
-    end
+    def write; end
   end
 end

@@ -70,7 +70,7 @@ module ThemeCheck
 
     def check
       puts "Checking #{@config.root} ..."
-      theme = ThemeCheck::Theme.new(@config.root, ignored_patterns: @config.ignored_patterns)
+      theme = ThemeCheck::FileSystemTheme.new(@config.root, ignored_patterns: @config.ignored_patterns)
       if theme.all.empty?
         raise Abort, "No templates found.\n#{USAGE}"
       end

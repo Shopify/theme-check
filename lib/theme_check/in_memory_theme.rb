@@ -13,10 +13,6 @@ module ThemeCheck
       @files = files
     end
 
-    def root
-      raise InMemoryTemplateNoRootError, 'InMemoryTheme does not have a root property.'
-    end
-
     def liquid
       @liquid ||= @files
         .select { |path, _v| LIQUID_REGEX.match?(path) }

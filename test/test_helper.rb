@@ -20,6 +20,11 @@ module Minitest
     end
 
     def make_theme(files = {})
+      # make_file_system_theme(files)
+      make_in_memory_theme(files)
+    end
+
+    def make_file_system_theme(files = {})
       dir = Pathname.new(Dir.mktmpdir)
       files.each_pair do |name, content|
         path = dir.join(name)
@@ -27,7 +32,7 @@ module Minitest
         path.write(content)
       end
       at_exit { dir.rmtree }
-      ThemeCheck::Theme.new(dir)
+      ThemeCheck::FileSystemTheme.new(dir)
     end
 
     def make_in_memory_theme(files = {})
@@ -39,7 +44,7 @@ module Minitest
       analyzer = ThemeCheck::Analyzer.new(theme, check_classes, true)
       analyzer.analyze_theme
       analyzer.correct_offenses
-      sources = theme.liquid.map { |template| [template.relative_path.to_s, template.path.read] }
+      sources = theme.liquid.map { |template| [template.relative_path.to_s, template.updated_source] }
       Hash[*sources.flatten]
     end
 

@@ -3,7 +3,7 @@ require "test_helper"
 
 class ConfigTest < Minitest::Test
   def test_load_file_uses_provided_config
-    theme = make_theme(".theme-check.yml" => <<~END)
+    theme = make_file_system_theme(".theme-check.yml" => <<~END)
       TemplateLength:
         enabled: false
     END
@@ -12,7 +12,7 @@ class ConfigTest < Minitest::Test
   end
 
   def test_load_file_in_parent_dir
-    theme = make_theme(
+    theme = make_file_system_theme(
       ".theme-check.yml" => <<~END,
         TemplateLength:
           enabled: false
@@ -24,7 +24,7 @@ class ConfigTest < Minitest::Test
   end
 
   def test_missing_file
-    theme = make_theme
+    theme = make_file_system_theme
     config = ThemeCheck::Config.from_path(theme.root)
     assert_equal(ThemeCheck::Config.default, config.to_h)
   end
@@ -62,13 +62,13 @@ class ConfigTest < Minitest::Test
   end
 
   def test_empty_file
-    theme = make_theme(".theme-check.yml" => "")
+    theme = make_file_system_theme(".theme-check.yml" => "")
     config = ThemeCheck::Config.from_path(theme.root)
     assert_equal(ThemeCheck::Config.default, config.to_h)
   end
 
   def test_root_from_config
-    theme = make_theme(
+    theme = make_file_system_theme(
       ".theme-check.yml" => <<~END,
         root: dist
       END
@@ -79,7 +79,7 @@ class ConfigTest < Minitest::Test
   end
 
   def test_picks_nearest_config
-    theme = make_theme(
+    theme = make_file_system_theme(
       ".theme-check.yml" => <<~END,
         TemplateLength:
           enabled: false
@@ -191,7 +191,7 @@ class ConfigTest < Minitest::Test
   end
 
   def test_custom_check
-    theme = make_theme(
+    theme = make_file_system_theme(
       ".theme-check.yml" => <<~END,
         require:
           - ./checks/custom_check.rb
@@ -224,7 +224,7 @@ class ConfigTest < Minitest::Test
   end
 
   def test_ignore
-    theme = make_theme(
+    theme = make_file_system_theme(
       ".theme-check.yml" => <<~END,
         ignore:
           - node_modules

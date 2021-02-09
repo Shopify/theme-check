@@ -3,16 +3,19 @@ require "pathname"
 
 module ThemeCheck
   class Template
-    attr_reader :path
-
-    def initialize(path, root)
-      @path = Pathname(path)
-      @root = Pathname(root)
-      @updated = false
+    # expects a Pathname instance
+    def relative_path
+      raise NotImplementedError
     end
 
-    def relative_path
-      @path.relative_path_from(@root)
+    # expects a string
+    def source
+      raise NotImplementedError
+    end
+
+    # should do something with an updated source
+    def write
+      raise NotImplementedError
     end
 
     def name
@@ -31,13 +34,15 @@ module ThemeCheck
       name.start_with?('snippets')
     end
 
-    def source
-      @source ||= @path.read
-    end
-
     def lines
       # Retain trailing newline character
       @lines ||= source.split("\n", -1)
+    end
+
+    # Not entirely obvious but lines is mutable, corrections are to be
+    # applied on @lines.
+    def updated_source
+      lines.join("\n")
     end
 
     def excerpt(line)
@@ -65,18 +70,8 @@ module ThemeCheck
       parse.root
     end
 
-    def update!
-      @updated = true
-    end
-
-    def write
-      if @updated
-        @path.write(lines.join("\n"))
-      end
-    end
-
     def ==(other)
-      other.is_a?(Template) && @path == other.path
+      other.is_a?(Template) && relative_path == other.relative_path
     end
 
     def self.parse(source)

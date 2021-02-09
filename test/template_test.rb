@@ -9,9 +9,12 @@ class TemplateTest < Minitest::Test
         {{ 1 + 2 }}
       </p>
     LIQUID
-    theme = make_theme("templates/index.liquid" => content)
+    theme = make_file_system_theme("templates/index.liquid" => content)
     @templates = [
-      ThemeCheck::Template.new(theme.root.join("templates/index.liquid"), theme.root),
+      ThemeCheck::FileSystemTemplate.new(
+        theme.root.join("templates/index.liquid"),
+        theme.root
+      ),
       ThemeCheck::InMemoryTemplate.new(
         "templates/index.liquid",
         content
