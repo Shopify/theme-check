@@ -30,17 +30,34 @@ class ConfigTest < Minitest::Test
   end
 
   def test_from_path_uses_empty_config_when_config_file_is_missing
-    ThemeCheck::Config.expects(:new).with('theme/')
+    ThemeCheck::Config.expects(:new).with(root: 'theme/')
     ThemeCheck::Config.from_path('theme/')
   end
 
+  def test_from_string
+    config = ThemeCheck::Config.from_string(<<~CONFIG)
+      TemplateLength:
+        enabled: false
+    CONFIG
+    assert_equal(false, config.to_h.dig("TemplateLength", "enabled"))
+  end
+
+  def test_from_hash
+    config = ThemeCheck::Config.from_hash({
+      "TemplateLength" => {
+        "enabled" => false,
+      },
+    })
+    assert_equal(false, config.to_h.dig("TemplateLength", "enabled"))
+  end
+
   def test_enabled_checks_excludes_disabled_checks
-    config = ThemeCheck::Config.new(".", "MissingTemplate" => { "enabled" => false })
+    config = ThemeCheck::Config.new(root: ".", configuration: { "MissingTemplate" => { "enabled" => false } })
     refute(check_enabled?(config, ThemeCheck::MissingTemplate))
   end
 
   def test_root
-    config = ThemeCheck::Config.new(".", "root" => "dist")
+    config = ThemeCheck::Config.new(root: ".", configuration: { "root" => "dist" })
     assert_equal(Pathname.new("dist"), config.root)
   end
 
@@ -70,7 +87,7 @@ class ConfigTest < Minitest::Test
       "src/.theme-check.yml" => <<~END,
         TemplateLength:
           enabled: true
-      END
+        END
     )
     config = ThemeCheck::Config.from_path(theme.root.join("src"))
     assert_equal(theme.root.join("src"), config.root)
@@ -84,7 +101,7 @@ class ConfigTest < Minitest::Test
 
   def test_enabled_checks_returns_default_checks_for_empty_config
     mock_default_config("SyntaxError" => { "enabled" => true })
-    config = ThemeCheck::Config.new(".")
+    config = ThemeCheck::Config.new(root: ".")
     assert(check_enabled?(config, ThemeCheck::SyntaxError))
   end
 
@@ -94,10 +111,14 @@ class ConfigTest < Minitest::Test
       .expects(:warn).with("unknown configuration: unknown")
     ThemeCheck::Config.any_instance
       .expects(:warn).with("unknown configuration: SyntaxError.unknown")
-    ThemeCheck::Config.new(".",
-      "unknown" => ".",
-      "SyntaxError" => { "unknown" => false },
-      "CustomCheck" => { "unknown" => false },)
+    ThemeCheck::Config.new(
+      root: ".",
+      configuration: {
+        "unknown" => ".",
+        "SyntaxError" => { "unknown" => false },
+        "CustomCheck" => { "unknown" => false },
+      }
+    )
   end
 
   def test_warn_about_type_mismatch
@@ -112,10 +133,14 @@ class ConfigTest < Minitest::Test
       .expects(:warn).with("bad configuration type for SyntaxError.enabled: expected true or false, got nil")
     ThemeCheck::Config.any_instance
       .expects(:warn).with("bad configuration type for TemplateLength: expected a Hash, got true")
-    ThemeCheck::Config.new(".",
-      "root" => [],
-      "SyntaxError" => { "enabled" => nil },
-      "TemplateLength" => true,)
+    ThemeCheck::Config.new(
+      root: ".",
+      configuration: {
+        "root" => [],
+        "SyntaxError" => { "enabled" => nil },
+        "TemplateLength" => true,
+      }
+    )
   end
 
   def test_merge_with_default_config
@@ -135,14 +160,18 @@ class ConfigTest < Minitest::Test
         "enabled" => true,
       },
     )
-    config = ThemeCheck::Config.new(".",
-      "ignore": [
-        "some_dir",
-      ],
-      "SyntaxError" => {
-        "muffin_mode" => "maybe",
-      },
-      "EmptyCheck" => {},)
+    config = ThemeCheck::Config.new(
+      root: ".",
+      configuration: {
+        "ignore": [
+          "some_dir",
+        ],
+        "SyntaxError" => {
+          "muffin_mode" => "maybe",
+        },
+        "EmptyCheck" => {},
+      }
+    )
     assert_equal({
       "ignore": [
         "some_dir",
@@ -174,21 +203,21 @@ class ConfigTest < Minitest::Test
           class CustomCheck < Check
           end
         end
-      END
+        END
     )
     config = ThemeCheck::Config.from_path(theme.root)
     assert(check_enabled?(config, ThemeCheck::CustomCheck))
   end
 
   def test_only_category
-    config = ThemeCheck::Config.new(".")
+    config = ThemeCheck::Config.new(root: ".")
     config.only_categories = [:liquid]
     assert(config.enabled_checks.any?)
     assert(config.enabled_checks.all? { |c| c.category == :liquid })
   end
 
   def test_exclude_category
-    config = ThemeCheck::Config.new(".")
+    config = ThemeCheck::Config.new(root: ".")
     config.exclude_categories = [:liquid]
     assert(config.enabled_checks.any?)
     assert(config.enabled_checks.none? { |c| c.category == :liquid })
