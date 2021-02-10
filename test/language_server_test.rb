@@ -192,7 +192,7 @@ class LanguageServerTest < Minitest::Test
     assert_includes(@err.string, "Checking #{storage.root.join('src')}")
   end
 
-  def test_sends_empty_diagnostic_for_fixed_offences
+  def test_sends_empty_diagnostic_for_fixed_offenses
     storage = make_file_system_storage(
       "layout/theme.liquid" => "",
       "templates/perfect.liquid" => "",

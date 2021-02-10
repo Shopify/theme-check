@@ -66,7 +66,7 @@ class ParserBlockingJavaScriptTest < Minitest::Test
       END
     )
     assert_offenses(<<~END, offenses)
-      The script_tag filter is parser-blocking, use a script tag with the async or defer attribute for better performance at templates/index.liquid:1
+      The script_tag filter is parser-blocking. Use a script tag with the async or defer attribute for better performance at templates/index.liquid:1
     END
   end
 

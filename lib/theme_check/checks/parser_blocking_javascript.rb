@@ -11,18 +11,18 @@ module ThemeCheck
     def on_document(node)
       @source = node.template.source
       @node = node
-      record_offences
+      record_offenses
     end
 
     private
 
-    def record_offences
-      record_offences_from_regex(
+    def record_offenses
+      record_offenses_from_regex(
         message: "Missing async or defer attribute on script tag",
         regex: PARSER_BLOCKING_SCRIPT_TAG,
       )
-      record_offences_from_regex(
-        message: "The script_tag filter is parser-blocking, use a script tag with the async or defer attribute for better performance",
+      record_offenses_from_regex(
+        message: "The script_tag filter is parser-blocking. Use a script tag with the async or defer attribute for better performance",
         regex: SCRIPT_TAG_FILTER,
       )
     end
@@ -31,7 +31,7 @@ module ThemeCheck
     # multiple lines (or repeat matches). This makes the line_number
     # calculation a bit weird. So instead, we traverse the string in
     # a very imperative way.
-    def record_offences_from_regex(regex: nil, message: nil)
+    def record_offenses_from_regex(regex: nil, message: nil)
       i = 0
       while (i = @source.index(regex, i))
         script = @source.match(regex, i)[0]

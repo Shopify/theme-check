@@ -20,7 +20,7 @@ module ThemeCheck
       keys[-1].end_with?('_html') || pluralized_key.end_with?('_html')
     end
 
-    def parse_and_add_offence(key, value)
+    def parse_and_add_offense(key, value)
       return unless value.is_a?(String)
 
       html = Nokogiri::HTML5.fragment(value, max_errors: -1)
@@ -36,7 +36,7 @@ module ThemeCheck
           visit_nested(v, keys + [k])
         end
       elsif html_key?(keys)
-        parse_and_add_offence(keys.join('.'), value)
+        parse_and_add_offense(keys.join('.'), value)
       end
     end
   end
