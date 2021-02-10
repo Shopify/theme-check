@@ -20,11 +20,11 @@ module Minitest
     end
 
     def make_theme(files = {})
-      # make_file_system_theme(files)
-      make_in_memory_theme(files)
+      make_file_system_theme(files)
+      # make_in_memory_theme(files)
     end
 
-    def make_file_system_theme(files = {})
+    def make_file_system_storage(files = {})
       dir = Pathname.new(Dir.mktmpdir)
       files.each_pair do |name, content|
         path = dir.join(name)
@@ -32,11 +32,21 @@ module Minitest
         path.write(content)
       end
       at_exit { dir.rmtree }
-      ThemeCheck::FileSystemTheme.new(dir)
+      ThemeCheck::FileSystemStorage.new(dir)
+    end
+
+    def make_in_memory_storage(files = {})
+      ThemeCheck::InMemoryStorage.new(files)
+    end
+
+    def make_file_system_theme(files = {})
+      storage = make_file_system_storage(files)
+      ThemeCheck::Theme.new(storage)
     end
 
     def make_in_memory_theme(files = {})
-      ThemeCheck::InMemoryTheme.new(files)
+      storage = make_in_memory_storage(files)
+      ThemeCheck::Theme.new(storage)
     end
 
     def fix_theme(*check_classes, templates)
@@ -44,7 +54,7 @@ module Minitest
       analyzer = ThemeCheck::Analyzer.new(theme, check_classes, true)
       analyzer.analyze_theme
       analyzer.correct_offenses
-      sources = theme.liquid.map { |template| [template.relative_path.to_s, template.updated_source] }
+      sources = theme.liquid.map { |template| [template.relative_path.to_s, template.updated_content] }
       Hash[*sources.flatten]
     end
 

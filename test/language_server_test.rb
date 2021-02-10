@@ -41,9 +41,9 @@ class LanguageServerTest < Minitest::Test
   TemplateMock = Struct.new(:path)
 
   def test_sends_offenses_on_open
-    theme = make_file_system_theme("layout/theme.liquid" => "")
+    storage = make_file_system_storage("layout/theme.liquid" => "")
     ThemeCheck::Analyzer.any_instance.stubs(:offenses).returns([
-      OffenseMock.build(theme.all[0].path),
+      OffenseMock.build(storage.path("layout/theme.liquid")),
     ])
 
     send_messages({
@@ -51,7 +51,7 @@ class LanguageServerTest < Minitest::Test
       id: "123",
       method: "initialize",
       params: {
-        rootPath: theme.root,
+        rootPath: storage.root,
       },
     }, {
       jsonrpc: "2.0",
@@ -81,7 +81,7 @@ class LanguageServerTest < Minitest::Test
       jsonrpc: "2.0",
       method: "textDocument/publishDiagnostics",
       params: {
-        uri: "file:#{theme.all[0].path}",
+        uri: "file:#{storage.path('layout/theme.liquid')}",
         diagnostics: [{
           range: {
             start: {
@@ -103,10 +103,10 @@ class LanguageServerTest < Minitest::Test
   end
 
   def test_sends_offenses_on_text_document_did_save
-    theme = make_file_system_theme("layout/theme.liquid" => "")
+    storage = make_file_system_storage("layout/theme.liquid" => "")
 
     @server.handler.stubs(:analyze).returns([
-      OffenseMock.build(theme.all[0].path),
+      OffenseMock.build(storage.path("layout/theme.liquid")),
     ])
 
     send_messages({
@@ -114,7 +114,7 @@ class LanguageServerTest < Minitest::Test
       id: "123",
       method: "initialize",
       params: {
-        rootPath: theme.root,
+        rootPath: storage.root,
       },
     }, {
       jsonrpc: "2.0",
@@ -140,7 +140,7 @@ class LanguageServerTest < Minitest::Test
       jsonrpc: "2.0",
       method: "textDocument/publishDiagnostics",
       params: {
-        uri: "file:#{theme.all[0].path}",
+        uri: "file:#{storage.path('layout/theme.liquid')}",
         diagnostics: [{
           range: {
             start: {
@@ -162,7 +162,7 @@ class LanguageServerTest < Minitest::Test
   end
 
   def test_finds_root_from_file
-    theme = make_file_system_theme(
+    storage = make_file_system_storage(
       "src/layout/theme.liquid" => "",
       "src/.theme-check.yml" => "",
       ".theme-check.yml" => "",
@@ -173,14 +173,14 @@ class LanguageServerTest < Minitest::Test
       id: "123",
       method: "initialize",
       params: {
-        rootPath: theme.root,
+        rootPath: storage.root,
       },
     }, {
       jsonrpc: "2.0",
       method: "textDocument/didOpen",
       params: {
         textDocument: {
-          uri: "file://" + theme.root.join("src/layout/theme.liquid").to_s,
+          uri: "file://" + storage.root.join("src/layout/theme.liquid").to_s,
           version: 1,
         },
       },
@@ -189,17 +189,17 @@ class LanguageServerTest < Minitest::Test
       method: "exit",
     })
 
-    assert_includes(@err.string, "Checking #{theme.root.join('src')}")
+    assert_includes(@err.string, "Checking #{storage.root.join('src')}")
   end
 
   def test_sends_empty_diagnostic_for_fixed_offences
-    theme = make_file_system_theme(
+    storage = make_file_system_storage(
       "layout/theme.liquid" => "",
       "templates/perfect.liquid" => "",
     )
     @server.handler.stubs(:analyze)
       .returns([
-        OffenseMock.build(theme["layout/theme"].path),
+        OffenseMock.build(storage.path('layout/theme.liquid')),
       ])
       # On second analysis, no more offenses
       .then.returns([])
@@ -209,7 +209,7 @@ class LanguageServerTest < Minitest::Test
       id: "123",
       method: "initialize",
       params: {
-        rootPath: theme.root,
+        rootPath: storage.root,
       },
     }, {
       jsonrpc: "2.0",
@@ -245,7 +245,7 @@ class LanguageServerTest < Minitest::Test
       jsonrpc: "2.0",
       method: "textDocument/publishDiagnostics",
       params: {
-        uri: "file:#{theme.all[0].path}",
+        uri: "file:#{storage.path('layout/theme.liquid')}",
         diagnostics: [{
           range: {
             start: {
@@ -268,7 +268,7 @@ class LanguageServerTest < Minitest::Test
       jsonrpc: "2.0",
       method: "textDocument/publishDiagnostics",
       params: {
-        uri: "file:#{theme.all[0].path}",
+        uri: "file:#{storage.path('layout/theme.liquid')}",
         diagnostics: [],
       },
     })

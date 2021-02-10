@@ -4,20 +4,27 @@ require "pathname"
 module ThemeCheck
   class Theme
     DEFAULT_LOCALE_REGEXP = %r{^locales/(.*)\.default$}
+    LIQUID_REGEX = /\.liquid$/i
+    JSON_REGEX = /\.json$/i
 
-    # Expects to return an array of Template
+    def initialize(storage)
+      @storage = storage
+    end
+
     def liquid
-      raise NotImplementedError
+      @liquid ||= @storage.files
+        .select { |path| LIQUID_REGEX.match?(path) }
+        .map { |path| Template.new(path, @storage) }
     end
 
-    # Expects to return an array of JsonFile
     def json
-      raise NotImplementedError
+      @json ||= @storage.files
+        .select { |path| JSON_REGEX.match?(path) }
+        .map { |path| JsonFile.new(path, @storage) }
     end
 
-    # Expects to return an array of directory names
     def directories
-      raise NotImplementedError
+      @storage.directories
     end
 
     def default_locale_json

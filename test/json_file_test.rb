@@ -47,12 +47,13 @@ class JsonFileTest < Minitest::Test
   private
 
   def make_file_system_json_file(name, content)
-    theme = make_file_system_theme(name => content)
-    ThemeCheck::FileSystemJsonFile.new(theme.root.join(name), theme.root)
+    storage = make_file_system_storage(name => content)
+    ThemeCheck::JsonFile.new(name, storage)
   end
 
   def make_in_memory_json_file(name, content)
-    ThemeCheck::InMemoryJsonFile.new(name, content)
+    storage = make_in_memory_storage(name => content)
+    ThemeCheck::JsonFile.new(name, storage)
   end
 
   def make_json_files(name, content)

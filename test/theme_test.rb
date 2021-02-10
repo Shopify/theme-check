@@ -75,7 +75,7 @@ class ThemeTest < Minitest::Test
   end
 
   def test_ignore
-    theme = ThemeCheck::FileSystemTheme.new(make_file_system_theme(
+    storage = ThemeCheck::FileSystemStorage.new(make_file_system_storage(
       "templates/index.liquid" => "",
       "ignored/product.liquid" => "",
       "ignored/nested/product.liquid" => "",
@@ -85,6 +85,7 @@ class ThemeTest < Minitest::Test
       "ignored/*",
       "*.json",
     ])
+    theme = ThemeCheck::Theme.new(storage)
 
     assert_equal([], theme.json.map(&:name))
     assert_equal(["templates/index"], theme.liquid.map(&:name))

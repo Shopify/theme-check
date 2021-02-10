@@ -3,19 +3,29 @@ require "pathname"
 
 module ThemeCheck
   class Template
-    # expects a Pathname instance
+    def initialize(relative_path, storage)
+      @storage = storage
+      @relative_path = relative_path
+    end
+
+    def path
+      @storage.path(@relative_path)
+    end
+
     def relative_path
-      raise NotImplementedError
+      @relative_pathname ||= Pathname.new(@relative_path)
     end
 
-    # expects a string
     def source
-      raise NotImplementedError
+      @source ||= @storage.read(@relative_path)
     end
 
-    # should do something with an updated source
     def write
-      raise NotImplementedError
+      content = updated_content
+      if source != content
+        @storage.write(@relative_path, content)
+        @source = content
+      end
     end
 
     def name
@@ -41,7 +51,7 @@ module ThemeCheck
 
     # Not entirely obvious but lines is mutable, corrections are to be
     # applied on @lines.
-    def updated_source
+    def updated_content
       lines.join("\n")
     end
 

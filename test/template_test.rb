@@ -9,15 +9,19 @@ class TemplateTest < Minitest::Test
         {{ 1 + 2 }}
       </p>
     LIQUID
-    theme = make_file_system_theme("templates/index.liquid" => content)
+    files = {
+      "templates/index.liquid" => content,
+    }
+    file_system_storage = make_file_system_storage(files)
+    in_memory_storage = make_in_memory_storage(files)
     @templates = [
-      ThemeCheck::FileSystemTemplate.new(
-        theme.root.join("templates/index.liquid"),
-        theme.root
-      ),
-      ThemeCheck::InMemoryTemplate.new(
+      ThemeCheck::Template.new(
         "templates/index.liquid",
-        content
+        file_system_storage
+      ),
+      ThemeCheck::Template.new(
+        "templates/index.liquid",
+        in_memory_storage
       ),
     ]
   end

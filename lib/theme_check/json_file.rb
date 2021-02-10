@@ -4,23 +4,46 @@ require "pathname"
 
 module ThemeCheck
   class JsonFile
-    # expects a Pathname instance
+    def initialize(relative_path, storage)
+      @relative_path = relative_path
+      @storage = storage
+      @loaded = false
+      @content = nil
+      @parser_error = nil
+    end
+
+    def path
+      @storage.path(@relative_path)
+    end
+
     def relative_path
-      raise NotImplementedError
+      @relative_pathname ||= Pathname.new(@relative_path)
     end
 
-    # expects a hash
     def content
-      raise NotImplementedError
+      load!
+      @content
     end
 
-    # expects a JSON::ParserError
     def parse_error
-      raise NotImplementedError
+      load!
+      @parser_error
     end
 
     def name
       relative_path.sub_ext('').to_s
+    end
+
+    private
+
+    def load!
+      return if @loaded
+
+      @content = JSON.parse(@storage.read(@relative_path))
+    rescue JSON::ParserError => e
+      @parser_error = e
+    ensure
+      @loaded = true
     end
   end
 end
