@@ -20,8 +20,13 @@ module Minitest
     end
 
     def make_theme(files = {})
-      make_file_system_theme(files)
-      # make_in_memory_theme(files)
+      storage = make_storage(files)
+      ThemeCheck::Theme.new(storage)
+    end
+
+    def make_storage(files = {})
+      return make_file_system_storage(files) if ENV['THEME_STORAGE'] == 'FileSystemStorage'
+      make_in_memory_storage(files)
     end
 
     def make_file_system_storage(files = {})
@@ -37,16 +42,6 @@ module Minitest
 
     def make_in_memory_storage(files = {})
       ThemeCheck::InMemoryStorage.new(files)
-    end
-
-    def make_file_system_theme(files = {})
-      storage = make_file_system_storage(files)
-      ThemeCheck::Theme.new(storage)
-    end
-
-    def make_in_memory_theme(files = {})
-      storage = make_in_memory_storage(files)
-      ThemeCheck::Theme.new(storage)
     end
 
     def fix_theme(*check_classes, templates)
