@@ -4,19 +4,27 @@ require "pathname"
 module ThemeCheck
   class Theme
     DEFAULT_LOCALE_REGEXP = %r{^locales/(.*)\.default$}
-    attr_reader :root
+    LIQUID_REGEX = /\.liquid$/i
+    JSON_REGEX = /\.json$/i
 
-    def initialize(root, ignored_patterns: [])
-      @root = Pathname.new(root)
-      @ignored_patterns = ignored_patterns
+    def initialize(storage)
+      @storage = storage
     end
 
     def liquid
-      @liquid ||= glob("**/*.liquid").map { |path| Template.new(path, @root) }
+      @liquid ||= @storage.files
+        .select { |path| LIQUID_REGEX.match?(path) }
+        .map { |path| Template.new(path, @storage) }
     end
 
     def json
-      @json ||= glob("**/*.json").map { |path| JsonFile.new(path, @root) }
+      @json ||= @storage.files
+        .select { |path| JSON_REGEX.match?(path) }
+        .map { |path| JsonFile.new(path, @storage) }
+    end
+
+    def directories
+      @storage.directories
     end
 
     def default_locale_json
@@ -52,19 +60,6 @@ module ThemeCheck
 
     def snippets
       liquid.select(&:snippet?)
-    end
-
-    def directories
-      @directories ||= glob('*').select { |f| File.directory?(f) }.map { |f| f.relative_path_from(@root) }
-    end
-
-    private
-
-    def glob(pattern)
-      @root.glob(pattern).reject do |path|
-        relative_path = path.relative_path_from(@root)
-        @ignored_patterns.any? { |ignored| relative_path.fnmatch?(ignored) }
-      end
     end
   end
 end

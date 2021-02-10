@@ -35,12 +35,6 @@ module ThemeCheck
       @offenses
     end
 
-    def analyze_file(path)
-      path = Pathname.new(path)
-      analyze_theme
-      @offenses.reject! { |offense| offense.template.path != path }
-    end
-
     def uncorrectable_offenses
       unless @auto_correct
         return @offenses

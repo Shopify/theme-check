@@ -3,29 +3,29 @@ require "test_helper"
 
 class ConfigTest < Minitest::Test
   def test_load_file_uses_provided_config
-    theme = make_theme(".theme-check.yml" => <<~END)
+    storage = make_file_system_storage(".theme-check.yml" => <<~END)
       TemplateLength:
         enabled: false
     END
-    config = ThemeCheck::Config.from_path(theme.root).to_h
+    config = ThemeCheck::Config.from_path(storage.root).to_h
     assert_equal(false, config.dig("TemplateLength", "enabled"))
   end
 
   def test_load_file_in_parent_dir
-    theme = make_theme(
+    storage = make_file_system_storage(
       ".theme-check.yml" => <<~END,
         TemplateLength:
           enabled: false
       END
       "dist/templates/index.liquid" => "",
     )
-    config = ThemeCheck::Config.from_path(theme.root.join("dist")).to_h
+    config = ThemeCheck::Config.from_path(storage.root.join("dist")).to_h
     assert_equal(false, config.dig("TemplateLength", "enabled"))
   end
 
   def test_missing_file
-    theme = make_theme
-    config = ThemeCheck::Config.from_path(theme.root)
+    storage = make_file_system_storage
+    config = ThemeCheck::Config.from_path(storage.root)
     assert_equal(ThemeCheck::Config.default, config.to_h)
   end
 
@@ -62,24 +62,24 @@ class ConfigTest < Minitest::Test
   end
 
   def test_empty_file
-    theme = make_theme(".theme-check.yml" => "")
-    config = ThemeCheck::Config.from_path(theme.root)
+    storage = make_file_system_storage(".theme-check.yml" => "")
+    config = ThemeCheck::Config.from_path(storage.root)
     assert_equal(ThemeCheck::Config.default, config.to_h)
   end
 
   def test_root_from_config
-    theme = make_theme(
+    storage = make_file_system_storage(
       ".theme-check.yml" => <<~END,
         root: dist
       END
       "dist/templates/index.liquid" => "",
     )
-    config = ThemeCheck::Config.from_path(theme.root)
-    assert_equal(theme.root.join("dist"), config.root)
+    config = ThemeCheck::Config.from_path(storage.root)
+    assert_equal(storage.root.join("dist"), config.root)
   end
 
   def test_picks_nearest_config
-    theme = make_theme(
+    storage = make_file_system_storage(
       ".theme-check.yml" => <<~END,
         TemplateLength:
           enabled: false
@@ -89,8 +89,8 @@ class ConfigTest < Minitest::Test
           enabled: true
         END
     )
-    config = ThemeCheck::Config.from_path(theme.root.join("src"))
-    assert_equal(theme.root.join("src"), config.root)
+    config = ThemeCheck::Config.from_path(storage.root.join("src"))
+    assert_equal(storage.root.join("src"), config.root)
     assert(check_enabled?(config, ThemeCheck::TemplateLength))
   end
 
@@ -191,7 +191,7 @@ class ConfigTest < Minitest::Test
   end
 
   def test_custom_check
-    theme = make_theme(
+    storage = make_file_system_storage(
       ".theme-check.yml" => <<~END,
         require:
           - ./checks/custom_check.rb
@@ -205,7 +205,7 @@ class ConfigTest < Minitest::Test
         end
         END
     )
-    config = ThemeCheck::Config.from_path(theme.root)
+    config = ThemeCheck::Config.from_path(storage.root)
     assert(check_enabled?(config, ThemeCheck::CustomCheck))
   end
 
@@ -224,14 +224,14 @@ class ConfigTest < Minitest::Test
   end
 
   def test_ignore
-    theme = make_theme(
+    storage = make_file_system_storage(
       ".theme-check.yml" => <<~END,
         ignore:
           - node_modules
           - dist/*.json
       END
     )
-    config = ThemeCheck::Config.from_path(theme.root)
+    config = ThemeCheck::Config.from_path(storage.root)
     assert_equal(["node_modules", "dist/*.json"], config.ignored_patterns)
   end
 

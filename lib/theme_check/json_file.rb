@@ -4,22 +4,20 @@ require "pathname"
 
 module ThemeCheck
   class JsonFile
-    attr_reader :path
-
-    def initialize(path, root)
-      @path = Pathname(path)
-      @root = Pathname(root)
+    def initialize(relative_path, storage)
+      @relative_path = relative_path
+      @storage = storage
       @loaded = false
       @content = nil
       @parser_error = nil
     end
 
-    def relative_path
-      @path.relative_path_from(@root)
+    def path
+      @storage.path(@relative_path)
     end
 
-    def name
-      relative_path.sub_ext('').to_s
+    def relative_path
+      @relative_pathname ||= Pathname.new(@relative_path)
     end
 
     def content
@@ -32,12 +30,16 @@ module ThemeCheck
       @parser_error
     end
 
+    def name
+      relative_path.sub_ext('').to_s
+    end
+
     private
 
     def load!
       return if @loaded
 
-      @content = JSON.parse(File.read(@path))
+      @content = JSON.parse(@storage.read(@relative_path))
     rescue JSON::ParserError => e
       @parser_error = e
     ensure
