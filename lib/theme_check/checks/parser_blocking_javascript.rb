@@ -5,7 +5,12 @@ module ThemeCheck
     severity :error
     category :liquid
 
-    PARSER_BLOCKING_SCRIPT_TAG = /<script(?:(?!defer|async|type=["']module['"]).)*?>/im
+    PARSER_BLOCKING_SCRIPT_TAG = %r{
+      <script                                    # Find the start of a script tag
+      (?=(?:[^>]|\n|\r)+?src=)+?                 # Make sure src= is in the script with a lookahead
+      (?:(?!defer|async|type=["']module['"]).)*? # Find tags that don't have defer|async|type="module"
+      >
+    }xim
     SCRIPT_TAG_FILTER = /\{\{[^}]+script_tag\s+\}\}/
 
     def on_document(node)

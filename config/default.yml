@@ -76,3 +76,6 @@ DeprecatedFilter:
 
 MissingEnableComment:
   enabled: true
+
+ParserBlockingJavaScript:
+  enabled: true

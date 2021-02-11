@@ -89,6 +89,26 @@ class ParserBlockingJavaScriptTest < Minitest::Test
     END
   end
 
+  def test_parser_blocking_inline_script
+    offenses = analyze_theme(
+      ThemeCheck::ParserBlockingJavaScript.new,
+      "templates/index.liquid" => <<~END,
+        <html>
+        <head>
+          <script>
+            console.log('do some stuff inline');
+          </script>
+          <script>console.log('do some stuff inline');</script>
+          <script type="application/json">
+            { "hello": "world" }
+          </script>
+        </head>
+        </html>
+      END
+    )
+    assert_offenses("", offenses)
+  end
+
   def test_repeated_offenses_are_correctly_reported
     offenses = analyze_theme(
       ThemeCheck::ParserBlockingJavaScript.new,
