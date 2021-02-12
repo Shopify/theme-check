@@ -61,12 +61,16 @@ class ThemeCheck < Formula
       ENV['PATH'] = ENV['PATH'].sub(HOMEBREW_SHIMS_PATH.to_s, '/usr/local/bin')
     end
 
-    system("#{ruby_bin}/gem", "install", cached_download,
-             "--no-document",
-             "--no-wrapper",
-             "--no-user-install",
-             "--install-dir", prefix,
-             "--bindir", bin)
+    system(
+      "#{ruby_bin}/gem",
+      "install",
+      cached_download,
+      "--no-document",
+      "--no-wrapper",
+      "--no-user-install",
+      "--install-dir", prefix,
+      "--bindir", bin
+    )
 
     raise "gem install 'theme-check' failed with status #{$CHILD_STATUS.exitstatus}" unless $CHILD_STATUS.success?
 

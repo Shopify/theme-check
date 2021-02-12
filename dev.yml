@@ -19,5 +19,7 @@ commands:
     run: bundle exec rake test
   style:
     run: bundle exec rake rubocop
+  autocorrect:
+    run: bundle exec rubocop --auto-correct
   language-server:
     run: bundle exec theme-check-language-server
