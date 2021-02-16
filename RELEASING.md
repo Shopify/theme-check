@@ -22,7 +22,7 @@
 
    ```bash
    VERSION=X.X.X
-   cp packaging/builds/$VERSION/theme-check ../homebrew-shopify
+   cp packaging/builds/$VERSION/theme-check.rb ../homebrew-shopify
    ```
 
 4. Create a branch + a commit on the [`homebrew-shopify`](https://github.com/Shopify/homebrew-shopify) repository.
