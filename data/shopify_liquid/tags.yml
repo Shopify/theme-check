@@ -1,0 +1,26 @@
+---
+- assign
+- break
+- capture
+- case
+- comment
+- continue
+- cycle
+- decrement
+- echo
+- for
+- form
+- if
+- ifchanged
+- increment
+- javascript
+- layout
+- paginate
+- raw
+- render
+- schema
+- section
+- style
+- stylesheet
+- tablerow
+- unless
