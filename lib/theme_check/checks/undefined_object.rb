@@ -49,8 +49,8 @@ module ThemeCheck
       end
     end
 
-    def initialize(ignore_snippets: false)
-      @ignore_snippets = ignore_snippets
+    def initialize(exclude_snippets: false)
+      @exclude_snippets = exclude_snippets
       @files = {}
     end
 
@@ -124,7 +124,7 @@ module ThemeCheck
     private
 
     def ignore?(node)
-      @ignore_snippets && node.template.snippet?
+      @exclude_snippets && node.template.snippet?
     end
 
     def each_template

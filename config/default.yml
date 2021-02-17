@@ -67,7 +67,7 @@ MissingRequiredTemplateFiles:
 
 UndefinedObject:
   enabled: true
-  ignore_snippets: true
+  exclude_snippets: true
 
 RequiredDirectories:
   enabled: true
