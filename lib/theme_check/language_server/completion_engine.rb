@@ -34,7 +34,6 @@ module ThemeCheck
 
     def initialize(storage)
       @storage = storage
-      @buffers = {}
     end
 
     def completions(name, line, col)
@@ -42,15 +41,9 @@ module ThemeCheck
       return [] if token.nil?
 
       if tag_completion?(token, line, col)
-        partial = token.content.match(WORD)[0]
-        ShopifyLiquid::Tag.labels
-          .select { |w| w.starts_with?(partial) }
-          .map { |tag| tag_to_completion(tag) }
+        tag_completions(token)
       elsif object_completion?(token, line, col)
-        partial = token.content.match(WORD)[0]
-        ShopifyLiquid::Object.labels
-          .select { |w| w.starts_with?(partial) }
-          .map { |object| object_to_completion(object) }
+        object_completions(token)
       else
         []
       end
@@ -76,14 +69,32 @@ module ThemeCheck
     def cursor_on_first_word?(token, line, col)
       return false unless token.content.match?(WORD)
       word_start = token.content.index(WORD)
-      word_end = word_start + token.content.match(WORD)[0].size
+      word_end = word_start + first_word(token).size
       token.start_line == line &&
       (col - token.start_col) >= word_start &&
-      (col - token.start_col) <= word_end + 1 # the plus 1 is so we consider the next "space" still in the word
+      (col - token.start_col) <= word_end
+    end
+
+    def cursor_on_start_content?(token, col, regex)
+      token.content.slice(0, col - token.start_col).match?(/^#{regex}(?:\s|\n)*$/m)
+    end
+
+    def first_word(token)
+      return token.content.match(WORD)[0] if token.content.match?(WORD)
     end
 
     def tag_completion?(token, line, col)
-      token.content.starts_with?(Liquid::TagStart) && cursor_on_first_word?(token, line, col)
+      token.content.starts_with?(Liquid::TagStart) && (
+        cursor_on_first_word?(token, line, col) ||
+        cursor_on_start_content?(token, col, Liquid::TagStart)
+      )
+    end
+
+    def tag_completions(token)
+      partial = first_word(token) || ''
+      ShopifyLiquid::Tag.labels
+        .select { |w| w.starts_with?(partial) }
+        .map { |tag| tag_to_completion(tag) }
     end
 
     def tag_to_completion(tag)
@@ -94,7 +105,17 @@ module ThemeCheck
     end
 
     def object_completion?(token, line, col)
-      token.content.match?(/^\{\{\s+\w+/) && cursor_on_first_word?(token, line, col)
+      token.content.match?(Liquid::VariableStart) && (
+        cursor_on_first_word?(token, line, col) ||
+        cursor_on_start_content?(token, col, Liquid::VariableStart)
+      )
+    end
+
+    def object_completions(token)
+      partial = first_word(token) || ''
+      ShopifyLiquid::Object.labels
+        .select { |w| w.starts_with?(partial) }
+        .map { |object| object_to_completion(object) }
     end
 
     def object_to_completion(tag)

@@ -26,6 +26,7 @@ module ThemeCheck
       prev = Token.new('', 0, 0, 0, 0)
       curr = Token.new('', 0, 0, 0, 0)
 
+      # This code is 1-indexed because Liquid::Tokenizer is 1-indexed.
       while (curr.start_line = tokenizer.line_number) && (content = tokenizer.shift)
         curr.start_col = if prev.end_line == curr.start_line
           prev.end_col + 1
@@ -42,10 +43,11 @@ module ThemeCheck
 
         block.call(Token.new(
           content,
-          curr.start_line,
-          curr.start_col,
-          curr.end_line,
-          curr.end_col,
+          # We convert it back to 0-index to fit with our own world.
+          curr.start_line - 1,
+          curr.start_col - 1,
+          curr.end_line - 1,
+          curr.end_col - 1,
         ))
 
         # recycling structs

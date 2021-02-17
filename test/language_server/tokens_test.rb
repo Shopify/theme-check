@@ -22,15 +22,15 @@ class TokensTest < Minitest::Test
       </html>
     LIQUID
 
-    assert_includes(tokens, ThemeCheck::Token.new("<html>\n  <head>\n    ", 1, 1, 3, 4))
-    assert_includes(tokens, ThemeCheck::Token.new("{{ 'foo.js' | asset_url | script_tag }}", 4, 5, 4, 43))
-    assert_includes(tokens, ThemeCheck::Token.new("{{ 'foo.js' | asset_url }}", 5, 18, 5, 43))
+    assert_includes(tokens, ThemeCheck::Token.new("<html>\n  <head>\n    ", 0, 0, 2, 3))
+    assert_includes(tokens, ThemeCheck::Token.new("{{ 'foo.js' | asset_url | script_tag }}", 3, 4, 3, 42))
+    assert_includes(tokens, ThemeCheck::Token.new("{{ 'foo.js' | asset_url }}", 4, 17, 4, 42))
   end
 
   def test_tokens_on_same_line
     tokens = ThemeCheck::Tokens.new('<div>{% if true %}content{% endif %}</div>').to_a
 
-    assert_includes(tokens, ThemeCheck::Token.new("{% if true %}", 1, 6, 1, 18))
-    assert_includes(tokens, ThemeCheck::Token.new("{% endif %}", 1, 26, 1, 36))
+    assert_includes(tokens, ThemeCheck::Token.new("{% if true %}", 0, 5, 0, 17))
+    assert_includes(tokens, ThemeCheck::Token.new("{% endif %}", 0, 25, 0, 35))
   end
 end
