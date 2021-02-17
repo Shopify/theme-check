@@ -49,23 +49,28 @@ module ThemeCheck
       end
     end
 
-    def initialize
+    def initialize(exclude_snippets: false)
+      @exclude_snippets = exclude_snippets
       @files = {}
     end
 
     def on_document(node)
+      return if ignore?(node)
       @files[node.template.name] = TemplateInfo.new
     end
 
     def on_assign(node)
+      return if ignore?(node)
       @files[node.template.name].all_assigns[node.value.to] = node
     end
 
     def on_capture(node)
+      return if ignore?(node)
       @files[node.template.name].all_captures[node.value.instance_variable_get('@to')] = node
     end
 
     def on_for(node)
+      return if ignore?(node)
       @files[node.template.name].all_forloops[node.value.variable_name] = node
     end
 
@@ -75,6 +80,7 @@ module ThemeCheck
     end
 
     def on_render(node)
+      return if ignore?(node)
       return unless node.value.template_name_expr.is_a?(String)
 
       snippet_name = "snippets/#{node.value.template_name_expr}"
@@ -85,6 +91,7 @@ module ThemeCheck
     end
 
     def on_variable_lookup(node)
+      return if ignore?(node)
       @files[node.template.name].add_variable_lookup(
         name: node.value.name,
         node: node,
@@ -114,13 +121,18 @@ module ThemeCheck
       end
     end
 
+    private
+
+    def ignore?(node)
+      @exclude_snippets && node.template.snippet?
+    end
+
     def each_template
       @files.each do |(name, info)|
         next if name.starts_with?('snippets/')
         yield [name, info]
       end
     end
-    private :each_template
 
     def check_object(info, all_global_objects, render_node = nil)
       check_undefined(info, all_global_objects, render_node)
@@ -134,7 +146,6 @@ module ThemeCheck
         check_object(snippet_info, all_global_objects + snippet_variables, node)
       end
     end
-    private :check_object
 
     def check_undefined(info, all_global_objects, render_node)
       all_variables = info.all_variables
@@ -154,6 +165,5 @@ module ThemeCheck
         end
       end
     end
-    private :check_undefined
   end
 end
