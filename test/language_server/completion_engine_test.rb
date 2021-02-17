@@ -18,6 +18,22 @@ class CompletionEngineTest < Minitest::Test
     })
   end
 
+  def test_complete_object
+    engine = make_engine(filename => <<~LIQUID)
+      {{ prod }}
+      {{ all_ }}
+    LIQUID
+
+    assert_includes(engine.completions(filename, 1, 6), {
+      label: "product",
+      kind: ThemeCheck::CompletionItemKinds::VARIABLE,
+    })
+    assert_includes(engine.completions(filename, 2, 6), {
+      label: "all_products",
+      kind: ThemeCheck::CompletionItemKinds::VARIABLE,
+    })
+  end
+
   def test_find_token
     engine = make_engine(filename => <<~LIQUID)
       <head>

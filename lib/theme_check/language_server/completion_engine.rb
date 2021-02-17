@@ -46,6 +46,11 @@ module ThemeCheck
         ShopifyLiquid::Tag.labels
           .select { |w| w.starts_with?(partial) }
           .map { |tag| tag_to_completion(tag) }
+      elsif object_completion?(token, line, col)
+        partial = token.content.match(WORD)[0]
+        ShopifyLiquid::Object.labels
+          .select { |w| w.starts_with?(partial) }
+          .map { |object| object_to_completion(object) }
       else
         []
       end
@@ -85,6 +90,17 @@ module ThemeCheck
       {
         label: tag,
         kind: CompletionItemKinds::KEYWORD,
+      }
+    end
+
+    def object_completion?(token, line, col)
+      token.content.match?(/^\{\{\s+\w+/) && cursor_on_first_word?(token, line, col)
+    end
+
+    def object_to_completion(tag)
+      {
+        label: tag,
+        kind: CompletionItemKinds::VARIABLE,
       }
     end
   end
