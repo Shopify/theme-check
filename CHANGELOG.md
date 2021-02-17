@@ -1,4 +1,9 @@
 
+v0.3.2 / 2021-02-17
+==================
+
+  * Ignore snippets in UndefinedObject check
+
 v0.3.1 / 2021-02-16
 ===================
 
