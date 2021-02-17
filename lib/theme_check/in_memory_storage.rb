@@ -6,7 +6,7 @@
 # as a big hash already, leave it like that and save yourself some IO.
 module ThemeCheck
   class InMemoryStorage < Storage
-    def initialize(files)
+    def initialize(files = {})
       @files = files
     end
 
