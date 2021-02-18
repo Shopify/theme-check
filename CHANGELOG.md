@@ -1,4 +1,10 @@
 
+v0.3.3 / 2021-02-18
+==================
+
+  * Fix column_end issues ([#164](https://github.com/Shopify/theme-check/issues/164))
+  * Fix stack overflow in UndefinedObject + UnusedAssign when snippets renders itself ([#165](https://github.com/Shopify/theme-check/issues/165))
+
 v0.3.2 / 2021-02-17
 ==================
 
