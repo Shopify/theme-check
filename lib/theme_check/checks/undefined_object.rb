@@ -134,7 +134,7 @@ module ThemeCheck
       end
     end
 
-    def check_object(info, all_global_objects, render_node = nil)
+    def check_object(info, all_global_objects, render_node = nil, visited_snippets = Set.new)
       check_undefined(info, all_global_objects, render_node)
 
       info.each_snippet do |(snippet_name, node)|
@@ -143,7 +143,10 @@ module ThemeCheck
 
         snippet_variables = node.value.attributes.keys +
           Array[node.value.instance_variable_get("@alias_name")]
-        check_object(snippet_info, all_global_objects + snippet_variables, node)
+        unless visited_snippets.include?(snippet_name)
+          visited_snippets << snippet_name
+          check_object(snippet_info, all_global_objects + snippet_variables, node, visited_snippets)
+        end
       end
     end
 

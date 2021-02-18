@@ -54,4 +54,24 @@ class UnusedAssignTest < Minitest::Test
     )
     assert_offenses("", offenses)
   end
+
+  def test_recursion_in_includes
+    offenses = analyze_theme(
+      ThemeCheck::UnusedAssign.new,
+      "templates/index.liquid" => <<~END,
+        {% assign a = 1 %}
+        {% include 'one' %}
+      END
+      "snippets/one.liquid" => <<~END,
+        {% include 'two' %}
+        {{ a }}
+      END
+      "snippets/two.liquid" => <<~END,
+        {% if some_end_condition %}
+          {% include 'one' %}
+        {% endif %}
+      END
+    )
+    assert_offenses("", offenses)
+  end
 end

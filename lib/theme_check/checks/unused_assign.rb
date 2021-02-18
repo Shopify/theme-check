@@ -6,12 +6,13 @@ module ThemeCheck
     category :liquid
 
     class TemplateInfo < Struct.new(:used_assigns, :assign_nodes, :includes)
-      def collect_used_assigns(templates)
+      def collect_used_assigns(templates, visited = Set.new)
         collected = used_assigns
         # Check recursively inside included snippets for use
         includes.each do |name|
-          if templates[name]
-            collected += templates[name].collect_used_assigns(templates)
+          if templates[name] && !visited.include?(name)
+            visited << name
+            collected += templates[name].collect_used_assigns(templates, visited)
           end
         end
         collected
