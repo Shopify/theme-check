@@ -99,8 +99,8 @@ class OffenseTest < Minitest::Test
     offense = ThemeCheck::Offense.new(check: Bogus.new, node: node)
     assert_equal(0, offense.start_line)
     assert_equal(3, offense.start_column)
-    assert_equal(3, offense.end_line)
-    assert_equal(0, offense.end_column)
+    assert_equal(2, offense.end_line)
+    assert_equal(12, offense.end_column)
   end
 
   def test_location_without_markup
