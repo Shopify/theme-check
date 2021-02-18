@@ -338,4 +338,24 @@ class UndefinedObjectTest < Minitest::Test
       Undefined object `checkout_html_classes` at templates/index.liquid:1
     END
   end
+
+  def test_recursion
+    offenses = analyze_theme(
+      ThemeCheck::UndefinedObject.new,
+      "templates/index.liquid" => <<~END,
+        {% render 'one' %}
+      END
+      "snippets/one.liquid" => <<~END,
+        {% render 'two' %}
+      END
+      "snippets/two.liquid" => <<~END,
+        {% if some_end_condition %}
+          {% render 'one' %}
+        {% endif %}
+      END
+    )
+    assert_offenses(<<~END, offenses)
+      Missing argument `some_end_condition` at snippets/one.liquid:1
+    END
+  end
 end
