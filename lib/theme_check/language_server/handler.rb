@@ -31,6 +31,7 @@ module ThemeCheck
       def on_exit(_id, _params)
         close!
       end
+      alias_method :on_shutdown, :on_exit
 
       def on_text_document_did_open(_id, params)
         analyze_and_send_offenses(params.dig('textDocument', 'uri').sub('file://', ''))
