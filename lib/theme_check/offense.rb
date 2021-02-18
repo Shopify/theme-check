@@ -55,7 +55,9 @@ module ThemeCheck
     end
 
     def end_line
-      if markup
+      if markup&.ends_with?("\n")
+        start_line + markup.count("\n") - 1
+      elsif markup
         start_line + markup.count("\n")
       else
         start_line
@@ -68,7 +70,7 @@ module ThemeCheck
     end
 
     def end_column
-      return 0 unless line_number && markup && !markup.ends_with?("\n")
+      return 0 unless line_number && markup
       markup_end = markup.split("\n").last
       template.full_line(end_line + 1).index(markup_end) + markup_end.size
     end
