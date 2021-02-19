@@ -67,9 +67,10 @@ module ThemeCheck
     private
 
     def cursor_on_first_word?(token, line, col)
-      return false unless token.content.match?(WORD)
-      word_start = token.content.index(WORD)
-      word_end = word_start + first_word(token).size
+      word = token.content.match(WORD)
+      return false if word.nil?
+      word_start = word.begin(0)
+      word_end = word.end(0)
       token.start_line == line &&
       (col - token.start_col) >= word_start &&
       (col - token.start_col) <= word_end
