@@ -94,13 +94,26 @@ class OffenseTest < Minitest::Test
     node = stub(
       template: @theme["templates/multiline"],
       line_number: 1,
-      markup: "render 'product-card',\n  product: product,\n  show: true\n",
+      markup: "render 'product-card',\n  product: product,\n  show: true\n\n\n",
     )
     offense = ThemeCheck::Offense.new(check: Bogus.new, node: node)
     assert_equal(0, offense.start_line)
     assert_equal(3, offense.start_column)
-    assert_equal(2, offense.end_line)
-    assert_equal(12, offense.end_column)
+    assert_equal(4, offense.end_line)
+    assert_equal(0, offense.end_column)
+  end
+
+  def test_multiline_markup_location_with_multiple_new_lines_back_to_back
+    node = stub(
+      template: @theme["templates/multiline"],
+      line_number: 1,
+      markup: "render 'product-card',\n\n\n  product: product",
+    )
+    offense = ThemeCheck::Offense.new(check: Bogus.new, node: node)
+    assert_equal(0, offense.start_line)
+    assert_equal(3, offense.start_column)
+    assert_equal(3, offense.end_line)
+    assert_equal(18, offense.end_column)
   end
 
   def test_location_without_markup

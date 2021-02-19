@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 module ThemeCheck
+  Position = Struct.new(:line, :column)
+
   class Offense
     MAX_SOURCE_EXCERPT_SIZE = 120
 
@@ -50,29 +52,19 @@ module ThemeCheck
     end
 
     def start_line
-      return 0 unless line_number
-      line_number - 1
-    end
-
-    def end_line
-      if markup&.ends_with?("\n")
-        start_line + markup.count("\n") - 1
-      elsif markup
-        start_line + markup.count("\n")
-      else
-        start_line
-      end
+      start_position.line
     end
 
     def start_column
-      return 0 unless line_number && markup
-      template.full_line(start_line + 1).index(markup.split("\n", 2).first)
+      start_position.column
+    end
+
+    def end_line
+      end_position.line
     end
 
     def end_column
-      return 0 unless line_number && markup
-      markup_end = markup.split("\n").last
-      template.full_line(end_line + 1).index(markup_end) + markup_end.size
+      end_position.column
     end
 
     def code_name
@@ -117,6 +109,46 @@ module ThemeCheck
       else
         message
       end
+    end
+
+    private
+
+    def full_line(line)
+      # Liquid::Template is 1-indexed.
+      template.full_line(line + 1)
+    end
+
+    def lines_of_content
+      @lines ||= markup.lines.map { |x| x.sub(/\n$/, '') }
+    end
+
+    # 0-indexed, inclusive
+    def start_position
+      return @start_position if @start_position
+      return @start_position = Position.new(0, 0) unless line_number && markup
+
+      position = Position.new
+      position.line = line_number - 1
+      position.column = full_line(position.line).index(lines_of_content.first) || 0
+
+      @start_position = position
+    end
+
+    # 0-indexed, exclusive. It's the line + col that are exclusive.
+    # This is why it doesn't make sense to calculate them separately.
+    def end_position
+      return @end_position if @end_position
+      return @end_position = Position.new(0, 0) unless line_number && markup
+
+      position = Position.new
+      position.line = start_line + lines_of_content.size - 1
+      position.column = if start_line == position.line
+        start_column + markup.size
+      else
+        lines_of_content.last.size
+      end
+
+      @end_position = position
     end
   end
 end
