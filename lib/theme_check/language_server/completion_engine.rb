@@ -40,9 +40,10 @@ module ThemeCheck
       token = find_token(name, line, col)
       return [] if token.nil?
 
-      if tag_completion?(token, line, col)
+      cursor = cursor_index(token, line, col)
+      if tag_completion?(token, cursor)
         tag_completions(token)
-      elsif object_completion?(token, line, col)
+      elsif object_completion?(token, cursor)
         object_completions(token)
       else
         []
@@ -66,28 +67,32 @@ module ThemeCheck
 
     private
 
-    def cursor_on_first_word?(token, line, col)
+    def cursor_index(token, line, col)
+      relative_line = line - token.start_line
+      return col - token.start_col if relative_line == 0
+      PositionConverter.from_line_to_column(relative_line, col, token.content)
+    end
+
+    def cursor_on_first_word?(token, cursor)
       word = token.content.match(WORD)
       return false if word.nil?
       word_start = word.begin(0)
       word_end = word.end(0)
-      token.start_line == line &&
-      (col - token.start_col) >= word_start &&
-      (col - token.start_col) <= word_end
+      word_start <= cursor && cursor <= word_end
     end
 
-    def cursor_on_start_content?(token, col, regex)
-      token.content.slice(0, col - token.start_col).match?(/^#{regex}(?:\s|\n)*$/m)
+    def cursor_on_start_content?(token, cursor, regex)
+      token.content.slice(0, cursor).match?(/^#{regex}(?:\s|\n)*$/m)
     end
 
     def first_word(token)
       return token.content.match(WORD)[0] if token.content.match?(WORD)
     end
 
-    def tag_completion?(token, line, col)
+    def tag_completion?(token, cursor)
       token.content.starts_with?(Liquid::TagStart) && (
-        cursor_on_first_word?(token, line, col) ||
-        cursor_on_start_content?(token, col, Liquid::TagStart)
+        cursor_on_first_word?(token, cursor) ||
+        cursor_on_start_content?(token, cursor, Liquid::TagStart)
       )
     end
 
@@ -105,10 +110,10 @@ module ThemeCheck
       }
     end
 
-    def object_completion?(token, line, col)
+    def object_completion?(token, cursor)
       token.content.match?(Liquid::VariableStart) && (
-        cursor_on_first_word?(token, line, col) ||
-        cursor_on_start_content?(token, col, Liquid::VariableStart)
+        cursor_on_first_word?(token, cursor) ||
+        cursor_on_start_content?(token, cursor, Liquid::VariableStart)
       )
     end
 
