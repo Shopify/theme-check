@@ -68,4 +68,25 @@ class CliTest < Minitest::Test
     end
     assert_includes(out, "corrected")
   end
+
+  def test_init
+    storage = make_file_system_storage
+    cli = ThemeCheck::Cli.new
+    out = capture(:stdout) do
+      cli.run([storage.root, "--init"])
+    end
+    assert_includes(out, "Writing new .theme-check.yml")
+  end
+
+  def test_init_abort_with_existing_config_file
+    storage = make_file_system_storage(
+      ".theme-check.yml" => <<~END,
+        root: .
+      END
+    )
+    cli = ThemeCheck::Cli.new
+    assert_raises(ThemeCheck::Cli::Abort, /^.theme-check.yml already exists/) do
+      cli.run([storage.root, "--init"])
+    end
+  end
 end
