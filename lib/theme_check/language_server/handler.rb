@@ -2,8 +2,6 @@
 
 module ThemeCheck
   module LanguageServer
-    TEXT_DOCUMENT_SYNC_FULL = 1
-
     class Handler
       CAPABILITIES = {
         completionProvider: {
@@ -12,7 +10,7 @@ module ThemeCheck
         },
         textDocumentSync: {
           openClose: true,
-          change: TEXT_DOCUMENT_SYNC_FULL,
+          change: TextDocumentSyncKind::FULL,
           willSave: false,
           save: true,
         },
