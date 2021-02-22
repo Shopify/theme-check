@@ -4,7 +4,13 @@ require_relative "language_server/handler"
 require_relative "language_server/server"
 require_relative "language_server/tokens"
 require_relative "language_server/position_helper"
+require_relative "language_server/completion_helper"
+require_relative "language_server/completion_provider"
 require_relative "language_server/completion_engine"
+
+Dir[__dir__ + "/language_server/completion_providers/*.rb"].each do |file|
+  require file
+end
 
 module ThemeCheck
   module LanguageServer
