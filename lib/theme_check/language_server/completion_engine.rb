@@ -38,7 +38,7 @@ module ThemeCheck
       def cursor_index(token, line, col)
         relative_line = line - token.start_line
         return col - token.start_col if relative_line == 0
-        from_line_to_column(relative_line, col, token.content)
+        from_line_column_to_index(relative_line, col, token.content)
       end
     end
   end
