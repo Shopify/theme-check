@@ -11,6 +11,7 @@ module ThemeCheck
         -x, [--exclude-category]  # Exclude this category of checks
         -l, [--list]              # List enabled checks
         -a, [--auto-correct]      # Automatically fix offenses
+        --init                    # Generate a .theme-check.yml file in the current directory
         -h, [--help]              # Show this. Hi!
         -v, [--version]           # Print Theme Check version
 
@@ -22,7 +23,7 @@ module ThemeCheck
     END
 
     def run(argv)
-      path = "."
+      @path = "."
 
       command = :check
       only_categories = []
@@ -44,15 +45,19 @@ module ThemeCheck
           command = :list
         when "--auto-correct", "-a"
           auto_correct = true
+        when "--init"
+          command = :init
         else
-          path = arg
+          @path = arg
         end
       end
 
-      @config = ThemeCheck::Config.from_path(path)
-      @config.only_categories = only_categories
-      @config.exclude_categories = exclude_categories
-      @config.auto_correct = auto_correct
+      unless [:version, :init].include?(command)
+        @config = ThemeCheck::Config.from_path(@path)
+        @config.only_categories = only_categories
+        @config.exclude_categories = exclude_categories
+        @config.auto_correct = auto_correct
+      end
 
       send(command)
     end
@@ -73,6 +78,17 @@ module ThemeCheck
 
     def version
       puts ThemeCheck::VERSION
+    end
+
+    def init
+      dotfile_path = ThemeCheck::Config.find(@path)
+      if dotfile_path.nil?
+        File.write(File.join(@path, ThemeCheck::Config::DOTFILE), File.read(ThemeCheck::Config::DEFAULT_CONFIG))
+
+        puts "Writing new #{ThemeCheck::Config::DOTFILE} to #{@path}"
+      else
+        raise Abort, "#{ThemeCheck::Config::DOTFILE} already exists at #{@path}."
+      end
     end
 
     def check
