@@ -24,7 +24,7 @@ module ThemeCheck
       def matches(s, re)
         start_at = 0
         matches = []
-        while(m = s.match(re, start_at))
+        while (m = s.match(re, start_at))
           matches.push(m)
           start_at = m.end(0)
         end

@@ -52,7 +52,6 @@ module ThemeCheck
         })
       end
 
-
       def test_about_to_type
         engine = make_engine(filename => "{{ }}")
         assert_includes(engine.completions(filename, 0, 3), {
