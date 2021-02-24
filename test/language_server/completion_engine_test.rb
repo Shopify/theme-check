@@ -73,17 +73,20 @@ module ThemeCheck
       end
 
       def test_find_token
-        engine = make_engine(filename => <<~LIQUID)
+        content = <<~LIQUID
           <head>
             {% rend %}
             <script src="{{ 'foo.js' |  }}"></script>
+            {% rend
           </head>
         LIQUID
+        engine = make_engine(filename => content)
 
-        assert_equal("{% rend %}", engine.find_token(filename, 1, 9).content)
-        assert_equal("{{ 'foo.js' |  }}", engine.find_token(filename, 2, 29).content)
-        assert_equal("<head>\n  ", engine.find_token(filename, 0, 0).content)
-        assert_equal("\"></script>\n</head>\n", engine.find_token(filename, 3, 0).content)
+        assert_can_find_token(engine, content, "{% rend %}")
+        assert_can_find_token(engine, content, "{{ 'foo.js' |  }}")
+        assert_can_find_token(engine, content, "<head>\n  ")
+        assert_can_find_token(engine, content, "\"></script>\n  ")
+        assert_can_find_token(engine, content, "{% rend\n</head>\n")
       end
 
       private
@@ -95,6 +98,18 @@ module ThemeCheck
 
       def filename
         "layout/theme.liquid"
+      end
+
+      def assert_can_find_token(engine, content, token)
+        # Being on the first character of a token should try to
+        # complete the previous one
+        refute_equal(token, engine.find_token(content, content.index(token))&.content)
+
+        # Being inside the token should give you the token
+        assert_equal(token, engine.find_token(content, content.index(token) + 1).content)
+
+        # Being on the next character (outside the token) should give you the previous one.
+        assert_equal(token, engine.find_token(content, content.index(token) + token.size).content)
       end
     end
   end

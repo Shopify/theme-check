@@ -3,10 +3,8 @@
 module ThemeCheck
   Token = Struct.new(
     :content,
-    :start_line,
-    :start_col,
-    :end_line,
-    :end_col,
+    :start, # inclusive
+    :end, # exclusive
   )
 
   # Implemented as an Enumerable so we stop iterating on the find once
@@ -23,31 +21,19 @@ module ThemeCheck
 
       tokenizer = Liquid::Tokenizer.new(@buffer, true)
 
-      prev = Token.new('', 0, 0, 0, 0)
-      curr = Token.new('', 0, 0, 0, 0)
+      prev = Token.new('', 0, 0)
+      curr = Token.new('', 0, 0)
 
-      # This code is 1-indexed because Liquid::Tokenizer is 1-indexed.
-      while (curr.start_line = tokenizer.line_number) && (content = tokenizer.shift)
-        curr.start_col = if prev.end_line == curr.start_line
-          prev.end_col + 1
-        else
-          1
-        end
+      while (content = tokenizer.shift)
+        content += tokenizer.shift if content == "{%"
 
-        curr.end_line = tokenizer.line_number
-        curr.end_col = if curr.start_line == curr.end_line
-          curr.start_col + content.size - 1
-        else
-          content.lines.last.size
-        end
+        curr.start = prev.end
+        curr.end = curr.start + content.size
 
         block.call(Token.new(
           content,
-          # We convert it back to 0-index to fit with our own world.
-          curr.start_line - 1,
-          curr.start_col - 1,
-          curr.end_line - 1,
-          curr.end_col - 1,
+          curr.start,
+          curr.end,
         ))
 
         # recycling structs

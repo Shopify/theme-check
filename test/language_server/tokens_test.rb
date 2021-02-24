@@ -1,36 +1,45 @@
 # frozen_string_literal: true
 require "test_helper"
 
-class TokensTest < Minitest::Test
-  def test_tokens
-    tokens = ThemeCheck::Tokens.new(<<~LIQUID).to_a
-      <html>
-        <head>
-          {% assign foo = 1 %}
-          {{ 'foo.js' | asset_url | script_tag }}
-          <script src="{{ 'foo.js' | asset_url }}" async></script>
-          {% if true %}content{% endif %}
-        </head>
-        <body>
-          {% if foo == 1 %}
-            <div>Hello World</div>
-          {% else %}
-            <div>Bye World</div>
-          {% endif %}
-          {% render 'foo.js' %}
-        </body>
-      </html>
-    LIQUID
+module ThemeCheck
+  class TokensTest < Minitest::Test
+    def test_tokens
+      template = <<~LIQUID
+        <html>
+          <head>
+            {% assign foo = 1 %}
+            {{ 'foo.js' | asset_url | script_tag }}
+            <script src="{{ 'foo.js' | asset_url }}" async></script>
+            {% if true %}content{% endif %}
+          </head>
+          <body>
+            {% if foo == 1 %}
+              <div>Hello World</div>
+            {% else %}
+              <div>Bye World</div>
+            {% endif %}
+            {% incomplete
+            {{ incomplete
+            {% render %}
+          </body>
+        </html>
+      LIQUID
+      tokens = Tokens.new(template).to_a
 
-    assert_includes(tokens, ThemeCheck::Token.new("<html>\n  <head>\n    ", 0, 0, 2, 3))
-    assert_includes(tokens, ThemeCheck::Token.new("{{ 'foo.js' | asset_url | script_tag }}", 3, 4, 3, 42))
-    assert_includes(tokens, ThemeCheck::Token.new("{{ 'foo.js' | asset_url }}", 4, 17, 4, 42))
-  end
+      assert_includes(tokens, token(template, "<html>\n  <head>\n    "))
+      assert_includes(tokens, token(template, "{% assign foo = 1 %}"))
+      assert_includes(tokens, token(template, "{{ 'foo.js' | asset_url | script_tag }}"))
+      assert_includes(tokens, token(template, "{% if foo == 1 %}"))
+      assert_includes(tokens, token(template, "{% else %}"))
+      assert_includes(tokens, token(template, "{% endif %}"))
+      # assert_includes(tokens, token(template, "{% incomplete\n    "))
+      # assert_includes(tokens, token(template, "{{ incomplete\n    "))
+    end
 
-  def test_tokens_on_same_line
-    tokens = ThemeCheck::Tokens.new('<div>{% if true %}content{% endif %}</div>').to_a
+    private
 
-    assert_includes(tokens, ThemeCheck::Token.new("{% if true %}", 0, 5, 0, 17))
-    assert_includes(tokens, ThemeCheck::Token.new("{% endif %}", 0, 25, 0, 35))
+    def token(string, content)
+      Token.new(content, string.index(content), string.index(content) + content.size)
+    end
   end
 end

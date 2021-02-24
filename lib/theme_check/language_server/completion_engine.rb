@@ -11,34 +11,27 @@ module ThemeCheck
       end
 
       def completions(name, line, col)
-        token = find_token(name, line, col)
+        buffer = @storage.read(name)
+        cursor = from_line_column_to_index(buffer, line, col)
+        token = find_token(buffer, cursor)
         return [] if token.nil?
 
-        cursor = cursor_index(token, line, col)
-        @providers.flat_map { |p| p.completions(token.content, cursor) }
-      end
-
-      def find_token(name, line, col)
-        template = @storage.read(name)
-        Tokens.new(template).find do |token|
-          # it's easier to make a condition for is it out than is it in.
-          is_out_of_bounds = (
-            line < token.start_line ||
-            token.end_line < line ||
-            (token.start_line == line && col < token.start_col) ||
-            (token.end_line == line && token.end_col < col)
+        @providers.flat_map do |p|
+          p.completions(
+            token.content,
+            cursor - token.start
           )
-
-          !is_out_of_bounds
         end
       end
 
-      private
-
-      def cursor_index(token, line, col)
-        relative_line = line - token.start_line
-        return col - token.start_col if relative_line == 0
-        from_line_column_to_index(relative_line, col, token.content)
+      def find_token(buffer, cursor)
+        Tokens.new(buffer).find do |token|
+          # Here we include the next character and exclude the first
+          # one becase when we want to autocomplete inside a token
+          # and at most 1 outside it since the cursor could be placed
+          # at the end of the token.
+          token.start < cursor && cursor <= token.end
+        end
       end
     end
   end

@@ -4,7 +4,7 @@
 module ThemeCheck
   module LanguageServer
     module PositionHelper
-      def from_line_column_to_index(row, col, content)
+      def from_line_column_to_index(content, row, col)
         i = 0
         result = 0
         lines = content.lines
@@ -16,7 +16,7 @@ module ThemeCheck
         result
       end
 
-      def from_index_to_line_column(index, content)
+      def from_index_to_line_column(content, index)
         lines = content[0..index].lines
         row = lines.size - 1
         col = lines.last.size - 1
