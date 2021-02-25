@@ -32,8 +32,8 @@ module ThemeCheck
       assert_includes(tokens, token(template, "{% if foo == 1 %}"))
       assert_includes(tokens, token(template, "{% else %}"))
       assert_includes(tokens, token(template, "{% endif %}"))
-      # assert_includes(tokens, token(template, "{% incomplete\n    "))
-      # assert_includes(tokens, token(template, "{{ incomplete\n    "))
+      assert_includes(tokens, token(template, "{% incomplete\n    "))
+      assert_includes(tokens, token(template, "{{ incomplete\n    "))
     end
 
     private
