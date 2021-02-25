@@ -1,4 +1,11 @@
 
+v0.4.0 / 2021-02-25
+==================
+
+  * Add Completion Engine ([#161](https://github.com/shopify/theme-check/issues/161))
+  * Add init command to CLI ([#174](https://github.com/shopify/theme-check/issues/174))
+  * Refactor start and end Position logic ([#172](https://github.com/shopify/theme-check/issues/172))
+
 v0.3.3 / 2021-02-18
 ==================
 
