@@ -41,7 +41,7 @@ module ThemeCheck
 
       def on_text_document_did_change(_id, params)
         uri = text_document_uri(params)
-        @storage.write(uri, did_change_text(params))
+        @storage.write(uri, content_changes_text(params))
       end
 
       def on_text_document_did_close(_id, params)
@@ -51,7 +51,7 @@ module ThemeCheck
 
       def on_text_document_did_open(_id, params)
         uri = text_document_uri(params)
-        @storage.write(uri, template(params))
+        @storage.write(uri, text_document_text(params))
         analyze_and_send_offenses(uri)
       end
 
@@ -75,12 +75,12 @@ module ThemeCheck
         params.dig('textDocument', 'uri').sub('file://', '')
       end
 
-      def did_change_text(params)
-        params.dig('contentChanges', 0, 'text')
+      def text_document_text(params)
+        params.dig('textDocument', 'text')
       end
 
-      def template(params)
-        params.dig('textDocument', 'text')
+      def content_changes_text(params)
+        params.dig('contentChanges', 0, 'text')
       end
 
       def analyze_and_send_offenses(file_path)
