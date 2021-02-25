@@ -4,9 +4,13 @@ module ThemeCheck
   module LanguageServer
     class Handler
       CAPABILITIES = {
+        completionProvider: {
+          triggerCharacters: ['.', '{{ ', '{% '],
+          context: true,
+        },
         textDocumentSync: {
           openClose: true,
-          change: false,
+          change: TextDocumentSyncKind::FULL,
           willSave: false,
           save: true,
         },
@@ -15,6 +19,8 @@ module ThemeCheck
       def initialize(server)
         @server = server
         @previously_reported_files = Set.new
+        @storage = InMemoryStorage.new
+        @completion_engine = CompletionEngine.new(@storage)
       end
 
       def on_initialize(id, params)
@@ -31,13 +37,51 @@ module ThemeCheck
       def on_exit(_id, _params)
         close!
       end
+      alias_method :on_shutdown, :on_exit
+
+      def on_text_document_did_change(_id, params)
+        uri = text_document_uri(params)
+        @storage.write(uri, content_changes_text(params))
+      end
+
+      def on_text_document_did_close(_id, params)
+        uri = text_document_uri(params)
+        @storage.write(uri, nil)
+      end
 
       def on_text_document_did_open(_id, params)
-        analyze_and_send_offenses(params.dig('textDocument', 'uri').sub('file://', ''))
+        uri = text_document_uri(params)
+        @storage.write(uri, text_document_text(params))
+        analyze_and_send_offenses(uri)
       end
-      alias_method :on_text_document_did_save, :on_text_document_did_open
+
+      def on_text_document_did_save(_id, params)
+        analyze_and_send_offenses(text_document_uri(params))
+      end
+
+      def on_text_document_completion(id, params)
+        uri = text_document_uri(params)
+        line = params.dig('position', 'line')
+        col = params.dig('position', 'character')
+        send_response(
+          id: id,
+          result: completions(uri, line, col)
+        )
+      end
 
       private
+
+      def text_document_uri(params)
+        params.dig('textDocument', 'uri').sub('file://', '')
+      end
+
+      def text_document_text(params)
+        params.dig('textDocument', 'text')
+      end
+
+      def content_changes_text(params)
+        params.dig('contentChanges', 0, 'text')
+      end
 
       def analyze_and_send_offenses(file_path)
         root = ThemeCheck::Config.find(file_path) || @root_path
@@ -58,6 +102,10 @@ module ThemeCheck
         log("Checking #{config.root}")
         analyzer.analyze_theme
         analyzer.offenses
+      end
+
+      def completions(uri, line, col)
+        @completion_engine.completions(uri, line, col)
       end
 
       def send_diagnostics(offenses)

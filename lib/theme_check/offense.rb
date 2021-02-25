@@ -37,6 +37,9 @@ module ThemeCheck
       elsif @node
         @node.line_number
       end
+
+      @start_position = nil
+      @end_position = nil
     end
 
     def source_excerpt
