@@ -19,6 +19,7 @@ module ThemeCheck
       :liquid,
       :translation,
       :json,
+      :performance,
     ]
 
     class << self
@@ -36,15 +37,19 @@ module ThemeCheck
         @severity if defined?(@severity)
       end
 
-      def category(category = nil)
-        if category
-          unless CATEGORIES.include?(category)
-            raise ArgumentError, "unknown category. Use: #{CATEGORIES.join(', ')}"
+      def categories(*categories)
+        @categories ||= []
+        if categories.any?
+          unknown_categories = categories.select { |category| !CATEGORIES.include?(category) }
+          if unknown_categories.any?
+            raise ArgumentError,
+              "unknown categories: #{unknown_categories.join(', ')}. Use: #{CATEGORIES.join(', ')}"
           end
-          @category = category
+          @categories = categories
         end
-        @category if defined?(@category)
+        @categories
       end
+      alias_method :category, :categories
 
       def doc(doc = nil)
         @doc = doc if doc
@@ -63,8 +68,8 @@ module ThemeCheck
       self.class.severity
     end
 
-    def category
-      self.class.category
+    def categories
+      self.class.categories
     end
 
     def doc
@@ -93,7 +98,7 @@ module ThemeCheck
 
     def to_s
       s = +"#{code_name}:\n"
-      properties = { severity: severity, category: category, doc: doc }.merge(options)
+      properties = { severity: severity, categories: categories, doc: doc }.merge(options)
       properties.each_pair do |name, value|
         s << "  #{name}: #{value}\n" if value
       end

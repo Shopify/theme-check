@@ -3,7 +3,7 @@ module ThemeCheck
   # Reports errors when trying to use parser-blocking script tags
   class ParserBlockingJavaScript < LiquidCheck
     severity :error
-    category :liquid
+    categories :liquid, :performance
 
     PARSER_BLOCKING_SCRIPT_TAG = %r{
       <script                                    # Find the start of a script tag
