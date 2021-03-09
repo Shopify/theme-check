@@ -53,6 +53,23 @@ class UndefinedObjectTest < Minitest::Test
     END
   end
 
+  def test_reports_several_offenses_for_same_object
+    offenses = analyze_theme(
+      ThemeCheck::UndefinedObject.new,
+      "templates/index.liquid" => <<~END,
+        {% if form[email] %}
+          {{ form[email] }}
+          {{ form[email] }}
+        {% endif %}
+      END
+    )
+    assert_offenses(<<~END, offenses)
+      Undefined object `email` at templates/index.liquid:1
+      Undefined object `email` at templates/index.liquid:2
+      Undefined object `email` at templates/index.liquid:3
+    END
+  end
+
   def test_does_not_report_on_string_argument_to_global_object
     offenses = analyze_theme(
       ThemeCheck::UndefinedObject.new,
