@@ -136,7 +136,7 @@ module ThemeCheck
 
     def test_js_bundles_bigger_than_threshold
       offenses = analyze_theme(
-        AssetSizeJavaScript.new(threshold_in_bytes: 1),
+        AssetSizeJavaScript.new(threshold_in_bytes: 2),
         "assets/theme.js" => <<~JS,
           console.log('hello world');
         JS
@@ -149,7 +149,7 @@ module ThemeCheck
         END
       )
       assert_offenses(<<~END, offenses)
-        Executing too much JavaScript on every page load at templates/index.liquid:3
+        JavaScript on every page load exceding compressed size threshold (2 Bytes), consider using the import on interaction pattern. at templates/index.liquid:3
       END
     end
   end
