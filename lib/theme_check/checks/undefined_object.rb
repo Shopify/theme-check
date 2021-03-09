@@ -21,7 +21,13 @@ module ThemeCheck
       end
 
       def add_variable_lookup(name:, node:)
-        line_number = node.parent.line_number
+        parent = node
+        line_number = nil
+        loop do
+          line_number = parent.line_number
+          parent = parent.parent
+          break unless line_number.nil? && parent
+        end
         key = [name, line_number]
         @all_variable_lookups[key] = node
       end
@@ -154,7 +160,7 @@ module ThemeCheck
       all_variables = info.all_variables
 
       info.each_variable_lookup(!!render_node) do |(key, node)|
-        name, _line_number = key
+        name, line_number = key
         next if all_variables.include?(name)
         next if all_global_objects.include?(name)
 
@@ -164,7 +170,7 @@ module ThemeCheck
         if render_node
           add_offense("Missing argument `#{name}`", node: render_node)
         else
-          add_offense("Undefined object `#{name}`", node: node)
+          add_offense("Undefined object `#{name}`", node: node, line_number: line_number)
         end
       end
     end
