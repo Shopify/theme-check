@@ -7,6 +7,7 @@ module ThemeCheck
     include RegexHelpers
     severity :error
     category :performance
+    doc "https://github.com/Shopify/theme-check/blob/master/docs/checks/asset_size_javascript.md"
 
     Script = Struct.new(:src, :match)
 
@@ -45,7 +46,7 @@ module ThemeCheck
         next if file_size.nil?
         next if file_size <= threshold_in_bytes
         add_offense(
-          "Executing too much JavaScript on every page load",
+          "JavaScript on every page load exceding compressed size threshold (#{threshold_in_bytes} Bytes), consider using the import on interaction pattern.",
           node: @node,
           markup: script.src,
           line_number: @source[0...script.match.begin(:src)].count("\n") + 1
