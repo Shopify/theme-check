@@ -22,10 +22,12 @@ module ThemeCheck
 
       def add_variable_lookup(name:, node:)
         parent = node
-        begin
+        line_number = nil
+        loop do
           line_number = parent.line_number
           parent = parent.parent
-        end while line_number.nil? && parent
+          break unless line_number.nil? && parent
+        end
         key = [name, line_number]
         @all_variable_lookups[key] = node
       end
