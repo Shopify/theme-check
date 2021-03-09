@@ -36,7 +36,7 @@ This rule disallows the use of theme JavaScript files and external scripts to ha
 </script>
 ```
 
-## Configuration
+## Rule Options
 
 The default configuration is the following.
 
