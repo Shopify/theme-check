@@ -4,6 +4,7 @@ module ThemeCheck
   module LanguageServer
     class CompletionProvider
       include CompletionHelper
+      include RegexHelpers
 
       class << self
         def all
