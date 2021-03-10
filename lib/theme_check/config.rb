@@ -83,8 +83,8 @@ module ThemeCheck
 
         check_class = ThemeCheck.const_get(check_name)
 
-        next if exclude_categories.include?(check_class.category)
-        next if only_categories.any? && !only_categories.include?(check_class.category)
+        next if check_class.categories.any? { |category| exclude_categories.include?(category) }
+        next if only_categories.any? && check_class.categories.none? { |category| only_categories.include?(category) }
 
         options_for_check = options.transform_keys(&:to_sym)
         options_for_check.delete(:enabled)

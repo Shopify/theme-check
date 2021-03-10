@@ -213,14 +213,14 @@ class ConfigTest < Minitest::Test
     config = ThemeCheck::Config.new(root: ".")
     config.only_categories = [:liquid]
     assert(config.enabled_checks.any?)
-    assert(config.enabled_checks.all? { |c| c.category == :liquid })
+    assert(config.enabled_checks.all? { |c| c.categories.include?(:liquid) })
   end
 
   def test_exclude_category
     config = ThemeCheck::Config.new(root: ".")
     config.exclude_categories = [:liquid]
     assert(config.enabled_checks.any?)
-    assert(config.enabled_checks.none? { |c| c.category == :liquid })
+    assert(config.enabled_checks.none? { |c| c.categories.include?(:liquid) })
   end
 
   def test_ignore
