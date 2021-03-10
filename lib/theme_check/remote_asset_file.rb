@@ -23,14 +23,23 @@ module ThemeCheck
 
     def initialize(src)
       @uri = RemoteAssetFile.uri(src)
+      @content = nil
     end
 
     def content
-      @content ||= Net::HTTP.get(@uri)
+      return @content unless @content.nil?
+
+      res = Net::HTTP.start(@uri.hostname, @uri.port, use_ssl: @uri.scheme == 'https') do |http|
+        req = Net::HTTP::Get.new(@uri)
+        req['Accept-Encoding'] = 'gzip, deflate, br'
+        http.request(req)
+      end
+
+      @content = res.body
     end
 
     def gzipped_size
-      @gzipped_size ||= Zlib.gzip(content).size
+      @gzipped_size ||= @content.size
     end
   end
 end
