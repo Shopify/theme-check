@@ -51,6 +51,10 @@ module ThemeCheck
         @doc if defined?(@doc)
       end
 
+      def docs_url(path)
+        "https://github.com/Shopify/theme-check/blob/master/#{path}"
+      end
+
       def can_disable(disableable = nil)
         unless disableable.nil?
           @can_disable = disableable
