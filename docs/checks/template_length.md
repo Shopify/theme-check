@@ -18,7 +18,7 @@ This check is aimed at eliminating large template files.
 
 The default configuration for this check is the following:
 
-```
+```yaml
 TemplateLength:
   enabled: true
   max_length: 200

@@ -20,7 +20,7 @@ This check is aimed at eliminating ...
 
 The default configuration for this check is the following:
 
-```
+```yaml
 CheckClassName:
   enabled: true
   some_option: 10
