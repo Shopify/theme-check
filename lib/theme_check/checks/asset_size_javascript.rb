@@ -30,8 +30,6 @@ module ThemeCheck
 
     def initialize(threshold_in_bytes: 10000)
       @threshold_in_bytes = threshold_in_bytes
-      @files = []
-      @scripts = []
     end
 
     def on_document(node)
