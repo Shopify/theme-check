@@ -42,13 +42,13 @@ The default configuration is the following.
 
 ```yaml
 AssetSizeJavaScript:
-  enabled: true
+  enabled: false
   threshold_in_bytes: 10000
 ```
 
 Options:
 
-- `enabled`: (Default: `true`) whether the check is enabled or not. (Default: true)
+- `enabled`: (Default: `false`) whether the check is enabled or not.
 - `threshold_in_bytes`: (Default: `10000`)
 
 ## Resources
