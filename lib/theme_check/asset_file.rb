@@ -24,7 +24,7 @@ module ThemeCheck
     end
 
     def gzipped_size
-      @gzipped_size ||= Zlib.gzip(content).size
+      @gzipped_size ||= Zlib.gzip(content).bytesize
     end
 
     def name

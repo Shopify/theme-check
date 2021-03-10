@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 require "net/http"
 require "pathname"
-require "zlib"
 
 module ThemeCheck
   class RemoteAssetFile
@@ -39,7 +38,7 @@ module ThemeCheck
     end
 
     def gzipped_size
-      @gzipped_size ||= @content.size
+      @gzipped_size ||= @content.bytesize
     end
   end
 end
