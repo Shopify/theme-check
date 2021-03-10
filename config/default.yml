@@ -16,6 +16,7 @@ MissingTemplate:
 
 NestedSnippet:
   enabled: true
+  max_nesting_level: 2
 
 RequiredLayoutThemeObject:
   enabled: true
@@ -83,3 +84,4 @@ ParserBlockingJavaScript:
 
 AssetSizeJavaScript:
   enabled: false
+  threshold_in_bytes: 10000
