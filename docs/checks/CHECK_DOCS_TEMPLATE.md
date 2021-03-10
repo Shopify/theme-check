@@ -43,5 +43,5 @@ This check has been introduced in Theme Check X.X.X.
 - [Rule Source][codesource]
 - [Documentation Source][docsource]
 
-[codesource]: lib/theme_check/checks/check_class_name.rb
-[docsource]: docs/checks/check_class_name.md
+[codesource]: /lib/theme_check/checks/check_class_name.rb
+[docsource]: /docs/checks/check_class_name.md
