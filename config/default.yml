@@ -82,4 +82,4 @@ ParserBlockingJavaScript:
   enabled: true
 
 AssetSizeJavaScript:
-  enabled: true
+  enabled: false
