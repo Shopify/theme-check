@@ -4,6 +4,7 @@ module ThemeCheck
   class ParserBlockingJavaScript < LiquidCheck
     severity :error
     categories :liquid, :performance
+    doc docs_url("docs/checks/parser_blocking_javascript.md")
 
     PARSER_BLOCKING_SCRIPT_TAG = %r{
       <script                                    # Find the start of a script tag
