@@ -70,7 +70,7 @@ This check has been introduced in Theme Check THEME_CHECK_VERSION.
 
 ## Resources
 
-- [The Impact On Interaction Pattern][ioip]
+- [The Import On Interaction Pattern][ioip]
 - [Rule Source][codesource]
 - [Documentation Source][docsource]
 
