@@ -4,7 +4,7 @@ This check exists to prevent rendering resources with the `render` tag, `section
 
 ## Check Details
 
-This check is aimed at eliminating ...
+This check is aimed at preventing liquid rendering errors.
 
 :-1: Example of **incorrect** code for this check:
 
