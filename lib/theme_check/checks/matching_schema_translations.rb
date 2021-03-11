@@ -3,7 +3,7 @@ module ThemeCheck
   class MatchingSchemaTranslations < LiquidCheck
     severity :suggestion
     category :translation
-    doc docs_url("checks/docs/matching_schema_translations.rb")
+    doc docs_url("docs/checks/matching_schema_translations.md")
 
     def on_schema(node)
       schema = JSON.parse(node.value.nodelist.join)
