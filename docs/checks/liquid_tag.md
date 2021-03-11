@@ -60,6 +60,6 @@ This check has been introduced in Theme Check 0.1.0.
 - [Rule Source][codesource]
 - [Documentation Source][docsource]
 
-[liquid] https://shopify.dev/docs/themes/liquid/reference/tags/theme-tags#liquid
+[liquid]: https://shopify.dev/docs/themes/liquid/reference/tags/theme-tags#liquid
 [codesource]: /lib/theme_check/checks/liquid_tag.rb
 [docsource]: /docs/checks/liquid_tag.md
