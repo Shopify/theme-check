@@ -71,8 +71,8 @@ This check has been introduced in Theme Check THEME_CHECK_VERSION.
 ## Resources
 
 - [The Impact On Interaction Pattern][ioip]
-- [Rule Source][source]
-- [Documentation Source][doc]
+- [Rule Source][codesource]
+- [Documentation Source][docsource]
 
 [ioip]: https://addyosmani.com/blog/import-on-interaction/
 [codesource]: /lib/theme_check/checks/asset_size_javascript.rb
