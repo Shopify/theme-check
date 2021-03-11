@@ -3,11 +3,11 @@
 module ThemeCheck
   # Reports missing shopify required theme files
   # required templates: https://shopify.dev/tutorials/review-theme-store-requirements-files
-
+  # https://shopify.dev/docs/themes/theme-templates
   class MissingRequiredTemplateFiles < LiquidCheck
     severity :error
     category :liquid
-    doc "https://shopify.dev/docs/themes/theme-templates"
+    doc docs_url("docs/checks/missing_required_template_files.rb")
 
     REQUIRED_LIQUID_FILES = %w(layout/theme)
     REQUIRED_TEMPLATE_FILES = %w(
