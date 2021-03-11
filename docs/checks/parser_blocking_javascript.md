@@ -67,6 +67,15 @@ This check is aimed at eliminating parser-blocking JavaScript on themes.
 <button id="thing">Click Me</button>
 ```
 
+## Check Options
+
+The default configuration for this check is the following:
+
+```yaml
+ParserBlockingJavaScript:
+  enabled: true
+```
+
 ## When Not To Use It
 
 This should only be turned off with the `theme-check-disable` comment when there's no better way to accomplish what you're doing than with a parser-blocking script.
