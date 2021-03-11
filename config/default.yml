@@ -10,6 +10,7 @@ ConvertIncludeToRender:
 
 LiquidTag:
   enabled: true
+  min_consecutive_statements: 4
 
 MissingTemplate:
   enabled: true
