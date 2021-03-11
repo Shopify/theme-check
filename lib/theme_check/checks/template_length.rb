@@ -3,6 +3,7 @@ module ThemeCheck
   class TemplateLength < LiquidCheck
     severity :suggestion
     category :liquid
+    doc docs_url("docs/checks/template_length.md")
 
     def initialize(max_length: 200, exclude_schema: true)
       @max_length = max_length

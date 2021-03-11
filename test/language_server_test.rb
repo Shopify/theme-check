@@ -11,7 +11,8 @@ class LanguageServerTest < Minitest::Test
     @server = ThemeCheck::LanguageServer::Server.new(
       in_stream: @in,
       out_stream: @out,
-      err_stream: @err
+      err_stream: @err,
+      should_raise_errors: true
     )
   end
 
@@ -24,6 +25,7 @@ class LanguageServerTest < Minitest::Test
     :end_column,
     :start_line,
     :end_line,
+    :doc,
   ) do
     def self.build(path)
       new(
@@ -35,6 +37,7 @@ class LanguageServerTest < Minitest::Test
         14,
         9,
         9,
+        "https://path.to/docs.md"
       )
     end
   end
@@ -95,6 +98,9 @@ class LanguageServerTest < Minitest::Test
           },
           severity: 3,
           code: "LiquidTag",
+          codeDescription: {
+            href: "https://path.to/docs.md",
+          },
           source: "theme-check",
           message: "Wrong",
         }],
@@ -154,6 +160,9 @@ class LanguageServerTest < Minitest::Test
           },
           severity: 3,
           code: "LiquidTag",
+          codeDescription: {
+            href: "https://path.to/docs.md",
+          },
           source: "theme-check",
           message: "Wrong",
         }],
@@ -259,6 +268,9 @@ class LanguageServerTest < Minitest::Test
           },
           severity: 3,
           code: "LiquidTag",
+          codeDescription: {
+            href: "https://path.to/docs.md",
+          },
           source: "theme-check",
           message: "Wrong",
         }],
@@ -298,6 +310,8 @@ class LanguageServerTest < Minitest::Test
       body = scanner.peek(len)
       actual_responses << JSON.parse(body).deep_symbolize_keys
     end
-    assert_equal(expected_responses, actual_responses)
+    expected_responses.each do |response|
+      assert_equal(response, actual_responses.shift)
+    end
   end
 end

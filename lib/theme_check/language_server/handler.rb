@@ -138,12 +138,20 @@ module ThemeCheck
       end
 
       def offense_to_diagnostic(offense)
-        {
+        diagnostic = {
+          code: offense.code_name,
+          message: offense.message,
           range: range(offense),
           severity: severity(offense),
-          code: offense.code_name,
           source: "theme-check",
-          message: offense.message,
+        }
+        diagnostic["codeDescription"] = code_description(offense) unless offense.doc.nil?
+        diagnostic
+      end
+
+      def code_description(offense)
+        {
+          href: offense.doc,
         }
       end
 

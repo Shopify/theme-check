@@ -10,11 +10,13 @@ module ThemeCheck
 
     class Server
       attr_reader :handler
+      attr_reader :should_raise_errors
 
       def initialize(
         in_stream: STDIN,
         out_stream: STDOUT,
-        err_stream: $DEBUG ? File.open('/tmp/lsp.log', 'a') : STDERR
+        err_stream: $DEBUG ? File.open('/tmp/lsp.log', 'a') : STDERR,
+        should_raise_errors: false
       )
         validate!([in_stream, out_stream, err_stream])
 
@@ -25,6 +27,8 @@ module ThemeCheck
 
         @out.sync = true # do not buffer
         @err.sync = true # do not buffer
+
+        @should_raise_errors = should_raise_errors
       end
 
       def listen
@@ -37,6 +41,7 @@ module ThemeCheck
           return 0
 
         rescue Exception => e # rubocop:disable Lint/RescueException
+          raise e if should_raise_errors
           log(e)
           log(e.backtrace)
           return 1
