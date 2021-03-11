@@ -4,6 +4,8 @@ require "test_helper"
 class ThemeTest < Minitest::Test
   def setup
     @theme = make_theme(
+      "assets/theme.js" => "",
+      "assets/theme.css" => "",
       "templates/index.liquid" => "",
       "snippets/product.liquid" => "",
       "sections/article-template/template.liquid" => "",
@@ -12,18 +14,26 @@ class ThemeTest < Minitest::Test
   end
 
   def test_all
-    assert_equal(4, @theme.all.size)
+    assert_equal(6, @theme.all.size)
+  end
+
+  def test_assets
+    assert_equal(2, @theme.assets.size)
+    assert(@theme.assets.all? { |a| a.instance_of?(ThemeCheck::AssetFile) })
   end
 
   def test_liquid
     assert_equal(3, @theme.liquid.size)
+    assert(@theme.liquid.all? { |a| a.instance_of?(ThemeCheck::Template) })
   end
 
   def test_json
     assert_equal(1, @theme.json.size)
+    assert(@theme.json.all? { |a| a.instance_of?(ThemeCheck::JsonFile) })
   end
 
   def test_by_name
+    assert_equal("assets/theme.css", @theme["assets/theme.css"].name)
     assert_equal("templates/index", @theme["templates/index"].name)
     assert_equal("sections/article-template/template", @theme["sections/article-template/template"].name)
   end

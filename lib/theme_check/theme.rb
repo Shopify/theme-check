@@ -11,6 +11,12 @@ module ThemeCheck
       @storage = storage
     end
 
+    def assets
+      @assets ||= @storage.files
+        .select { |path| path.starts_with?("assets/") }
+        .map { |path| AssetFile.new(path, @storage) }
+    end
+
     def liquid
       @liquid ||= @storage.files
         .select { |path| LIQUID_REGEX.match?(path) }
@@ -43,7 +49,7 @@ module ThemeCheck
     end
 
     def all
-      @all ||= json + liquid
+      @all ||= json + liquid + assets
     end
 
     def [](name)

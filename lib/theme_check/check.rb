@@ -18,6 +18,7 @@ module ThemeCheck
     CATEGORIES = [
       :liquid,
       :translation,
+      :performance,
       :json,
       :performance,
     ]

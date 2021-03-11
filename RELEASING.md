@@ -2,7 +2,7 @@
 
 1. Check the Semantic Versioning page for info on how to version the new release: http://semver.org
 
-2. Create a PR to update the version in `lib/theme_check/version.rb`
+2. Create a PR to update the version in `lib/theme_check/version.rb` and replace the `THEME_CHECK_VERSION` placeholder in the documentation for new rules.
 
 3. Merge your PR to master
 

@@ -20,16 +20,6 @@ module ThemeCheck
       def first_word(content)
         return content.match(WORD)[0] if content.match?(WORD)
       end
-
-      def matches(s, re)
-        start_at = 0
-        matches = []
-        while (m = s.match(re, start_at))
-          matches.push(m)
-          start_at = m.end(0)
-        end
-        matches
-      end
     end
   end
 end
