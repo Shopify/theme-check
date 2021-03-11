@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module ThemeCheck
   class DeprecatedFilter < LiquidCheck
-    doc "https://shopify.dev/docs/themes/liquid/reference/filters/deprecated-filters"
+    doc docs_url("docs/checks/deprecated_filter.md")
     category :liquid
     severity :suggestion
 
