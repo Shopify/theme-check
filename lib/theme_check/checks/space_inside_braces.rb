@@ -4,6 +4,7 @@ module ThemeCheck
   class SpaceInsideBraces < LiquidCheck
     severity :style
     category :liquid
+    doc docs_url("docs/checks/space_inside_braces.md")
 
     def initialize
       @ignore = false
