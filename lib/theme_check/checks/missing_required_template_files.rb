@@ -6,7 +6,7 @@ module ThemeCheck
   class MissingRequiredTemplateFiles < LiquidCheck
     severity :error
     category :liquid
-    doc docs_url("docs/checks/missing_required_template_files.rb")
+    doc docs_url(__FILE__)
 
     REQUIRED_LIQUID_FILES = %w(layout/theme)
     REQUIRED_TEMPLATE_FILES = %w(

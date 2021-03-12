@@ -7,7 +7,7 @@ module ThemeCheck
     include RegexHelpers
     severity :error
     category :performance
-    doc docs_url("docs/checks/asset_size_javascript.md")
+    doc docs_url(__FILE__)
 
     Script = Struct.new(:src, :match)
 

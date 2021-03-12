@@ -32,7 +32,14 @@ Theme Check currently checks for the following:
 ✅ Deprecated filters  
 ✅ Missing `theme-check-enable` comment  
 
-And many more to come! Suggestions welcome ([create an issue](https://github.com/Shopify/theme-check/issues)).
+As well as checks that prevent easy to spot performance problems:
+
+✅ Use of [parser-blocking](/docs/checks/parser_blocking_javascript.md) JavaScript  
+✅ [Too much JavaScript](/docs/checks/asset_size_javascript.md)  
+
+For detailed descriptions and configuration options, [take a look at the complete list.](/docs/checks/)
+
+With more to come! Suggestions welcome ([create an issue](https://github.com/Shopify/theme-check/issues)).
 
 ## Requirements
 
@@ -87,7 +94,7 @@ TemplateLength:
   enabled: false
   # Or configure options
   max_length: 300
-  
+
 # Enable a custom check
 MyCustomCheck
   enabled: true

@@ -4,7 +4,7 @@ module ThemeCheck
   class UnusedAssign < LiquidCheck
     severity :suggestion
     category :liquid
-    doc docs_url("docs/checks/unused_assign.md")
+    doc docs_url(__FILE__)
 
     class TemplateInfo < Struct.new(:used_assigns, :assign_nodes, :includes)
       def collect_used_assigns(templates, visited = Set.new)

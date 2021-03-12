@@ -12,7 +12,7 @@ module ThemeCheck
   class UnknownFilter < LiquidCheck
     severity :error
     category :liquid
-    doc docs_url("docs/checks/unknown_filter.md")
+    doc docs_url(__FILE__)
 
     def on_variable(node)
       used_filters = node.value.filters.map { |name, *_rest| name }

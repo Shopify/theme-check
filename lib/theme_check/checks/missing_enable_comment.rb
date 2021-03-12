@@ -2,7 +2,7 @@
 module ThemeCheck
   class MissingEnableComment < LiquidCheck
     severity :error
-    doc docs_url("docs/checks/missing_enable_comment.md")
+    doc docs_url(__FILE__)
 
     # Don't allow this check to be disabled with a comment,
     # as we need to be able to check for disabled checks.

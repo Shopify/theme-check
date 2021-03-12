@@ -3,7 +3,7 @@ module ThemeCheck
   class TranslationKeyExists < LiquidCheck
     severity :error
     category :translation
-    doc docs_url("docs/checks/translation_key_exists.md")
+    doc docs_url(__FILE__)
 
     def on_variable(node)
       return unless @theme.default_locale_json&.content&.is_a?(Hash)

@@ -4,7 +4,7 @@ module ThemeCheck
   class SyntaxError < LiquidCheck
     severity :error
     category :liquid
-    doc docs_url("docs/checks/syntax_error.md")
+    doc docs_url(__FILE__)
 
     def on_document(node)
       node.template.warnings.each do |warning|

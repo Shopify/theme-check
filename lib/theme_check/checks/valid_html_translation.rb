@@ -5,7 +5,7 @@ require 'nokogumbo'
 module ThemeCheck
   class ValidHTMLTranslation < JsonCheck
     severity :suggestion
-    doc docs_url("docs/checks/valid_html_translation.md")
+    doc docs_url(__FILE__)
 
     def on_file(file)
       return unless file.name.starts_with?("locales/")

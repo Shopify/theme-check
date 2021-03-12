@@ -3,7 +3,7 @@ module ThemeCheck
   class ValidJson < JsonCheck
     severity :error
     category :json
-    doc docs_url("docs/checks/valid_json.md")
+    doc docs_url(__FILE__)
 
     def on_file(file)
       if file.parse_error

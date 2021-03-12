@@ -4,7 +4,7 @@ module ThemeCheck
   class MatchingTranslations < JsonCheck
     severity :suggestion
     category :translation
-    doc docs_url("docs/checks/matching_translations.md")
+    doc docs_url(__FILE__)
 
     def initialize
       @files = []
