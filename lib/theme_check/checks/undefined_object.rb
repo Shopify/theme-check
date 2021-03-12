@@ -2,7 +2,7 @@
 module ThemeCheck
   class UndefinedObject < LiquidCheck
     category :liquid
-    doc "https://shopify.dev/docs/themes/liquid/reference/objects"
+    doc docs_url("docs/checks/undefined_object.md")
     severity :error
 
     class TemplateInfo
