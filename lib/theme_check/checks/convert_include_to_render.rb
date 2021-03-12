@@ -4,7 +4,7 @@ module ThemeCheck
   class ConvertIncludeToRender < LiquidCheck
     severity :suggestion
     category :liquid
-    doc "https://shopify.dev/docs/themes/liquid/reference/tags/deprecated-tags#include"
+    doc docs_url("docs/checks/convert_include_to_render.md")
 
     def on_include(node)
       add_offense("`include` is deprecated - convert it to `render`", node: node)
