@@ -4,7 +4,7 @@ Reports deeply nested `render` tags (or deprecated `include` tags).
 
 ## Check Details
 
-This check is aimed at eliminating ...
+This check is aimed at eliminating excessive nesting of snippets.
 
 :-1: Examples of **incorrect** code for this check:
 
