@@ -66,7 +66,7 @@ This makes disabling the rule an explicit affair and shows that the code is smel
 
 ## Version
 
-This check has been introduced in Theme Check THEME_CHECK_VERSION.
+This check has been introduced in Theme Check 0.5.0.
 
 ## Resources
 
