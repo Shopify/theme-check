@@ -5,7 +5,7 @@ module ThemeCheck
   class RequiredDirectories < LiquidCheck
     severity :error
     category :liquid
-    doc "https://shopify.dev/tutorials/develop-theme-files"
+    doc docs_url("docs/checks/required_directories.md")
 
     REQUIRED_DIRECTORIES = %w(assets config layout locales sections snippets templates)
 

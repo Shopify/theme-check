@@ -71,6 +71,15 @@ Add checks for eliminating translations mistakes in schema tags.
 {% endschema %}
 ```
 
+## Check Options
+
+The default configuration for this check is the following:
+
+```yaml
+MatchingSchemaTranslations:
+  enabled: true
+```
+
 ## Version
 
 This check has been introduced in Theme Check 0.1.0.

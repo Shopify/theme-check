@@ -50,6 +50,15 @@ This check warns against missing translations in locale files.
 }
 ```
 
+## Check Options
+
+The default configuration for this check is the following:
+
+```yaml
+MatchingTranslations:
+  enabled: true
+```
+
 ## Version
 
 This check has been introduced in Theme Check 0.1.0.

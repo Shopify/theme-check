@@ -4,6 +4,7 @@ module ThemeCheck
   class NestedSnippet < LiquidCheck
     severity :suggestion
     category :liquid
+    doc docs_url("docs/checks/nested_snippet.md")
 
     class TemplateInfo < Struct.new(:includes)
       def with_deep_nested(templates, max, current_level = 0)

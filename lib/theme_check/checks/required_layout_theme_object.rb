@@ -4,7 +4,7 @@ module ThemeCheck
   class RequiredLayoutThemeObject < LiquidCheck
     severity :error
     category :liquid
-    doc "https://shopify.dev/docs/themes/theme-templates/theme-liquid"
+    doc docs_url("docs/checks/required_layout_theme_object.md")
 
     LAYOUT_FILENAME = "layout/theme"
 

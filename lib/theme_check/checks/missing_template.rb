@@ -4,6 +4,7 @@ module ThemeCheck
   class MissingTemplate < LiquidCheck
     severity :suggestion
     category :liquid
+    doc docs_url("docs/checks/missing_template.md")
 
     def on_include(node)
       template = node.value.template_name_expr
