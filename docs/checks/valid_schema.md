@@ -1,36 +1,26 @@
-# Enforce valid JSON (`ValidJson`)
+# Enforce valid JSON in schema tags (`ValidSchema`)
 
-This check exists to prevent invalid JSON files in themes.
+This check exists to prevent invalid JSON in `{% schema %}` tags.
 
 ## Check Details
 
-This check is aimed at eliminating errors in JSON files.
+This check is aimed at eliminating JSON errors in schema tags.
 
 :-1: Examples of **incorrect** code for this check:
 
-```json
+```liquid
+{% schema %}
 {
   "comma": "trailing",
 }
-```
-
-```json
-{
-  "quotes": 'Oops, those are single quotes'
-}
+{% endschema %}
 ```
 
 :+1: Examples of **correct** code for this check:
 
-```json
+```liquid
 {
   "comma": "not trailing"
-}
-```
-
-```json
-{
-  "quotes": "Yes. Double quotes."
 }
 ```
 
@@ -39,13 +29,13 @@ This check is aimed at eliminating errors in JSON files.
 The default configuration for this check is the following:
 
 ```yaml
-ValidJson:
+ValidSchema:
   enabled: true
 ```
 
 ## When Not To Use It
 
-It is not safe to disable this rule.
+It is not safe to disable this check.
 
 ## Version
 
@@ -56,5 +46,5 @@ This check has been introduced in Theme Check 0.1.0.
 - [Rule Source][codesource]
 - [Documentation Source][docsource]
 
-[codesource]: /lib/theme_check/checks/valid_json.rb
-[docsource]: /docs/checks/valid_json.md
+[codesource]: /lib/theme_check/checks/valid_schema.rb
+[docsource]: /docs/checks/valid_schema.md
