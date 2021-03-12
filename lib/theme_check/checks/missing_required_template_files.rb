@@ -3,7 +3,6 @@
 module ThemeCheck
   # Reports missing shopify required theme files
   # required templates: https://shopify.dev/tutorials/review-theme-store-requirements-files
-  # https://shopify.dev/docs/themes/theme-templates
   class MissingRequiredTemplateFiles < LiquidCheck
     severity :error
     category :liquid
