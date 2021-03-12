@@ -7,7 +7,7 @@ module ThemeCheck
     include RegexHelpers
     severity :error
     category :performance
-    doc "https://github.com/Shopify/theme-check/blob/master/docs/checks/asset_size_javascript.md"
+    doc docs_url("docs/checks/asset_size_javascript.md")
 
     Script = Struct.new(:src, :match)
 
