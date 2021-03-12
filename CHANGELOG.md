@@ -1,4 +1,14 @@
 
+0.5.0 / 2021-03-12
+==================
+
+  * Add [AssetSizeJavaScript](/docs/checks/asset_size_javascript.md) check ([#194](https://github.com/Shopify/theme-check/pull/194))
+  * Add [documentation for all checks](/docs/checks)
+  * Make documentation for checks mandatory
+  * Add link to documentation from within the editor (via `codeDescription` in the Language Server) (![Demo](https://screenshot.click/10-29-cjx7r-4asor.mp4))
+  * Allow checks to have multiple categories
+  * Fix multiple occurrences of UndefinedObject not being reported ([#192](https://github.com/shopify/theme-check/issues/192))
+
 v0.4.0 / 2021-02-25
 ==================
 
