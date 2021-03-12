@@ -44,7 +44,6 @@ module ThemeCheck
   # NOTE: inherit from JsonCheck to implement a JSON based check.
   class MyCheckName < LiquidCheck
     severity :suggestion # :error or :style
-    doc "https://..."    # Optional link to doc
 
     def on_document(node)
       # Called with the root node of all templates
@@ -122,7 +121,7 @@ module ThemeCheck
 end
 ```
 
-Add the new check to `config/default.yml` to enable it.
+Add the new check to `config/default.yml` to enable it (and duplicate the default configuration if applicable).
 
 ```yaml
 MyCheckName:
@@ -131,4 +130,8 @@ MyCheckName:
 
 Add a corresponding test file under `test/checks`.
 
+Add a documentation file in `docs/checks/#{name_of_check}.md` based off of the [check documentation template][doctemplate].
+
 When done, run the tests with `dev test`.
+
+[doctemplate]: /docs/checks/CHECK_DOCS_TEMPLATE.md
