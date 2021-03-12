@@ -121,7 +121,7 @@ module ThemeCheck
 end
 ```
 
-Add the new check to `config/default.yml` to enable it (and duplicate the default configuration if applicable).
+Add the new check to `config/default.yml` to enable it. If the check is configurable, the `initialize` argument name and default values should also be duplicated inside `config/default.yml`.
 
 ```yaml
 MyCheckName:
