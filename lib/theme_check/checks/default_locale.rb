@@ -3,7 +3,7 @@ module ThemeCheck
   class DefaultLocale < JsonCheck
     severity :suggestion
     category :translation
-    doc docs_url("docs/checks/default_locale.md")
+    doc docs_url(__FILE__)
 
     def on_end
       return if @theme.default_locale_json

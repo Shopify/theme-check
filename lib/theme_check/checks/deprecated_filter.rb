@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module ThemeCheck
   class DeprecatedFilter < LiquidCheck
-    doc docs_url("docs/checks/deprecated_filter.md")
+    doc docs_url(__FILE__)
     category :liquid
     severity :suggestion
 

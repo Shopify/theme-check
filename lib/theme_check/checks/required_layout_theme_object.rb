@@ -4,7 +4,7 @@ module ThemeCheck
   class RequiredLayoutThemeObject < LiquidCheck
     severity :error
     category :liquid
-    doc docs_url("docs/checks/required_layout_theme_object.md")
+    doc docs_url(__FILE__)
 
     LAYOUT_FILENAME = "layout/theme"
 

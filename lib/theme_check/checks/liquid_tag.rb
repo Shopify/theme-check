@@ -4,7 +4,7 @@ module ThemeCheck
   class LiquidTag < LiquidCheck
     severity :suggestion
     category :liquid
-    doc docs_url("docs/checks/liquid_tag.md")
+    doc docs_url(__FILE__)
 
     def initialize(min_consecutive_statements: 4)
       @first_statement = nil

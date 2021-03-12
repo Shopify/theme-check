@@ -5,7 +5,7 @@ module ThemeCheck
   class UnusedSnippet < LiquidCheck
     severity :suggestion
     category :liquid
-    doc docs_url("docs/checks/unused_snippet.md")
+    doc docs_url(__FILE__)
 
     def initialize
       @used_templates = Set.new

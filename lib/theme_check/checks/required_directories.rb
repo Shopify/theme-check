@@ -5,7 +5,7 @@ module ThemeCheck
   class RequiredDirectories < LiquidCheck
     severity :error
     category :liquid
-    doc docs_url("docs/checks/required_directories.md")
+    doc docs_url(__FILE__)
 
     REQUIRED_DIRECTORIES = %w(assets config layout locales sections snippets templates)
 

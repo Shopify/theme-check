@@ -2,7 +2,7 @@
 module ThemeCheck
   class UndefinedObject < LiquidCheck
     category :liquid
-    doc docs_url("docs/checks/undefined_object.md")
+    doc docs_url(__FILE__)
     severity :error
 
     class TemplateInfo

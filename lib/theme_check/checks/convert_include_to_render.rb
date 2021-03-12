@@ -4,7 +4,7 @@ module ThemeCheck
   class ConvertIncludeToRender < LiquidCheck
     severity :suggestion
     category :liquid
-    doc docs_url("docs/checks/convert_include_to_render.md")
+    doc docs_url(__FILE__)
 
     def on_include(node)
       add_offense("`include` is deprecated - convert it to `render`", node: node)
