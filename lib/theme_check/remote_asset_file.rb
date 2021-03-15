@@ -38,7 +38,7 @@ module ThemeCheck
     end
 
     def gzipped_size
-      @gzipped_size ||= @content.bytesize
+      @gzipped_size ||= content.bytesize
     end
   end
 end
