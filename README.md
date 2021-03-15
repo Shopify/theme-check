@@ -36,6 +36,7 @@ As well as checks that prevent easy to spot performance problems:
 
 ✅ Use of [parser-blocking](/docs/checks/parser_blocking_javascript.md) JavaScript  
 ✅ [Too much JavaScript](/docs/checks/asset_size_javascript.md)  
+✅ [Too much CSS](/docs/checks/asset_size_css.md)  
 
 For detailed descriptions and configuration options, [take a look at the complete list.](/docs/checks/)
 
