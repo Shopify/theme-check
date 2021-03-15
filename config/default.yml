@@ -85,4 +85,8 @@ ParserBlockingJavaScript:
 
 AssetSizeJavaScript:
   enabled: false
-  threshold_in_bytes: 10000
+  threshold_in_bytes: 10_000
+
+AssetSizeCSS:
+  enabled: false
+  threshold_in_bytes: 100_000
