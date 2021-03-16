@@ -56,4 +56,16 @@ class TranslationKeyExistsTest < Minitest::Test
       'unknownkey' does not have a matching entry in 'locales/en.default.json' at templates/index.liquid:3
     END
   end
+
+  def test_counts_shopify_provided_translations_as_defined
+    offenses = analyze_theme(
+      ThemeCheck::TranslationKeyExists.new,
+      "locales/en.default.json" => JSON.dump({}),
+      "templates/index.liquid" => <<~END,
+        {{ 'shopify.sentence.words_connector' | t }}
+      END
+    )
+
+    assert_offenses('', offenses)
+  end
 end
