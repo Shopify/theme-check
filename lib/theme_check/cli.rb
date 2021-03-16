@@ -7,13 +7,14 @@ module ThemeCheck
       Usage: theme-check [options] /path/to/your/theme
 
       Options:
-        -c, [--category]          # Only run this category of checks
-        -x, [--exclude-category]  # Exclude this category of checks
-        -l, [--list]              # List enabled checks
-        -a, [--auto-correct]      # Automatically fix offenses
-        --init                    # Generate a .theme-check.yml file in the current directory
-        -h, [--help]              # Show this. Hi!
-        -v, [--version]           # Print Theme Check version
+        --init                               Generate a .theme-check.yml file in the current directory
+        -C, --config <path>                  Use the config provided, overriding .theme-check.yml if present
+        -c, --category <category>            Only run this category of checks
+        -x, --exclude-category  <category>   Exclude this category of checks
+        -l, --list                           List enabled checks
+        -a, --auto-correct                   Automatically fix offenses
+        -h, --help                           Show this. Hi!
+        -v, --version                        Print Theme Check version
 
       Description:
         Theme Check helps you follow Shopify Themes & Liquid best practices by analyzing the
@@ -29,6 +30,7 @@ module ThemeCheck
       only_categories = []
       exclude_categories = []
       auto_correct = false
+      config_path = nil
 
       args = argv.dup
       while (arg = args.shift)
@@ -37,6 +39,8 @@ module ThemeCheck
           raise Abort, USAGE
         when "--version", "-v"
           command = :version
+        when "--config", "-C"
+          config_path = Pathname.new(args.shift)
         when "--category", "-c"
           only_categories << args.shift.to_sym
         when "--exclude-category", "-x"
@@ -53,7 +57,14 @@ module ThemeCheck
       end
 
       unless [:version, :init].include?(command)
-        @config = ThemeCheck::Config.from_path(@path)
+        @config = if config_path.present?
+          ThemeCheck::Config.new(
+            root: @path,
+            configuration: ThemeCheck::Config.load_file(config_path)
+          )
+        else
+          ThemeCheck::Config.from_path(@path)
+        end
         @config.only_categories = only_categories
         @config.exclude_categories = exclude_categories
         @config.auto_correct = auto_correct
