@@ -7,7 +7,7 @@ module ThemeCheck
 
       def completions(content, cursor)
         return [] unless can_complete?(content, cursor)
-        ShopifyLiquid::Filter.labels
+        available_labels
           .select { |w| w.starts_with?(partial(content, cursor)) }
           .map { |filter| filter_to_completion(filter) }
       end
@@ -20,6 +20,10 @@ module ThemeCheck
       end
 
       private
+
+      def available_labels
+        @labels ||= ShopifyLiquid::Filter.labels - ShopifyLiquid::DeprecatedFilter.labels
+      end
 
       def cursor_on_filter?(content, cursor)
         return false unless content.match?(NAMED_FILTER)
