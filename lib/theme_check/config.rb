@@ -10,6 +10,8 @@ module ThemeCheck
     attr_accessor :only_categories, :exclude_categories, :auto_correct
 
     class << self
+      attr_reader :last_loaded_config
+
       def from_path(path)
         if (filename = find(path))
           new(root: filename.dirname, configuration: load_file(filename))
@@ -36,6 +38,7 @@ module ThemeCheck
       end
 
       def load_file(absolute_path)
+        @last_loaded_config = absolute_path
         YAML.load_file(absolute_path)
       end
 
