@@ -10,6 +10,10 @@ module ThemeCheck
         all.fetch(filter, nil)
       end
 
+      def labels
+        @labels ||= all.keys
+      end
+
       private
 
       def all

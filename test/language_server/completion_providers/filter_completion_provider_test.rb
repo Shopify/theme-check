@@ -26,6 +26,13 @@ module ThemeCheck
           kind: CompletionItemKinds::FUNCTION,
         })
       end
+
+      def test_does_not_complete_deprecated_filters
+        refute_includes(@module.completions("{{ 'foo.js' | hex_to", 14), {
+          label: "hex_to_rgba",
+          kind: CompletionItemKinds::FUNCTION,
+        })
+      end
     end
   end
 end
