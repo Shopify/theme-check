@@ -2,13 +2,14 @@
 module ThemeCheck
   # Reports errors when trying to use parser-blocking script tags
   class ParserBlockingJavaScript < LiquidCheck
+    include RegexHelpers
     severity :error
     categories :liquid, :performance
     doc docs_url(__FILE__)
 
     PARSER_BLOCKING_SCRIPT_TAG = %r{
       <script                                    # Find the start of a script tag
-      (?=(?:[^>]|\n|\r)+?src=)+?                 # Make sure src= is in the script with a lookahead
+      (?=[^>]+?src=)                             # Make sure src= is in the script with a lookahead
       (?:(?!defer|async|type=["']module['"]).)*? # Find tags that don't have defer|async|type="module"
       >
     }xim
@@ -33,23 +34,14 @@ module ThemeCheck
       )
     end
 
-    # The trickiness here is matching on scripts that are defined on
-    # multiple lines (or repeat matches). This makes the line_number
-    # calculation a bit weird. So instead, we traverse the string in
-    # a very imperative way.
     def record_offenses_from_regex(regex: nil, message: nil)
-      i = 0
-      while (i = @source.index(regex, i))
-        script = @source.match(regex, i)[0]
-
+      matches(@source, regex).each do |match|
         add_offense(
           message,
           node: @node,
-          markup: script,
-          line_number: @source[0...i].count("\n") + 1
+          markup: match[0],
+          line_number: @source[0...match.begin(0)].count("\n") + 1
         )
-
-        i += script.size
       end
     end
   end

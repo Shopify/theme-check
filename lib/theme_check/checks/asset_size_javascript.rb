@@ -11,17 +11,11 @@ module ThemeCheck
 
     Script = Struct.new(:src, :match)
 
-    TAG = /#{Liquid::TagStart}.*?#{Liquid::TagEnd}/om
-    VARIABLE = /#{Liquid::VariableStart}.*?#{Liquid::VariableEnd}/om
-    START_OR_END_QUOTE = /(^['"])|(['"]$)/
     SCRIPT_TAG_SRC = %r{
       <script
         [^>]+                              # any non closing tag character
         src=                               # src attribute start
-        (?<src>
-          '(?:#{TAG}|#{VARIABLE}|[^']+)*'| # any combination of tag/variable or non straight quote inside straight quotes
-          "(?:#{TAG}|#{VARIABLE}|[^"]+)*"  # any combination of tag/variable or non double quotes inside double quotes
-        )
+        (?<src>#{QUOTED_LIQUID_ATTRIBUTE}) # src attribute value (may contain liquid)
         [^>]*                              # any non closing character till the end
       >
     }omix

@@ -8,19 +8,13 @@ module ThemeCheck
 
     Link = Struct.new(:href, :index)
 
-    TAG = /#{Liquid::TagStart}.*?#{Liquid::TagEnd}/om
-    VARIABLE = /#{Liquid::VariableStart}.*?#{Liquid::VariableEnd}/om
-    START_OR_END_QUOTE = /(^['"])|(['"]$)/
     LINK_TAG_HREF = %r{
       <link
-        (?=(?:[^>]|\n|\r)+?rel=['"]?stylesheet['"]?)+?  # Make sure rel=stylesheet is in the link with lookahead
-        [^>]+                                           # any non closing tag character
-        href=                                           # href attribute start
-        (?<href>
-          '(?:#{TAG}|#{VARIABLE}|[^']+)*'|              # any combination of tag/variable or non straight quote inside straight quotes
-          "(?:#{TAG}|#{VARIABLE}|[^"]+)*"               # any combination of tag/variable or non double quotes inside double quotes
-        )
-        [^>]*                                           # any non closing character till the end
+        (?=[^>]+?rel=['"]?stylesheet['"]?)    # Make sure rel=stylesheet is in the link with lookahead
+        [^>]+                                 # any non closing tag character
+        href=                                 # href attribute start
+        (?<href>#{QUOTED_LIQUID_ATTRIBUTE})   # href attribute value (may contain liquid)
+        [^>]*                                 # any non closing character till the end
       >
     }omix
     STYLESHEET_TAG = %r{
