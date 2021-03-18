@@ -31,13 +31,13 @@ This check is aimed at eliminating parser-blocking JavaScript on themes.
 
 ```liquid
 <!-- Good. Using the asset_url filter + defer -->
-<script src="{{ 'theme.js' | asset_url }}" defer><script>
+<script src="{{ 'theme.js' | asset_url }}" defer></script>
 
 <!-- Also good. Using the asset_url filter + async -->
-<script src="{{ 'theme.js' | asset_url }}" async><script>
+<script src="{{ 'theme.js' | asset_url }}" async></script>
 
 <!-- Better than synchronous jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js" defer><script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
 ...
 <button id="thing">Click me!</button>
 <script>
