@@ -90,3 +90,6 @@ AssetSizeJavaScript:
 AssetSizeCSS:
   enabled: false
   threshold_in_bytes: 100_000
+
+ImgWidthAndHeight:
+  enabled: true
