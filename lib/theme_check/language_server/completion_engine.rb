@@ -7,7 +7,7 @@ module ThemeCheck
 
       def initialize(storage)
         @storage = storage
-        @providers = CompletionProvider.all.map(&:new)
+        @providers = CompletionProvider.all.map { |x| x.new(storage) }
       end
 
       def completions(name, line, col)
