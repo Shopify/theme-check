@@ -21,6 +21,6 @@ group :development do
   gem 'guard-minitest'
 end
 
-gem 'rubocop', '~> 0.93.1', require: false
-gem 'rubocop-performance', '~> 1.8.1', require: false
-gem 'rubocop-shopify', '~> 1.0.6', require: false
+gem 'rubocop', '~> 1.4', require: false
+gem 'rubocop-performance', '~> 1.10.2', require: false
+gem 'rubocop-shopify', '~> 1.0.7', require: false

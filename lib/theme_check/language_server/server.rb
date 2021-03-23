@@ -6,6 +6,7 @@ require 'active_support/core_ext/string/inflections'
 module ThemeCheck
   module LanguageServer
     class DoneStreaming < StandardError; end
+
     class IncompatibleStream < StandardError; end
 
     class Server
