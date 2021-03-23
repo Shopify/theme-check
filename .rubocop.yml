@@ -1,7 +1,10 @@
-inherit_from:
-  - 'https://shopify.github.io/ruby-style-guide/rubocop.yml'
+inherit_gem:
+  rubocop-shopify: rubocop.yml
 
-require: rubocop-performance
+require:
+  - rubocop-performance
+  - rubocop-minitest
+  - rubocop-rake
 
 AllCops:
   TargetRubyVersion: 2.7
