@@ -1,4 +1,15 @@
 
+0.6.0 / 2021-03-23
+==================
+
+  * Add [Snippet Completion](https://screenshot.click/23-22-5tyee-kv5vl.mp4) ([#223](https://github.com/shopify/theme-check/issues/223))
+  * Add [Snippet Document Links](https://screenshot.click/23-09-71h84-pp23z.mp4) ([#223](https://github.com/shopify/theme-check/issues/223))
+  * Add [ImgWidthAndHeight](/docs/checks/img_width_and_height.md) check ([#216](https://github.com/shopify/theme-check/issues/216))
+  * Add [AssetSizeCSS](/docs/checks/asset_size_css.md) check ([#206](https://github.com/shopify/theme-check/issues/206))
+  * Do not flag SystemTranslations as errors ([#114](https://github.com/shopify/theme-check/issues/114))
+  * Do not complete deprecated filters ([#205](https://github.com/shopify/theme-check/issues/205))
+  * Add `-C, --config path` support ([#213](https://github.com/shopify/theme-check/issues/213))
+
 0.5.0 / 2021-03-12
 ==================
 

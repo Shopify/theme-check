@@ -40,7 +40,7 @@ This rule is safe to disable.
 
 ## Version
 
-This check has been introduced in Theme Check THEME_CHECK_VERSION.
+This check has been introduced in Theme Check 0.6.0.
 
 ## Resources
 
