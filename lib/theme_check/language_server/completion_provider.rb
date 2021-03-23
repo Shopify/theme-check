@@ -16,6 +16,10 @@ module ThemeCheck
         end
       end
 
+      def initialize(storage = InMemoryStorage.new)
+        @storage = storage
+      end
+
       def completions(content, cursor)
         raise NotImplementedError
       end

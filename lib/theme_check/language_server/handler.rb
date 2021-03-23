@@ -8,6 +8,7 @@ module ThemeCheck
           triggerCharacters: ['.', '{{ ', '{% '],
           context: true,
         },
+        documentLinkProvider: true,
         textDocumentSync: {
           openClose: true,
           change: TextDocumentSyncKind::FULL,
@@ -19,12 +20,13 @@ module ThemeCheck
       def initialize(server)
         @server = server
         @previously_reported_files = Set.new
-        @storage = InMemoryStorage.new
-        @completion_engine = CompletionEngine.new(@storage)
       end
 
       def on_initialize(id, params)
         @root_path = params["rootPath"]
+        @storage = in_memory_storage(@root_path)
+        @completion_engine = CompletionEngine.new(@storage)
+        @document_link_engine = DocumentLinkEngine.new(@storage)
         # https://microsoft.github.io/language-server-protocol/specifications/specification-current/#responseMessage
         send_response(
           id: id,
@@ -59,6 +61,14 @@ module ThemeCheck
         analyze_and_send_offenses(text_document_uri(params))
       end
 
+      def on_text_document_document_link(id, params)
+        uri = text_document_uri(params)
+        send_response(
+          id: id,
+          result: document_links(uri)
+        )
+      end
+
       def on_text_document_completion(id, params)
         uri = text_document_uri(params)
         line = params.dig('position', 'line')
@@ -70,6 +80,23 @@ module ThemeCheck
       end
 
       private
+
+      def in_memory_storage(root)
+        config = ThemeCheck::Config.from_path(root)
+
+        # Make a real FS to get the files from the snippets folder
+        fs = ThemeCheck::FileSystemStorage.new(
+          config.root,
+          ignored_patterns: config.ignored_patterns
+        )
+
+        # Turn that into a hash of empty buffers
+        files = fs.files
+          .map { |fn| [fn, ""] }
+          .to_h
+
+        InMemoryStorage.new(files, root)
+      end
 
       def text_document_uri(params)
         params.dig('textDocument', 'uri').sub('file://', '')
@@ -106,6 +133,10 @@ module ThemeCheck
 
       def completions(uri, line, col)
         @completion_engine.completions(uri, line, col)
+      end
+
+      def document_links(uri)
+        @document_link_engine.document_links(uri)
       end
 
       def send_diagnostics(offenses)

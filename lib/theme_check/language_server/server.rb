@@ -16,7 +16,7 @@ module ThemeCheck
       def initialize(
         in_stream: STDIN,
         out_stream: STDOUT,
-        err_stream: $DEBUG ? File.open('/tmp/lsp.log', 'a') : STDERR,
+        err_stream: STDERR,
         should_raise_errors: false
       )
         validate!([in_stream, out_stream, err_stream])
@@ -51,7 +51,7 @@ module ThemeCheck
 
       def send_response(response)
         response_body = JSON.dump(response)
-        log(response_body) if $DEBUG
+        log(JSON.pretty_generate(response)) if $DEBUG
 
         @out.write("Content-Length: #{response_body.size}\r\n")
         @out.write("\r\n")
