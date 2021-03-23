@@ -61,7 +61,7 @@ It is otherwise unwise to disable this check, since it would negatively impact t
 
 ## Version
 
-This check has been introduced in Theme Check THEME_CHECK_VERSION.
+This check has been introduced in Theme Check 0.6.0.
 
 ## Resources
 
