@@ -35,6 +35,7 @@ Theme Check currently checks for the following:
 As well as checks that prevent easy to spot performance problems:
 
 ✅ Use of [parser-blocking](/docs/checks/parser_blocking_javascript.md) JavaScript  
+✅ [Use of non-Shopify domains for assets](/docs/checks/remote_asset.md)  
 ✅ [Missing width and height attributes on `img` tags](/docs/checks/img_width_and_height.md)  
 ✅ [Too much JavaScript](/docs/checks/asset_size_javascript.md)  
 ✅ [Too much CSS](/docs/checks/asset_size_css.md)  
