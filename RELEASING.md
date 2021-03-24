@@ -2,11 +2,18 @@
 
 1. Check the Semantic Versioning page for info on how to version the new release: http://semver.org
 
-2. Create a PR to update the version in `lib/theme_check/version.rb` and replace the `THEME_CHECK_VERSION` placeholder in the documentation for new rules.
+2. Run the following command to update the version in `lib/theme_check/version.rb` and replace the `THEME_CHECK_VERSION` placeholder in the documentation for new rules:
 
-3. Merge your PR to master
+   ```bash
+   VERSION="X.X.X"
+   rake prerelease[$VERSION]
+   ```
 
-4. On [Shipit](https://shipit.shopify.io/shopify/theme-check/rubygems), deploy your commit.
+3. Commit your changes and make a PR.
+
+4. Merge your PR to master.
+
+5. On [Shipit](https://shipit.shopify.io/shopify/theme-check/rubygems), deploy your commit.
 
 ## Homebrew Release Process
 

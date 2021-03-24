@@ -46,3 +46,9 @@ end
 
 desc("Builds all distribution packages of the CLI")
 task(package: 'package:all')
+
+desc("Update files in the repo to match new version")
+task :prerelease, [:version] do |_t, args|
+  require 'theme_check/releaser'
+  ThemeCheck::Releaser.new.release(args.version)
+end
