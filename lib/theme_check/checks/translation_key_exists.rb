@@ -4,10 +4,7 @@ module ThemeCheck
     extend self
 
     def translations
-      @translations ||= begin
-        # loaded as a Set because the include? lookup will be much faster.
-        YAML.load(File.read("#{__dir__}/../../../data/shopify_translation_keys.yml")).to_set
-      end
+      @translations ||= YAML.load(File.read("#{__dir__}/../../../data/shopify_translation_keys.yml")).to_set
     end
 
     def include?(key)

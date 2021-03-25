@@ -7,11 +7,9 @@ module ThemeCheck
       extend self
 
       def labels
-        @labels ||= begin
-          YAML.load(File.read("#{__dir__}/../../../data/shopify_liquid/filters.yml"))
-            .values
-            .flatten
-        end
+        @labels ||= YAML.load(File.read("#{__dir__}/../../../data/shopify_liquid/filters.yml"))
+          .values
+          .flatten
       end
     end
   end

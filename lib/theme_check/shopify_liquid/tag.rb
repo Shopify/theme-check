@@ -7,9 +7,7 @@ module ThemeCheck
       extend self
 
       def labels
-        @tags ||= begin
-          YAML.load(File.read("#{__dir__}/../../../data/shopify_liquid/tags.yml"))
-        end
+        @tags ||= YAML.load(File.read("#{__dir__}/../../../data/shopify_liquid/tags.yml"))
       end
     end
   end
