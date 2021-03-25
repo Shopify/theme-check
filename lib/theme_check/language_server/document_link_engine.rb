@@ -10,8 +10,9 @@ module ThemeCheck
         @storage = storage
       end
 
-      def document_links(uri)
-        buffer = @storage.read(uri)
+      def document_links(relative_path)
+        buffer = @storage.read(relative_path)
+        return [] unless buffer
         matches(buffer, PARTIAL_RENDER).map do |match|
           start_line, start_character = from_index_to_line_column(
             buffer,

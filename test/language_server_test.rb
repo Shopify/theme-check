@@ -65,7 +65,7 @@ class LanguageServerTest < Minitest::Test
       method: "textDocument/didOpen",
       params: {
         textDocument: {
-          uri: "file://layout/theme.liquid",
+          uri: "file://" + storage.path('layout/theme.liquid'),
           version: 1,
         },
       },
@@ -84,7 +84,7 @@ class LanguageServerTest < Minitest::Test
       jsonrpc: "2.0",
       method: "textDocument/publishDiagnostics",
       params: {
-        uri: "file:#{storage.path('layout/theme.liquid')}",
+        uri: "file://" + storage.path('layout/theme.liquid'),
         diagnostics: [{
           range: {
             start: {
@@ -127,7 +127,7 @@ class LanguageServerTest < Minitest::Test
       method: "textDocument/didSave",
       params: {
         textDocument: {
-          uri: "file://layout/theme.liquid",
+          uri: "file://" + storage.path('layout/theme.liquid'),
           version: 1,
         },
       },
@@ -146,7 +146,7 @@ class LanguageServerTest < Minitest::Test
       jsonrpc: "2.0",
       method: "textDocument/publishDiagnostics",
       params: {
-        uri: "file:#{storage.path('layout/theme.liquid')}",
+        uri: "file://" + storage.path('layout/theme.liquid'),
         diagnostics: [{
           range: {
             start: {
@@ -189,7 +189,7 @@ class LanguageServerTest < Minitest::Test
       method: "textDocument/didOpen",
       params: {
         textDocument: {
-          uri: "file://" + storage.root.join("src/layout/theme.liquid").to_s,
+          uri: "file://" + storage.path("src/layout/theme.liquid"),
           version: 1,
         },
       },
@@ -198,7 +198,125 @@ class LanguageServerTest < Minitest::Test
       method: "exit",
     })
 
-    assert_includes(@err.string, "Checking #{storage.root.join('src')}")
+    assert_includes(@err.string, "Checking #{storage.path('src')}")
+  end
+
+  def test_document_link_response
+    template = <<~LIQUID
+      {% render 'a' %}
+    LIQUID
+
+    storage = make_file_system_storage
+
+    send_messages({
+      jsonrpc: "2.0",
+      id: "123",
+      method: "initialize",
+      params: {
+        rootPath: storage.root,
+      },
+    }, {
+      jsonrpc: "2.0",
+      method: "textDocument/didOpen",
+      params: {
+        textDocument: {
+          uri: "file://" + storage.path('layout/theme.liquid'),
+          text: template,
+          version: 1,
+        },
+      },
+    }, {
+      jsonrpc: "2.0",
+      id: 1,
+      method: "textDocument/documentLink",
+      params: {
+        textDocument: {
+          uri: "file://" + storage.path('layout/theme.liquid'),
+        },
+      },
+    }, {
+      jsonrpc: "2.0",
+      method: "exit",
+    })
+
+    assert_responses_include({
+      jsonrpc: "2.0",
+      id: 1,
+      result: [{
+        target: "file://" + storage.path('snippets/a.liquid'),
+        range: {
+          start: {
+            line: 0,
+            character: template.index('a'),
+          },
+          end: {
+            line: 0,
+            character: template.index('a') + 1,
+          },
+        },
+      }],
+    })
+  end
+
+  def test_document_links_from_correct_root
+    template = <<~LIQUID
+      {% render 'a' %}
+    LIQUID
+
+    storage = make_file_system_storage(
+      ".theme-check.yml" => <<~CONFIG,
+        root: src/theme
+      CONFIG
+    )
+
+    send_messages({
+      jsonrpc: "2.0",
+      id: "123",
+      method: "initialize",
+      params: {
+        rootPath: storage.root,
+      },
+    }, {
+      jsonrpc: "2.0",
+      method: "textDocument/didOpen",
+      params: {
+        textDocument: {
+          uri: "file://" + storage.path('src/theme/layout/theme.liquid'),
+          text: template,
+          version: 1,
+        },
+      },
+    }, {
+      jsonrpc: "2.0",
+      id: 1,
+      method: "textDocument/documentLink",
+      params: {
+        textDocument: {
+          uri: "file://" + storage.path('src/theme/layout/theme.liquid'),
+        },
+      },
+    }, {
+      jsonrpc: "2.0",
+      method: "exit",
+    })
+
+    assert_responses_include({
+      jsonrpc: "2.0",
+      id: 1,
+      result: [{
+        target: "file://" + storage.path('src/theme/snippets/a.liquid'),
+        range: {
+          start: {
+            line: 0,
+            character: template.index('a'),
+          },
+          end: {
+            line: 0,
+            character: template.index('a') + 1,
+          },
+        },
+      }],
+    })
   end
 
   def test_sends_empty_diagnostic_for_fixed_offenses
@@ -254,7 +372,7 @@ class LanguageServerTest < Minitest::Test
       jsonrpc: "2.0",
       method: "textDocument/publishDiagnostics",
       params: {
-        uri: "file:#{storage.path('layout/theme.liquid')}",
+        uri: "file://#{storage.path('layout/theme.liquid')}",
         diagnostics: [{
           range: {
             start: {
@@ -280,7 +398,7 @@ class LanguageServerTest < Minitest::Test
       jsonrpc: "2.0",
       method: "textDocument/publishDiagnostics",
       params: {
-        uri: "file:#{storage.path('layout/theme.liquid')}",
+        uri: "file://#{storage.path('layout/theme.liquid')}",
         diagnostics: [],
       },
     })
@@ -302,7 +420,7 @@ class LanguageServerTest < Minitest::Test
     @err.rewind
   end
 
-  def assert_responses(*expected_responses)
+  def responses
     actual_responses = []
     scanner = StringScanner.new(@out.string)
     while scanner.scan_until(/Content-Length: (\d+)\r\n\r\n/)
@@ -310,8 +428,31 @@ class LanguageServerTest < Minitest::Test
       body = scanner.peek(len)
       actual_responses << JSON.parse(body).deep_symbolize_keys
     end
+    actual_responses
+  end
+
+  def assert_responses(*expected_responses)
+    actual_responses = responses
     expected_responses.each do |response|
       assert_equal(response, actual_responses.shift)
+    end
+  end
+
+  def assert_responses_include(*expected_responses)
+    actual_responses = responses
+    expected_responses.each do |response|
+      assert(
+        actual_responses.find { |actual| actual == response },
+        <<~ERR,
+          Expected to find the following object:
+
+            #{JSON.pretty_generate(response)}
+
+          in the following responses:
+
+            #{JSON.pretty_generate(actual_responses)}"
+        ERR
+      )
     end
   end
 end

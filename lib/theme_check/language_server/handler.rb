@@ -42,19 +42,19 @@ module ThemeCheck
       alias_method :on_shutdown, :on_exit
 
       def on_text_document_did_change(_id, params)
-        uri = text_document_uri(params)
-        @storage.write(uri, content_changes_text(params))
+        relative_path = relative_path_from_text_document_uri(params)
+        @storage.write(relative_path, content_changes_text(params))
       end
 
       def on_text_document_did_close(_id, params)
-        uri = text_document_uri(params)
-        @storage.write(uri, nil)
+        relative_path = relative_path_from_text_document_uri(params)
+        @storage.write(relative_path, "")
       end
 
       def on_text_document_did_open(_id, params)
-        uri = text_document_uri(params)
-        @storage.write(uri, text_document_text(params))
-        analyze_and_send_offenses(uri)
+        relative_path = relative_path_from_text_document_uri(params)
+        @storage.write(relative_path, text_document_text(params))
+        analyze_and_send_offenses(text_document_uri(params))
       end
 
       def on_text_document_did_save(_id, params)
@@ -62,27 +62,27 @@ module ThemeCheck
       end
 
       def on_text_document_document_link(id, params)
-        uri = text_document_uri(params)
+        relative_path = relative_path_from_text_document_uri(params)
         send_response(
           id: id,
-          result: document_links(uri)
+          result: document_links(relative_path)
         )
       end
 
       def on_text_document_completion(id, params)
-        uri = text_document_uri(params)
+        relative_path = relative_path_from_text_document_uri(params)
         line = params.dig('position', 'line')
         col = params.dig('position', 'character')
         send_response(
           id: id,
-          result: completions(uri, line, col)
+          result: completions(relative_path, line, col)
         )
       end
 
       private
 
       def in_memory_storage(root)
-        config = ThemeCheck::Config.from_path(root)
+        config = config_for_path(root)
 
         # Make a real FS to get the files from the snippets folder
         fs = ThemeCheck::FileSystemStorage.new(
@@ -95,11 +95,15 @@ module ThemeCheck
           .map { |fn| [fn, ""] }
           .to_h
 
-        InMemoryStorage.new(files, root)
+        InMemoryStorage.new(files, config.root)
       end
 
       def text_document_uri(params)
         params.dig('textDocument', 'uri').sub('file://', '')
+      end
+
+      def relative_path_from_text_document_uri(params)
+        @storage.relative_path(text_document_uri(params))
       end
 
       def text_document_text(params)
@@ -110,9 +114,13 @@ module ThemeCheck
         params.dig('contentChanges', 0, 'text')
       end
 
-      def analyze_and_send_offenses(file_path)
-        root = ThemeCheck::Config.find(file_path) || @root_path
-        config = ThemeCheck::Config.from_path(root)
+      def config_for_path(path)
+        root = ThemeCheck::Config.find(path) || @root_path
+        ThemeCheck::Config.from_path(root)
+      end
+
+      def analyze_and_send_offenses(absolute_path)
+        config = config_for_path(absolute_path)
         storage = ThemeCheck::FileSystemStorage.new(
           config.root,
           ignored_patterns: config.ignored_patterns
@@ -131,12 +139,12 @@ module ThemeCheck
         analyzer.offenses
       end
 
-      def completions(uri, line, col)
-        @completion_engine.completions(uri, line, col)
+      def completions(relative_path, line, col)
+        @completion_engine.completions(relative_path, line, col)
       end
 
-      def document_links(uri)
-        @document_link_engine.document_links(uri)
+      def document_links(relative_path)
+        @document_link_engine.document_links(relative_path)
       end
 
       def send_diagnostics(offenses)
@@ -162,7 +170,7 @@ module ThemeCheck
         send_response(
           method: 'textDocument/publishDiagnostics',
           params: {
-            uri: "file:#{path}",
+            uri: "file://#{path}",
             diagnostics: offenses.map { |offense| offense_to_diagnostic(offense) },
           },
         )
