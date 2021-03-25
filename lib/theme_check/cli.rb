@@ -6,14 +6,17 @@ module ThemeCheck
     USAGE = <<~END
       Usage: theme-check [options] /path/to/your/theme
 
-      Options:
-        --init                               Generate a .theme-check.yml file in the current directory
+      Basic Options:
         -C, --config <path>                  Use the config provided, overriding .theme-check.yml if present
         -c, --category <category>            Only run this category of checks
         -x, --exclude-category  <category>   Exclude this category of checks
-        -l, --list                           List enabled checks
         -a, --auto-correct                   Automatically fix offenses
+
+      Miscellaneous:
+        --init                               Generate a .theme-check.yml file
+        --print-config                       Output active config to STDOUT
         -h, --help                           Show this. Hi!
+        -l, --list                           List enabled checks
         -v, --version                        Print Theme Check version
 
       Description:
@@ -51,6 +54,8 @@ module ThemeCheck
           auto_correct = true
         when "--init"
           command = :init
+        when "--print"
+          command = :print
         else
           @path = arg
         end
@@ -100,6 +105,10 @@ module ThemeCheck
       else
         raise Abort, "#{ThemeCheck::Config::DOTFILE} already exists at #{@path}."
       end
+    end
+
+    def print
+      puts YAML.dump(@config.to_h)
     end
 
     def check

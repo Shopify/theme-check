@@ -22,6 +22,18 @@ class CliTest < Minitest::Test
     assert_includes(out, "files inspected")
   end
 
+  def test_print
+    cli = ThemeCheck::Cli.new
+    out = capture(:stdout) do
+      cli.run([__dir__ + "/theme", '--print'])
+    end
+
+    assert_includes(out, <<~EXPECTED)
+      SyntaxError:
+        enabled: true
+    EXPECTED
+  end
+
   def test_config_flag
     storage = make_file_system_storage(
       ".theme-check.yml" => <<~YAML,
@@ -32,13 +44,13 @@ class CliTest < Minitest::Test
 
     cli = ThemeCheck::Cli.new
     out = capture(:stdout) do
-      assert_raises(ThemeCheck::Cli::Abort) do
-        cli.run([__dir__ + "/theme", "-C", storage.path(".theme-check.yml")])
-      end
+      cli.run([__dir__ + "/theme", "-C", storage.path(".theme-check.yml"), '--print'])
     end
 
-    assert_equal(storage.path('.theme-check.yml'), ThemeCheck::Config.last_loaded_config)
-    assert_includes(out, "files inspected")
+    assert_includes(out, <<~EXPECTED)
+      SyntaxError:
+        enabled: false
+    EXPECTED
   end
 
   def test_check_with_category
