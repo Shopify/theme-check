@@ -12,11 +12,7 @@ module ThemeCheck
     end
 
     def path(relative_path)
-      @root.join(relative_path).to_s
-    end
-
-    def relative_path(absolute_path)
-      Pathname.new(absolute_path).relative_path_from(@root).to_s
+      @root.join(relative_path)
     end
 
     def read(relative_path)
@@ -37,6 +33,10 @@ module ThemeCheck
         .flat_map { |relative_path| Pathname.new(relative_path).ascend.to_a }
         .map(&:to_s)
         .uniq
+    end
+
+    def relative_path(absolute_path)
+      Pathname.new(absolute_path).relative_path_from(@root).to_s
     end
   end
 end
