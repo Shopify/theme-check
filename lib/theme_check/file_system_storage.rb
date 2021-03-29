@@ -12,7 +12,7 @@ module ThemeCheck
     end
 
     def path(relative_path)
-      @root.join(relative_path).to_s
+      @root.join(relative_path)
     end
 
     def read(relative_path)

@@ -65,7 +65,7 @@ class LanguageServerTest < Minitest::Test
       method: "textDocument/didOpen",
       params: {
         textDocument: {
-          uri: "file://" + storage.path('layout/theme.liquid'),
+          uri: "file://#{storage.path('layout/theme.liquid')}",
           version: 1,
         },
       },
@@ -84,7 +84,7 @@ class LanguageServerTest < Minitest::Test
       jsonrpc: "2.0",
       method: "textDocument/publishDiagnostics",
       params: {
-        uri: "file://" + storage.path('layout/theme.liquid'),
+        uri: "file://#{storage.path('layout/theme.liquid')}",
         diagnostics: [{
           range: {
             start: {
@@ -127,7 +127,7 @@ class LanguageServerTest < Minitest::Test
       method: "textDocument/didSave",
       params: {
         textDocument: {
-          uri: "file://" + storage.path('layout/theme.liquid'),
+          uri: "file://#{storage.path('layout/theme.liquid')}",
           version: 1,
         },
       },
@@ -146,7 +146,7 @@ class LanguageServerTest < Minitest::Test
       jsonrpc: "2.0",
       method: "textDocument/publishDiagnostics",
       params: {
-        uri: "file://" + storage.path('layout/theme.liquid'),
+        uri: "file://#{storage.path('layout/theme.liquid')}",
         diagnostics: [{
           range: {
             start: {
@@ -189,7 +189,7 @@ class LanguageServerTest < Minitest::Test
       method: "textDocument/didOpen",
       params: {
         textDocument: {
-          uri: "file://" + storage.path("src/layout/theme.liquid"),
+          uri: "file://#{storage.path("src/layout/theme.liquid")}",
           version: 1,
         },
       },
@@ -220,7 +220,7 @@ class LanguageServerTest < Minitest::Test
       method: "textDocument/didOpen",
       params: {
         textDocument: {
-          uri: "file://" + storage.path('layout/theme.liquid'),
+          uri: "file://#{storage.path('layout/theme.liquid')}",
           text: template,
           version: 1,
         },
@@ -231,7 +231,7 @@ class LanguageServerTest < Minitest::Test
       method: "textDocument/documentLink",
       params: {
         textDocument: {
-          uri: "file://" + storage.path('layout/theme.liquid'),
+          uri: "file://#{storage.path('layout/theme.liquid')}",
         },
       },
     }, {
@@ -243,7 +243,7 @@ class LanguageServerTest < Minitest::Test
       jsonrpc: "2.0",
       id: 1,
       result: [{
-        target: "file://" + storage.path('snippets/a.liquid'),
+        target: "file://#{storage.path('snippets/a.liquid')}",
         range: {
           start: {
             line: 0,
@@ -281,7 +281,7 @@ class LanguageServerTest < Minitest::Test
       method: "textDocument/didOpen",
       params: {
         textDocument: {
-          uri: "file://" + storage.path('src/theme/layout/theme.liquid'),
+          uri: "file://#{storage.path('src/theme/layout/theme.liquid')}",
           text: template,
           version: 1,
         },
@@ -292,7 +292,7 @@ class LanguageServerTest < Minitest::Test
       method: "textDocument/documentLink",
       params: {
         textDocument: {
-          uri: "file://" + storage.path('src/theme/layout/theme.liquid'),
+          uri: "file://#{storage.path('src/theme/layout/theme.liquid')}",
         },
       },
     }, {
@@ -304,7 +304,7 @@ class LanguageServerTest < Minitest::Test
       jsonrpc: "2.0",
       id: 1,
       result: [{
-        target: "file://" + storage.path('src/theme/snippets/a.liquid'),
+        target: "file://#{storage.path('src/theme/snippets/a.liquid')}",
         range: {
           start: {
             line: 0,

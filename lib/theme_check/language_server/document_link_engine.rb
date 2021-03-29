@@ -41,7 +41,7 @@ module ThemeCheck
       end
 
       def link(partial)
-        'file://' + @storage.path('snippets/' + partial + '.liquid')
+        "file://#{@storage.path('snippets/' + partial + '.liquid')}"
       end
     end
   end
