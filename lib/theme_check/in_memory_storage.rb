@@ -6,32 +6,29 @@
 # as a big hash already, leave it like that and save yourself some IO.
 module ThemeCheck
   class InMemoryStorage < Storage
-    def initialize(files = {}, root = nil)
+    def initialize(files = {}, root = "/dev/null")
       @files = files
-      @root = root
+      @root = Pathname.new(root)
     end
 
-    def path(name)
-      return File.join(@root, name) unless @root.nil?
-      name
+    def path(relative_path)
+      @root.join(relative_path).to_s
     end
 
-    def relative_path(name)
-      path = Pathname.new(name)
-      return path.relative_path_from(@root).to_s unless path.relative? || @root.nil?
-      name
+    def relative_path(absolute_path)
+      Pathname.new(absolute_path).relative_path_from(@root).to_s
     end
 
-    def read(name)
-      @files[relative_path(name)]
+    def read(relative_path)
+      @files[relative_path]
     end
 
-    def write(name, content)
-      @files[relative_path(name)] = content
+    def write(relative_path, content)
+      @files[relative_path] = content
     end
 
     def files
-      @values ||= @files.keys
+      @files.keys
     end
 
     def directories
