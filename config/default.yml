@@ -93,3 +93,6 @@ AssetSizeCSS:
 
 ImgWidthAndHeight:
   enabled: true
+
+RemoteAsset:
+  enabled: true
