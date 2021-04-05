@@ -48,6 +48,53 @@ class SpaceInsideBracesTest < Minitest::Test
     END
   end
 
+  def test_reports_extra_space_around_pipeline
+    offenses = analyze_theme(
+      ThemeCheck::SpaceInsideBraces.new,
+      "templates/index.liquid" => <<~END,
+        {{ url  | asset_url | img_tag }}
+        {{ url |  asset_url | img_tag }}
+        {% assign my_upcase_string = "Hello world"  | upcase %}
+        {% assign my_upcase_string = "Hello world" |  upcase %}
+      END
+    )
+    assert_offenses(<<~END, offenses)
+      Too many spaces before '|' at templates/index.liquid:1
+      Too many spaces after '|' at templates/index.liquid:2
+      Too many spaces before '|' at templates/index.liquid:3
+      Too many spaces after '|' at templates/index.liquid:4
+    END
+  end
+
+  def test_reports_missing_space_around_pipeline
+    offenses = analyze_theme(
+      ThemeCheck::SpaceInsideBraces.new,
+      "templates/index.liquid" => <<~END,
+        {{ url| asset_url | img_tag }}
+        {{ url |asset_url | img_tag }}
+        {% assign my_upcase_string = "Hello world"| upcase %}
+        {% assign my_upcase_string = "Hello world" |upcase %}
+      END
+    )
+    assert_offenses(<<~END, offenses)
+      Space missing before '|' at templates/index.liquid:1
+      Space missing after '|' at templates/index.liquid:2
+      Space missing before '|' at templates/index.liquid:3
+      Space missing after '|' at templates/index.liquid:4
+    END
+  end
+
+  def test_dont_report_on_correct_spaces_around_pipeline
+    offenses = analyze_theme(
+      ThemeCheck::SpaceInsideBraces.new,
+      "templates/index.liquid" => <<~END,
+        {{ url | asset_url | img_tag }}
+        {% assign my_upcase_string = "Hello world" | upcase %}
+      END
+    )
+    assert_offenses('', offenses)
+  end
+
   def test_reports_extra_space_after_colon_in_assign_tag
     offenses = analyze_theme(
       ThemeCheck::SpaceInsideBraces.new,
