@@ -127,6 +127,20 @@ module ThemeCheck
         assert_can_lookup_tag("assign foo = 'bar' | replace: attr: var", "var")
       end
 
+      def test_can_lookup_inside_multiline_liquid_tags
+        assert_can_lookup(<<~LIQUID, '', -1)
+          {% liquid
+            assign foo = cart
+            assign bar =\t
+        LIQUID
+
+        assert_can_lookup(<<~LIQUID, 'cart', -1)
+          {% liquid
+            assign foo = blob
+            assign bar = cart
+        LIQUID
+      end
+
       def test_can_lookup_table_row_statements
       end
 

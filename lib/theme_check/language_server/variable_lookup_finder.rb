@@ -105,6 +105,7 @@ module ThemeCheck
         markup += '"' if markup.count('"').odd?
         markup += "]" if markup =~ UNCLOSED_SQUARE_BRACKET
         markup += ' %}' unless is_liquid_tag
+        markup = "{% liquid \n#{last_line}" if is_liquid_tag
 
         # if statements
         is_if_tag = markup =~ /\A{%\s*if/im
@@ -135,12 +136,18 @@ module ThemeCheck
         end
 
         # case statements
-        is_case_or_when_tag = markup =~ /\A{%\s*(case|when)/im
-        is_liquid_case_or_when = is_liquid_tag && last_line.match?(/^\s*(case|when)/)
-        return empty_lookup if (is_case_or_when_tag || is_liquid_case_or_when) && ends_with_spaces
-        markup = "{% case x %}" + markup if markup =~ /\A{%\s*when/im
-        markup += '{% endcase %}' if is_case_or_when_tag
-        markup += "\n endcase" if is_liquid_case_or_when
+        is_case_tag = markup =~ /\A{%\s*case/im
+        is_liquid_case = is_liquid_tag && last_line.match?(/^\s*case/)
+        return empty_lookup if (is_case_tag || is_liquid_case) && ends_with_spaces
+        markup += "{% endcase %}" if is_case_tag
+        markup += "\n endcase" if is_liquid_case
+
+        # when
+        is_when_tag = markup =~ /\A{%\s*when/im
+        is_liquid_when = is_liquid_tag && last_line.match?(/^\s*when/)
+        return empty_lookup if (is_when_tag || is_liquid_when) && ends_with_spaces
+        markup = "{% case x %}" + markup + "{% endcase %}" if markup =~ /\A{%\s*when/im
+        markup = "{% liquid\n case x\n #{last_line}\n endcase\n" if is_liquid_when
 
         # for statements
         is_for_tag = markup =~ /\A{%\s*for/im
@@ -150,7 +157,7 @@ module ThemeCheck
         markup += "\n endfor" if is_liquid_for
 
         # closing liquid tag
-        markup += "\n %}" if is_liquid_tag
+        markup += "\n%}" if is_liquid_tag
 
         template = Liquid::Template.parse(markup)
         current_tag = template.root.nodelist[0]
@@ -208,7 +215,7 @@ module ThemeCheck
       end
 
       def variable_lookup_for_render_tag(render_tag)
-        return empty_lookup if render_tag.raw =~ /:\s+$/
+        return empty_lookup if render_tag.raw =~ /:\s*$/
         render_tag.attributes.values.last
       end
 
@@ -224,7 +231,7 @@ module ThemeCheck
         has_filters = !variable.filters.empty?
 
         # Can complete after trailing comma or :
-        if has_filters && variable.raw =~ /[:,]\s+$/
+        if has_filters && variable.raw =~ /[:,]\s*$/
           empty_lookup
         elsif has_filters
           last_filter_argument(variable.filters)
