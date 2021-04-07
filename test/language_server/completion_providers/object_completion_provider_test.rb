@@ -39,6 +39,7 @@ module ThemeCheck
         refute_can_complete(@provider, "{{ all_prod }}")
 
         # not an object.
+        refute_can_complete(@provider, "{{ all_products.")
         refute_can_complete(@provider, "{{ all_products. ")
         refute_can_complete(@provider, "{{ all_products.featured_image ")
 

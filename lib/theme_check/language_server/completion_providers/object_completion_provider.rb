@@ -6,6 +6,7 @@ module ThemeCheck
       def completions(content, cursor)
         return [] unless (variable_lookup = variable_lookup_at_cursor(content, cursor))
         return [] unless variable_lookup.lookups.empty?
+        return [] if content[cursor - 1] == "."
         ShopifyLiquid::Object.labels
           .select { |w| w.starts_with?(partial(variable_lookup)) }
           .map { |object| object_to_completion(object) }
