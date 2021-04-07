@@ -8,15 +8,22 @@ on:
 
 jobs:
   test:
+    runs-on: macos-latest
 
-    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        version:
+          - 3.0.0
+          - 2.7.1
+
+    name: Ruby ${{ matrix.version }}
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Ruby
+    - name: Set up Ruby ${{ matrix.version }}
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.7
+        ruby-version: ${{ matrix.version }}
     - uses: actions/cache@v1
       with:
         path: vendor/bundle
