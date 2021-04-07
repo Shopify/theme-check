@@ -8,6 +8,7 @@ module ThemeCheck
       UNCLOSED_SQUARE_BRACKET = /\[[^\]]*\Z/
       UNCLOSED_SINGLE_QUOTE = /'[^']*\Z/
       UNCLOSED_DOUBLE_QUOTE = /"[^"]*\Z/
+      TAG_START = /#{Liquid::TagStart}-?/
 
       def lookup(content, cursor)
         potential_lookup = lookup_liquid_variable(content, cursor) || lookup_liquid_tag(content, cursor)
@@ -23,7 +24,7 @@ module ThemeCheck
         previous_char = content[cursor - 1]
         is_liquid_variable = content =~ Liquid::VariableStart
         is_in_variable_segment = previous_char =~ /[a-z0-9_.'"-]/i
-        is_on_blank_variable_lookup_position = content[0..cursor - 1] =~ /[{:,]\s+$/
+        is_on_blank_variable_lookup_position = content[0..cursor - 1] =~ /[{:,-]\s+$/
         (
           is_liquid_variable && (
             is_in_variable_segment ||
@@ -34,7 +35,7 @@ module ThemeCheck
 
       def lookup_liquid_variable(content, cursor)
         return unless cursor_is_on_liquid_variable_lookup_position(content, cursor)
-        start_index = 2
+        start_index = content.match(/#{Liquid::VariableStart}-?/o).end(0) + 1
         end_index = cursor - 1
 
         # We take the following content
@@ -70,7 +71,7 @@ module ThemeCheck
             |case|when
             |in
           )
-          |[:,=]
+          |[:,=.]
         )
         \s+$
       }oimx
@@ -96,7 +97,7 @@ module ThemeCheck
         markup = content[start_index..end_index]
         last_line = markup.rstrip.lines.last
 
-        is_liquid_tag = markup =~ /\A{%\s*liquid/im
+        is_liquid_tag = markup =~ /\A#{TAG_START}\s*liquid/oim
         ends_with_spaces = markup =~ / +$/
         ends_with_potential_lookup_position = markup =~ ENDS_WITH_POTENTIAL_LOOKUP_POSITION
 
@@ -108,7 +109,7 @@ module ThemeCheck
         markup = "{% liquid \n#{last_line}" if is_liquid_tag
 
         # if statements
-        is_if_tag = markup =~ /\A{%\s*if/im
+        is_if_tag = markup =~ /\A#{TAG_START}\s*if/oim
         is_liquid_if = is_liquid_tag && last_line.match?(/^\s*if/)
         return empty_lookup if (is_if_tag || is_liquid_if) && ends_with_spaces
         markup += '{% endif %}' if is_if_tag
@@ -116,13 +117,13 @@ module ThemeCheck
 
         # unless statements
         is_liquid_unless = is_liquid_tag && last_line.match?(/^\s*unless/)
-        is_unless_tag = markup =~ /\A{%\s*unless/im
+        is_unless_tag = markup =~ /\A#{TAG_START}\s*unless/oim
         return empty_lookup if (is_unless_tag || is_liquid_unless) && ends_with_spaces
         markup += '{% endunless %}' if is_unless_tag
         markup += "\n endunless" if is_liquid_unless
 
         # elsif statements
-        is_elsif_tag = markup =~ /\A{%\s*elsif/im
+        is_elsif_tag = markup =~ /\A#{TAG_START}\s*elsif/oim
         is_liquid_elsif = is_liquid_tag && last_line.match?(/\A\s*elsif/)
         return empty_lookup if (is_elsif_tag || is_liquid_elsif) && ends_with_spaces
         markup = '{% if x %}' + markup + '{% endif %}' if is_elsif_tag
@@ -136,21 +137,21 @@ module ThemeCheck
         end
 
         # case statements
-        is_case_tag = markup =~ /\A{%\s*case/im
+        is_case_tag = markup =~ /\A#{TAG_START}\s*case/oim
         is_liquid_case = is_liquid_tag && last_line.match?(/^\s*case/)
         return empty_lookup if (is_case_tag || is_liquid_case) && ends_with_spaces
         markup += "{% endcase %}" if is_case_tag
         markup += "\n endcase" if is_liquid_case
 
         # when
-        is_when_tag = markup =~ /\A{%\s*when/im
+        is_when_tag = markup =~ /\A#{TAG_START}\s*when/oim
         is_liquid_when = is_liquid_tag && last_line.match?(/^\s*when/)
         return empty_lookup if (is_when_tag || is_liquid_when) && ends_with_spaces
-        markup = "{% case x %}" + markup + "{% endcase %}" if markup =~ /\A{%\s*when/im
+        markup = "{% case x %}" + markup + "{% endcase %}" if markup =~ /\A#{TAG_START}\s*when/im
         markup = "{% liquid\n case x\n #{last_line}\n endcase\n" if is_liquid_when
 
         # for statements
-        is_for_tag = markup =~ /\A{%\s*for/im
+        is_for_tag = markup =~ /\A#{TAG_START}\s*for/oim
         is_liquid_for = is_liquid_tag && last_line.match?(/^\s*(for)/)
         return empty_lookup if (is_for_tag || is_liquid_for) && ends_with_potential_lookup_position
         markup += "{% endfor %}" if is_for_tag

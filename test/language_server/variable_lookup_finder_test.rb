@@ -6,6 +6,7 @@ module ThemeCheck
     class VariableLookupFinderTest < Minitest::Test
       def test_lookup_liquid_variable
         assert_can_lookup('{{ ', '')
+        assert_can_lookup("{{- ", '')
         assert_can_lookup('{{  ', '')
         assert_can_lookup("{{ \n\t", '')
         assert_can_lookup('{{ }}', '', -2)
@@ -35,6 +36,9 @@ module ThemeCheck
         refute_can_lookup('{{ "foo')
         refute_can_lookup('{{ "foo"')
 
+        # attribute
+        assert_can_lookup('{{ product.', 'product')
+
         # square brackets
         assert_can_lookup('{{ product["handle', 'product.handle')
         refute_can_lookup('{{ product["handle"')
@@ -50,6 +54,7 @@ module ThemeCheck
 
       def test_can_lookup_echo_statements
         assert_can_lookup('{% echo ', '')
+        assert_can_lookup('{%- echo ', '')
         assert_can_lookup('{% echo  ', '')
         assert_can_lookup("{% echo \n\t", '')
         assert_can_lookup('{% echo %}', '', -2)
@@ -71,6 +76,8 @@ module ThemeCheck
       def test_can_lookup_conditional_statements
         ["if", "unless", "elsif"].each do |keyword|
           assert_can_lookup_tag("#{keyword} ", "")
+          assert_can_lookup_tag("#{keyword} form.", "form")
+          assert_can_lookup_tag("#{keyword} form.ppty", "form.ppty")
           assert_can_lookup_tag("#{keyword} condition", "condition")
           assert_can_lookup_tag("#{keyword} false or ", "")
           assert_can_lookup_tag("#{keyword} false or condition", "condition")
@@ -146,6 +153,7 @@ module ThemeCheck
 
       def assert_can_lookup_tag(tag_content, expected_markup)
         assert_can_lookup("{% #{tag_content}", expected_markup)
+        assert_can_lookup("{%- #{tag_content}", expected_markup)
         assert_can_lookup(<<~LIQUID, expected_markup, -1)
           {% liquid
             #{tag_content}
@@ -165,6 +173,7 @@ module ThemeCheck
 
       def refute_can_lookup_tag(tag_content)
         refute_can_lookup("{% #{tag_content}")
+        refute_can_lookup("{%- #{tag_content}")
         refute_can_lookup(<<~LIQUID, -1)
           {% liquid
             #{tag_content}
