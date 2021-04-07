@@ -61,6 +61,54 @@ module Minitest
       assert_includes(offenses.sort_by(&:location).join("\n"), output.chomp)
     end
 
+    module CompletionProviderTestHelper
+      def assert_can_complete(provider, token, offset = 0)
+        refute_empty(
+          provider.completions(token, token.size + offset).map { |x| x[:label] },
+          <<~ERRMSG,
+            Expected completions at the specified cursor position:
+            #{token}
+            #{' ' * (token.size + offset)}^
+          ERRMSG
+        )
+      end
+
+      def assert_can_complete_with(provider, token, label, offset = 0)
+        assert_includes(
+          provider.completions(token, token.size + offset).map { |x| x[:label] },
+          label,
+          <<~ERRMSG,
+            Expected '#{label}' to be suggested at the specified cursor position:
+            #{token}
+            #{' ' * (token.size + offset)}^
+          ERRMSG
+        )
+      end
+
+      def refute_can_complete(provider, token, offset = 0)
+        assert_empty(
+          provider.completions(token, token.size + offset),
+          <<~ERRMSG,
+            Expected no completions at the specified cursor location:
+            #{token}
+            #{' ' * (token.size + offset)}^
+          ERRMSG
+        )
+      end
+
+      def refute_can_complete_with(provider, token, label, offset = 0)
+        refute_includes(
+          provider.completions(token, token.size + offset).map { |x| x[:label] },
+          label,
+          <<~ERRMSG,
+            Expected '#{label}' not to be suggested at the specified cursor position:
+            #{token}
+            #{' ' * (token.size + offset)}^
+          ERRMSG
+        )
+      end
+    end
+
     class TracerCheck < ThemeCheck::Check
       attr_reader :calls
 

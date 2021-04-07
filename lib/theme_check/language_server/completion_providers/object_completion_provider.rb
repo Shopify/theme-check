@@ -4,18 +4,19 @@ module ThemeCheck
   module LanguageServer
     class ObjectCompletionProvider < CompletionProvider
       def completions(content, cursor)
-        return [] unless can_complete?(content, cursor)
-        partial = first_word(content) || ''
+        return [] unless (variable_lookup = variable_lookup_at_cursor(content, cursor))
+        return [] unless variable_lookup.lookups.empty?
         ShopifyLiquid::Object.labels
-          .select { |w| w.starts_with?(partial) }
+          .select { |w| w.starts_with?(partial(variable_lookup)) }
           .map { |object| object_to_completion(object) }
       end
 
-      def can_complete?(content, cursor)
-        content.match?(Liquid::VariableStart) && (
-          cursor_on_first_word?(content, cursor) ||
-          cursor_on_start_content?(content, cursor, Liquid::VariableStart)
-        )
+      def variable_lookup_at_cursor(content, cursor)
+        VariableLookupFinder.lookup(content, cursor)
+      end
+
+      def partial(variable_lookup)
+        variable_lookup.name || ''
       end
 
       private

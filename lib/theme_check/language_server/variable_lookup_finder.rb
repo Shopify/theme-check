@@ -47,7 +47,7 @@ module ThemeCheck
         markup = content[start_index..end_index]
 
         # Early return for incomplete variables
-        return variable_lookup('') if markup =~ /\s+$/
+        return empty_lookup if markup =~ /\s+$/
         return if markup =~ /((?<!\[)['"]|\]|\[)$/
 
         # Now we go to hack city... The cursor might be in the middle
@@ -62,9 +62,34 @@ module ThemeCheck
         variable_lookup_for_liquid_variable(variable)
       end
 
+      ENDS_WITH_POTENTIAL_LOOKUP_POSITION = %r{
+        (
+          \s(
+            if|elsif|unless|and|or|#{Liquid::Condition.operators.keys.join("|")}
+            |echo
+            |case|when
+            |in
+          )
+          |[:,=]
+        )
+        \s+$
+      }oimx
+
+      def cursor_is_on_liquid_tag_lookup_position(content, cursor)
+        previous_char = content[cursor - 1]
+        is_liquid_tag = content.match?(Liquid::TagStart)
+        is_in_variable_segment = previous_char =~ /[a-z0-9_.'"-]/i
+        is_on_blank_variable_lookup_position = content[0..cursor - 1] =~ ENDS_WITH_POTENTIAL_LOOKUP_POSITION
+        (
+          is_liquid_tag && (
+            is_in_variable_segment ||
+            is_on_blank_variable_lookup_position
+          )
+        )
+      end
+
       def lookup_liquid_tag(content, cursor)
-        return unless content.match?(Liquid::TagStart)
-        return if content.match?(Liquid::TagEnd) || content[cursor - 1] == '%'
+        return unless cursor_is_on_liquid_tag_lookup_position(content, cursor)
 
         start_index = 0
         end_index = cursor - 1
@@ -73,6 +98,7 @@ module ThemeCheck
 
         is_liquid_tag = markup =~ /\A{%\s*liquid/im
         ends_with_spaces = markup =~ / +$/
+        ends_with_potential_lookup_position = markup =~ ENDS_WITH_POTENTIAL_LOOKUP_POSITION
 
         # Welcome to Hackcity
         markup += "'" if markup.count("'").odd?
@@ -83,22 +109,21 @@ module ThemeCheck
         # if statements
         is_if_tag = markup =~ /\A{%\s*if/im
         is_liquid_if = is_liquid_tag && last_line.match?(/^\s*if/)
-        return variable_lookup('') if (is_if_tag || is_liquid_if) && ends_with_spaces
+        return empty_lookup if (is_if_tag || is_liquid_if) && ends_with_spaces
         markup += '{% endif %}' if is_if_tag
         markup += "\n endif" if is_liquid_if
 
         # unless statements
-        is_unless_tag = markup =~ /\A{%\s*unless/im
         is_liquid_unless = is_liquid_tag && last_line.match?(/^\s*unless/)
         is_unless_tag = markup =~ /\A{%\s*unless/im
-        return variable_lookup('') if (is_unless_tag || is_liquid_unless) && ends_with_spaces
+        return empty_lookup if (is_unless_tag || is_liquid_unless) && ends_with_spaces
         markup += '{% endunless %}' if is_unless_tag
         markup += "\n endunless" if is_liquid_unless
 
         # elsif statements
         is_elsif_tag = markup =~ /\A{%\s*elsif/im
         is_liquid_elsif = is_liquid_tag && last_line.match?(/\A\s*elsif/)
-        return variable_lookup('') if (is_elsif_tag || is_liquid_elsif) && ends_with_spaces
+        return empty_lookup if (is_elsif_tag || is_liquid_elsif) && ends_with_spaces
         markup = '{% if x %}' + markup + '{% endif %}' if is_elsif_tag
         if is_liquid_elsif
           markup = <<~LIQUID
@@ -110,13 +135,19 @@ module ThemeCheck
         end
 
         # case statements
+        is_case_or_when_tag = markup =~ /\A{%\s*(case|when)/im
+        is_liquid_case_or_when = is_liquid_tag && last_line.match?(/^\s*(case|when)/)
+        return empty_lookup if (is_case_or_when_tag || is_liquid_case_or_when) && ends_with_spaces
         markup = "{% case x %}" + markup if markup =~ /\A{%\s*when/im
-        markup += '{% endcase %}' if markup =~ /\A{%\s*(case|when)/im
-        markup += "\n endcase" if is_liquid_tag && last_line.match?(/^\s*(case|when)/)
+        markup += '{% endcase %}' if is_case_or_when_tag
+        markup += "\n endcase" if is_liquid_case_or_when
 
         # for statements
-        markup += "{% endfor %}" if markup =~ /\A{%\s*for/im
-        markup += "\n endfor" if is_liquid_tag && last_line.match?(/^\s*(for)/)
+        is_for_tag = markup =~ /\A{%\s*for/im
+        is_liquid_for = is_liquid_tag && last_line.match?(/^\s*(for)/)
+        return empty_lookup if (is_for_tag || is_liquid_for) && ends_with_potential_lookup_position
+        markup += "{% endfor %}" if is_for_tag
+        markup += "\n endfor" if is_liquid_for
 
         # closing liquid tag
         markup += "\n %}" if is_liquid_tag
@@ -177,6 +208,7 @@ module ThemeCheck
       end
 
       def variable_lookup_for_render_tag(render_tag)
+        return empty_lookup if render_tag.raw =~ /:\s+$/
         render_tag.attributes.values.last
       end
 
@@ -189,13 +221,22 @@ module ThemeCheck
       end
 
       def variable_lookup_for_liquid_variable(variable)
-        # Here we take the last filter argument or the first argument
-        return last_filter_argument(variable.filters) unless variable.filters.empty?
-        variable.name
+        has_filters = !variable.filters.empty?
+
+        # Can complete after trailing comma or :
+        if has_filters && variable.raw =~ /[:,]\s+$/
+          empty_lookup
+        elsif has_filters
+          last_filter_argument(variable.filters)
+        elsif variable.name.nil?
+          empty_lookup
+        else
+          variable.name
+        end
       end
 
-      def variable_lookup(content)
-        Liquid::VariableLookup.parse(content)
+      def empty_lookup
+        Liquid::VariableLookup.parse('')
       end
 
       # We want the last thing in variable.filters which is at most

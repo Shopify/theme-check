@@ -48,6 +48,26 @@ module ThemeCheck
         # refute_can_lookup('{{ cart | image: attr')
       end
 
+      def test_can_lookup_echo_statements
+        assert_can_lookup('{% echo ', '')
+        assert_can_lookup('{% echo  ', '')
+        assert_can_lookup("{% echo \n\t", '')
+        assert_can_lookup('{% echo %}', '', -2)
+        assert_can_lookup('{% echo cart', 'cart')
+        assert_can_lookup('{% echo cart %}', 'cart', -3)
+        assert_can_lookup('{% echo "foo" | replace: ', '')
+        assert_can_lookup('{% echo "foo" | replace: var', 'var')
+        assert_can_lookup('{% echo "foo" | replace: var1, ', '')
+        assert_can_lookup('{% echo "foo" | replace: var1, var2', 'var2')
+        assert_can_lookup('{% echo "foo" | replace: attr: var', 'var')
+        assert_can_lookup_tag("echo ", "")
+        assert_can_lookup_tag("echo  ", "")
+        assert_can_lookup_tag("echo cart", "cart")
+        assert_can_lookup_tag("echo cart.error", "cart.error")
+        assert_can_lookup_tag("echo 'bar' | replace: 'arg', cart.error", "cart.error")
+        assert_can_lookup_tag("echo 'bar' | replace: attr: cart.error", "cart.error")
+      end
+
       def test_can_lookup_conditional_statements
         ["if", "unless", "elsif"].each do |keyword|
           assert_can_lookup_tag("#{keyword} ", "")
@@ -63,13 +83,15 @@ module ThemeCheck
       end
 
       def test_can_lookup_case_statements
+        assert_can_lookup("{% case ", "")
         assert_can_lookup("{% case cart.err", "cart.err")
+        assert_can_lookup("{% when ", "")
         assert_can_lookup("{% when cart.err", "cart.err")
-        assert_can_lookup(<<~LIQUID, "cart.error")
+        assert_can_lookup(<<~LIQUID, "cart.error", -1)
           {% liquid
             case cart.error
         LIQUID
-        assert_can_lookup(<<~LIQUID, "cart.error")
+        assert_can_lookup(<<~LIQUID, "cart.error", -1)
           {% liquid
             case error
             when cart.error
@@ -82,24 +104,27 @@ module ThemeCheck
       end
 
       def test_can_lookup_for_statements
+        assert_can_lookup_tag("for p in ", "")
+        assert_can_lookup_tag("for p in cart", "cart")
         assert_can_lookup_tag("for p in cart.error", "cart.error")
       end
 
       def test_can_lookup_render_statements
+        assert_can_lookup_tag("render 'snippet', error: ", "")
         assert_can_lookup_tag("render 'snippet', error: cart.error", "cart.error")
+        assert_can_lookup_tag("render 'snippet', foo: 'bar', error: ", "")
         assert_can_lookup_tag("render 'snippet', foo: 'bar', error: cart.error", "cart.error")
       end
 
       def test_can_lookup_assign_statements
+        assert_can_lookup_tag("assign foo = ", "")
         assert_can_lookup_tag("assign foo = cart.error", "cart.error")
-        assert_can_lookup_tag("assign foo = 'bar' | replace: 'arg', cart.error", "cart.error")
-        assert_can_lookup_tag("assign foo = 'bar' | replace: attr: cart.error", "cart.error")
-      end
-
-      def test_can_lookup_echo_statements
-        assert_can_lookup_tag("echo cart.error", "cart.error")
-        assert_can_lookup_tag("echo 'bar' | replace: 'arg', cart.error", "cart.error")
-        assert_can_lookup_tag("echo 'bar' | replace: attr: cart.error", "cart.error")
+        assert_can_lookup_tag("assign foo = 'bar' | replace: ", "")
+        assert_can_lookup_tag("assign foo = 'bar' | replace: from", "from")
+        assert_can_lookup_tag("assign foo = 'bar' | replace: 'from', ", "")
+        assert_can_lookup_tag("assign foo = 'bar' | replace: 'from', to", "to")
+        assert_can_lookup_tag("assign foo = 'bar' | replace: attr: ", "")
+        assert_can_lookup_tag("assign foo = 'bar' | replace: attr: var", "var")
       end
 
       def test_can_lookup_table_row_statements
@@ -107,7 +132,7 @@ module ThemeCheck
 
       def assert_can_lookup_tag(tag_content, expected_markup)
         assert_can_lookup("{% #{tag_content}", expected_markup)
-        assert_can_lookup(<<~LIQUID, expected_markup)
+        assert_can_lookup(<<~LIQUID, expected_markup, -1)
           {% liquid
             #{tag_content}
         LIQUID
@@ -126,7 +151,7 @@ module ThemeCheck
 
       def refute_can_lookup_tag(tag_content)
         refute_can_lookup("{% #{tag_content}")
-        refute_can_lookup(<<~LIQUID)
+        refute_can_lookup(<<~LIQUID, -1)
           {% liquid
             #{tag_content}
         LIQUID
