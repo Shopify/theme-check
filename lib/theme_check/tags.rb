@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require "active_support/core_ext/string/starts_ends_with"
 
 module ThemeCheck
   module Tags
@@ -19,7 +18,7 @@ module ThemeCheck
           "Error in tag 'section' - Valid syntax: section '[type]'",
         ) unless match
         @section_name = match[:section_name].tr(%('"), '')
-        @section_name.chomp!(".liquid") if @section_name.ends_with?(".liquid")
+        @section_name.chomp!(".liquid") if @section_name.end_with?(".liquid")
       end
     end
 

@@ -135,7 +135,7 @@ module ThemeCheck
 
     def each_template
       @files.each do |(name, info)|
-        next if name.starts_with?('snippets/')
+        next if name.start_with?('snippets/')
         yield [name, info]
       end
     end

@@ -62,7 +62,7 @@ module ThemeCheck
       end
 
       unless [:version, :init].include?(command)
-        @config = if config_path.present?
+        @config = if config_path
           ThemeCheck::Config.new(
             root: @path,
             configuration: ThemeCheck::Config.load_file(config_path)

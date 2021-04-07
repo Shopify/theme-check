@@ -56,7 +56,7 @@ module ThemeCheck
       # More complicated liquid statements are not in scope.
       if src =~ /^#{VARIABLE}$/o && src =~ /asset_url/ && src =~ Liquid::QuotedString
         asset_id = Regexp.last_match(0).gsub(START_OR_END_QUOTE, "")
-        asset = @theme.assets.find { |a| a.name.ends_with?("/" + asset_id) }
+        asset = @theme.assets.find { |a| a.name.end_with?("/" + asset_id) }
         return if asset.nil?
         asset.gzipped_size
       elsif src =~ %r{^(https?:)?//}

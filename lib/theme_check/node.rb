@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require 'active_support/core_ext/string/inflections'
 
 module ThemeCheck
   # A node from the Liquid AST, the result of parsing a template.
@@ -101,7 +100,7 @@ module ThemeCheck
     # The `:under_score_name` of this type of node. Used to dispatch to the `on_<type_name>`
     # and `after_<type_name>` check methods.
     def type_name
-      @type_name ||= @value.class.name.demodulize.underscore.to_sym
+      @type_name ||= StringHelpers.underscore(StringHelpers.demodulize(@value.class.name)).to_sym
     end
 
     # Is this node inside a `{% liquid ... %}` block?

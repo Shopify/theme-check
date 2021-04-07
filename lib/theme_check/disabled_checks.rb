@@ -61,11 +61,11 @@ module ThemeCheck
     end
 
     def start_disabling?(text)
-      text.strip.starts_with?(DISABLE_START)
+      text.strip.start_with?(DISABLE_START)
     end
 
     def stop_disabling?(text)
-      text.strip.starts_with?(DISABLE_END)
+      text.strip.start_with?(DISABLE_END)
     end
 
     # Return a list of checks from a theme-check-disable comment

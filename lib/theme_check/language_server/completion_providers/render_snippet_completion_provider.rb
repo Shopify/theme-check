@@ -7,7 +7,7 @@ module ThemeCheck
         return [] unless cursor_on_quoted_argument?(content, cursor)
         partial = snippet(content) || ''
         snippets
-          .select { |x| x.starts_with?(partial) }
+          .select { |x| x.start_with?(partial) }
           .map { |x| snippet_to_completion(x) }
       end
 
