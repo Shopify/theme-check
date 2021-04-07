@@ -2,26 +2,29 @@
 - assign
 - break
 - capture
-- case
-- comment
+- case: endcase
+- comment: endcomment
 - continue
 - cycle
 - decrement
 - echo
-- for
-- form
-- if
+- else
+- elsif
+- for: endfor
+- form: endform
+- if: endif
 - ifchanged
 - increment
-- javascript
+- javascript: endjavascript
 - layout
 - liquid
-- paginate
+- paginate: endpaginate
 - raw
 - render
-- schema
+- schema: endschema
 - section
-- style
+- style: endstyle
 - stylesheet
 - tablerow
 - unless
+- when
