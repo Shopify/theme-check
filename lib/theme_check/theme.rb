@@ -13,7 +13,7 @@ module ThemeCheck
 
     def assets
       @assets ||= @storage.files
-        .select { |path| path.starts_with?("assets/") }
+        .select { |path| path.start_with?("assets/") }
         .map { |path| AssetFile.new(path, @storage) }
     end
 

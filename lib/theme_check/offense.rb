@@ -83,7 +83,7 @@ module ThemeCheck
     end
 
     def check_name
-      check.class.name.demodulize
+      StringHelpers.demodulize(check.class.name)
     end
 
     def doc

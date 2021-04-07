@@ -8,7 +8,7 @@ module ThemeCheck
       def completions(content, cursor)
         return [] unless can_complete?(content, cursor)
         available_labels
-          .select { |w| w.starts_with?(partial(content, cursor)) }
+          .select { |w| w.start_with?(partial(content, cursor)) }
           .map { |filter| filter_to_completion(filter) }
       end
 

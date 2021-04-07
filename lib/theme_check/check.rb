@@ -82,7 +82,7 @@ module ThemeCheck
     end
 
     def code_name
-      self.class.name.demodulize
+      StringHelpers.demodulize(self.class.name)
     end
 
     def ignore!

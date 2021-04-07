@@ -7,7 +7,7 @@ module ThemeCheck
         return [] unless can_complete?(content, cursor)
         partial = first_word(content) || ''
         ShopifyLiquid::Object.labels
-          .select { |w| w.starts_with?(partial) }
+          .select { |w| w.start_with?(partial) }
           .map { |object| object_to_completion(object) }
       end
 

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 require 'json'
 require 'stringio'
-require 'active_support/core_ext/string/inflections'
 
 module ThemeCheck
   module LanguageServer
@@ -99,7 +98,7 @@ module ThemeCheck
       end
 
       def to_snake_case(method_name)
-        method_name.gsub(/[^\w]/, '_').underscore
+        StringHelpers.underscore(method_name.gsub(/[^\w]/, '_'))
       end
 
       def initial_line

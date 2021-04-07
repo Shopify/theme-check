@@ -35,7 +35,7 @@ module ThemeCheck
     def record_missing_field_offenses(img_match)
       width = WIDTH_ATTRIBUTE.match(img_match[0])
       height = HEIGHT_ATTRIBUTE.match(img_match[0])
-      return if width.present? && height.present?
+      return if width && height
       missing_width = width.nil?
       missing_height = height.nil?
       error_message = if missing_width && missing_height

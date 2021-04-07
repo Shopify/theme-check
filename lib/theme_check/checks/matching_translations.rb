@@ -11,7 +11,7 @@ module ThemeCheck
     end
 
     def on_file(file)
-      return unless file.name.starts_with?("locales/")
+      return unless file.name.start_with?("locales/")
       return unless file.content.is_a?(Hash)
       return if file.name == @theme.default_locale_json&.name
 
