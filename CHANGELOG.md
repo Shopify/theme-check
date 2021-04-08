@@ -1,4 +1,12 @@
 
+0.7.0 / 2021-04-08
+==================
+
+  * Add [RemoteAsset Check](/docs/checks/remote_asset.md)
+  * Fixes:
+    * Don't hang on self closing img tags ([#247](https://github.com/shopify/theme-check/issues/247))
+    * Fix document links from different root
+
 0.6.0 / 2021-03-23
 ==================
 
