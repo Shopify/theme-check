@@ -23,7 +23,7 @@ module ThemeCheck
 
       return if updated_version_file == version_file
       puts "Updating version to #{version} in #{version_file_path}."
-      File.write(version_file_path, version_file)
+      File.write(version_file_path, updated_version_file)
     end
 
     def update_docs(version)

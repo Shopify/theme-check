@@ -64,7 +64,7 @@ When the remote content is highly dynamic.
 
 ## Version
 
-This check has been introduced in Theme Check THEME_CHECK_VERSION.
+This check has been introduced in Theme Check 0.7.0.
 
 ## Resources
 
