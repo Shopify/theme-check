@@ -26,6 +26,30 @@ module ThemeCheck
       assert_offenses("", offenses)
     end
 
+    def test_regex_doesnt_hang_on_self_closing_tag
+      offenses = analyze_theme(
+        ImgWidthAndHeight.new,
+        "templates/index.liquid" => <<~END,
+          <img src="a.jpg" width="100" height="200"/>
+          <img src="a.jpg" width="100" height="200" />
+          <img src="a.jpg" width="{{ image.width }}" height="{{ image.height }}" />
+          <img class="product__image lazyload"
+              alt="{{ image.alt | escape }}"
+              style="max-width: {{ 600 | times: image.aspect_ratio | round }}px; max-height: 600px;"
+              src="{{ image.src }}"
+              srcset="{% for width in responsive_image_widths %}
+                {% assign img_width = width | append: 'x' %}
+                {% if image.width >= width %}{{ image.src | img_url: img_width }} {{ width }}w,{% endif %}
+              {% endfor %}"
+              width="{{ image.width }}"
+              height="{{ image.height }}"
+              sizes="{{ 600 | times: image.aspect_ratio | round}}px"
+            />
+        END
+      )
+      assert_offenses("", offenses)
+    end
+
     def test_ignore_lazysizes
       offenses = analyze_theme(
         ImgWidthAndHeight.new,
