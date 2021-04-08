@@ -11,7 +11,7 @@ module ThemeCheck
       <script                                    # Find the start of a script tag
       (?=[^>]+?src=)                             # Make sure src= is in the script with a lookahead
       (?:(?!defer|async|type=["']module['"]).)*? # Find tags that don't have defer|async|type="module"
-      >
+      /?>
     }xim
     SCRIPT_TAG_FILTER = /\{\{[^}]+script_tag\s+\}\}/
 

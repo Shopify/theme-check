@@ -8,7 +8,7 @@ module ThemeCheck
     doc docs_url(__FILE__)
 
     # Not implemented with lookbehinds and lookaheads because performance was shit!
-    IMG_TAG = /<img#{HTML_ATTRIBUTES}>/oxim
+    IMG_TAG = %r{<img#{HTML_ATTRIBUTES}/?>}oxim
     SRC_ATTRIBUTE = /\s(src)=(#{QUOTED_LIQUID_ATTRIBUTE})/oxim
     WIDTH_ATTRIBUTE = /\s(width)=(#{QUOTED_LIQUID_ATTRIBUTE})/oxim
     HEIGHT_ATTRIBUTE = /\s(height)=(#{QUOTED_LIQUID_ATTRIBUTE})/oxim
