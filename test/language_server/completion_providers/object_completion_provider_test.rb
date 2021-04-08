@@ -4,30 +4,56 @@ require "test_helper"
 module ThemeCheck
   module LanguageServer
     class ObjectCompletionProviderTest < Minitest::Test
+      include CompletionProviderTestHelper
+
       def setup
-        @module = ObjectCompletionProvider.new
+        @provider = ObjectCompletionProvider.new
       end
 
-      def test_can_complete?
-        assert(@module.can_complete?("{{ ", 3))
-        assert(@module.can_complete?("{{  ", 4))
-        assert(@module.can_complete?("{{ all_", 3))
-        assert(@module.can_complete?("{{ all_", 7))
-        assert(@module.can_complete?("{{ all_ }}", 3))
+      def test_completions_from_different_cursor_positions
+        # variables
+        assert_can_complete(@provider, "{{ ")
+        assert_can_complete(@provider, "{{ all_")
 
-        refute(@module.can_complete?("{%  ", 4))
-        refute(@module.can_complete?("{% rend", 9))
+        # Cursor inside the token
+        assert_can_complete(@provider, "{{ all_ }}", -3)
+
+        # filters
+        assert_can_complete(@provider, "{{ '1234' | replace: prod")
+
+        # for loops
+        assert_can_complete(@provider, "{% for p in all_")
+        assert_can_complete(@provider, "{% for p in all_ %}", -3)
+
+        # case statements
+        assert_can_complete(@provider, "{% case all_prod")
+        assert_can_complete(@provider, "{% when all_prod")
+
+        # render attributes
+        assert_can_complete(@provider, "{% render 'snippet', products: all_")
+
+        # out of bounds for completions
+        refute_can_complete(@provider, "{{")
+        refute_can_complete(@provider, "{{ all_prod ")
+        refute_can_complete(@provider, "{{ all_prod }")
+        refute_can_complete(@provider, "{{ all_prod }}")
+
+        # not an object.
+        refute_can_complete(@provider, "{{ all_products.")
+        refute_can_complete(@provider, "{{ all_products. ")
+        refute_can_complete(@provider, "{{ all_products.featured_image ")
+
+        # not completable
+        refute_can_complete(@provider, "{%  ")
+        refute_can_complete(@provider, "{% rend")
       end
 
-      def test_completions
-        assert_includes(@module.completions("{{ all_", 7), {
-          label: "all_products",
-          kind: CompletionItemKinds::VARIABLE,
-        })
-        assert_includes(@module.completions("{{ prod", 7), {
-          label: "product",
-          kind: CompletionItemKinds::VARIABLE,
-        })
+      def test_correctly_suggests_things
+        assert_can_complete_with(@provider, "{{ ", 'all_products')
+        assert_can_complete_with(@provider, "{{  ", 'all_products')
+        assert_can_complete_with(@provider, "{{ all_", 'all_products')
+
+        refute_can_complete_with(@provider, "{{ all_", 'cart')
       end
     end
   end
