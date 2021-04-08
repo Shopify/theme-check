@@ -24,7 +24,7 @@ module ThemeCheck
       puts "Grabbing sha256 checksum from Rubygems.org"
       require 'digest/sha2'
       require 'open-uri'
-      gem_checksum = open("https://rubygems.org/downloads/theme-check-#{ThemeCheck::VERSION}.gem") do |io|
+      gem_checksum = URI.open("https://rubygems.org/downloads/theme-check-#{ThemeCheck::VERSION}.gem") do |io|
         Digest::SHA256.new.hexdigest(io.read)
       end
 
