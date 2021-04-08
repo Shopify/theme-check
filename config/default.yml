@@ -92,7 +92,7 @@ AssetSizeCSS:
   threshold_in_bytes: 100_000
 
 ImgWidthAndHeight:
-  enabled: true
+  enabled: false
 
 RemoteAsset:
   enabled: true

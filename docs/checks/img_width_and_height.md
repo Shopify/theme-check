@@ -45,7 +45,7 @@ The default configuration for this check is the following:
 
 ```yaml
 ImgWidthAndHeight:
-  enabled: true
+  enabled: false
 ```
 
 ## When Not To Use It
