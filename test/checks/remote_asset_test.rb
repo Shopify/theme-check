@@ -35,6 +35,9 @@ module ThemeCheck
           {{ url | global_asset_url | script_tag }}
           {{ url | payment_type_img_url | img_tag }}
           {{ url | shopify_asset_url | img_tag }}
+
+          <!-- weird edge cases from the wild -->
+          <img alt="logo" src="" data-src="{{ url | asset_url | img_tag }}" width="100" height="100" />
         END
       )
       assert_offenses("", offenses)

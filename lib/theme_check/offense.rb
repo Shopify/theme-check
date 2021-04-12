@@ -32,6 +32,8 @@ module ThemeCheck
         node&.markup
       end
 
+      raise ArgumentError, "Offense markup cannot be an empty string" if @markup.is_a?(String) && @markup.empty?
+
       @line_number = if line_number
         line_number
       elsif @node
