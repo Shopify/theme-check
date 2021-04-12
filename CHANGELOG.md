@@ -1,4 +1,9 @@
 
+0.7.2 / 2021-04-12
+==================
+
+  * Fixup bug in RemoteAsset causing Language Server to break
+
 0.7.1 / 2021-04-12
 ==================
 
