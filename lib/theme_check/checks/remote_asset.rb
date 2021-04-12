@@ -24,7 +24,7 @@ module ThemeCheck
       'shopify_asset_url',
     ]
 
-    RESOURCE_TAG = /<(?<tag_name>img|script|link|source)#{HTML_ATTRIBUTES}>/oim
+    RESOURCE_TAG = %r{<(?<tag_name>img|script|link|source)#{HTML_ATTRIBUTES}/?>}oim
     RESOURCE_URL = /\s(?:src|href)=(?<resource_url>#{QUOTED_LIQUID_ATTRIBUTE})/oim
     ASSET_URL_FILTER = /[\|\s]*(#{ASSET_URL_FILTERS.join('|')})/omi
     PROTOCOL = %r{(https?:)?//}
