@@ -1,4 +1,10 @@
 
+0.7.1 / 2021-04-12
+==================
+
+  * Fix High CPU Bug in RemoteAsset check
+  * Fix document link for render tags that trim whitespace.
+
 0.7.0 / 2021-04-08
 ==================
 
