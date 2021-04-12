@@ -76,6 +76,7 @@ module ThemeCheck
         next if url_hosted_by_shopify?(resource_url)
         next if resource_url =~ ABSOLUTE_PATH
         next if resource_url =~ RELATIVE_PATH
+        next if resource_url.empty?
 
         start = match.begin(0) + resource_match.begin(:resource_url)
         add_offense(
