@@ -13,7 +13,7 @@ class ThemeCheck < Formula
   class RubyGemsDownloadStrategy < AbstractDownloadStrategy
     include RubyBin
 
-    def fetch
+    def fetch(_timeout: nil, **_options)
       ohai("Fetching theme-check from gem source")
       cache.cd do
         ENV['GEM_SPEC_CACHE'] = "#{cache}/gem_spec_cache"
