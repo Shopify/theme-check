@@ -9,7 +9,7 @@ module ThemeCheck
       def test_makes_links_out_of_render_tags
         content = <<~LIQUID
           {% render 'a' %}
-          {% render "b" %}
+          {%- render "b" -%}
         LIQUID
 
         engine = make_engine(
