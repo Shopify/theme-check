@@ -16,6 +16,7 @@ module ThemeCheck
 
           <!-- images -->
           <img alt="logo" src="{{ 'heart.png' | asset_url }}" width="100" height="100">
+          <img alt="logo" src="{{ 'heart.png' | asset_url }}" width="100" height="100"/>
           <source src="{{ 'heart.png' | asset_url }}">
 
           <!-- Good kind of URLs -->
