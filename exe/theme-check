@@ -3,4 +3,4 @@
 
 require "theme_check"
 
-ThemeCheck::Cli.new.run!(ARGV)
+ThemeCheck::Cli.parse_and_run(ARGV)
