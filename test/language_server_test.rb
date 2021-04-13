@@ -330,8 +330,7 @@ class LanguageServerTest < Minitest::Test
       .returns([
         OffenseMock.build(storage.path('layout/theme.liquid')),
       ])
-      # On second analysis, no more offenses
-      .then.returns([])
+      .then.returns([]) # On second analysis, no more offenses
 
     send_messages({
       "jsonrpc" => "2.0",

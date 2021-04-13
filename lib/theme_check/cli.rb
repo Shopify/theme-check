@@ -17,7 +17,7 @@ module ThemeCheck
     end
 
     def option_parser(parser = OptionParser.new, help: true)
-      return @option_parser if @option_parser
+      return @option_parser if defined?(@option_parser)
       @option_parser = parser
       @option_parser.banner = "Usage: theme-check [options] [/path/to/your/theme]"
 
