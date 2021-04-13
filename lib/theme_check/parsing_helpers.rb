@@ -6,7 +6,7 @@ module ThemeCheck
       scanner = StringScanner.new(markup)
 
       while scanner.scan(/.*?("|')/)
-        yield scanner.matched[..-2]
+        yield scanner.matched[0..-2]
         # Skip to the end of the string
         scanner.skip_until(scanner.matched[-1] == "'" ? /[^\\]'/ : /[^\\]"/)
       end

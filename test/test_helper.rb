@@ -69,7 +69,7 @@ module Minitest
       end
 
       def respond_to?(method)
-        method.start_with?("on_") || method.start_with?("after_") || super
+        method.to_s.start_with?("on_") || method.to_s.start_with?("after_") || super
       end
 
       def method_missing(method, node)
