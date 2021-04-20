@@ -29,10 +29,6 @@ module ThemeCheck
       @disabled_checks.update(node) if node.comment?
     end
 
-    def visit_children(node)
-      node.children.each { |child| visit(child) }
-    end
-
     def call_checks(method, *args)
       checks.call(method, *args)
     end
