@@ -20,6 +20,10 @@ module ThemeCheck
       @relative_pathname ||= Pathname.new(@relative_path)
     end
 
+    def source
+      @source ||= @storage.read(@relative_path)
+    end
+
     def content
       load!
       @content
@@ -39,7 +43,7 @@ module ThemeCheck
     def load!
       return if @loaded
 
-      @content = JSON.parse(@storage.read(@relative_path))
+      @content = JSON.parse(source)
     rescue JSON::ParserError => e
       @parser_error = e
     ensure
