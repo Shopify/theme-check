@@ -29,7 +29,7 @@ module ThemeCheck
         refute_nil(match, "Should find a document_link with target == '#{target}'")
 
         assert_equal(
-          from_index_to_line_column(content, content.index(needle)),
+          from_index_to_row_column(content, content.index(needle)),
           [
             match.dig(:range, :start, :line),
             match.dig(:range, :start, :character),
@@ -37,7 +37,7 @@ module ThemeCheck
         )
 
         assert_equal(
-          from_index_to_line_column(content, content.index(needle) + 1),
+          from_index_to_row_column(content, content.index(needle) + 1),
           [
             match.dig(:range, :end, :line),
             match.dig(:range, :end, :character),
