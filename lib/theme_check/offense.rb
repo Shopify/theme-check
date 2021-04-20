@@ -54,12 +54,20 @@ module ThemeCheck
       end
     end
 
+    def start_index
+      @position.start_index
+    end
+
     def start_line
       @position.start_row
     end
 
     def start_column
       @position.start_column
+    end
+
+    def end_index
+      @position.end_index
     end
 
     def end_line

@@ -130,11 +130,11 @@ module ThemeCheck
       @position ||= Position.new(markup, template&.source, line_number)
     end
 
-    def begin
+    def start_index
       position.start_index
     end
 
-    def end
+    def end_index
       position.end_index
     end
   end

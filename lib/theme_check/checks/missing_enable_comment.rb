@@ -17,13 +17,13 @@ module ThemeCheck
     end
 
     def after_document(node)
-      return if @disabled_checks.full_document_disabled?
-      return unless @disabled_checks.any?
+      checks_missing_end_index = @disabled_checks.checks_missing_end_index
+      return if checks_missing_end_index.empty?
 
-      message = if @disabled_checks.all_disabled?
+      message = if checks_missing_end_index.any? { |name| name == :all }
         "All checks were"
       else
-        @disabled_checks.all.join(', ') + " " + (@disabled_checks.all.size == 1 ? "was" : "were")
+        checks_missing_end_index.join(', ') + " " + (checks_missing_end_index.size == 1 ? "was" : "were")
       end
 
       add_offense("#{message} disabled but not re-enabled with theme-check-enable", node: node)

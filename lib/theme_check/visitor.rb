@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 module ThemeCheck
   class Visitor
+    attr_reader :checks
+
     def initialize(checks)
       @checks = checks
     end
@@ -8,6 +10,7 @@ module ThemeCheck
     def visit_template(template)
       @disabled_checks = DisabledChecks.new
       visit(Node.new(template.root, nil, template))
+      remove_disabled_offenses
     rescue Liquid::Error => exception
       exception.template_name = template.name
       call_checks(:on_error, exception)
@@ -33,12 +36,12 @@ module ThemeCheck
       checks.call(method, *args)
     end
 
-    def checks
-      return @checks unless @disabled_checks.any?
-
-      return @checks.always_enabled if @disabled_checks.all_disabled?
-
-      @checks.except_for(@disabled_checks)
+    def remove_disabled_offenses
+      checks.disableable.each do |check|
+        check.offenses.reject! do |offense|
+          @disabled_checks.disabled?(offense.code_name, offense.start_index)
+        end
+      end
     end
   end
 end
