@@ -6,8 +6,8 @@ module ThemeCheck
     include JsonHelpers
 
     attr_accessor :theme
-    attr_accessor :offenses
     attr_accessor :options
+    attr_writer :offenses
 
     SEVERITIES = [
       :error,
@@ -67,6 +67,10 @@ module ThemeCheck
         end
         defined?(@can_disable) ? @can_disable : true
       end
+    end
+
+    def offenses
+      @offenses ||= []
     end
 
     def severity
