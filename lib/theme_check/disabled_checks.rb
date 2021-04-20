@@ -1,6 +1,35 @@
 # frozen_string_literal: true
 
 module ThemeCheck
+  class DisabledCheck
+    Range = Struct.new(:begin, :end)
+
+    attr_reader :name
+    attr_accessor :currently_disabled
+
+    def initialize(name)
+      @name = name
+      @ranges = []
+      @currently_disabled = false
+    end
+
+    def begin=(index)
+      return unless @ranges.empty? || !last.end.nil?
+      @currently_disabled = true
+      @ranges << Range.new(index, nil)
+    end
+
+    def end=(index)
+      return if @ranges.empty? || !last.end.nil?
+      @currently_disabled = false
+      last.end = index
+    end
+
+    def last
+      @ranges.last
+    end
+  end
+
   class DisabledChecks
     DISABLE_START = 'theme-check-disable'
     DISABLE_END = 'theme-check-enable'
@@ -11,7 +40,7 @@ module ThemeCheck
     ACTION_UNRELATED_COMMENT = :unrelated
 
     def initialize
-      @disabled = []
+      @disabled_checks = {}
       @all_disabled = false
       @full_document_disabled = false
     end
@@ -20,15 +49,24 @@ module ThemeCheck
       text = comment_text(node)
 
       if start_disabling?(text)
-        @disabled = checks_from_text(text)
-        @all_disabled = @disabled.empty?
+        checks = checks_from_text(text)
+        @all_disabled = checks.empty?
+
+        checks.each do |check_name|
+          @disabled_checks[check_name] ||= DisabledCheck.new(check_name)
+          @disabled_checks[check_name].begin = node.begin
+        end
 
         if node&.line_number == 1
           @full_document_disabled = true
         end
       elsif stop_disabling?(text)
         checks = checks_from_text(text)
-        @disabled = checks.empty? ? [] : @disabled - checks
+
+        checks.each do |check_name|
+          next unless @disabled_checks.key?(check_name)
+          @disabled_checks[check_name].end = node.end
+        end
 
         @all_disabled = false
       end
@@ -36,7 +74,7 @@ module ThemeCheck
 
     # Whether any checks are currently disabled
     def any?
-      !@disabled.empty? || @all_disabled
+      !all.empty? || @all_disabled
     end
 
     # Whether all checks should be disabled
@@ -46,7 +84,7 @@ module ThemeCheck
 
     # Get a list of all the individual disabled checks
     def all
-      @disabled
+      @disabled_checks.values.select(&:currently_disabled).map(&:name)
     end
 
     # If the first line of the document is a theme-check-disable comment

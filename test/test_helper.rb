@@ -10,7 +10,8 @@ require "tmpdir"
 module Minitest
   class Test
     def parse_liquid(code)
-      ThemeCheck::Template.parse(code)
+      storage = make_storage("file.liquid" => code)
+      ThemeCheck::Template.new("file.liquid", storage)
     end
 
     def analyze_theme(*check_classes, templates)
