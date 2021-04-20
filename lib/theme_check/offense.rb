@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 module ThemeCheck
-  Position = Struct.new(:line, :column)
+  Position2 = Struct.new(:line, :column)
 
   class Offense
     MAX_SOURCE_EXCERPT_SIZE = 120
@@ -130,9 +130,9 @@ module ThemeCheck
     # 0-indexed, inclusive
     def start_position
       return @start_position if @start_position
-      return @start_position = Position.new(0, 0) unless line_number && markup
+      return @start_position = Position2.new(0, 0) unless line_number && markup
 
-      position = Position.new
+      position = Position2.new
       position.line = line_number - 1
       position.column = full_line(position.line).index(lines_of_content.first) || 0
 
@@ -143,9 +143,9 @@ module ThemeCheck
     # This is why it doesn't make sense to calculate them separately.
     def end_position
       return @end_position if @end_position
-      return @end_position = Position.new(0, 0) unless line_number && markup
+      return @end_position = Position2.new(0, 0) unless line_number && markup
 
-      position = Position.new
+      position = Position2.new
       position.line = start_line + lines_of_content.size - 1
       position.column = if start_line == position.line
         start_column + markup.size
