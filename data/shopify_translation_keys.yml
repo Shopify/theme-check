@@ -848,3 +848,4 @@
 - shopify.store_availability.pick_up_time.two_to_four_hours
 - shopify.store_availability.pick_up_time.immediately
 - shopify.store_availability.pick_up_time.next_day
+- shopify.online_store.spam_detection.disclaimer_html
