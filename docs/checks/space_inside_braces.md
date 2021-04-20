@@ -21,6 +21,10 @@ This check is aimed at eliminating ugly Liquid:
 <!-- Arround filter pipelines -->
 {{ url  | asset_url | img_tag }}
 {% assign my_upcase_string = "Hello world"| upcase %}
+
+<!-- Arround symbol operators -->
+{%- if target  == product and product.price_varies -%}
+{%- if product.featured_media.width >=165 -%}
 ```
 
 :+1: Examples of **correct** code for this check:
@@ -39,6 +43,8 @@ This check is aimed at eliminating ugly Liquid:
 %}
 {{ url | asset_url | img_tag }}
 {% assign my_upcase_string = "Hello world" | upcase %}
+{%- if target == product and product.price_varies -%}
+{%- if product.featured_media.width >= 165 -%}
 ```
 
 ## Check Options
