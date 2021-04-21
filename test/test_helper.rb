@@ -10,7 +10,8 @@ require "tmpdir"
 module Minitest
   class Test
     def parse_liquid(code)
-      ThemeCheck::Template.parse(code)
+      storage = make_storage("file.liquid" => code)
+      ThemeCheck::Template.new("file.liquid", storage)
     end
 
     def analyze_theme(*check_classes, templates)
@@ -54,6 +55,14 @@ module Minitest
     end
 
     def assert_offenses(output, offenses)
+      # Making sure nothing blows up in the language_server
+      offenses.each do |offense|
+        assert(offense.start_line)
+        assert(offense.start_column)
+        assert(offense.end_line)
+        assert(offense.end_column)
+      end
+
       assert_equal(output.chomp, offenses.sort_by(&:location).join("\n"))
     end
 

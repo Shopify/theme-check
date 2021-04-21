@@ -52,7 +52,6 @@ class LocaleDiffTest < Minitest::Test
       { "title" => "Hello" },
     )
     check = MockCheck.new
-    check.offenses = []
     diff.add_as_offenses(check, key_prefix: ["locales"])
     assert_offenses(<<~END, check.offenses)
       Extra translation keys: locales.title

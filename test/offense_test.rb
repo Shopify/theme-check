@@ -91,23 +91,25 @@ class OffenseTest < Minitest::Test
   end
 
   def test_multiline_markup_location_with_trailing_new_line
+    markup = "render 'product-card',\n  product: product,\n  show: true\n\n\n"
     node = stub(
-      template: @theme["templates/multiline"],
+      template: make_theme("stub.liquid" => "{% #{markup}%}")["stub"],
       line_number: 1,
-      markup: "render 'product-card',\n  product: product,\n  show: true\n\n\n",
+      markup: markup
     )
     offense = ThemeCheck::Offense.new(check: Bogus.new, node: node)
     assert_equal(0, offense.start_line)
     assert_equal(3, offense.start_column)
-    assert_equal(4, offense.end_line)
+    assert_equal(5, offense.end_line)
     assert_equal(0, offense.end_column)
   end
 
   def test_multiline_markup_location_with_multiple_new_lines_back_to_back
+    markup = "render 'product-card',\n\n\n  product: product"
     node = stub(
-      template: @theme["templates/multiline"],
+      template: make_theme("stub.liquid" => "{% #{markup}%}")["stub"],
       line_number: 1,
-      markup: "render 'product-card',\n\n\n  product: product",
+      markup: markup
     )
     offense = ThemeCheck::Offense.new(check: Bogus.new, node: node)
     assert_equal(0, offense.start_line)
@@ -126,6 +128,6 @@ class OffenseTest < Minitest::Test
     assert_equal(0, offense.start_line)
     assert_equal(0, offense.end_line)
     assert_equal(0, offense.start_column)
-    assert_equal(0, offense.end_column)
+    assert_equal(3, offense.end_column)
   end
 end

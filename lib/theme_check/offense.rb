@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 module ThemeCheck
-  Position = Struct.new(:line, :column)
-
   class Offense
     MAX_SOURCE_EXCERPT_SIZE = 120
 
@@ -20,6 +18,7 @@ module ThemeCheck
       end
 
       @node = node
+      @template = nil
       if node
         @template = node.template
       elsif template
@@ -40,8 +39,7 @@ module ThemeCheck
         @node.line_number
       end
 
-      @start_position = nil
-      @end_position = nil
+      @position = Position.new(@markup, @template&.source, @line_number)
     end
 
     def source_excerpt
@@ -56,20 +54,28 @@ module ThemeCheck
       end
     end
 
+    def start_index
+      @position.start_index
+    end
+
     def start_line
-      start_position.line
+      @position.start_row
     end
 
     def start_column
-      start_position.column
+      @position.start_column
+    end
+
+    def end_index
+      @position.end_index
     end
 
     def end_line
-      end_position.line
+      @position.end_row
     end
 
     def end_column
-      end_position.column
+      @position.end_column
     end
 
     def code_name
@@ -114,46 +120,6 @@ module ThemeCheck
       else
         message
       end
-    end
-
-    private
-
-    def full_line(line)
-      # Liquid::Template is 1-indexed.
-      template.full_line(line + 1)
-    end
-
-    def lines_of_content
-      @lines ||= markup.lines.map { |x| x.sub(/\n$/, '') }
-    end
-
-    # 0-indexed, inclusive
-    def start_position
-      return @start_position if @start_position
-      return @start_position = Position.new(0, 0) unless line_number && markup
-
-      position = Position.new
-      position.line = line_number - 1
-      position.column = full_line(position.line).index(lines_of_content.first) || 0
-
-      @start_position = position
-    end
-
-    # 0-indexed, exclusive. It's the line + col that are exclusive.
-    # This is why it doesn't make sense to calculate them separately.
-    def end_position
-      return @end_position if @end_position
-      return @end_position = Position.new(0, 0) unless line_number && markup
-
-      position = Position.new
-      position.line = start_line + lines_of_content.size - 1
-      position.column = if start_line == position.line
-        start_column + markup.size
-      else
-        lines_of_content.last.size
-      end
-
-      @end_position = position
     end
   end
 end

@@ -12,7 +12,7 @@ module ThemeCheck
 
       def completions(relative_path, line, col)
         buffer = @storage.read(relative_path)
-        cursor = from_line_column_to_index(buffer, line, col)
+        cursor = from_row_column_to_index(buffer, line, col)
         token = find_token(buffer, cursor)
         return [] if token.nil?
 

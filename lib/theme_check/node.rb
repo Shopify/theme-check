@@ -125,5 +125,17 @@ module ThemeCheck
       start = template.full_line(line_number).index(markup)
       [start, start + markup.length - 1]
     end
+
+    def position
+      @position ||= Position.new(markup, template&.source, line_number)
+    end
+
+    def start_index
+      position.start_index
+    end
+
+    def end_index
+      position.end_index
+    end
   end
 end

@@ -14,12 +14,12 @@ module ThemeCheck
         buffer = @storage.read(relative_path)
         return [] unless buffer
         matches(buffer, PARTIAL_RENDER).map do |match|
-          start_line, start_character = from_index_to_line_column(
+          start_line, start_character = from_index_to_row_column(
             buffer,
             match.begin(:partial),
           )
 
-          end_line, end_character = from_index_to_line_column(
+          end_line, end_character = from_index_to_row_column(
             buffer,
             match.end(:partial)
           )

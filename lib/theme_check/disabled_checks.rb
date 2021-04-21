@@ -8,50 +8,36 @@ module ThemeCheck
 
     ACTION_DISABLE_CHECKS = :disable
     ACTION_ENABLE_CHECKS = :enable
-    ACTION_UNRELATED_COMMENT = :unrelated
 
     def initialize
-      @disabled = []
-      @all_disabled = false
-      @full_document_disabled = false
+      @disabled_checks = {}
     end
 
     def update(node)
       text = comment_text(node)
-
       if start_disabling?(text)
-        @disabled = checks_from_text(text)
-        @all_disabled = @disabled.empty?
-
-        if node&.line_number == 1
-          @full_document_disabled = true
+        checks_from_text(text).each do |check_name|
+          @disabled_checks[check_name] ||= DisabledCheck.new(check_name)
+          @disabled_checks[check_name].start_index = node.start_index
+          @disabled_checks[check_name].first_line = true if node.line_number == 1
         end
       elsif stop_disabling?(text)
-        checks = checks_from_text(text)
-        @disabled = checks.empty? ? [] : @disabled - checks
-
-        @all_disabled = false
+        checks_from_text(text).each do |check_name|
+          next unless @disabled_checks.key?(check_name)
+          @disabled_checks[check_name].end_index = node.end_index
+        end
       end
     end
 
-    # Whether any checks are currently disabled
-    def any?
-      !@disabled.empty? || @all_disabled
+    def disabled?(key, index)
+      @disabled_checks[:all]&.disabled?(index) ||
+        @disabled_checks[key]&.disabled?(index)
     end
 
-    # Whether all checks should be disabled
-    def all_disabled?
-      @all_disabled
-    end
-
-    # Get a list of all the individual disabled checks
-    def all
-      @disabled
-    end
-
-    # If the first line of the document is a theme-check-disable comment
-    def full_document_disabled?
-      @full_document_disabled
+    def checks_missing_end_index
+      @disabled_checks.values
+        .select(&:missing_end_index?)
+        .map(&:name)
     end
 
     private
@@ -69,9 +55,11 @@ module ThemeCheck
     end
 
     # Return a list of checks from a theme-check-disable comment
-    # Returns [] if all checks are meant to be disabled
+    # Returns [:all] if all checks are meant to be disabled
     def checks_from_text(text)
-      text.gsub(DISABLE_PREFIX_PATTERN, '').strip.split(',').map(&:strip)
+      checks = text.gsub(DISABLE_PREFIX_PATTERN, '').strip.split(',').map(&:strip)
+      return [:all] if checks.empty?
+      checks
     end
   end
 end
