@@ -17,6 +17,10 @@ This check is aimed at eliminating ugly Liquid:
 <!-- After commas and semicolons -->
 {% form 'type',  object, key:value %}
 {% endform %}
+
+<!-- Arround filter pipelines -->
+{{ url  | asset_url | img_tag }}
+{% assign my_upcase_string = "Hello world"| upcase %}
 ```
 
 :+1: Examples of **correct** code for this check:
@@ -33,6 +37,8 @@ This check is aimed at eliminating ugly Liquid:
   media_size: section.settings.product_recommendations_image_ratio,
   center_align_text: section.settings.center_align_text
 %}
+{{ url | asset_url | img_tag }}
+{% assign my_upcase_string = "Hello world" | upcase %}
 ```
 
 ## Check Options
