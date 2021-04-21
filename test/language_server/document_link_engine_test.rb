@@ -8,18 +8,26 @@ module ThemeCheck
 
       def test_makes_links_out_of_render_tags
         content = <<~LIQUID
-          {% render 'a' %}
-          {%- render "b" -%}
+          {% render '1' %}
+          {%- render "2" -%}
+          {% liquid
+            assign x = "x"
+            render '3'
+          %}
+          {%- liquid
+            assign x = "x"
+            render "4"
+          -%}
         LIQUID
 
         engine = make_engine(
-          "snippets/a.liquid" => "",
-          "snippets/b.liquid" => "",
           "templates/product.liquid" => content,
         )
 
-        assert_links_include("a", content, engine.document_links("templates/product.liquid"))
-        assert_links_include("b", content, engine.document_links("templates/product.liquid"))
+        assert_links_include("1", content, engine.document_links("templates/product.liquid"))
+        assert_links_include("2", content, engine.document_links("templates/product.liquid"))
+        assert_links_include("3", content, engine.document_links("templates/product.liquid"))
+        assert_links_include("4", content, engine.document_links("templates/product.liquid"))
       end
 
       def assert_links_include(needle, content, links)
