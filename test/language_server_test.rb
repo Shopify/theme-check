@@ -405,6 +405,26 @@ class LanguageServerTest < Minitest::Test
     })
   end
 
+  def test_handles_on_initialize_with_null_paths
+    send_messages({
+      "jsonrpc" => "2.0",
+      "id" => "123",
+      "method" => "initialize",
+      "params" => {
+        "rootPath" => nil,
+        "rootUri" => nil,
+      },
+    })
+
+    assert_responses({
+      "jsonrpc" => "2.0",
+      "id" => "123",
+      "result" => {
+        "capabilities" => {},
+      },
+    })
+  end
+
   private
 
   def send_messages(*messages)
