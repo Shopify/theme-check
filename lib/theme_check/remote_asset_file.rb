@@ -35,6 +35,9 @@ module ThemeCheck
       end
 
       @content = res.body
+
+    rescue OpenSSL::SSL::SSLError, Zlib::StreamError, *NET_HTTP_EXCEPTIONS
+      @contents = ''
     end
 
     def gzipped_size
