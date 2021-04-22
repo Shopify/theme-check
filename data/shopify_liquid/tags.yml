@@ -8,6 +8,8 @@
 - cycle
 - decrement
 - echo
+- else
+- elsif
 - for
 - form
 - if
@@ -25,3 +27,4 @@
 - stylesheet
 - tablerow
 - unless
+- when
