@@ -23,17 +23,17 @@ module ThemeCheck
       end
 
       def on_initialize(id, params)
-        @root_path = params["rootPath"]
+        @root_path = path_from_uri(params["rootUri"]) || params["rootPath"]
+
+        # Tell the client we don't support anything if there's no rootPath
+        return send_response(id, { capabilities: {} }) if @root_path.nil?
         @storage = in_memory_storage(@root_path)
         @completion_engine = CompletionEngine.new(@storage)
         @document_link_engine = DocumentLinkEngine.new(@storage)
         # https://microsoft.github.io/language-server-protocol/specifications/specification-current/#responseMessage
-        send_response(
-          id: id,
-          result: {
-            capabilities: CAPABILITIES,
-          }
-        )
+        send_response(id, {
+          capabilities: CAPABILITIES,
+        })
       end
 
       def on_exit(_id, _params)
@@ -63,20 +63,14 @@ module ThemeCheck
 
       def on_text_document_document_link(id, params)
         relative_path = relative_path_from_text_document_uri(params)
-        send_response(
-          id: id,
-          result: document_links(relative_path)
-        )
+        send_response(id, document_links(relative_path))
       end
 
       def on_text_document_completion(id, params)
         relative_path = relative_path_from_text_document_uri(params)
         line = params.dig('position', 'line')
         col = params.dig('position', 'character')
-        send_response(
-          id: id,
-          result: completions(relative_path, line, col)
-        )
+        send_response(id, completions(relative_path, line, col))
       end
 
       private
@@ -99,7 +93,11 @@ module ThemeCheck
       end
 
       def text_document_uri(params)
-        params.dig('textDocument', 'uri').sub('file://', '')
+        path_from_uri(params.dig('textDocument', 'uri'))
+      end
+
+      def path_from_uri(uri)
+        uri&.sub('file://', '')
       end
 
       def relative_path_from_text_document_uri(params)
@@ -167,13 +165,10 @@ module ThemeCheck
 
       def send_diagnostic(path, offenses)
         # https://microsoft.github.io/language-server-protocol/specifications/specification-current/#notificationMessage
-        send_response(
-          method: 'textDocument/publishDiagnostics',
-          params: {
-            uri: "file://#{path}",
-            diagnostics: offenses.map { |offense| offense_to_diagnostic(offense) },
-          },
-        )
+        send_notification('textDocument/publishDiagnostics', {
+          uri: "file://#{path}",
+          diagnostics: offenses.map { |offense| offense_to_diagnostic(offense) },
+        })
       end
 
       def offense_to_diagnostic(offense)
@@ -220,9 +215,22 @@ module ThemeCheck
         }
       end
 
-      def send_response(message)
+      def send_message(message)
         message[:jsonrpc] = '2.0'
         @server.send_response(message)
+      end
+
+      def send_response(id, result = nil, error = nil)
+        message = { id: id }
+        message[:result] = result if result
+        message[:error] = error if error
+        send_message(message)
+      end
+
+      def send_notification(method, params)
+        message = { method: method }
+        message[:params] = params
+        send_message(message)
       end
 
       def log(message)
