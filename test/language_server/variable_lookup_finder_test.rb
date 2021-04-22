@@ -184,6 +184,12 @@ module ThemeCheck
       end
 
       def assert_can_lookup(token, expected_markup, offset = 0)
+        # Make sure nothing blows up by doing lookups at every point
+        # in every test strings.
+        (0...token.size).each do |i|
+          assert(VariableLookupFinder.lookup(token, i) || true)
+        end if ENV["PARANOID"]
+
         assert_equal(
           Liquid::VariableLookup.parse(expected_markup),
           VariableLookupFinder.lookup(token, token.size + offset),
@@ -203,6 +209,12 @@ module ThemeCheck
       end
 
       def refute_can_lookup(token, offset = 0)
+        # Make sure nothing blows up by doing lookups at every point
+        # in every test strings.
+        (0...token.size).each do |i|
+          assert(VariableLookupFinder.lookup(token, i) || true)
+        end if ENV["PARANOID"]
+
         assert_nil(
           VariableLookupFinder.lookup(token, token.size + offset),
           <<~ERRMSG,
