@@ -1,4 +1,14 @@
 
+0.8.1 / 2021-04-22
+==================
+
+  * Add consistent spacing around the pipe character (`|`) in variable expressions to the `SpaceInsideBrace` check ([#73](https://github.com/shopify/theme-check/issues/73))
+  * Add ReCaptcha system translation ([#265](https://github.com/shopify/theme-check/issues/265))
+  * Fix document links in `{% liquid %}` tags ([#263](https://github.com/shopify/theme-check/issues/263))
+  * Fix theme-check-disable for checks based on regular expressions ([#242](https://github.com/shopify/theme-check/issues/242))
+  * Fix VS Code crash on new window ([#264](https://github.com/shopify/theme-check/issues/264))
+  * Rescue errors thrown by remote_asset_file
+
 0.8.0 / 2021-04-13
 ==================
 
