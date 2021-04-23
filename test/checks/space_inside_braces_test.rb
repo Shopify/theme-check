@@ -107,7 +107,7 @@ class SpaceInsideBracesTest < Minitest::Test
     END
   end
 
-  def test_dont_report_with_proper_spaces
+  def test_dont_report_on_proper_spaces_around_pipeline
     offenses = analyze_theme(
       ThemeCheck::SpaceInsideBraces.new,
       "templates/index.liquid" => <<~END,
@@ -170,5 +170,117 @@ class SpaceInsideBracesTest < Minitest::Test
     sources.each do |path, source|
       assert_equal(expected_sources[path], source)
     end
+  end
+
+  def test_reports_extra_space_after_operators
+    offenses = analyze_theme(
+      ThemeCheck::SpaceInsideBraces.new,
+      "templates/index.liquid" => <<~END,
+        {%- if x >  y -%}{%- endif -%}
+        {%- if x <  y -%}{%- endif -%}
+        {%- if x ==  "x" -%}{%- endif -%}
+        {%- if x !=  "x" -%}{%- endif -%}
+        {%- if x >=  y -%}{%- endif -%}
+        {%- if x <=  y -%}{%- endif -%}
+        {%- if x <>  y -%}{%- endif -%}
+      END
+    )
+    assert_offenses(<<~END, offenses)
+      Too many spaces after '>' at templates/index.liquid:1
+      Too many spaces after '<' at templates/index.liquid:2
+      Too many spaces after '==' at templates/index.liquid:3
+      Too many spaces after '!=' at templates/index.liquid:4
+      Too many spaces after '>=' at templates/index.liquid:5
+      Too many spaces after '<=' at templates/index.liquid:6
+      Too many spaces after '<>' at templates/index.liquid:7
+    END
+  end
+
+  def test_reports_missing_space_after_operators
+    offenses = analyze_theme(
+      ThemeCheck::SpaceInsideBraces.new,
+      "templates/index.liquid" => <<~END,
+        {%- if x >y -%}{%- endif -%}
+        {%- if x <y -%}{%- endif -%}
+        {%- if x =="x" -%}{%- endif -%}
+        {%- if x !="x" -%}{%- endif -%}
+        {%- if x >=y -%}{%- endif -%}
+        {%- if x <=y -%}{%- endif -%}
+        {%- if x <>y -%}{%- endif -%}
+      END
+    )
+    assert_offenses(<<~END, offenses)
+      Space missing after '>' at templates/index.liquid:1
+      Space missing after '<' at templates/index.liquid:2
+      Space missing after '==' at templates/index.liquid:3
+      Space missing after '!=' at templates/index.liquid:4
+      Space missing after '>=' at templates/index.liquid:5
+      Space missing after '<=' at templates/index.liquid:6
+      Space missing after '<>' at templates/index.liquid:7
+    END
+  end
+
+  def test_reports_extra_space_before_operators
+    offenses = analyze_theme(
+      ThemeCheck::SpaceInsideBraces.new,
+      "templates/index.liquid" => <<~END,
+        {%- if x  > y -%}{%- endif -%}
+        {%- if x  < y -%}{%- endif -%}
+        {%- if x  == "x" -%}{%- endif -%}
+        {%- if x  != "x" -%}{%- endif -%}
+        {%- if x  >= y -%}{%- endif -%}
+        {%- if x  <= y -%}{%- endif -%}
+        {%- if x  <> y -%}{%- endif -%}
+      END
+    )
+    assert_offenses(<<~END, offenses)
+      Too many spaces before '>' at templates/index.liquid:1
+      Too many spaces before '<' at templates/index.liquid:2
+      Too many spaces before '==' at templates/index.liquid:3
+      Too many spaces before '!=' at templates/index.liquid:4
+      Too many spaces before '>=' at templates/index.liquid:5
+      Too many spaces before '<=' at templates/index.liquid:6
+      Too many spaces before '<>' at templates/index.liquid:7
+    END
+  end
+
+  def test_reports_missing_space_before_operators
+    offenses = analyze_theme(
+      ThemeCheck::SpaceInsideBraces.new,
+      "templates/index.liquid" => <<~END,
+        {%- if x> y -%}{%- endif -%}
+        {%- if x< y -%}{%- endif -%}
+        {%- if x== "x" -%}{%- endif -%}
+        {%- if x!= "x" -%}{%- endif -%}
+        {%- if x>= y -%}{%- endif -%}
+        {%- if x<= y -%}{%- endif -%}
+        {%- if x<> y -%}{%- endif -%}
+      END
+    )
+    assert_offenses(<<~END, offenses)
+      Space missing before '>' at templates/index.liquid:1
+      Space missing before '<' at templates/index.liquid:2
+      Space missing before '==' at templates/index.liquid:3
+      Space missing before '!=' at templates/index.liquid:4
+      Space missing before '>=' at templates/index.liquid:5
+      Space missing before '<=' at templates/index.liquid:6
+      Space missing before '<>' at templates/index.liquid:7
+    END
+  end
+
+  def test_dont_report_with_correct_spaces_around_operators
+    offenses = analyze_theme(
+      ThemeCheck::SpaceInsideBraces.new,
+      "templates/index.liquid" => <<~END,
+        {%- if x > y -%}{%- endif -%}
+        {%- if x < y -%}{%- endif -%}
+        {%- if x == "x" -%}{%- endif -%}
+        {%- if x != "x" -%}{%- endif -%}
+        {%- if x >= y -%}{%- endif -%}
+        {%- if x <= y -%}{%- endif -%}
+        {%- if x <> y -%}{%- endif -%}
+      END
+    )
+    assert_offenses('', offenses)
   end
 end
