@@ -167,69 +167,46 @@ module ThemeCheck
         is_liquid_tag = markup =~ tag_regex('liquid')
         ends_with_blank_potential_lookup = markup =~ ENDS_WITH_BLANK_POTENTIAL_LOOKUP
         last_line = markup.rstrip.lines.last
+        markup = "{% #{last_line}" if is_liquid_tag
 
         # Close the tag
-        markup += ' %}' unless is_liquid_tag
-        markup = "{% liquid \n#{last_line}" if is_liquid_tag
+        markup += ' %}'
 
         # if statements
         is_if_tag = markup =~ tag_regex('if')
-        is_if_liquid_tag = is_liquid_tag && last_line =~ liquid_tag_regex('if')
-        return :empty_lookup_markup if (is_if_tag || is_if_liquid_tag) && ends_with_blank_potential_lookup
+        return :empty_lookup_markup if is_if_tag && ends_with_blank_potential_lookup
         markup += '{% endif %}' if is_if_tag
-        markup += "\n endif" if is_if_liquid_tag
 
         # unless statements
-        is_unless_liquid_tag = is_liquid_tag && last_line =~ liquid_tag_regex('unless')
         is_unless_tag = markup =~ tag_regex('unless')
-        return :empty_lookup_markup if (is_unless_tag || is_unless_liquid_tag) && ends_with_blank_potential_lookup
+        return :empty_lookup_markup if is_unless_tag && ends_with_blank_potential_lookup
         markup += '{% endunless %}' if is_unless_tag
-        markup += "\n endunless" if is_unless_liquid_tag
 
         # elsif statements
         is_elsif_tag = markup =~ tag_regex('elsif')
-        is_elsif_liquid_tag = is_liquid_tag && last_line =~ liquid_tag_regex('elsif')
-        return :empty_lookup_markup if (is_elsif_tag || is_elsif_liquid_tag) && ends_with_blank_potential_lookup
+        return :empty_lookup_markup if is_elsif_tag && ends_with_blank_potential_lookup
         markup = '{% if x %}' + markup + '{% endif %}' if is_elsif_tag
-        if is_elsif_liquid_tag
-          markup = <<~LIQUID
-            {% liquid
-              if x
-              #{markup.lines[-1]}
-              endif
-          LIQUID
-        end
 
         # case statements
         is_case_tag = markup =~ tag_regex('case')
-        is_case_liquid_tag = is_liquid_tag && last_line =~ liquid_tag_regex('case')
-        return :empty_lookup_markup if (is_case_tag || is_case_liquid_tag) && ends_with_blank_potential_lookup
+        return :empty_lookup_markup if is_case_tag && ends_with_blank_potential_lookup
         markup += "{% endcase %}" if is_case_tag
-        markup += "\n endcase" if is_case_liquid_tag
 
         # when
         is_when_tag = markup =~ tag_regex('when')
-        is_when_liquid_tag = is_liquid_tag && last_line =~ liquid_tag_regex('when')
-        return :empty_lookup_markup if (is_when_tag || is_when_liquid_tag) && ends_with_blank_potential_lookup
+        return :empty_lookup_markup if is_when_tag && ends_with_blank_potential_lookup
         markup = "{% case x %}" + markup + "{% endcase %}" if is_when_tag
-        markup = "{% liquid\n case x\n #{last_line}\n endcase\n" if is_when_liquid_tag
 
         # for statements
         is_for_tag = markup =~ tag_regex('for')
-        is_for_liquid_tag = is_liquid_tag && last_line =~ liquid_tag_regex('for')
-        return :empty_lookup_markup if (is_for_tag || is_for_liquid_tag) && ends_with_blank_potential_lookup
+        return :empty_lookup_markup if is_for_tag && ends_with_blank_potential_lookup
         markup += "{% endfor %}" if is_for_tag
-        markup += "\n endfor" if is_for_liquid_tag
 
         # tablerow statements
         is_tablerow_tag = markup =~ tag_regex('tablerow')
-        is_tablerow_liquid_tag = is_liquid_tag && last_line =~ liquid_tag_regex('tablerow')
-        return :empty_lookup_markup if (is_tablerow_tag || is_tablerow_liquid_tag) && ends_with_blank_potential_lookup
+        return :empty_lookup_markup if is_tablerow_tag && ends_with_blank_potential_lookup
         markup += "{% endtablerow %}" if is_tablerow_tag
-        markup += "\n endtablerow" if is_tablerow_liquid_tag
 
-        # closing liquid tag
-        markup += "\n%}" if is_liquid_tag
         markup
       end
 
@@ -312,10 +289,6 @@ module ThemeCheck
 
       def tag_regex(tag)
         ShopifyLiquid::Tag.tag_regex(tag)
-      end
-
-      def liquid_tag_regex(tag)
-        ShopifyLiquid::Tag.liquid_tag_regex(tag)
       end
     end
   end
