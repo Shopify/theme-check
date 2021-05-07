@@ -56,6 +56,22 @@ SpaceInsideBraces:
   enabled: true
 ```
 
+## Auto-correction
+
+This check can automatically trim or add spaces around `{{ ... }}`.
+
+```liquid
+{{ x}}
+{{x}}
+{{  x  }}
+```
+
+Can all be auto-corrected with the `--auto-correct` option to:
+
+```liquid
+{{ x }}
+```
+
 ## When Not To Use It
 
 If you don't care about the look of your code.
