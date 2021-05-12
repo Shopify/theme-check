@@ -34,18 +34,19 @@ module ThemeCheck
       node_class = node.respond_to?(:value) ? node.value.class : "?"
 
       ThemeCheck.bug(<<~EOS)
-        Exception while running #{check.code_name}##{method}:
+        Exception while running `#{check.code_name}##{method}`:
+        ```
+        #{e.class}: #{e.message}
+          #{e.backtrace.join("\n  ")}
+        ```
 
-          #{e.class}: #{e.message}
-            #{e.backtrace.join("\n    ")}
-
-        Template: #{template}
-        Node: #{node_class}
+        Template: `#{template}`
+        Node: `#{node_class}`
         Markup:
         ```
         #{markup}
         ```
-        Check options: #{check.options.pretty_inspect}
+        Check options: `#{check.options.pretty_inspect}`
       EOS
     end
   end
