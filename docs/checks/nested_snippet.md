@@ -45,7 +45,7 @@ The default configuration for this check is the following:
 ```yaml
 NestedSnippet:
   enabled: true
-  max_nesting_level: 2
+  max_nesting_level: 3
 ```
 
 ### `max_nesting_level`

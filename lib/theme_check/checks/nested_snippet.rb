@@ -20,7 +20,7 @@ module ThemeCheck
       end
     end
 
-    def initialize(max_nesting_level: 2)
+    def initialize(max_nesting_level: 3)
       @max_nesting_level = max_nesting_level
       @templates = {}
     end

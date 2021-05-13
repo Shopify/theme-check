@@ -17,7 +17,7 @@ MissingTemplate:
 
 NestedSnippet:
   enabled: true
-  max_nesting_level: 2
+  max_nesting_level: 3
 
 RequiredLayoutThemeObject:
   enabled: true
