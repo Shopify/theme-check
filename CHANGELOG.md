@@ -1,4 +1,17 @@
 
+v0.8.3 / 2021-05-17
+==================
+
+  * Making sure VERSION is set before referencing it
+
+v0.8.2 / 2021-05-14
+===================
+
+  * Bump NestedSnippet max_nesting_level to 3
+  * Add a message to help debug errors, and timeout checks after 5 sec
+  * Object Completions Everywhere!
+  * Include operators to space inside braces check
+
 0.8.1 / 2021-04-22
 ==================
 
