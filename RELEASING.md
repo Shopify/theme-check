@@ -9,11 +9,13 @@
    rake prerelease[$VERSION]
    ```
 
-3. Commit your changes and make a PR.
+3. Run [`git changelog`](https://github.com/tj/git-extras) to update `CHANGELOG.md`.
 
-4. Merge your PR to master.
+4. Commit your changes and make a PR.
 
-5. On [Shipit](https://shipit.shopify.io/shopify/theme-check/rubygems), deploy your commit.
+5. Merge your PR to master.
+
+6. On [Shipit](https://shipit.shopify.io/shopify/theme-check/rubygems), deploy your commit.
 
 ## Homebrew Release Process
 
