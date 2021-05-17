@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require 'theme_check/version'
 
 module ThemeCheck
   BUG_POSTAMBLE = <<~EOS
