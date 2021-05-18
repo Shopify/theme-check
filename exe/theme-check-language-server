@@ -6,6 +6,9 @@ require 'theme_check'
 if ENV["THEME_CHECK_DEBUG"] == "true"
   $DEBUG = true
 end
+if ENV["THEME_CHECK_TRACE_FILE"]
+  ThemeCheck.trace!(ENV["THEME_CHECK_TRACE_FILE"])
+end
 # Force encoding to UTF-8 to fix VSCode
 Encoding.default_external = Encoding::UTF_8
 status_code = ThemeCheck::LanguageServer.start
