@@ -43,14 +43,14 @@ module ThemeCheck
         rescue Exception => e # rubocop:disable Lint/RescueException
           raise e if should_raise_errors
           log(e)
-          log(e.backtrace)
+          debug(e.backtrace)
           return 1
         end
       end
 
       def send_response(response)
         response_body = JSON.dump(response)
-        log(JSON.pretty_generate(response)) if $DEBUG
+        log(response_body)
 
         @out.write("Content-Length: #{response_body.size}\r\n")
         @out.write("\r\n")
@@ -58,9 +58,16 @@ module ThemeCheck
         @out.flush
       end
 
-      def log(message)
-        @err.puts(message)
-        @err.flush
+      def log(message, err: true)
+        ThemeCheck.trace("LSP: #{message}") if ThemeCheck.trace?
+        if err
+          @err.puts(message)
+          @err.flush
+        end
+      end
+
+      def debug(message)
+        log(message, err: $DEBUG)
       end
 
       private
@@ -85,7 +92,7 @@ module ThemeCheck
       def process_request
         request_body = read_new_content
         request_json = JSON.parse(request_body)
-        log(JSON.pretty_generate(request_json)) if $DEBUG
+        log(request_body)
 
         id = request_json['id']
         method_name = request_json['method']
@@ -93,7 +100,9 @@ module ThemeCheck
         method_name = "on_#{to_snake_case(method_name)}"
 
         if @handler.respond_to?(method_name)
-          @handler.send(method_name, id, params)
+          ThemeCheck.trace("LSP: calling #{method_name}") do
+            @handler.send(method_name, id, params)
+          end
         end
       end
 
@@ -124,7 +133,7 @@ module ThemeCheck
             content += @in.read(length + 2)
           rescue => e
             log(e)
-            log(e.backtrace)
+            debug(e.backtrace)
             # We have almost certainly been disconnected from the server
             cleanup
             raise DoneStreaming

@@ -59,6 +59,10 @@ module ThemeCheck
         "List enabled checks"
       ) { @command = :list }
       @option_parser.on(
+        "-t", "--trace FILE",
+        "Output tracing info while running checks"
+      ) { |file| ThemeCheck.trace!(file) }
+      @option_parser.on(
         "-v", "--version",
         "Print Theme Check version"
       ) { @command = :version }

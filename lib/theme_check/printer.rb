@@ -2,6 +2,8 @@
 
 module ThemeCheck
   class Printer
+    include Colorize
+
     def print(theme, offenses, auto_correct)
       offenses.each do |offense|
         print_offense(offense, auto_correct)
@@ -41,10 +43,6 @@ module ThemeCheck
 
     private
 
-    def colorize(str, color_code)
-      "\e[#{color_code}m#{str}\e[0m"
-    end
-
     def colorized_severity(severity)
       case severity
       when :error
@@ -54,30 +52,6 @@ module ThemeCheck
       when :style
         light_blue(severity)
       end
-    end
-
-    def red(str)
-      colorize(str, 31)
-    end
-
-    def green(str)
-      colorize(str, 32)
-    end
-
-    def yellow(str)
-      colorize(str, 33)
-    end
-
-    def blue(str)
-      colorize(str, 34)
-    end
-
-    def pink(str)
-      colorize(str, 35)
-    end
-
-    def light_blue(str)
-      colorize(str, 36)
     end
   end
 end

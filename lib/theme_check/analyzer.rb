@@ -37,12 +37,20 @@ module ThemeCheck
     end
 
     def analyze_theme
-      offenses_clear!
-      @theme.liquid.each { |template| @visitor.visit_template(template) }
-      @theme.json.each { |json_file| @json_checks.call(:on_file, json_file) }
-      @liquid_checks.call(:on_end)
-      @json_checks.call(:on_end)
-      offenses
+      if ThemeCheck.trace?
+        ThemeCheck.trace("Analyzing theme ...")
+        ThemeCheck.trace("#{@theme.all.size} files")
+        ThemeCheck.trace("#{@theme.liquid.size} Liquid files")
+        ThemeCheck.trace("#{@theme.json.size} JSON files")
+      end
+      ThemeCheck.trace("Analyzed theme") do
+        offenses_clear!
+        @theme.liquid.each { |template| @visitor.visit_template(template) }
+        @theme.json.each { |json_file| @json_checks.call(:on_file, json_file) }
+        @liquid_checks.call(:on_end)
+        @json_checks.call(:on_end)
+        offenses
+      end
     end
 
     def uncorrectable_offenses

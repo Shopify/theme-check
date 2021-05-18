@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 require "liquid"
 
-require_relative "theme_check/bug"
+require_relative "theme_check/colorize"
+require_relative "theme_check/logging"
 require_relative "theme_check/exceptions"
 require_relative "theme_check/analyzer"
 require_relative "theme_check/check"

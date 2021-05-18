@@ -22,14 +22,17 @@ module ThemeCheck
       return unless check.respond_to?(method) && !check.ignored?
 
       Timeout.timeout(CHECK_METHOD_TIMEOUT) do
-        check.send(method, *args)
+        template = extract_template(args) if ThemeCheck.trace?
+        ThemeCheck.trace("Running #{check.code_name}##{method} on #{template}") do
+          check.send(method, *args)
+        end
       end
     rescue Liquid::Error
       # Pass-through Liquid errors
       raise
     rescue => e
       node = args.first
-      template = node.respond_to?(:template) ? node.template.relative_path : "?"
+      template = extract_template(args)
       markup = node.respond_to?(:markup) ? node.markup : ""
       node_class = node.respond_to?(:value) ? node.value.class : "?"
 
@@ -48,6 +51,11 @@ module ThemeCheck
         ```
         Check options: `#{check.options.pretty_inspect}`
       EOS
+    end
+
+    def extract_template(args)
+      node = args.first
+      node.template.relative_path.to_s if node.respond_to?(:template)
     end
   end
 end
