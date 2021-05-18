@@ -4,34 +4,30 @@ require "test_helper"
 module ThemeCheck
   module LanguageServer
     class FilterCompletionProviderTest < Minitest::Test
+      include CompletionProviderTestHelper
+
       def setup
-        @module = FilterCompletionProvider.new
+        @provider = FilterCompletionProvider.new
       end
 
       def test_can_complete?
-        assert(@module.can_complete?("{{ 'foo.js' | asset", 19))
-        assert(@module.can_complete?("{{ 'foo.js' | ", 14))
+        assert_can_complete(@provider, "{{ 'foo.js' | ")
+        assert_can_complete(@provider, "{{ 'foo.js' | asset")
+        assert_can_complete(@provider, "{{ 'foo.js' | asset_url | ")
+        assert_can_complete(@provider, "{{ 'foo.js' | asset_url | img")
 
-        refute(@module.can_complete?("{{ 'foo.js' ", 4))
-        refute(@module.can_complete?("{% if foo", 9))
+        refute_can_complete(@provider, "{{ 'foo.js' ")
+        refute_can_complete(@provider, "{% if foo")
       end
 
       def test_completions
-        assert_includes(@module.completions("{{ 'foo.js' | asset", 19), {
-          label: "asset_url",
-          kind: CompletionItemKinds::FUNCTION,
-        })
-        assert_includes(@module.completions("{{ 'foo.js' | ", 14), {
-          label: "asset_url",
-          kind: CompletionItemKinds::FUNCTION,
-        })
+        assert_can_complete_with(@provider, "{{ 'foo.js' | ", "asset_url")
+        assert_can_complete_with(@provider, "{{ 'foo.js' | asset", "asset_url")
+        assert_can_complete_with(@provider, "{{ 'foo.js' | asset_url | img", "img_url")
       end
 
       def test_does_not_complete_deprecated_filters
-        refute_includes(@module.completions("{{ 'foo.js' | hex_to", 14), {
-          label: "hex_to_rgba",
-          kind: CompletionItemKinds::FUNCTION,
-        })
+        refute_can_complete_with(@provider, "{{ 'foo.js' | hex_to", "hex_to_rgba")
       end
     end
   end

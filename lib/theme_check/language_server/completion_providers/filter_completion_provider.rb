@@ -37,6 +37,7 @@ module ThemeCheck
         partial_match = matches(content, NAMED_FILTER).find do |match|
           match.begin(1) <= cursor && cursor < match.end(1) + 1 # including next character
         end
+        return '' if partial_match.nil?
         partial_match[1]
       end
 
