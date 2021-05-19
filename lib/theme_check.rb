@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 require "liquid"
 
+require_relative "theme_check/version"
 require_relative "theme_check/bug"
 require_relative "theme_check/exceptions"
 require_relative "theme_check/analyzer"
@@ -35,6 +36,5 @@ require_relative "theme_check/template"
 require_relative "theme_check/theme"
 require_relative "theme_check/visitor"
 require_relative "theme_check/corrector"
-require_relative "theme_check/version"
 
 Dir[__dir__ + "/theme_check/checks/*.rb"].each { |file| require file }
