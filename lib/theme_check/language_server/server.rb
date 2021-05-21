@@ -52,7 +52,7 @@ module ThemeCheck
         response_body = JSON.dump(response)
         log(JSON.pretty_generate(response)) if $DEBUG
 
-        @out.write("Content-Length: #{response_body.size}\r\n")
+        @out.write("Content-Length: #{response_body.bytesize}\r\n")
         @out.write("\r\n")
         @out.write(response_body)
         @out.flush
