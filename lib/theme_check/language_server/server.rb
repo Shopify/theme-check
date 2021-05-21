@@ -50,7 +50,7 @@ module ThemeCheck
 
       def send_response(response)
         response_body = JSON.dump(response)
-        log(response_body)
+        debug(response_body)
 
         @out.write("Content-Length: #{response_body.size}\r\n")
         @out.write("\r\n")
@@ -92,7 +92,7 @@ module ThemeCheck
       def process_request
         request_body = read_new_content
         request_json = JSON.parse(request_body)
-        log(request_body)
+        debug(request_body)
 
         id = request_json['id']
         method_name = request_json['method']
