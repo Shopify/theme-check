@@ -38,3 +38,7 @@ require_relative "theme_check/visitor"
 require_relative "theme_check/corrector"
 
 Dir[__dir__ + "/theme_check/checks/*.rb"].each { |file| require file }
+
+# UTF-8 is the default internal and external encoding, like in Rails & Shopify.
+Encoding.default_external = Encoding::UTF_8
+Encoding.default_internal = Encoding::UTF_8
