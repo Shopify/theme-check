@@ -40,6 +40,20 @@ class ContentForHeaderModificationTest < Minitest::Test
     END
   end
 
+  def test_reports_echo
+    offenses = analyze_theme(
+      ThemeCheck::ContentForHeaderModification.new,
+      "layout/theme.liquid" => <<~END,
+        {% liquid
+          echo content_for_header | split: ','
+        %}
+      END
+    )
+    assert_offenses(<<~END, offenses)
+      Do not rely on the content of `content_for_header` at layout/theme.liquid:2
+    END
+  end
+
   def test_do_not_report_normal_use
     offenses = analyze_theme(
       ThemeCheck::ContentForHeaderModification.new,
