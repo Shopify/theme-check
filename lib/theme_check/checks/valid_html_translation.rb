@@ -5,6 +5,7 @@ require 'nokogumbo'
 module ThemeCheck
   class ValidHTMLTranslation < JsonCheck
     severity :suggestion
+    category :translation
     doc docs_url(__FILE__)
 
     def on_file(file)
