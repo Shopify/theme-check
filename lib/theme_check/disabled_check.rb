@@ -4,10 +4,11 @@
 # We'll use the node position to figure out if the test is disabled or not.
 module ThemeCheck
   class DisabledCheck
-    attr_reader :name, :ranges
+    attr_reader :name, :template, :ranges
     attr_accessor :first_line
 
-    def initialize(name)
+    def initialize(template, name)
+      @template = template
       @name = name
       @ranges = []
       @first_line = false
@@ -24,7 +25,8 @@ module ThemeCheck
     end
 
     def disabled?(index)
-      ranges.any? { |range| range.cover?(index) }
+      index == 0 && first_line ||
+        ranges.any? { |range| range.cover?(index) }
     end
 
     def last
@@ -33,7 +35,7 @@ module ThemeCheck
 
     def missing_end_index?
       return false if first_line && ranges.size == 1
-      last.end.nil?
+      last&.end.nil?
     end
   end
 end

@@ -19,7 +19,8 @@ module ThemeCheck
         end
       end
 
-      @visitor = Visitor.new(@liquid_checks)
+      @disabled_checks = DisabledChecks.new
+      @visitor = Visitor.new(@liquid_checks, @disabled_checks)
     end
 
     def offenses
@@ -42,6 +43,8 @@ module ThemeCheck
       @theme.json.each { |json_file| @json_checks.call(:on_file, json_file) }
       @liquid_checks.call(:on_end)
       @json_checks.call(:on_end)
+      @disabled_checks.remove_disabled_offenses(@liquid_checks)
+      @disabled_checks.remove_disabled_offenses(@json_checks)
       offenses
     end
 

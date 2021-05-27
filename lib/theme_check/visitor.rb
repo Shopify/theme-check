@@ -3,14 +3,13 @@ module ThemeCheck
   class Visitor
     attr_reader :checks
 
-    def initialize(checks)
+    def initialize(checks, disabled_checks)
       @checks = checks
+      @disabled_checks = disabled_checks
     end
 
     def visit_template(template)
-      @disabled_checks = DisabledChecks.new
       visit(Node.new(template.root, nil, template))
-      remove_disabled_offenses
     rescue Liquid::Error => exception
       exception.template_name = template.name
       call_checks(:on_error, exception)
@@ -34,14 +33,6 @@ module ThemeCheck
 
     def call_checks(method, *args)
       checks.call(method, *args)
-    end
-
-    def remove_disabled_offenses
-      checks.disableable.each do |check|
-        check.offenses.reject! do |offense|
-          @disabled_checks.disabled?(offense.code_name, offense.start_index)
-        end
-      end
     end
   end
 end

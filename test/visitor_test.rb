@@ -4,7 +4,7 @@ require "test_helper"
 class VisitorTest < Minitest::Test
   def setup
     @tracer = TracerCheck.new
-    @visitor = ThemeCheck::Visitor.new(ThemeCheck::Checks.new([@tracer]))
+    @visitor = ThemeCheck::Visitor.new(ThemeCheck::Checks.new([@tracer]), ThemeCheck::DisabledChecks.new)
   end
 
   def test_assign

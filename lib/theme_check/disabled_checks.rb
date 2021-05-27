@@ -10,34 +10,46 @@ module ThemeCheck
     ACTION_ENABLE_CHECKS = :enable
 
     def initialize
-      @disabled_checks = {}
+      @disabled_checks = Hash.new do |hash, key|
+        template, check_name = key
+        hash[key] = DisabledCheck.new(template, check_name)
+      end
     end
 
     def update(node)
       text = comment_text(node)
       if start_disabling?(text)
         checks_from_text(text).each do |check_name|
-          @disabled_checks[check_name] ||= DisabledCheck.new(check_name)
-          @disabled_checks[check_name].start_index = node.start_index
-          @disabled_checks[check_name].first_line = true if node.line_number == 1
+          disabled = @disabled_checks[[node.template, check_name]]
+          disabled.start_index = node.start_index
+          disabled.first_line = true if node.line_number == 1
         end
       elsif stop_disabling?(text)
         checks_from_text(text).each do |check_name|
-          next unless @disabled_checks.key?(check_name)
-          @disabled_checks[check_name].end_index = node.end_index
+          disabled = @disabled_checks[[node.template, check_name]]
+          next unless disabled
+          disabled.end_index = node.end_index
         end
       end
     end
 
-    def disabled?(key, index)
-      @disabled_checks[:all]&.disabled?(index) ||
-        @disabled_checks[key]&.disabled?(index)
+    def disabled?(template, check_name, index)
+      @disabled_checks[[template, :all]]&.disabled?(index) ||
+        @disabled_checks[[template, check_name]]&.disabled?(index)
     end
 
     def checks_missing_end_index
       @disabled_checks.values
         .select(&:missing_end_index?)
         .map(&:name)
+    end
+
+    def remove_disabled_offenses(checks)
+      checks.disableable.each do |check|
+        check.offenses.reject! do |offense|
+          disabled?(offense.template, offense.code_name, offense.start_index)
+        end
+      end
     end
 
     private
