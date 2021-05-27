@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require "benchmark"
 
 module ThemeCheck
   module LanguageServer
@@ -130,8 +131,11 @@ module ThemeCheck
         if @diagnostics_tracker.first_run?
           # Analyze the full theme on first run
           log("Checking #{config.root}")
-          offenses = analyzer.analyze_theme
-          log("Found #{offenses.size} offenses")
+          offenses = nil
+          time = Benchmark.measure do
+            offenses = analyzer.analyze_theme
+          end
+          log("Found #{offenses.size} offenses in #{format("%0.2f", time.real)}s")
           send_diagnostics(offenses)
         else
           # Analyze selected files
@@ -139,8 +143,11 @@ module ThemeCheck
           file = theme[relative_path]
           if file
             log("Checking #{relative_path}")
-            offenses = analyzer.analyze_files([file])
-            log("Found #{offenses.size} offenses")
+            offenses = nil
+            time = Benchmark.measure do
+              offenses = analyzer.analyze_files([file])
+            end
+            log("Found #{offenses.size} new offenses in #{format("%0.2f", time.real)}s")
             send_diagnostics(offenses, [absolute_path])
           else
             # Not a theme file, skipping
@@ -158,7 +165,6 @@ module ThemeCheck
 
       def send_diagnostics(offenses, analyzed_files = nil)
         @diagnostics_tracker.build_diagnostics(offenses, analyzed_files: analyzed_files) do |path, offenses|
-          log("Sending #{offenses.size} diagnostics for #{path}")
           send_diagnostic(path, offenses)
         end
       end
