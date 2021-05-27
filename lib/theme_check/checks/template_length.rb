@@ -8,6 +8,9 @@ module ThemeCheck
     def initialize(max_length: 200, exclude_schema: true)
       @max_length = max_length
       @exclude_schema = exclude_schema
+    end
+
+    def on_document(_node)
       @excluded_lines = 0
     end
 
