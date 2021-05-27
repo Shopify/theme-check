@@ -25,7 +25,12 @@ class LanguageServerTest < Minitest::Test
     :start_line,
     :end_line,
     :doc,
+    :whole_theme?,
   ) do
+    def single_file?
+      !whole_theme?
+    end
+
     def self.build(path)
       new(
         'LiquidTag',
@@ -36,7 +41,8 @@ class LanguageServerTest < Minitest::Test
         14,
         9,
         9,
-        "https://path.to/docs.md"
+        "https://path.to/docs.md",
+        true,
       )
     end
   end
@@ -113,7 +119,7 @@ class LanguageServerTest < Minitest::Test
   def test_sends_offenses_on_text_document_did_save
     storage = make_file_system_storage("layout/theme.liquid" => "")
 
-    @server.handler.stubs(:analyze).returns([
+    ThemeCheck::Analyzer.any_instance.expects(:offenses).returns([
       OffenseMock.build(storage.path("layout/theme.liquid")),
     ])
 
@@ -326,7 +332,8 @@ class LanguageServerTest < Minitest::Test
       "layout/theme.liquid" => "",
       "templates/perfect.liquid" => "",
     )
-    @server.handler.stubs(:analyze)
+    ThemeCheck::Analyzer.any_instance.expects(:offenses)
+      .twice
       .returns([
         OffenseMock.build(storage.path('layout/theme.liquid')),
       ])
@@ -344,7 +351,7 @@ class LanguageServerTest < Minitest::Test
       "method" => "textDocument/didSave",
       "params" => {
         "textDocument" => {
-          "uri" => "file://layout/theme.liquid",
+          "uri" => "file://#{storage.path('layout/theme.liquid')}",
           "version" => 1,
         },
       },
@@ -353,7 +360,7 @@ class LanguageServerTest < Minitest::Test
       "method" => "textDocument/didSave",
       "params" => {
         "textDocument" => {
-          "uri" => "file://layout/theme.liquid",
+          "uri" => "file://#{storage.path('layout/theme.liquid')}",
           "version" => 1,
         },
       },
@@ -455,7 +462,16 @@ class LanguageServerTest < Minitest::Test
   def assert_responses(*expected_responses)
     actual_responses = responses
     expected_responses.each do |response|
-      assert_equal(response, actual_responses.shift)
+      actual_response = actual_responses.shift
+      assert_equal(response, actual_response, <<~ERR)
+        Expected response:
+
+        #{JSON.pretty_generate(response)}
+
+        Actual response:
+
+        #{JSON.pretty_generate(actual_response)}"
+      ERR
     end
   end
 
@@ -467,11 +483,11 @@ class LanguageServerTest < Minitest::Test
         <<~ERR,
           Expected to find the following object:
 
-            #{JSON.pretty_generate(response)}
+          #{JSON.pretty_generate(response)}
 
           in the following responses:
 
-            #{JSON.pretty_generate(actual_responses)}"
+          #{JSON.pretty_generate(actual_responses)}"
         ERR
       )
     end

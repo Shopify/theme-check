@@ -114,6 +114,24 @@ module ThemeCheck
       end
     end
 
+    def whole_theme?
+      check.whole_theme?
+    end
+
+    def single_file?
+      check.single_file?
+    end
+
+    def ==(other)
+      other.is_a?(Offense) &&
+        check == other.check &&
+        message == other.message &&
+        template == other.template &&
+        node == other.node &&
+        markup == other.markup &&
+        line_number == other.line_number
+    end
+
     def to_s
       if template
         "#{message} at #{location}"

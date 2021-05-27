@@ -38,6 +38,14 @@ module ThemeCheck
       relative_path.sub_ext('').to_s
     end
 
+    def json?
+      true
+    end
+
+    def liquid?
+      false
+    end
+
     private
 
     def load!

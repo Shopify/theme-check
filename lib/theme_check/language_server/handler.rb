@@ -19,7 +19,7 @@ module ThemeCheck
 
       def initialize(server)
         @server = server
-        @previously_reported_files = Set.new
+        @diagnostics_tracker = DiagnosticsTracker.new
       end
 
       def on_initialize(id, params)
@@ -52,6 +52,7 @@ module ThemeCheck
       end
 
       def on_text_document_did_open(_id, params)
+        return unless @diagnostics_tracker.first_run?
         relative_path = relative_path_from_text_document_uri(params)
         @storage.write(relative_path, text_document_text(params))
         analyze_and_send_offenses(text_document_uri(params))
@@ -124,17 +125,27 @@ module ThemeCheck
           ignored_patterns: config.ignored_patterns
         )
         theme = ThemeCheck::Theme.new(storage)
-
-        offenses = analyze(theme, config)
-        log("Found #{theme.all.size} templates, and #{offenses.size} offenses")
-        send_diagnostics(offenses)
-      end
-
-      def analyze(theme, config)
         analyzer = ThemeCheck::Analyzer.new(theme, config.enabled_checks)
-        log("Checking #{config.root}")
-        analyzer.analyze_theme
-        analyzer.offenses
+
+        if @diagnostics_tracker.first_run?
+          # Analyze the full theme on first run
+          log("Checking #{config.root}")
+          offenses = analyzer.analyze_theme
+          log("Found #{offenses.size} offenses")
+          send_diagnostics(offenses)
+        else
+          # Analyze selected files
+          relative_path = Pathname.new(@storage.relative_path(absolute_path))
+          file = theme[relative_path]
+          if file
+            log("Checking #{relative_path}")
+            offenses = analyzer.analyze_files([file])
+            log("Found #{offenses.size} offenses")
+            send_diagnostics(offenses, [absolute_path])
+          else
+            # Not a theme file, skipping
+          end
+        end
       end
 
       def completions(relative_path, line, col)
@@ -145,22 +156,11 @@ module ThemeCheck
         @document_link_engine.document_links(relative_path)
       end
 
-      def send_diagnostics(offenses)
-        reported_files = Set.new
-
-        offenses.group_by(&:template).each do |template, template_offenses|
-          next unless template
-          send_diagnostic(template.path, template_offenses)
-          reported_files << template.path
+      def send_diagnostics(offenses, analyzed_files = nil)
+        @diagnostics_tracker.build_diagnostics(offenses, analyzed_files: analyzed_files) do |path, offenses|
+          log("Sending #{offenses.size} diagnostics for #{path}")
+          send_diagnostic(path, offenses)
         end
-
-        # Publish diagnostics with empty array if all issues on a previously reported template
-        # have been solved.
-        (@previously_reported_files - reported_files).each do |path|
-          send_diagnostic(path, [])
-        end
-
-        @previously_reported_files = reported_files
       end
 
       def send_diagnostic(path, offenses)

@@ -32,6 +32,14 @@ module ThemeCheck
       relative_path.sub_ext('').to_s
     end
 
+    def json?
+      false
+    end
+
+    def liquid?
+      true
+    end
+
     def template?
       name.start_with?('templates')
     end

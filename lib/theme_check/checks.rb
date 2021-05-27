@@ -13,7 +13,15 @@ module ThemeCheck
     end
 
     def disableable
-      self.class.new(select(&:can_disable?))
+      @disableable ||= self.class.new(select(&:can_disable?))
+    end
+
+    def whole_theme
+      @whole_theme ||= self.class.new(select(&:whole_theme?))
+    end
+
+    def single_file
+      @single_file ||= self.class.new(select(&:single_file?))
     end
 
     private
