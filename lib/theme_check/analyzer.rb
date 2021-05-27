@@ -24,46 +24,26 @@ module ThemeCheck
       @liquid_checks.flat_map(&:offenses) + @json_checks.flat_map(&:offenses)
     end
 
-    def offenses_clear!
-      @liquid_checks.each do |check|
-        check.offenses.clear
-      end
-
-      @json_checks.each do |check|
-        check.offenses.clear
-      end
-    end
-
     def analyze_theme
-      offenses_clear!
+      reset
 
-      disabled_checks = DisabledChecks.new
-
-      visitor = Visitor.new(@liquid_checks, disabled_checks)
+      visitor = Visitor.new(@liquid_checks, @disabled_checks)
       @theme.liquid.each { |template| visitor.visit_template(template) }
       @theme.json.each { |json_file| @json_checks.call(:on_file, json_file) }
 
-      @liquid_checks.call(:on_end)
-      @json_checks.call(:on_end)
-
-      disabled_checks.remove_disabled_offenses(@liquid_checks)
-      disabled_checks.remove_disabled_offenses(@json_checks)
-
-      offenses
+      finish
     end
 
     def analyze_files(files)
-      offenses_clear!
-
-      disabled_checks = DisabledChecks.new
+      reset
 
       # Call all checks that run on the whole theme
-      visitor = Visitor.new(@liquid_checks.whole_theme, disabled_checks)
+      visitor = Visitor.new(@liquid_checks.whole_theme, @disabled_checks)
       @theme.liquid.each { |template| visitor.visit_template(template) }
       @theme.json.each { |json_file| @json_checks.whole_theme.call(:on_file, json_file) }
 
       # Call checks that run on a single files, only on specified file
-      visitor = Visitor.new(@liquid_checks.single_file, disabled_checks)
+      visitor = Visitor.new(@liquid_checks.single_file, @disabled_checks)
       files.each do |file|
         if file.liquid?
           visitor.visit_template(file)
@@ -72,13 +52,7 @@ module ThemeCheck
         end
       end
 
-      @liquid_checks.call(:on_end)
-      @json_checks.call(:on_end)
-
-      disabled_checks.remove_disabled_offenses(@liquid_checks)
-      disabled_checks.remove_disabled_offenses(@json_checks)
-
-      offenses
+      finish
     end
 
     def uncorrectable_offenses
@@ -94,6 +68,30 @@ module ThemeCheck
         offenses.each(&:correct)
         @theme.liquid.each(&:write)
       end
+    end
+
+    private
+
+    def reset
+      @disabled_checks = DisabledChecks.new
+
+      @liquid_checks.each do |check|
+        check.offenses.clear
+      end
+
+      @json_checks.each do |check|
+        check.offenses.clear
+      end
+    end
+
+    def finish
+      @liquid_checks.call(:on_end)
+      @json_checks.call(:on_end)
+
+      @disabled_checks.remove_disabled_offenses(@liquid_checks)
+      @disabled_checks.remove_disabled_offenses(@json_checks)
+
+      offenses
     end
   end
 end
