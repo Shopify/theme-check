@@ -35,7 +35,7 @@ module ThemeCheck
           reported_files << template.path
         end
 
-        @single_files_offenses.each do |path, offenses|
+        @single_files_offenses.each do |path, _|
           # Already reported above, skip
           next if reported_files.include?(path)
 

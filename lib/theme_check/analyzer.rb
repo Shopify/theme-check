@@ -72,7 +72,7 @@ module ThemeCheck
         end
       end
 
-      @liquid_checks.call(:on_end)  
+      @liquid_checks.call(:on_end)
       @json_checks.call(:on_end)
 
       disabled_checks.remove_disabled_offenses(@liquid_checks)

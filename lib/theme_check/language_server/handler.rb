@@ -141,6 +141,7 @@ module ThemeCheck
           # Analyze selected files
           relative_path = Pathname.new(@storage.relative_path(absolute_path))
           file = theme[relative_path]
+          # Skip if not a theme file
           if file
             log("Checking #{relative_path}")
             offenses = nil
@@ -149,8 +150,6 @@ module ThemeCheck
             end
             log("Found #{offenses.size} new offenses in #{format("%0.2f", time.real)}s")
             send_diagnostics(offenses, [absolute_path])
-          else
-            # Not a theme file, skipping
           end
         end
       end
@@ -164,8 +163,8 @@ module ThemeCheck
       end
 
       def send_diagnostics(offenses, analyzed_files = nil)
-        @diagnostics_tracker.build_diagnostics(offenses, analyzed_files: analyzed_files) do |path, offenses|
-          send_diagnostic(path, offenses)
+        @diagnostics_tracker.build_diagnostics(offenses, analyzed_files: analyzed_files) do |path, diagnostic_offenses|
+          send_diagnostic(path, diagnostic_offenses)
         end
       end
 

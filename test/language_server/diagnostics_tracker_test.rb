@@ -144,8 +144,8 @@ module ThemeCheck
 
       def build_diagnostics(offenses:, analyzed_files: nil)
         actual_diagnostics = {}
-        @tracker.build_diagnostics(offenses, analyzed_files: analyzed_files) do |path, offenses|
-          actual_diagnostics[path] = offenses
+        @tracker.build_diagnostics(offenses, analyzed_files: analyzed_files) do |path, diagnostic_offenses|
+          actual_diagnostics[path] = diagnostic_offenses
         end
         actual_diagnostics
       end
