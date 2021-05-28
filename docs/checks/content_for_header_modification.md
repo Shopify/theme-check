@@ -29,7 +29,7 @@ ContentForHeaderModification:
 
 ## Version
 
-This check has been introduced in Theme Check THEME_CHECK_VERSION.
+This check has been introduced in Theme Check 0.9.0.
 
 ## Resources
 
