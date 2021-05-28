@@ -67,6 +67,13 @@ module ThemeCheck
         end
         defined?(@can_disable) ? @can_disable : true
       end
+
+      def single_file(single_file = nil)
+        unless single_file.nil?
+          @single_file = single_file
+        end
+        defined?(@single_file) ? @single_file : !method_defined?(:on_end)
+      end
     end
 
     def offenses
@@ -99,6 +106,18 @@ module ThemeCheck
 
     def can_disable?
       self.class.can_disable
+    end
+
+    def single_file?
+      self.class.single_file
+    end
+
+    def whole_theme?
+      !single_file?
+    end
+
+    def ==(other)
+      other.is_a?(Check) && code_name == other.code_name
     end
 
     def to_s

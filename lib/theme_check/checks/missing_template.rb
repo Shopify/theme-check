@@ -5,6 +5,7 @@ module ThemeCheck
     severity :suggestion
     category :liquid
     doc docs_url(__FILE__)
+    single_file false
 
     def on_include(node)
       template = node.value.template_name_expr

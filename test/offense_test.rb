@@ -130,4 +130,9 @@ class OffenseTest < Minitest::Test
     assert_equal(0, offense.start_column)
     assert_equal(3, offense.end_column)
   end
+
+  def test_equal
+    assert_equal(ThemeCheck::Offense.new(check: Bogus.new), ThemeCheck::Offense.new(check: Bogus.new))
+    refute_equal(ThemeCheck::Offense.new(check: Bogus.new), ThemeCheck::Offense.new(check: Bogus.new, markup: "nope"))
+  end
 end

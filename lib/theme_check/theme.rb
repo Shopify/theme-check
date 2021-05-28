@@ -52,8 +52,13 @@ module ThemeCheck
       @all ||= json + liquid + assets
     end
 
-    def [](name)
-      all.find { |t| t.name == name }
+    def [](name_or_relative_path)
+      case name_or_relative_path
+      when Pathname
+        all.find { |t| t.relative_path == name_or_relative_path }
+      else
+        all.find { |t| t.name == name_or_relative_path }
+      end
     end
 
     def templates
