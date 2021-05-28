@@ -21,7 +21,6 @@ module ThemeCheck
           @html_checks << check
         end
       end
-
     end
 
     def offenses
