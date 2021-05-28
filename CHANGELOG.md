@@ -1,4 +1,19 @@
 
+v0.9.0 / 2021-05-28
+==================
+
+  * Introduce HtmlCheck, and convert ParserBlockingJavaScript & ImgWidthAndHeight to it
+  * Move `script-tag` validation from ParserBlockingJavaScript to ParserBlockingScriptTag
+  * Add ability to ignore individual checks using file patterns
+  * Introduce single file and whole theme checks to optimize LSP diagnostics
+  * Fix TemplateLength counter not being reseted on each document
+  * Add missing category to ValidHTMLTranslation
+  * Set Ruby default encodings to UTF-8 to fix encoding issues
+  * Add ContentForHeaderModification check to prevent relying on the content of ``content_for_header`
+  * Fix `Content-Length` in LSP responses
+  * Fix disabling checks that emit offences in `on_end`
+  * Fix completion bug in `filter_completion_provider`
+
 v0.8.3 / 2021-05-17
 ==================
 
