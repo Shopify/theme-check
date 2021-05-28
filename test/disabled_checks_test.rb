@@ -200,5 +200,18 @@ module ThemeCheck
 
       assert_empty(@on_end_check.offenses.map(&:template))
     end
+
+    def test_can_ignore_check_using_pattern
+      template = parse_liquid(<<~END)
+        {% assign x = 'x' %}
+      END
+      @assign_check.ignored_patterns = [
+        template.relative_path.to_s,
+      ]
+      @visitor.visit_template(template)
+      @disabled_checks.remove_disabled_offenses(@checks)
+
+      assert_empty(@assign_check.offenses.map(&:template))
+    end
   end
 end

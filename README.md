@@ -92,11 +92,14 @@ root: dist
 require:
   - ./path/to/my_custom_check.rb
 
-# Disable some checks
 TemplateLength:
+  # Disable some checks
   enabled: false
   # Or configure options
   max_length: 300
+  # Or ignore certain paths
+  ignore:
+    - snippets/icon-*
 
 # Enable a custom check
 MyCustomCheck

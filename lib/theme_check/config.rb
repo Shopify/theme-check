@@ -91,11 +91,13 @@ module ThemeCheck
 
         options_for_check = options.transform_keys(&:to_sym)
         options_for_check.delete(:enabled)
+        ignored_patterns = options_for_check.delete(:ignore) || []
         check = if options_for_check.empty?
           check_class.new
         else
           check_class.new(**options_for_check)
         end
+        check.ignored_patterns = ignored_patterns
         check.options = options_for_check
         check
       end.compact

@@ -33,7 +33,11 @@ module ThemeCheck
       end
     end
 
-    def disabled?(template, check_name, index)
+    def disabled?(check, template, check_name, index)
+      return true if check.ignored_patterns&.any? do |pattern|
+        template.relative_path.fnmatch?(pattern)
+      end
+
       @disabled_checks[[template, :all]]&.disabled?(index) ||
         @disabled_checks[[template, check_name]]&.disabled?(index)
     end
@@ -47,7 +51,7 @@ module ThemeCheck
     def remove_disabled_offenses(checks)
       checks.disableable.each do |check|
         check.offenses.reject! do |offense|
-          disabled?(offense.template, offense.code_name, offense.start_index)
+          disabled?(check, offense.template, offense.code_name, offense.start_index)
         end
       end
     end

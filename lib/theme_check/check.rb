@@ -6,7 +6,7 @@ module ThemeCheck
     include JsonHelpers
 
     attr_accessor :theme
-    attr_accessor :options
+    attr_accessor :options, :ignored_patterns
     attr_writer :offenses
 
     SEVERITIES = [
@@ -93,10 +93,6 @@ module ThemeCheck
       @ignored = true
     end
 
-    def unignore!
-      @ignored = false
-    end
-
     def ignored?
       defined?(@ignored) && @ignored
     end
@@ -107,7 +103,12 @@ module ThemeCheck
 
     def to_s
       s = +"#{code_name}:\n"
-      properties = { severity: severity, categories: categories, doc: doc }.merge(options)
+      properties = {
+        severity: severity,
+        categories: categories,
+        doc: doc,
+        ignored_patterns: ignored_patterns,
+      }.merge(options)
       properties.each_pair do |name, value|
         s << "  #{name}: #{value}\n" if value
       end
