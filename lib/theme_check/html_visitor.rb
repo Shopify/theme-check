@@ -1,0 +1,36 @@
+# frozen_string_literal: true
+require "nokogumbo"
+require "forwardable"
+
+module ThemeCheck
+  class HtmlVisitor
+    attr_reader :checks
+
+    def initialize(checks)
+      @checks = checks
+    end
+
+    def visit_template(template)
+      doc = parse(template)
+      visit(HtmlNode.new(doc, template))
+    end
+
+    private
+
+    def parse(template)
+      Nokogiri::HTML5.fragment(template.source)
+    end
+
+    def visit(node)
+      call_checks(:"on_#{node.name}", node)
+      node.children.each { |child| visit(child) }
+      unless node.literal?
+        call_checks(:"after_#{node.name}", node)
+      end
+    end
+
+    def call_checks(method, *args)
+      checks.call(method, *args)
+    end
+  end
+end
