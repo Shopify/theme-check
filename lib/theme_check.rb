@@ -36,6 +36,9 @@ require_relative "theme_check/template"
 require_relative "theme_check/theme"
 require_relative "theme_check/visitor"
 require_relative "theme_check/corrector"
+require_relative "theme_check/html_node"
+require_relative "theme_check/html_visitor"
+require_relative "theme_check/html_check"
 
 Dir[__dir__ + "/theme_check/checks/*.rb"].each { |file| require file }
 

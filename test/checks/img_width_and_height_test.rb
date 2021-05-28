@@ -26,7 +26,7 @@ module ThemeCheck
       assert_offenses("", offenses)
     end
 
-    def test_regex_doesnt_hang_on_self_closing_tag
+    def test_doesnt_hang_on_self_closing_tag
       offenses = analyze_theme(
         ImgWidthAndHeight.new,
         "templates/index.liquid" => <<~END,

@@ -41,7 +41,8 @@ Under `lib/theme_check/checks`, create new Ruby file with a unique name describi
 ```ruby
 module ThemeCheck
   # Does one thing, and does it well!
-  # NOTE: inherit from JsonCheck to implement a JSON based check.
+  # NOTE: inherit from `JsonCheck` to implement a JSON-based check, and from `HtmlCheck`
+  # to implement an HTML-based one. See other checks in `lib/theme_check/checks` for examples.
   class MyCheckName < LiquidCheck
     severity :suggestion # :error or :style
 
