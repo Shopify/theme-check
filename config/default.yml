@@ -107,6 +107,9 @@ ParserBlockingJavaScript:
   enabled: true
   ignore: []
 
+ParserBlockingScriptTag:
+  enabled: true
+
 AssetSizeJavaScript:
   enabled: false
   ignore: []
