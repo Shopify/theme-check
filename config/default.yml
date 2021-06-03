@@ -130,6 +130,10 @@ RemoteAsset:
   enabled: true
   ignore: []
 
+AssetUrlFilters:
+  enabled: true
+  ignore: []
+
 ContentForHeaderModification:
   enabled: true
   ignore: []

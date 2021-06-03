@@ -6,6 +6,7 @@ module ThemeCheck
     extend ChecksTracking
     include ParsingHelpers
 
+    # TODO: remove this once all regex checks are migrate to HtmlCheck# TODO: remove this once all regex checks are migrate to HtmlCheck
     TAG = /#{Liquid::TagStart}.*?#{Liquid::TagEnd}/om
     VARIABLE = /#{Liquid::VariableStart}.*?#{Liquid::VariableEnd}/om
     START_OR_END_QUOTE = /(^['"])|(['"]$)/
