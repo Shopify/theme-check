@@ -1,4 +1,10 @@
 
+v0.9.1 / 2021-06-04
+==================
+
+  * Convert `RemoteAsset` into an `HtmlCheck`
+  * Move Liquid logic from `RemoteAsset` to a new `AssetUrlFilters` check
+
 v0.9.0 / 2021-05-28
 ==================
 
