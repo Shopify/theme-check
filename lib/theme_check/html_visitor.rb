@@ -22,10 +22,12 @@ module ThemeCheck
     end
 
     def visit(node)
+      call_checks(:on_element, node) if node.element?
       call_checks(:"on_#{node.name}", node)
       node.children.each { |child| visit(child) }
       unless node.literal?
         call_checks(:"after_#{node.name}", node)
+        call_checks(:after_element, node) if node.element?
       end
     end
 

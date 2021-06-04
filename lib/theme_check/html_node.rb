@@ -17,6 +17,10 @@ module ThemeCheck
       @value.name == "text"
     end
 
+    def element?
+      @value.element?
+    end
+
     def children
       @value.children.map { |child| HtmlNode.new(child, template) }
     end

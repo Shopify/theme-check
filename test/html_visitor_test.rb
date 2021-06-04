@@ -15,12 +15,16 @@ class HtmlVisitorTest < Minitest::Test
     @visitor.visit_template(template)
     assert_equal([
       :on_document,
+      :on_element,
       :on_a,
       :on_text, "About",
       :after_a,
+      :after_element,
       :on_text, "\n",
+      :on_element,
       :on_img,
       :after_img,
+      :after_element,
       :on_text, "\n",
       :after_document
     ], @tracer.calls)
@@ -36,9 +40,11 @@ class HtmlVisitorTest < Minitest::Test
     assert_equal([
       :on_document,
       :on_text, "{% capture x %}\n  ",
+      :on_element,
       :on_a,
       :on_text, "About",
       :after_a,
+      :after_element,
       :on_text, "\n{% endcapture %}\n",
       :after_document
     ], @tracer.calls)
