@@ -16,12 +16,21 @@ This check is aimed at defering loading non-critical images.
 
 ```liquid
 <img src="a.jpg">
+
+<!-- Replaces lazysize.js -->
+<img src="a.jpg" class="lazyload">
+
+<!-- `auto` is deprecated -->
+<img src="a.jpg" loading="auto">
 ```
 
 :+1: Examples of **correct** code for this check:
 
 ```liquid
 <img src="a.jpg" loading="lazy">
+
+<!-- `eager` is also accepted, but prefer `lazy` -->
+<img src="a.jpg" loading="eager">
 ```
 
 ## Check Options
