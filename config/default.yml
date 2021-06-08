@@ -137,3 +137,7 @@ AssetUrlFilters:
 ContentForHeaderModification:
   enabled: true
   ignore: []
+
+ImgLazyLoading:
+  enabled: true
+  ignore: []
