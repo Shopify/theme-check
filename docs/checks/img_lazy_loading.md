@@ -48,7 +48,7 @@ If you don't want to defer loading of images, then it's safe to disable this rul
 
 ## Version
 
-This check has been introduced in Theme Check THEME_CHECK_VERSION.
+This check has been introduced in Theme Check 0.10.0.
 
 ## Resources
 
