@@ -1,4 +1,9 @@
 
+v0.10.0 / 2021-06-08
+==================
+
+  * Add ImgLazyLoading check for recommending loading="lazy" attribute
+
 v0.9.1 / 2021-06-04
 ==================
 
