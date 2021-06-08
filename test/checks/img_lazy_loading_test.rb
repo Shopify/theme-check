@@ -8,6 +8,8 @@ module ThemeCheck
         ImgLazyLoading.new,
         "templates/index.liquid" => <<~END,
           <img src="a.jpg" loading="lazy">
+          <img src="a.jpg" loading="LAZY">
+          <img src="a.jpg" LOADING="LAZY">
         END
       )
       assert_offenses("", offenses)

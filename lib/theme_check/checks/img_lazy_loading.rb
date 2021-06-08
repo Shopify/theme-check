@@ -6,7 +6,7 @@ module ThemeCheck
     doc docs_url(__FILE__)
 
     def on_img(node)
-      if node.attributes["loading"]&.value != "lazy"
+      if node.attributes["loading"]&.value&.downcase != "lazy"
         add_offense("Add loading=\"lazy\" to defer loading of images", node: node)
       end
     end
