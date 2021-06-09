@@ -1,6 +1,11 @@
 # HTML check API
 
-For checking HTML elements in `.liquid`.
+For checking HTML elements in `.liquid` files.
+
+If you need to check an HTML tag or its attributes, use an `HtmlCheck`.
+
+The HTML in Liquid files is parsed using the Nokogiri, by consequence you will get [`Nokogiri::XML::Node`][nokogiri].
+
 
 ```ruby
 module ThemeCheck
@@ -34,4 +39,8 @@ end
 
 ## Resources
 
-- [Nokogiri::XML::Node API doc](https://www.rubydoc.info/github/sparklemotion/nokogiri/Nokogiri/XML/Node)
+- [Nokogiri::XML::Node API doc][nokogiri]
+
+[nokogiri]: https://www.rubydoc.info/github/sparklemotion/nokogiri/Nokogiri/XML/Node
+
+

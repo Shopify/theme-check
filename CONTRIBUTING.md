@@ -36,9 +36,11 @@ bundle exec theme-check /path/to/your/theme
 
 ## Creating a new "Check"
 
-Run `bundle exec rake "new_check[MyNewCheckName]"` to generate all the files requires to create a new check.
+Run `bundle exec rake "new_check[MyNewCheckName]"` to generate all the files required to create a new check.
 
-Add the new check to `config/default.yml` to enable it. If the check is configurable, the `initialize` argument name and default values should also be duplicated inside `config/default.yml`.
+Check the [Check API](/docs/api/check.md) for how to implement a check. Also take a look at other checks in [lib/theme_check/checks](/lib/theme_check/checks).
+
+We done implementing your check, add it to `config/default.yml` to enable it:
 
 ```yaml
 MyNewCheckName:
@@ -46,4 +48,20 @@ MyNewCheckName:
   ignore: []
 ```
 
-Check the [Check API](/docs/api/check.md) for details.
+If the check is configurable, the `initialize` argument names and default values should also be duplicated inside `config/default.yml`. eg.:
+
+```ruby
+class MyCheckName < LiquidCheck
+  def initialize(muffin_mode: true)
+    @muffin_mode = muffin_mode
+  end
+  # ...
+end
+```
+
+```yaml
+MyNewCheckName:
+  enabled: true
+  ignore: []
+  muffin_mode: true
+```

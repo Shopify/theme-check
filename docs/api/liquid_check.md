@@ -2,6 +2,11 @@
 
 For checking the Liquid code in `.liquid` files.
 
+All code inside `{% ... %}` or `{{ ... }}` is Liquid code.
+
+Liquid files are parsed using the Liquid parser, by consequence you will get Liquid nodes (tags, blocks) in your callback methods. Check the Liquid source for details on those nodes: [Liquid source][liquidsource].
+
+
 ```ruby
 module ThemeCheck
   class MyCheckName < LiquidCheck
@@ -89,4 +94,6 @@ end
 
 ## Resources
 
-- [Liquid source](https://github.com/Shopify/liquid/tree/master/lib/liquid)
+- [Liquid source][liquidsource]
+
+[liquidsource]: https://github.com/Shopify/liquid/tree/master/lib/liquid

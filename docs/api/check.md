@@ -1,25 +1,15 @@
 # Check API
 
+Theme Check uses static analysis. It parses theme files into an AST, and then calls the appropriate checks to analyze it.
+
+An [AST](https://en.wikipedia.org/wiki/Abstract_syntax_tree) is a tree of node, representing the theme file.
+
+Checks are Ruby classes with callback methods:
+- `on_TYPE` that runs before a node of the specific TYPE is visited.
+- `after_TYPE` that runs after a node of the specific TYPE is visited.
+
 There are three types of checks currently supported:
 
-## Liquid checks
-
-For checking the Liquid code in `.liquid`.
-
-All code inside `{% ... %}` or `{{ ... }}` is Liquid code.
-
-Check the API of [`LiquidCheck`](/docs/api/liquid_check.md) for details.
-
-## HTML checks
-
-For checking HTML elements in `.liquid`.
-
-If you need to checks a tag or its attributes, use an `HtmlCheck`.
-
-Check the API of [`HtmlCheck`](/docs/api/html_check.md) for details.
-
-## JSON checks
-
-For checking the content of `.json` files, use a `JsonCheck`.
-
-Check the API of [`JsonCheck`](/docs/api/html_check.md) for details.
+- [`LiquidCheck`](/docs/api/liquid_check.md)
+- [`HtmlCheck`](/docs/api/html_check.md)
+- [`JsonCheck`](/docs/api/html_check.md)

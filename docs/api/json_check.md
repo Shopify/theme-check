@@ -12,7 +12,7 @@ module ThemeCheck
 
     def on_file(file)
       file # an instance of `ThemeCheck::JsonFile`
-      file.content # the parsed JSON, as a Ruby object
+      file.content # the parsed JSON, as a Ruby object, usually a Hash
     end
   end
 end
