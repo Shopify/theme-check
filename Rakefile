@@ -52,3 +52,34 @@ task :prerelease, [:version] do |_t, args|
   require 'theme_check/releaser'
   ThemeCheck::Releaser.new.release(args.version)
 end
+
+desc "Create a new check"
+task :new_check, [:name] do |_t, args|
+  require "theme_check/string_helpers"
+  class_name = args.name
+  base_name = ThemeCheck::StringHelpers.underscore(class_name)
+  code_source = "lib/theme_check/checks/#{base_name}.rb"
+  doc_source = "docs/checks/#{base_name}.md"
+  test_source = "test/checks/#{base_name}_test.rb"
+  erb(
+    "lib/theme_check/checks/TEMPLATE.rb.erb", code_source,
+    class_name: class_name,
+  )
+  erb(
+    "test/checks/TEMPLATE.rb.erb", test_source,
+    class_name: class_name,
+  )
+  erb(
+    "docs/checks/TEMPLATE.md.erb", doc_source,
+    class_name: class_name,
+    code_source: code_source,
+    doc_source: doc_source,
+  )
+  sh "bundle exec ruby -Itest test/checks/my_new_check_test.rb"
+end
+
+def erb(file, to, **args)
+  require "erb"
+  File.write(to, ERB.new(File.read(file)).result_with_hash(args))
+  puts "Generated #{to}"
+end
