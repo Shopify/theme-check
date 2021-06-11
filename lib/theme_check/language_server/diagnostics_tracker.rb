@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require "logger"
 
 module ThemeCheck
   module LanguageServer
@@ -16,6 +17,7 @@ module ThemeCheck
       def build_diagnostics(offenses, analyzed_files: nil)
         reported_files = Set.new
         new_single_file_offenses = {}
+        analyzed_files = analyzed_files.map { |path| Pathname.new(path) } if analyzed_files
 
         offenses.group_by(&:template).each do |template, template_offenses|
           next unless template

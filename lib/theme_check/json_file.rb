@@ -46,6 +46,11 @@ module ThemeCheck
       false
     end
 
+    def ==(other)
+      other.is_a?(JsonFile) && relative_path == other.relative_path
+    end
+    alias_method :eql?, :==
+
     private
 
     def load!

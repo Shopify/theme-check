@@ -21,13 +21,13 @@ module ThemeCheck
 
       class WholeThemeOffense < Offense
         def initialize(code_name, path)
-          super(code_name, Template.new(path), true)
+          super(code_name, Template.new(Pathname.new(path)), true)
         end
       end
 
       class SingleFileOffense < Offense
         def initialize(code_name, path)
-          super(code_name, Template.new(path), false)
+          super(code_name, Template.new(Pathname.new(path)), false)
         end
       end
 
@@ -95,6 +95,7 @@ module ThemeCheck
       def test_include_single_file_offenses_of_previous_runs
         build_diagnostics(
           offenses: [
+            WholeThemeOffense.new("MissingTemplate", "template/index.liquid"),
             SingleFileOffense.new("UnusedAssign", "template/index.liquid"),
           ],
         )
@@ -140,6 +141,28 @@ module ThemeCheck
         )
       end
 
+      def test_clears_single_theme_offenses_when_missing
+        build_diagnostics(
+          offenses: [
+            WholeThemeOffense.new("MissingTemplate", "template/index.liquid"),
+            SingleFileOffense.new("UnusedAssign", "template/index.liquid"),
+          ],
+        )
+        assert_diagnostics(
+          offenses: [
+            WholeThemeOffense.new("MissingTemplate", "template/index.liquid"),
+          ],
+          analyzed_files: [
+            "template/index.liquid",
+          ],
+          diagnostics: {
+            "template/index.liquid" => [
+              WholeThemeOffense.new("MissingTemplate", "template/index.liquid"),
+            ],
+          },
+        )
+      end
+
       private
 
       def build_diagnostics(offenses:, analyzed_files: nil)
@@ -152,7 +175,7 @@ module ThemeCheck
 
       def assert_diagnostics(offenses:, analyzed_files:, diagnostics:)
         actual_diagnostics = build_diagnostics(offenses: offenses, analyzed_files: analyzed_files)
-        assert_equal(diagnostics, actual_diagnostics)
+        assert_equal(diagnostics, actual_diagnostics.transform_keys(&:to_s))
       end
     end
   end

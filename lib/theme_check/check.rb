@@ -123,6 +123,7 @@ module ThemeCheck
     def ==(other)
       other.is_a?(Check) && code_name == other.code_name
     end
+    alias_method :eql?, :==
 
     def to_s
       s = +"#{code_name}:\n"

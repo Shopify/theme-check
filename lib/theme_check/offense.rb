@@ -124,13 +124,13 @@ module ThemeCheck
 
     def ==(other)
       other.is_a?(Offense) &&
-        check == other.check &&
+        code_name == other.code_name &&
         message == other.message &&
-        template == other.template &&
-        node == other.node &&
-        markup == other.markup &&
-        line_number == other.line_number
+        location == other.location &&
+        start_index == other.start_index &&
+        end_index == other.end_index
     end
+    alias_method :eql?, :==
 
     def to_s
       if template
