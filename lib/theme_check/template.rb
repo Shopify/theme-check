@@ -91,6 +91,7 @@ module ThemeCheck
     def ==(other)
       other.is_a?(Template) && relative_path == other.relative_path
     end
+    alias_method :eql?, :==
 
     def self.parse(source)
       Liquid::Template.parse(
