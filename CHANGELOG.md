@@ -1,4 +1,10 @@
 
+v0.10.1 / 2021-06-11
+==================
+
+  * Fix LSP diagnostics not being merged properly when analyzing a single file.
+    Causing VSCode problems not being cleared after fixing.
+
 v0.10.0 / 2021-06-08
 ==================
 
