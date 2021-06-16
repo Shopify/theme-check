@@ -3,89 +3,6 @@ require "test_helper"
 
 module ThemeCheck
   class AssetSizeJavaScriptTest < Minitest::Test
-    def test_script_tag_src_regex
-      # using quotes
-      assert_src(<<~EXPECTED.strip, <<~SOURCE)
-        "{{ 'theme.js' | asset_url }}"
-      EXPECTED
-        <script src="{{ 'theme.js' | asset_url }}"></script>
-      SOURCE
-
-      # using straight quotes
-      assert_src(<<~EXPECTED.strip, <<~SOURCE)
-        '{{ 'theme.js' | asset_url }}'
-      EXPECTED
-        <script src='{{ 'theme.js' | asset_url }}'></script>
-      SOURCE
-
-      # with follow up boolean attribute
-      assert_src(<<~EXPECTED.strip, <<~SOURCE)
-        "/theme.js"
-      EXPECTED
-        <script src="/theme.js" defer></script>
-      SOURCE
-
-      # with follow up attribute + value
-      assert_src(<<~EXPECTED.strip, <<~SOURCE)
-        'theme.js'
-      EXPECTED
-        <script src='theme.js' defer="defer"></script>
-      SOURCE
-
-      # with whitespace after boolean attribute
-      assert_src(<<~EXPECTED.strip, <<~SOURCE)
-        'theme.js'
-      EXPECTED
-        <script
-          src='theme.js'
-          defer
-        ></script>
-      SOURCE
-
-      # with whitespace inside variable
-      assert_src(<<~EXPECTED.strip, <<~SOURCE)
-        '{{
-            'theme.js' | asset_url
-          }}'
-      EXPECTED
-        <script
-          src='{{
-            'theme.js' | asset_url
-          }}'
-          defer
-        ></script>
-      SOURCE
-    end
-
-    def assert_src(expected, source)
-      match = AssetSizeJavaScript::SCRIPT_TAG_SRC.match(source)
-      assert(match, "Expected to extract #{expected} from #{source}")
-      assert_equal(expected, match[:src])
-    end
-
-    def test_scripts_extractor
-      check = AssetSizeJavaScript.new
-      scripts = check.scripts(<<~SOURCE)
-        <html>
-          <head>
-            <script src="{{ '1.js' | asset_url }}" defer></script>
-            <script src="{{ '2.js' | asset_url }}" async="async"></script>
-            <script src="3.js" type="module"></script>
-            <script type="text/javascript" src="4.js"></script>
-          </head>
-        </html>
-      SOURCE
-
-      expected = [
-        "{{ '1.js' | asset_url }}",
-        "{{ '2.js' | asset_url }}",
-        "3.js",
-        "4.js",
-      ]
-
-      assert_equal(expected, scripts.map(&:src))
-    end
-
     def test_src_to_file_size
       theme = make_theme({
         "assets/theme.js" => "console.log('hello world'); console.log('Oh. Hi Mark!')",
@@ -151,6 +68,22 @@ module ThemeCheck
       assert_offenses(<<~END, offenses)
         JavaScript on every page load exceding compressed size threshold (2 Bytes), consider using the import on interaction pattern. at templates/index.liquid:3
       END
+    end
+
+    def test_inline_javascript
+      offenses = analyze_theme(
+        AssetSizeJavaScript.new(threshold_in_bytes: 2),
+        "templates/index.liquid" => <<~END,
+          <html>
+            <head>
+              <script>
+                console.log('hello world');
+              </script>
+            </head>
+          </html>
+        END
+      )
+      assert_offenses("", offenses)
     end
   end
 end
