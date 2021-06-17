@@ -4,6 +4,7 @@ module ThemeCheck
   # Encourages the use of the Import on Interaction pattern [1].
   # [1]: https://addyosmani.com/blog/import-on-interaction/
   class AssetSizeJavaScript < HtmlCheck
+    include RegexHelpers
     severity :error
     category :html, :performance
     doc docs_url(__FILE__)
