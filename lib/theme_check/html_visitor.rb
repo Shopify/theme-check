@@ -18,7 +18,7 @@ module ThemeCheck
     private
 
     def parse(template)
-      Nokogiri::HTML5.fragment(template.source)
+      Nokogiri::HTML5.fragment(template.source, max_tree_depth: -1, max_attributes: -1)
     end
 
     def visit(node)
