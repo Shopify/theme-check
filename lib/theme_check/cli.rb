@@ -10,7 +10,7 @@ module ThemeCheck
     def initialize
       @path = "."
       @command = :check
-      @only_categories = []
+      @include_categories = []
       @exclude_categories = []
       @auto_correct = false
       @config_path = nil
@@ -25,15 +25,16 @@ module ThemeCheck
       @option_parser.separator("Basic Options:")
       @option_parser.on(
         "-C", "--config PATH",
-        "Use the config provided, overriding .theme-check.yml if present"
+        "Use the config provided, overriding .theme-check.yml if present",
+        "Use :theme_app_extension to use default checks for theme app extensions"
       ) { |path| @config_path = path }
       @option_parser.on(
-        "-c", "--category CATEGORY",
-        "Only run this category of checks"
-      ) { |category| @only_categories << category.to_sym }
+        "-c", "--category CATEGORY", Check::CATEGORIES, "Only run this category of checks",
+        "Runs checks matching all categories when specified more than once"
+      ) { |category| @include_categories << category.to_sym }
       @option_parser.on(
-        "-x", "--exclude-category CATEGORY",
-        "Exclude this category of checks"
+        "-x", "--exclude-category CATEGORY", Check::CATEGORIES, "Exclude this category of checks",
+        "Excludes checks matching any category when specified more than once"
       ) { |category| @exclude_categories << category.to_sym }
       @option_parser.on(
         "-a", "--auto-correct",
@@ -77,6 +78,8 @@ module ThemeCheck
 
     def parse(argv)
       @path = option_parser.parse(argv).first || "."
+    rescue OptionParser::InvalidArgument => e
+      abort(e.message)
     end
 
     def run!
@@ -84,13 +87,13 @@ module ThemeCheck
         @config = if @config_path
           ThemeCheck::Config.new(
             root: @path,
-            configuration: ThemeCheck::Config.load_file(@config_path)
+            configuration: ThemeCheck::Config.load_config(@config_path)
           )
         else
           ThemeCheck::Config.from_path(@path)
         end
-        @config.only_categories = @only_categories
-        @config.exclude_categories = @exclude_categories
+        @config.include_categories = @include_categories unless @include_categories.empty?
+        @config.exclude_categories = @exclude_categories unless @exclude_categories.empty?
         @config.auto_correct = @auto_correct
       end
 
@@ -130,7 +133,7 @@ module ThemeCheck
     def init
       dotfile_path = ThemeCheck::Config.find(@path)
       if dotfile_path.nil?
-        File.write(File.join(@path, ThemeCheck::Config::DOTFILE), File.read(ThemeCheck::Config::DEFAULT_CONFIG))
+        File.write(File.join(@path, ThemeCheck::Config::DOTFILE), File.read(ThemeCheck::Config::bundled_config_path("default.yml")))
 
         puts "Writing new #{ThemeCheck::Config::DOTFILE} to #{@path}"
       else

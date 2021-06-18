@@ -3,11 +3,11 @@
 module ThemeCheck
   class Config
     DOTFILE = '.theme-check.yml'
-    DEFAULT_CONFIG = "#{__dir__}/../../config/default.yml"
+    BUNDLED_CONFIGS_DIR = "#{__dir__}/../../config"
     BOOLEAN = [true, false]
 
     attr_reader :root
-    attr_accessor :only_categories, :exclude_categories, :auto_correct
+    attr_accessor :auto_correct
 
     class << self
       attr_reader :last_loaded_config
@@ -42,18 +42,46 @@ module ThemeCheck
         YAML.load_file(absolute_path)
       end
 
+      def bundled_config_path(name)
+        "#{BUNDLED_CONFIGS_DIR}/#{name}"
+      end
+
+      def load_bundled_config(name)
+        load_file(bundled_config_path(name))
+      end
+
+      def load_config(path)
+        if path[0] == ":"
+          load_bundled_config("#{path[1..]}.yml")
+        elsif path.is_a?(Symbol)
+          load_bundled_config("#{path}.yml")
+        else
+          load_file(path)
+        end
+      end
+
       def default
-        @default ||= load_file(DEFAULT_CONFIG)
+        @default ||= load_config(":default")
       end
     end
 
     def initialize(root: nil, configuration: nil, should_resolve_requires: true)
       @configuration = if configuration
+        # TODO: Do we need to handle extends here? What base configuration
+        # should we validate against once Theme App Extensions has its own
+        # checks? :all?
         validate_configuration(configuration)
       else
         {}
       end
-      merge_with_default_configuration!(@configuration)
+
+      # Follow extends
+      extends = @configuration["extends"] || ":default"
+      while extends
+        extended_configuration = self.class.load_config(extends)
+        extends = extended_configuration["extends"]
+        @configuration = merge_configurations!(@configuration, extended_configuration)
+      end
 
       @root = if root && @configuration.key?("root")
         Pathname.new(root).join(@configuration["root"])
@@ -61,8 +89,6 @@ module ThemeCheck
         Pathname.new(root)
       end
 
-      @only_categories = []
-      @exclude_categories = []
       @auto_correct = false
 
       resolve_requires if @root && should_resolve_requires
@@ -87,7 +113,7 @@ module ThemeCheck
         check_class = ThemeCheck.const_get(check_name)
 
         next if check_class.categories.any? { |category| exclude_categories.include?(category) }
-        next if only_categories.any? && check_class.categories.none? { |category| only_categories.include?(category) }
+        next if include_categories.any? && !include_categories.all? { |category| check_class.categories.include?(category) }
 
         options_for_check = options.transform_keys(&:to_sym)
         options_for_check.delete(:enabled)
@@ -105,6 +131,22 @@ module ThemeCheck
 
     def ignored_patterns
       self["ignore"] || []
+    end
+
+    def include_categories
+      self["include_categories"] || []
+    end
+
+    def include_categories=(categories)
+      @configuration["include_categories"] = categories
+    end
+
+    def exclude_categories
+      self["exclude_categories"] || []
+    end
+
+    def exclude_categories=(categories)
+      @configuration["exclude_categories"] = categories
     end
 
     private
@@ -147,13 +189,13 @@ module ThemeCheck
       valid_configuration
     end
 
-    def merge_with_default_configuration!(configuration, default_configuration = self.class.default)
-      default_configuration.each do |key, default|
+    def merge_configurations!(configuration, extended_configuration)
+      extended_configuration.each do |key, default|
         value = configuration[key]
 
         case value
         when Hash
-          merge_with_default_configuration!(value, default)
+          merge_configurations!(value, default)
         when nil
           configuration[key] = default
         end
