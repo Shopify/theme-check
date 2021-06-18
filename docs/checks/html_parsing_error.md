@@ -39,7 +39,7 @@ If you don't care about HTML offenses.
 
 ## Version
 
-This check has been introduced in Theme Check THEME_CHECK_VERSION.
+This check has been introduced in Theme Check 0.10.2.
 
 ## Resources
 

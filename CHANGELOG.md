@@ -1,4 +1,10 @@
 
+v0.10.2 / 2021-06-18
+==================
+
+  * Fix error when parsing a template with lots of HTML attributes.
+  * Add `HtmlParsingError` check for reporting errors during HTML parsing.
+
 v0.10.1 / 2021-06-11
 ==================
 
