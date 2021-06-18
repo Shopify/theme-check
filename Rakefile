@@ -75,7 +75,7 @@ task :new_check, [:name] do |_t, args|
     code_source: code_source,
     doc_source: doc_source,
   )
-  sh "bundle exec ruby -Itest test/checks/my_new_check_test.rb"
+  sh "bundle exec ruby -Itest #{test_source}"
 end
 
 def erb(file, to, **args)

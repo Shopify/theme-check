@@ -13,12 +13,14 @@ module ThemeCheck
     def visit_template(template)
       doc = parse(template)
       visit(HtmlNode.new(doc, template))
+    rescue ArgumentError => e
+      call_checks(:on_parse_error, e, template)
     end
 
     private
 
     def parse(template)
-      Nokogiri::HTML5.fragment(template.source)
+      Nokogiri::HTML5.fragment(template.source, max_tree_depth: 400, max_attributes: 400)
     end
 
     def visit(node)
