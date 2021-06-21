@@ -99,6 +99,14 @@ DeprecatedFilter:
   enabled: true
   ignore: []
 
+DeprecateLazysizes:
+  enabled: true
+  ignore: []
+
+DeprecateBgsizes:
+  enabled: true
+  ignore: []
+
 MissingEnableComment:
   enabled: true
   ignore: []

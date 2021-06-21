@@ -39,19 +39,5 @@ module ThemeCheck
         Prefer loading="lazy" to defer loading of images at templates/index.liquid:1
       END
     end
-
-    def test_reports_lazysizes
-      offenses = analyze_theme(
-        ImgLazyLoading.new,
-        "templates/index.liquid" => <<~END,
-          <img src="a.jpg" class="lazyload">
-          <img src="a.jpg" class="lazyload otherclass">
-        END
-      )
-      assert_offenses(<<~END, offenses)
-        Use the native loading=\"lazy\" attribute instead of lazysizes at templates/index.liquid:1
-        Use the native loading=\"lazy\" attribute instead of lazysizes at templates/index.liquid:2
-      END
-    end
   end
 end
