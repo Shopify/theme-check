@@ -3,22 +3,10 @@ module ThemeCheck
   # Reports errors when trying to use too much JavaScript on page load
   # Encourages the use of the Import on Interaction pattern [1].
   # [1]: https://addyosmani.com/blog/import-on-interaction/
-  class AssetSizeJavaScript < LiquidCheck
-    include RegexHelpers
+  class AssetSizeJavaScript < HtmlCheck
     severity :error
-    category :performance
+    category :html, :performance
     doc docs_url(__FILE__)
-
-    Script = Struct.new(:src, :match)
-
-    SCRIPT_TAG_SRC = %r{
-      <script
-        [^>]+                              # any non closing tag character
-        src=                               # src attribute start
-        (?<src>#{QUOTED_LIQUID_ATTRIBUTE}) # src attribute value (may contain liquid)
-        [^>]*                              # any non closing character till the end
-      >
-    }omix
 
     attr_reader :threshold_in_bytes
 
@@ -26,29 +14,14 @@ module ThemeCheck
       @threshold_in_bytes = threshold_in_bytes
     end
 
-    def on_document(node)
-      @node = node
-      @source = node.template.source
-      record_offenses
-    end
-
-    def record_offenses
-      scripts(@source).each do |script|
-        file_size = src_to_file_size(script.src)
-        next if file_size.nil?
-        next if file_size <= threshold_in_bytes
-        add_offense(
-          "JavaScript on every page load exceding compressed size threshold (#{threshold_in_bytes} Bytes), consider using the import on interaction pattern.",
-          node: @node,
-          markup: script.src,
-          line_number: @source[0...script.match.begin(:src)].count("\n") + 1
-        )
-      end
-    end
-
-    def scripts(source)
-      matches(source, SCRIPT_TAG_SRC)
-        .map { |m| Script.new(m[:src].gsub(START_OR_END_QUOTE, ""), m) }
+    def on_script(node)
+      file_size = src_to_file_size(node.attributes['src']&.value)
+      return if file_size.nil?
+      return if file_size <= threshold_in_bytes
+      add_offense(
+        "JavaScript on every page load exceding compressed size threshold (#{threshold_in_bytes} Bytes), consider using the import on interaction pattern.",
+        node: node
+      )
     end
 
     def src_to_file_size(src)
