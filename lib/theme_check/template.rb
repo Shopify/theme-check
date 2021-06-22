@@ -98,6 +98,7 @@ module ThemeCheck
         source,
         line_numbers: true,
         error_mode: :warn,
+        disable_liquid_c_nodes: true,
       )
     end
   end

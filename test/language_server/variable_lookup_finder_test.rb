@@ -4,6 +4,11 @@ require "test_helper"
 module ThemeCheck
   module LanguageServer
     class VariableLookupFinderTest < Minitest::Test
+      def setup
+        super
+        skip("Liquid-C not supported") if liquid_c_enabled?
+      end
+
       def test_lookup_liquid_variable
         assert_can_lookup_var('', '')
         assert_can_lookup_var(' ', '')

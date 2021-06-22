@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require "liquid"
+require "liquid/c"
 
 require_relative "theme_check/version"
 require_relative "theme_check/bug"
@@ -45,3 +46,17 @@ Dir[__dir__ + "/theme_check/checks/*.rb"].each { |file| require file }
 # UTF-8 is the default internal and external encoding, like in Rails & Shopify.
 Encoding.default_external = Encoding::UTF_8
 Encoding.default_internal = Encoding::UTF_8
+
+module ThemeCheck
+  def self.with_liquid_c_disabled
+    if defined?(Liquid::C)
+      was_enabled = Liquid::C.enabled
+      Liquid::C.enabled = false if was_enabled
+    end
+    yield
+  ensure
+    if defined?(Liquid::C) && was_enabled
+      Liquid::C.enabled = true
+    end
+  end
+end

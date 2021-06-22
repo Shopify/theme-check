@@ -4,6 +4,11 @@ require "test_helper"
 module ThemeCheck
   module LanguageServer
     class CompletionEngineTest < Minitest::Test
+      def setup
+        super
+        skip("Liquid-C not supported") if liquid_c_enabled?
+      end
+
       def test_complete_tag
         engine = make_engine(filename => <<~LIQUID)
           {% ren %}

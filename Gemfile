@@ -9,6 +9,8 @@ gemspec
 gem 'bundler'
 gem 'rake'
 
+gem "liquid-c", github: "Shopify/liquid-c", branch: "2020-stable", ref: "a2dc03a82d37554b698099b5634de37cfb614fb2"
+
 group :test do
   gem 'minitest'
   gem 'minitest-focus'
