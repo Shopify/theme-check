@@ -19,7 +19,7 @@ module ThemeCheck
       return if file_size.nil?
       return if file_size <= threshold_in_bytes
       add_offense(
-        "JavaScript on every page load exceding compressed size threshold (#{threshold_in_bytes} Bytes), consider using the import on interaction pattern.",
+        "JavaScript on every page load exceeds compressed size threshold (#{threshold_in_bytes} Bytes), consider using the import on interaction pattern.",
         node: node
       )
     end
