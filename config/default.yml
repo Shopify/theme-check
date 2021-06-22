@@ -114,13 +114,11 @@ AssetSizeJavaScript:
   enabled: false
   ignore: []
   threshold_in_bytes: 10_000
-  ignore: []
 
 AssetSizeCSS:
   enabled: false
   ignore: []
   threshold_in_bytes: 100_000
-  ignore: []
 
 ImgWidthAndHeight:
   enabled: true

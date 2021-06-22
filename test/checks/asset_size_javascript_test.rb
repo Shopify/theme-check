@@ -66,7 +66,7 @@ module ThemeCheck
         END
       )
       assert_offenses(<<~END, offenses)
-        JavaScript on every page load exceding compressed size threshold (2 Bytes), consider using the import on interaction pattern. at templates/index.liquid:3
+        JavaScript on every page load exceeds compressed size threshold (2 Bytes), consider using the import on interaction pattern. at templates/index.liquid:3
       END
     end
 

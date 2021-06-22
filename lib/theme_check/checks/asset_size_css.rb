@@ -43,7 +43,7 @@ module ThemeCheck
         next if file_size.nil?
         next if file_size <= threshold_in_bytes
         add_offense(
-          "CSS on every page load exceding compressed size threshold (#{threshold_in_bytes} Bytes).",
+          "CSS on every page load exceeds compressed size threshold (#{threshold_in_bytes} Bytes).",
           node: @node,
           markup: stylesheet.href,
           line_number: @source[0...stylesheet.index].count("\n") + 1

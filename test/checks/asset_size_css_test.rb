@@ -149,8 +149,8 @@ module ThemeCheck
         END
       )
       assert_offenses(<<~END, offenses)
-        CSS on every page load exceding compressed size threshold (2 Bytes). at templates/index.liquid:3
-        CSS on every page load exceding compressed size threshold (2 Bytes). at templates/index.liquid:4
+        CSS on every page load exceeds compressed size threshold (2 Bytes). at templates/index.liquid:3
+        CSS on every page load exceeds compressed size threshold (2 Bytes). at templates/index.liquid:4
       END
     end
   end
