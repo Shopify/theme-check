@@ -169,14 +169,19 @@ module ThemeCheck
 
     class Stylesheet < Liquid::Raw; end
 
-    Liquid::Template.register_tag('form', Form)
-    Liquid::Template.register_tag('layout', Layout)
-    Liquid::Template.register_tag('render', Render)
-    Liquid::Template.register_tag('paginate', Paginate)
-    Liquid::Template.register_tag('section', Section)
-    Liquid::Template.register_tag('style', Style)
-    Liquid::Template.register_tag('schema', Schema)
-    Liquid::Template.register_tag('javascript', Javascript)
-    Liquid::Template.register_tag('stylesheet', Stylesheet)
+    def self.register_tag(name, klass)
+      return if Liquid::Template.tags[name]
+      Liquid::Template.register_tag(name, klass)
+    end
+
+    register_tag('form', Form)
+    register_tag('layout', Layout)
+    register_tag('render', Render)
+    register_tag('paginate', Paginate)
+    register_tag('section', Section)
+    register_tag('style', Style)
+    register_tag('schema', Schema)
+    register_tag('javascript', Javascript)
+    register_tag('stylesheet', Stylesheet)
   end
 end
