@@ -167,3 +167,13 @@ ImgLazyLoading:
 HtmlParsingError:
   enabled: true
   ignore: []
+
+AssetSizeAppBlockJavaScript:
+  enabled: false
+  ignore: []
+  threshold_in_bytes: 10_000
+
+AssetSizeAppBlockCSS:
+  enabled: false
+  ignore: []
+  threshold_in_bytes: 100_000

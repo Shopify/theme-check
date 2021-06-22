@@ -109,12 +109,12 @@ ParserBlockingScriptTag:
   enabled: true
 
 AssetSizeJavaScript:
-  enabled: false
+  enabled: true
   ignore: []
   threshold_in_bytes: 10_000
 
 AssetSizeCSS:
-  enabled: false
+  enabled: true
   ignore: []
   threshold_in_bytes: 100_000
 
@@ -141,3 +141,13 @@ ImgLazyLoading:
 HtmlParsingError:
   enabled: true
   ignore: []
+
+AssetSizeAppBlockJavaScript:
+  enabled: true
+  ignore: []
+  threshold_in_bytes: 10_000
+
+AssetSizeAppBlockCSS:
+  enabled: true
+  ignore: []
+  threshold_in_bytes: 100_000
