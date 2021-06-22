@@ -174,14 +174,18 @@ module ThemeCheck
       Liquid::Template.register_tag(name, klass)
     end
 
-    register_tag('form', Form)
-    register_tag('layout', Layout)
-    register_tag('render', Render)
-    register_tag('paginate', Paginate)
-    register_tag('section', Section)
-    register_tag('style', Style)
-    register_tag('schema', Schema)
-    register_tag('javascript', Javascript)
-    register_tag('stylesheet', Stylesheet)
+    def self.register_tags
+      return if defined?(@registered_tags) && @registered_tags
+      @registered_tags = true
+      register_tag('form', Form)
+      register_tag('layout', Layout)
+      register_tag('render', Render)
+      register_tag('paginate', Paginate)
+      register_tag('section', Section)
+      register_tag('style', Style)
+      register_tag('schema', Schema)
+      register_tag('javascript', Javascript)
+      register_tag('stylesheet', Stylesheet)
+    end
   end
 end
