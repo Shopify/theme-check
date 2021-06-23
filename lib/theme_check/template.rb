@@ -94,7 +94,7 @@ module ThemeCheck
     alias_method :eql?, :==
 
     def self.parse(source)
-      Tags.register_tags
+      Tags.register_tags!
       Liquid::Template.parse(
         source,
         line_numbers: true,
