@@ -16,6 +16,6 @@ class ShopifyLiquidTest < Minitest::Test
   end
 
   def test_object_labels
-    assert_equal(80, ThemeCheck::ShopifyLiquid::Object.labels.size)
+    assert_equal(82, ThemeCheck::ShopifyLiquid::Object.labels.size)
   end
 end
