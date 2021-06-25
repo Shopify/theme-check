@@ -10,7 +10,7 @@ module ThemeCheck
         quote = scanner.matched[-1] == "'" ? "'" : "\""
         # Skip to the end of the string
         # Check for empty string first, since follow regexp uses lookahead
-        scanner.skip(quote) || scanner.skip_until(/[^\\]#{quote}/)
+        scanner.skip(/#{quote}/) || scanner.skip_until(/[^\\]#{quote}/)
       end
 
       yield scanner.rest if scanner.rest?
