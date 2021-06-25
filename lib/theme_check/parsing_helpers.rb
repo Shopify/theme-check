@@ -7,8 +7,10 @@ module ThemeCheck
 
       while scanner.scan(/.*?("|')/)
         yield scanner.matched[0..-2]
+        quote = scanner.matched[-1] == "'" ? "'" : "\""
         # Skip to the end of the string
-        scanner.skip_until(scanner.matched[-1] == "'" ? /[^\\]'/ : /[^\\]"/)
+        # Check for empty string first, since follow regexp uses lookahead
+        scanner.skip(quote) || scanner.skip_until(/[^\\]#{quote}/)
       end
 
       yield scanner.rest if scanner.rest?
