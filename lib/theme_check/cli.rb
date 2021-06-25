@@ -133,11 +133,16 @@ module ThemeCheck
     def init
       dotfile_path = ThemeCheck::Config.find(@path)
       if dotfile_path.nil?
-        File.write(File.join(@path, ThemeCheck::Config::DOTFILE), File.read(ThemeCheck::Config::bundled_config_path("default.yml")))
+        config_name = if @config_path && @config_path[0] == ":"
+          "#{@config_path[1..]}.yml"
+        else
+          "default.yml"
+        end
+        File.write(File.join(@path, ThemeCheck::Config::DOTFILE), File.read(ThemeCheck::Config.bundled_config_path(config_name)))
 
         puts "Writing new #{ThemeCheck::Config::DOTFILE} to #{@path}"
       else
-        raise Abort, "#{ThemeCheck::Config::DOTFILE} already exists at #{@path}."
+        raise Abort, "#{ThemeCheck::Config::DOTFILE} already exists at #{@path}"
       end
     end
 
