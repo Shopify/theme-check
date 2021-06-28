@@ -21,8 +21,10 @@ The default configuration for this check is the following:
 ```yaml
 TemplateLength:
   enabled: true
-  max_length: 200
+  max_length: 500
   exclude_schema: true
+  exclude_stylesheet: true
+  exclude_javascript: true
 ```
 
 ### `max_length`
@@ -31,7 +33,15 @@ The `max_length` (Default: `200`) option determines the maximum number of lines 
 
 ### `exclude_schema`
 
-The `exclude_schema` (Default: `true`) option determines if the schema lines from a template should be excluded from the line count.
+The `exclude_schema` (Default: `true`) option determines if the lines inside `{% schema %}` blocks from a template should be excluded from the line count.
+
+### `exclude_stylesheet`
+
+The `exclude_stylesheet` (Default: `true`) option determines if the lines inside `{% stylesheet %}` blocks from a template should be excluded from the line count.
+
+### `exclude_javascript`
+
+The `exclude_javascript` (Default: `true`) option determines if the lines inside `{% javascript %}` blocks from a template should be excluded from the line count.
 
 ## When Not To Use It
 

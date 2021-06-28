@@ -38,9 +38,13 @@ SyntaxError:
 TemplateLength:
   enabled: true
   ignore: []
-  max_length: 200
+  max_length: 500
   # Exclude content of {% schema %} in line count
   exclude_schema: true
+  # Exclude content of {% stylesheet %} in line count
+  exclude_stylesheet: true
+  # Exclude content of {% javascript %} in line count
+  exclude_javascript: true
 
 UnknownFilter:
   enabled: true

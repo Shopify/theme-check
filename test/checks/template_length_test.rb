@@ -28,4 +28,28 @@ class TemplateLengthTest < Minitest::Test
     )
     assert_offenses("", offenses)
   end
+
+  def test_excludes_lines_inside_stylesheet
+    offenses = analyze_theme(
+      ThemeCheck::TemplateLength.new(max_length: 10, exclude_stylesheet: true),
+      "sections/long.liquid" => <<~END,
+        {% stylesheet %}
+          #{"\n" * 10}
+        {% endstylesheet %}
+      END
+    )
+    assert_offenses("", offenses)
+  end
+
+  def test_excludes_lines_inside_javascript
+    offenses = analyze_theme(
+      ThemeCheck::TemplateLength.new(max_length: 10, exclude_javascript: true),
+      "sections/long.liquid" => <<~END,
+        {% javascript %}
+          #{"\n" * 10}
+        {% endjavascript %}
+      END
+    )
+    assert_offenses("", offenses)
+  end
 end
