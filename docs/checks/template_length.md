@@ -21,7 +21,7 @@ The default configuration for this check is the following:
 ```yaml
 TemplateLength:
   enabled: true
-  max_length: 200
+  max_length: 500
   exclude_schema: true
 ```
 
