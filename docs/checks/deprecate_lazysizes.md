@@ -50,7 +50,7 @@ You should disable this rule if you want to support lazy loading of images in ol
 
 ## Version
 
-This check has been introduced in Theme Check THEME_CHECK_VERSION.
+This check has been introduced in Theme Check 1.0.0.
 
 ## Resources
 
