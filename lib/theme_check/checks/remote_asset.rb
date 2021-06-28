@@ -9,6 +9,7 @@ module ThemeCheck
     PROTOCOL = %r{(https?:)?//}
     ABSOLUTE_PATH = %r{\A/[^/]}im
     RELATIVE_PATH = %r{\A(?!#{PROTOCOL})[^/\{]}oim
+    CDN_ROOT = "https://cdn.shopify.com/"
 
     def on_element(node)
       return unless TAGS.include?(node.name)
@@ -17,6 +18,7 @@ module ThemeCheck
       return if resource_url.nil? || resource_url.empty?
 
       # Ignore if URL is Liquid, taken care of by AssetUrlFilters check
+      return if resource_url.start_with?(CDN_ROOT)
       return if resource_url =~ ABSOLUTE_PATH
       return if resource_url =~ RELATIVE_PATH
       return if url_hosted_by_shopify?(resource_url)
