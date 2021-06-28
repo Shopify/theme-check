@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 module ThemeCheck
-  # Recommends using {% liquid ... %} if 4 or more consecutive {% ... %} are found.
+  # Recommends using {% liquid ... %} if 5 or more consecutive {% ... %} are found.
   class LiquidTag < LiquidCheck
     severity :suggestion
     category :liquid
     doc docs_url(__FILE__)
 
-    def initialize(min_consecutive_statements: 4)
+    def initialize(min_consecutive_statements: 5)
       @first_statement = nil
       @consecutive_statements = 0
       @min_consecutive_statements = min_consecutive_statements

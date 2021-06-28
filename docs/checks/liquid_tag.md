@@ -39,12 +39,12 @@ The default configuration for this check is the following:
 ```yaml
 LiquidTag:
   enabled: true
-  min_consecutive_statements: 4
+  min_consecutive_statements: 5
 ```
 
 ### `min_consecutive_statements`
 
-The `min_consecutive_statements` option (Default: `4`) determines the maximum (inclusive) number of consecutive statements before the check recommends a refactor.
+The `min_consecutive_statements` option (Default: `5`) determines the maximum (inclusive) number of consecutive statements before the check recommends a refactor.
 
 ## When Not To Use It
 
