@@ -1,4 +1,18 @@
 
+v1.0.0 / 2021-06-28
+==================
+
+  * Convert `AssetSizeCSS` to `HtmlCheck`
+  * Add `DeprecateLazysizes` & `DeprecateBgsizes` checks
+  * Allow hardcoded CDN urls in `RemoteAsset`
+  * Bump `LiquidTag` `min_consecutive_statements` default to 5
+  * Exclude {% javascript %} and {% stylesheet %} from line counts in `TemplateLength`
+  * Bump `TemplateLength` `max_length` default to 500
+  * Fix `StringScanner#skip(String)` not being supported on some Rubies
+  * Fix `ParsingHelpers#outside_of_strings` handling of empty strings
+  * Update to support new `{% render %}` syntax
+  * Converted `AssetSizeJavaScript` to `HtmlCheck`
+
 v0.10.2 / 2021-06-18
 ==================
 

@@ -55,7 +55,7 @@ You should disable this rule in older browsers that don't support the CSS image-
 
 ## Version
 
-This check has been introduced in Theme Check THEME_CHECK_VERSION.
+This check has been introduced in Theme Check 1.0.0.
 
 ## Resources
 
