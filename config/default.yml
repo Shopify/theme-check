@@ -12,7 +12,7 @@ ConvertIncludeToRender:
 LiquidTag:
   enabled: true
   ignore: []
-  min_consecutive_statements: 4
+  min_consecutive_statements: 5
 
 MissingTemplate:
   enabled: true
