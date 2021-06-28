@@ -13,6 +13,7 @@ module ThemeCheck
           <!-- styles -->
           {{ 'theme.css' | asset_url | stylesheet_tag }}
           <link href="{{ 'theme.css' | asset_url }}" rel="stylesheet">
+          <link rel="stylesheet" href="https://cdn.shopify.com/shopifycloud/ui.css">
 
           <!-- images -->
           <img alt="logo" src="{{ 'heart.png' | asset_url }}" width="100" height="100">
