@@ -283,4 +283,14 @@ class SpaceInsideBracesTest < Minitest::Test
     )
     assert_offenses('', offenses)
   end
+
+  def test_dont_report_missing_spaces_inside_strings
+    offenses = analyze_theme(
+      ThemeCheck::SpaceInsideBraces.new,
+      "templates/index.liquid" => <<~END,
+        {{ filter.min_value.value | money_without_currency | replace: '.', '' | replace: ',', '.' }}
+      END
+    )
+    assert_offenses('', offenses)
+  end
 end
