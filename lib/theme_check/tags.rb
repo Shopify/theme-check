@@ -177,7 +177,6 @@ module ThemeCheck
       end
 
       def register_tag(name, klass)
-        return if Liquid::Template.tags[name]
         Liquid::Template.register_tag(name, klass)
       end
 
