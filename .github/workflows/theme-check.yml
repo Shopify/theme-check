@@ -34,6 +34,8 @@ jobs:
       run: bundle install --jobs=3 --retry=3 --path=vendor/bundle
     - name: Run tests
       run: bundle exec rake
+    - name: Check dawn
+      run: bundle exec rake check_dawn
     - name: Test runtime
       # Testing that runtime can execute, not testing the results themselves
       run: bundle exec theme-check ./test/theme | grep -q "files inspected"
