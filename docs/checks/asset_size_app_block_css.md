@@ -19,7 +19,7 @@ This rule disallows the use of too much CSS in themes, as configured by `thresho
 
 ## Check Options
 
-The default configuration is the following.
+The default configuration is the following:
 
 ```yaml
 AssetSizeAppBlockCSS:
@@ -35,11 +35,12 @@ This includes theme and remote stylesheets.
 
 ## When Not To Use It
 
-This rule is safe to disable.
+This rule should not be disabled locally since the check will be enforced when
+promoting new versions of the extension.
 
 ## Version
 
-This check has been introduced in Theme Check 1.1.0
+This check has been introduced in THEME_CHECK_VERSION
 
 ## Resources
 

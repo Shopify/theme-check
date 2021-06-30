@@ -1,8 +1,3 @@
-Unreleased
-==========
-
-  * Add AssetSizeAppBlockCSS and AssetSizeAppBlockJavaScript checks
-
 v1.0.0 / 2021-06-28
 ==================
 

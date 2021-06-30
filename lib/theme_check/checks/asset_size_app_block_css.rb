@@ -7,6 +7,10 @@ module ThemeCheck
     category :performance
     doc docs_url(__FILE__)
 
+    # Don't allow this check to be disabled with a comment,
+    # since we need to be able to enforce this server-side
+    can_disable false
+
     attr_reader :threshold_in_bytes
 
     def initialize(threshold_in_bytes: 100_000)

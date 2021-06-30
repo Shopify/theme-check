@@ -16,14 +16,14 @@ This rule disallows the use of block JavaScript files and external scripts to ha
 {% schema %}
 {
   ...
-  "javascript": "chat-widjet.js"
+  "javascript": "chat-widget.js"
 }
 {% endschema %}
 ```
 
 ## Check Options
 
-The default configuration is the following.
+The default configuration is the following:
 
 ```yaml
 AssetSizeAppBlockJavaScript:
@@ -39,19 +39,12 @@ This includes theme and remote scripts.
 
 ## When Not To Use It
 
-When you can't do anything about it, it is preferable to disable this rule using the comment syntax:
-
-```
-{% comment %}theme-check-disable AppBlockAssets{% endcomment %}
-<script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
-{% comment %}theme-check-enable AppBlockAssets{% endcomment %}
-```
-
-This makes disabling the rule an explicit affair and shows that the code is smelly.
+This rule should not be disabled locally since the check will be enforced when
+promoting new versions of the extension.
 
 ## Version
 
-This check has been introduced in Theme Check 1.1.0
+This check has been introduced in THEME_CHECK_VERSION
 
 ## Resources
 
