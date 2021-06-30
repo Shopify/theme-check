@@ -20,6 +20,10 @@ module ThemeCheck
       @parser_error
     end
 
+    def create(content: '{}')
+      @storage.write(relative_path, content)
+    end
+
     def json?
       true
     end

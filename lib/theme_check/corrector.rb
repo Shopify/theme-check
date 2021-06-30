@@ -31,5 +31,10 @@ module ThemeCheck
     def create(theme, relative_path, content)
       theme.storage.write(relative_path, content)
     end
+
+    def create_default_locale_json(theme)
+      theme.default_locale_json = JsonFile.new('locales/' + theme.default_locale + '.default.json', theme.storage)
+      theme.default_locale_json.create
+    end
   end
 end
