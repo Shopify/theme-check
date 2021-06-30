@@ -7,8 +7,7 @@ module ThemeCheck
     doc docs_url(__FILE__)
 
     def initialize(min_consecutive_statements: 5)
-      @first_statement = nil
-      @consecutive_statements = 0
+      @consecutive_statements = []
       @min_consecutive_statements = min_consecutive_statements
     end
 
@@ -19,6 +18,10 @@ module ThemeCheck
       elsif !node.comment?
         increment_consecutive_statements(node)
       end
+    end
+
+    def on_else_condition(node)
+      @consecutive_statements << node
     end
 
     def on_string(node)
@@ -33,16 +36,25 @@ module ThemeCheck
     end
 
     def increment_consecutive_statements(node)
-      @first_statement ||= node
-      @consecutive_statements += 1
+      @consecutive_statements << node.markup
     end
 
     def reset_consecutive_statements
-      if @consecutive_statements >= @min_consecutive_statements
-        add_offense("Use {% liquid ... %} to write multiple tags", node: @first_statement)
+      if @consecutive_statements.length >= @min_consecutive_statements
+        binding.pry
+        result = "liquid\n"
+        prev = nil
+
+        @consecutive_statements.each do |statement|
+          result += "#{statement} \n"
+        end
+
+        add_offense("Use {% liquid ... %} to write multiple tags", node: @consecutive_statements[0]) do |corrector|
+          corrector.replace(@consecutive_statements[0], result)
+        end
       end
       @first_statement = nil
-      @consecutive_statements = 0
+      @consecutive_statements = []
     end
   end
 end
