@@ -2,6 +2,7 @@
 require "rake/testtask"
 require "rubocop/rake_task"
 require "bundler/gem_tasks"
+require "tmpdir"
 
 namespace :tests do
   task all: [:in_memory, :file_system]
@@ -76,6 +77,21 @@ task :new_check, [:name] do |_t, args|
     doc_source: doc_source,
   )
   sh "bundle exec ruby -Itest #{test_source}"
+end
+
+desc "Check that Dawn passes all our tests"
+task :check_dawn do
+  Dir.mktmpdir do |tmpdir|
+    # Clone Dawn into a temporary directory
+    puts "Cloning dawn into #{tmpdir}"
+    system "git clone -q https://github.com/Shopify/dawn #{tmpdir}"
+    dawn_rev = %x{git -C #{tmpdir} rev-parse HEAD}
+    puts "Got dawn rev #{dawn_rev}"
+    # Run theme-check on Dawn
+    unless system("bundle exec theme-check #{tmpdir}")
+      abort("theme-check failed to validate dawn")
+    end
+  end
 end
 
 def erb(file, to, **args)
