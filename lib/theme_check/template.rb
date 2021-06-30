@@ -94,10 +94,12 @@ module ThemeCheck
     alias_method :eql?, :==
 
     def self.parse(source)
+      Tags.register_tags!
       Liquid::Template.parse(
         source,
         line_numbers: true,
         error_mode: :warn,
+        disable_liquid_c_nodes: true,
       )
     end
   end

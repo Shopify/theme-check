@@ -143,7 +143,7 @@ class ConfigTest < Minitest::Test
     )
   end
 
-  def test_merge_with_default_config
+  def test_merge_configs
     mock_default_config(
       "root": ".",
       "ignore": [
@@ -193,6 +193,7 @@ class ConfigTest < Minitest::Test
   def test_custom_check
     storage = make_file_system_storage(
       ".theme-check.yml" => <<~END,
+        include_categories: []
         require:
           - ./checks/custom_check.rb
         CustomCheck:
@@ -209,11 +210,19 @@ class ConfigTest < Minitest::Test
     assert(check_enabled?(config, ThemeCheck::CustomCheck))
   end
 
-  def test_only_category
+  def test_include_category
     config = ThemeCheck::Config.new(root: ".")
-    config.only_categories = [:liquid]
+    config.include_categories = [:liquid]
     assert(config.enabled_checks.any?)
     assert(config.enabled_checks.all? { |c| c.categories.include?(:liquid) })
+  end
+
+  def test_include_categories
+    config = ThemeCheck::Config.new(root: ".")
+    config.include_categories = [:liquid, :performance]
+    assert(config.enabled_checks.any?)
+    assert(config.enabled_checks.all? { |c| c.categories.include?(:liquid) && c.categories.include?(:performance) })
+    assert(config.enabled_checks.none? { |c| c.categories.include?(:liquid) && !c.categories.include?(:performance) })
   end
 
   def test_exclude_category
@@ -221,6 +230,13 @@ class ConfigTest < Minitest::Test
     config.exclude_categories = [:liquid]
     assert(config.enabled_checks.any?)
     assert(config.enabled_checks.none? { |c| c.categories.include?(:liquid) })
+  end
+
+  def test_exclude_categories
+    config = ThemeCheck::Config.new(root: ".")
+    config.exclude_categories = [:liquid, :performance]
+    assert(config.enabled_checks.any?)
+    assert(config.enabled_checks.none? { |c| c.categories.include?(:liquid) || c.categories.include?(:performance) })
   end
 
   def test_ignore
@@ -243,5 +259,6 @@ class ConfigTest < Minitest::Test
 
   def mock_default_config(config)
     ThemeCheck::Config.stubs(:default).returns(config)
+    ThemeCheck::Config.stubs(:load_config).with(":default").returns(config)
   end
 end

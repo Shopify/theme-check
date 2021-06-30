@@ -7,6 +7,11 @@ class VisitorTest < Minitest::Test
     @visitor = ThemeCheck::Visitor.new(ThemeCheck::Checks.new([@tracer]), ThemeCheck::DisabledChecks.new)
   end
 
+  def run
+    # Liquid-C is disabled from the Analyzer, before the visitor is called
+    ThemeCheck.with_liquid_c_disabled { super }
+  end
+
   def test_assign
     template = parse_liquid(<<~END)
       {% assign x = 'hello' %}

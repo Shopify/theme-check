@@ -1,0 +1,11 @@
+root: .
+
+require: []
+
+include_categories: []
+
+exclude_categories: []
+
+ignore:
+  - node_modules/*
+

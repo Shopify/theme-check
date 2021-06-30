@@ -8,6 +8,7 @@ module ThemeCheck
 
       def setup
         @provider = ObjectCompletionProvider.new
+        skip("Liquid-C not supported") if liquid_c_enabled?
       end
 
       def test_completions_from_different_cursor_positions

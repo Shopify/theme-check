@@ -18,7 +18,7 @@ ConvertIncludeToRender:
 LiquidTag:
   enabled: true
   ignore: []
-  min_consecutive_statements: 5
+  min_consecutive_statements: 4
 
 MissingTemplate:
   enabled: true
@@ -44,13 +44,9 @@ SyntaxError:
 TemplateLength:
   enabled: true
   ignore: []
-  max_length: 500
+  max_length: 200
   # Exclude content of {% schema %} in line count
   exclude_schema: true
-  # Exclude content of {% stylesheet %} in line count
-  exclude_stylesheet: true
-  # Exclude content of {% javascript %} in line count
-  exclude_javascript: true
 
 UnknownFilter:
   enabled: true
@@ -72,10 +68,6 @@ MatchingTranslations:
   enabled: true
   ignore: []
 
-DefaultLocale:
-  enabled: true
-  ignore: []
-
 TranslationKeyExists:
   enabled: true
   ignore: []
@@ -92,28 +84,16 @@ ValidSchema:
   enabled: true
   ignore: []
 
-MissingRequiredTemplateFiles:
-  enabled: true
-  ignore: []
-
 UndefinedObject:
   enabled: true
   ignore: []
   exclude_snippets: true
 
 RequiredDirectories:
-  enabled: true
+  enabled: false
   ignore: []
 
 DeprecatedFilter:
-  enabled: true
-  ignore: []
-
-DeprecateLazysizes:
-  enabled: true
-  ignore: []
-
-DeprecateBgsizes:
   enabled: true
   ignore: []
 
@@ -127,22 +107,16 @@ ParserBlockingJavaScript:
 
 ParserBlockingScriptTag:
   enabled: true
-  ignore: []
 
 AssetSizeJavaScript:
   enabled: false
-  threshold_in_bytes: 10_000
   ignore: []
+  threshold_in_bytes: 10_000
 
 AssetSizeCSS:
   enabled: false
-  threshold_in_bytes: 100_000
   ignore: []
-
-AssetSizeCSSStylesheetTag:
-  enabled: false
   threshold_in_bytes: 100_000
-  ignore: []
 
 ImgWidthAndHeight:
   enabled: true

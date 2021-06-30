@@ -14,6 +14,10 @@ module Minitest
       ThemeCheck::Template.new("file.liquid", storage)
     end
 
+    def liquid_c_enabled?
+      defined?(Liquid::C) && Liquid::C.enabled
+    end
+
     def analyze_theme(*check_classes, templates)
       analyzer = ThemeCheck::Analyzer.new(make_theme(templates), check_classes)
       analyzer.analyze_theme
