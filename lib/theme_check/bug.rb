@@ -2,6 +2,8 @@
 require 'theme_check/version'
 
 module ThemeCheck
+  class ThemeCheckError < StandardError; end
+
   BUG_POSTAMBLE = <<~EOS
     Theme Check Version: #{VERSION}
     Ruby Version: #{RUBY_VERSION}
@@ -15,6 +17,6 @@ module ThemeCheck
   EOS
 
   def self.bug(message)
-    abort(message + BUG_POSTAMBLE)
+    raise ThemeCheckError, message + BUG_POSTAMBLE
   end
 end
