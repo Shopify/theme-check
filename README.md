@@ -100,6 +100,8 @@ TemplateLength:
   # Or ignore certain paths
   ignore:
     - snippets/icon-*
+  # Or change the severity (error|suggestion|style)
+  severity: suggestion
 
 # Enable a custom check
 MyCustomCheck
@@ -140,4 +142,41 @@ Disable checks for the _entire document_ by placing the comment on the first lin
 {% comment %}theme-check-disable SpaceInsideBraces{% endcomment %}
 
 {%assign x = 1%}
+```
+
+## Exit Code and `--fail-level`
+
+Use the `--fail-level` (default: `error`) flag to configure the exit code of theme-check. Useful in CI scenarios.
+
+Example:
+
+```
+# Make CI fail on styles warnings, suggestions, and errors
+theme-check --fail-level style path_to_theme
+
+# Make CI fail on suggestions, and errors
+theme-check --fail-level suggestion path_to_theme
+
+# Make CI fail on errors
+theme-check path_to_theme
+```
+
+There are three fail levels:
+
+- `error`
+- `suggestion`
+- `style`
+
+Exit code meanings:
+
+- 0: Success!
+- 1: Your code doesn't pass the checks
+- 2: There's a bug in theme-check
+
+If you would like to change the severity of a check, you can do so with the `severity` attribute. Example:
+
+```yaml
+DeprecateLazysizes:
+  enabled: true
+  severity: error
 ```

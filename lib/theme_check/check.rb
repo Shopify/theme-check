@@ -9,11 +9,18 @@ module ThemeCheck
     attr_accessor :options, :ignored_patterns
     attr_writer :offenses
 
+    # The order matters.
     SEVERITIES = [
       :error,
       :suggestion,
       :style,
     ]
+
+    # [severity: sym] => number
+    SEVERITY_VALUES = SEVERITIES
+      .map
+      .with_index { |sev, i| [sev, i] }
+      .to_h
 
     CATEGORIES = [
       :liquid,
@@ -36,6 +43,10 @@ module ThemeCheck
           @severity = severity
         end
         @severity if defined?(@severity)
+      end
+
+      def severity_value(severity)
+        SEVERITY_VALUES[severity]
       end
 
       def categories(*categories)
@@ -85,7 +96,18 @@ module ThemeCheck
     end
 
     def severity
-      self.class.severity
+      @severity ||= self.class.severity
+    end
+
+    def severity=(severity)
+      unless SEVERITIES.include?(severity)
+        raise ArgumentError, "unknown severity. Use: #{SEVERITIES.join(', ')}"
+      end
+      @severity = severity
+    end
+
+    def severity_value
+      SEVERITY_VALUES[severity]
     end
 
     def categories

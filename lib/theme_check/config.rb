@@ -117,12 +117,14 @@ module ThemeCheck
 
         options_for_check = options.transform_keys(&:to_sym)
         options_for_check.delete(:enabled)
+        severity = options_for_check.delete(:severity)
         ignored_patterns = options_for_check.delete(:ignore) || []
         check = if options_for_check.empty?
           check_class.new
         else
           check_class.new(**options_for_check)
         end
+        check.severity = severity.to_sym if severity
         check.ignored_patterns = ignored_patterns
         check.options = options_for_check
         check
@@ -175,6 +177,8 @@ module ThemeCheck
           else
             warn("bad configuration type for #{name}: expected a Hash, got #{value.inspect}")
           end
+        elsif key == "severity"
+          valid_configuration[key] = value
         elsif default.nil?
           warn("unknown configuration: #{name}")
         elsif BOOLEAN.include?(default) && !BOOLEAN.include?(value)

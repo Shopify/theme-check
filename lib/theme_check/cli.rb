@@ -14,6 +14,7 @@ module ThemeCheck
       @exclude_categories = []
       @auto_correct = false
       @config_path = nil
+      @fail_level = :error
     end
 
     def option_parser(parser = OptionParser.new, help: true)
@@ -40,6 +41,12 @@ module ThemeCheck
         "-a", "--auto-correct",
         "Automatically fix offenses"
       ) { @auto_correct = true }
+      @option_parser.on(
+        "--fail-level SEVERITY", Check::SEVERITIES,
+        "Minimum severity (error|suggestion|style) for exit with error code"
+      ) do |severity|
+        @fail_level = severity.to_sym
+      end
 
       @option_parser.separator("")
       @option_parser.separator("Miscellaneous:")
@@ -102,12 +109,16 @@ module ThemeCheck
 
     def run
       run!
+      exit(0)
     rescue Abort => e
       if e.message.empty?
         exit(1)
       else
         abort(e.message)
       end
+    rescue ThemeCheckError => e
+      STDERR.puts(e.message)
+      exit(2)
     end
 
     def self.parse_and_run!(argv)
@@ -165,7 +176,9 @@ module ThemeCheck
       analyzer.analyze_theme
       analyzer.correct_offenses
       ThemeCheck::Printer.new.print(theme, analyzer.offenses, @config.auto_correct)
-      raise Abort, "" if analyzer.uncorrectable_offenses.any?
+      raise Abort, "" if analyzer.uncorrectable_offenses.any? do |offense|
+        offense.check.severity_value <= Check.severity_value(@fail_level)
+      end
     end
   end
 end
