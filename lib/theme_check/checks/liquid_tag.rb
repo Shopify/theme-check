@@ -20,10 +20,6 @@ module ThemeCheck
       end
     end
 
-    def on_else_condition(node)
-      @consecutive_statements << node
-    end
-
     def on_string(node)
       # Only reset the counter on outputted strings, and ignore empty line-breaks
       if node.parent.block? && !node.value.strip.empty?
@@ -41,9 +37,7 @@ module ThemeCheck
 
     def reset_consecutive_statements
       if @consecutive_statements.length >= @min_consecutive_statements
-        binding.pry
         result = "liquid\n"
-        prev = nil
 
         @consecutive_statements.each do |statement|
           result += "#{statement} \n"
