@@ -1,3 +1,17 @@
+
+v1.0.1 / 2021-07-06
+==================
+
+  * Add `--fail-level` CLI flag to configure exit code
+  * Refactor all theme file classes to inherit from `ThemeFile`
+  * Fix `undefined method liquid?` error when scanning from LSP
+  * Adding asset document links
+  * Allow initializing theme app extension configuration files
+  * Allow disabling registering mock Liquid tags w/ `ThemeCheck::Tags.register_tags = false`
+  * Support Theme App Extensions
+  * Add checks for theme app extension block JS/CSS
+  * Disable Liquid::C when parsing Liquid templates
+
 v1.0.0 / 2021-06-28
 ==================
 

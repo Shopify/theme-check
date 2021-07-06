@@ -40,7 +40,7 @@ promoting new versions of the extension.
 
 ## Version
 
-This check has been introduced in THEME_CHECK_VERSION
+This check has been introduced in 1.0.1
 
 ## Resources
 
