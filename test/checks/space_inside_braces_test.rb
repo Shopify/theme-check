@@ -293,4 +293,14 @@ class SpaceInsideBracesTest < Minitest::Test
     )
     assert_offenses('', offenses)
   end
+
+  def test_dont_report_empty_variables
+    offenses = analyze_theme(
+      ThemeCheck::SpaceInsideBraces.new,
+      "templates/index.liquid" => <<~END,
+        {{}}
+      END
+    )
+    assert_offenses('', offenses)
+  end
 end

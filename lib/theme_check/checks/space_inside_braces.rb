@@ -51,7 +51,7 @@ module ThemeCheck
     end
 
     def on_variable(node)
-      return if @ignore
+      return if @ignore || node.markup.empty?
       if node.markup[0] != " "
         add_offense("Space missing after '{{'", node: node) do |corrector|
           corrector.insert_before(node, " ")
