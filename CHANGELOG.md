@@ -1,5 +1,5 @@
 
-v1.0.1 / 2021-07-06
+v1.1.0 / 2021-07-06
 ==================
 
   * Add `--fail-level` CLI flag to configure exit code
