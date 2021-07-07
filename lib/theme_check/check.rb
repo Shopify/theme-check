@@ -69,7 +69,7 @@ module ThemeCheck
       end
 
       def docs_url(path)
-        "https://github.com/Shopify/theme-check/blob/master/docs/checks/#{File.basename(path, '.rb')}.md"
+        "https://github.com/Shopify/theme-check/blob/main/docs/checks/#{File.basename(path, '.rb')}.md"
       end
 
       def can_disable(disableable = nil)

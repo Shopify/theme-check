@@ -22,7 +22,7 @@ module ThemeCheck
       File.join(
         __dir__,
         '..',
-        doc.sub(%r{^https://.+master/}, '')
+        doc.sub(%r{^https://.+main/}, '')
       )
     end
   end
