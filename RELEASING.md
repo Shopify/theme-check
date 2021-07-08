@@ -13,7 +13,7 @@
 
 4. Commit your changes and make a PR.
 
-5. Merge your PR to master.
+5. Merge your PR to main.
 
 6. On [Shipit](https://shipit.shopify.io/shopify/theme-check/rubygems), deploy your commit.
 
@@ -46,7 +46,7 @@
 
    ```bash
    # shortcut if you have `hub` installed
-   hub compare "master:bump/theme-check-$VERSION"
+   hub compare "main:bump/theme-check-$VERSION"
    ```
 
 ## Shopify CLI Release Process
