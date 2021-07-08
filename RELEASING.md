@@ -17,6 +17,14 @@
 
 6. On [Shipit](https://shipit.shopify.io/shopify/theme-check/rubygems), deploy your commit.
 
+## Shopify CLI Release Process
+
+1. Update the `theme-check` version in [shopify-cli.gemspec](https://github.com/Shopify/shopify-cli/blob/main/shopify-cli.gemspec#L47)
+
+2. Run `dev up` to update the `Gemfile.lock`
+
+3. Make a PR in `shopify-cli`.
+
 ## Homebrew Release Process
 
 1. Release `theme-check` on RubyGems by following the steps in the previous section.
