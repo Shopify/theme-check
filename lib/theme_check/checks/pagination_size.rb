@@ -5,9 +5,11 @@ module ThemeCheck
     categories :performance
     doc docs_url(__FILE__)
 
+    attr_reader :min_size
     attr_reader :max_size
 
-    def initialize(max_size: 50)
+    def initialize(min_size: 1, max_size: 50)
+      @min_size = min_size
       @max_size = max_size
     end
 
@@ -41,8 +43,10 @@ module ThemeCheck
         else
           get_setting_default_value(size.lookups.last)
         end
-        if numerical_size > @max_size
-          nodes.each { |node| add_offense("Use a smaller pagination size", node: node) }
+        if numerical_size.nil?
+          nodes.each { |node| add_offense("Default pagination size should be defined in the section settings", node: node) }
+        elsif numerical_size > @max_size || numerical_size < @min_size || !numerical_size.is_a?(Integer)
+          nodes.each { |node| add_offense("Pagination size must be a positive integer between #{@min_size} and #{@max_size}", node: node) }
         end
       end
     end
@@ -54,8 +58,8 @@ module ThemeCheck
       unless setting.empty?
         return setting.first['default']
       end
-      # Setting does not exist, assume it is too big
-      Float::INFINITY
+      # Setting does not exist
+      nil
     end
   end
 end

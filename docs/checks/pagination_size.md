@@ -17,7 +17,7 @@ This check is aimed at keeping response times low.
 {% paginate collection.products by 12 %}
 ```
 
-Use sizes that are below the `max_size`.
+Use sizes that are integers below the `max_size`, and above the `min_size`.
 
 ## Check Options
 
@@ -27,6 +27,7 @@ The default configuration for this check is the following:
 PaginationSize:
   enabled: true
   ignore: []
+  min_size: 1
   max_size: 50
 ```
 
