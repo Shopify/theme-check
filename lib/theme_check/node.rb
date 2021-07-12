@@ -22,9 +22,7 @@ module ThemeCheck
     end
 
     def markup=(markup)
-      if tag?
-        @value.raw = markup
-      elsif @value.instance_variable_defined?(:@markup)
+      if @value.instance_variable_defined?(:@markup)
         @value.instance_variable_set(:@markup, markup)
       end
     end
