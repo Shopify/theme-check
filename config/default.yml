@@ -177,3 +177,9 @@ AssetSizeAppBlockCSS:
   enabled: false
   ignore: []
   threshold_in_bytes: 100_000
+
+PaginationSize:
+  enabled: true
+  ignore: []
+  min_size: 1
+  max_size: 50
