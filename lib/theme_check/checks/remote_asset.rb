@@ -28,7 +28,7 @@ module ThemeCheck
       return if rel && rel.value != "stylesheet"
 
       add_offense(
-        "Asset should be served by the Shopify CDN for better performance.",
+        "Asset should be served by the Shopify CDN for better performance",
         node: node,
       )
     end
