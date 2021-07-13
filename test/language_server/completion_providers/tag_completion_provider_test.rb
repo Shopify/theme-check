@@ -4,30 +4,36 @@ require "test_helper"
 module ThemeCheck
   module LanguageServer
     class TagCompletionProviderTest < Minitest::Test
+      include CompletionProviderTestHelper
+
       def setup
-        @module = TagCompletionProvider.new
+        @provider = TagCompletionProvider.new
       end
 
       def test_can_complete?
-        assert(@module.can_complete?("{% ", 3))
-        assert(@module.can_complete?("{%  ", 4))
-        assert(@module.can_complete?("{% rend", 3))
-        assert(@module.can_complete?("{% rend", 7))
-        assert(@module.can_complete?("{% rend %}", 3))
+        assert_can_complete(@provider, "{% ")
+        assert_can_complete(@provider, "{%  ")
+        assert_can_complete(@provider, "{% rend")
+        assert_can_complete(@provider, "{% rend")
+        assert_can_complete(@provider, "{% rend %}", -3)
 
-        refute(@module.can_complete?("{{  ", 4))
-        refute(@module.can_complete?("{% if foo", 9))
+        refute_can_complete(@provider, "{{  ")
+        refute_can_complete(@provider, "{% if foo")
       end
 
       def test_completions
-        assert_includes(@module.completions("{% rend", 7), {
-          label: "render",
-          kind: CompletionItemKinds::KEYWORD,
-        })
-        assert_includes(@module.completions("{% comm", 7), {
-          label: "comment",
-          kind: CompletionItemKinds::KEYWORD,
-        })
+        assert_can_complete_with(@provider, "{% rend", "render")
+        assert_can_complete_with(@provider, "{% comm", "comment")
+      end
+
+      def test_complete_end_blocks
+        # the end* are not suggested unless you type end
+        refute_can_complete_with(@provider, "{% ", "endcomment")
+        refute_can_complete_with(@provider, "{% en", "endcomment")
+
+        # the end* are suggested if end is part of your tag
+        assert_can_complete_with(@provider, "{% end", "endcomment")
+        assert_can_complete_with(@provider, "{% endcomm", "endcomment")
       end
     end
   end
