@@ -99,7 +99,7 @@ module ThemeCheck
       end
 
       def path_from_uri(uri)
-        uri&.sub('file://', '')
+        uri&.sub('file://', '')&.sub('/c%3A', '')
       end
 
       def relative_path_from_text_document_uri(params)
