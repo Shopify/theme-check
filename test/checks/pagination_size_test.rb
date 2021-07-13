@@ -66,6 +66,22 @@ module ThemeCheck
       END
     end
 
+    def test_flag_use_of_size_is_integer
+      offenses = analyze_theme(
+        PaginationSize.new(min_size: 1, max_size: 50),
+        "templates/index.liquid" => <<~END,
+          {%- paginate collection.products by 1.5 -%}
+          {%- endpaginate -%}
+          {% paginate collection.products by 1.5 %}
+          {% endpaginate %}
+        END
+      )
+      assert_offenses(<<~END, offenses)
+        Pagination size must be a positive integer between 1 and 50 at templates/index.liquid:1
+        Pagination size must be a positive integer between 1 and 50 at templates/index.liquid:3
+      END
+    end
+
     def test_flag_use_of_setting_value
       offenses = analyze_theme(
         PaginationSize.new(min_size: 1, max_size: 50),
