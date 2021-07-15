@@ -1,4 +1,12 @@
 
+v1.2.0 / 2021-07-15
+==================
+
+  * Add Windows Support ([#364](https://github.com/shopify/theme-check/issues/364))
+  * Ignore empty `{{}}` in SpaceInsideBraces ([#350](https://github.com/shopify/theme-check/issues/350))
+  * Switch to main branch
+  * Minor documentation fixes
+
 v1.1.0 / 2021-07-06
 ==================
 

@@ -13,6 +13,13 @@
 
 4. Commit your changes and make a PR.
 
+   ```bash
+   git checkout -b "bump/theme-check-$VERSION"
+   git add docs/checks CHANGELOG.md lib/theme_check/version.rb
+   git commit -m "Bump theme-check version to $VERSION"
+   hub compare "main:bump/theme-check-$VERSION"
+   ```
+
 5. Merge your PR to main.
 
 6. On [Shipit](https://shipit.shopify.io/shopify/theme-check/rubygems), deploy your commit.
