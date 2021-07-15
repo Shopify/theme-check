@@ -25,5 +25,5 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency('liquid', '>= 5.0.1')
-  spec.add_dependency('nokogumbo')
+  spec.add_dependency('nokogiri', '>= 1.12.0.rc1')
 end
