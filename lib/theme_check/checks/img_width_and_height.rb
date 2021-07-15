@@ -35,7 +35,7 @@ module ThemeCheck
       return unless value =~ ENDS_IN_CSS_UNIT
       value_without_units = value.gsub(ENDS_IN_CSS_UNIT, '')
       add_offense(
-        "The #{attribute} attribute does not take units. Replace with \"#{value_without_units}\"",
+        "The #{attribute} attribute does not take units. Replace with \"#{value_without_units}\".",
         node: node,
       )
     end
