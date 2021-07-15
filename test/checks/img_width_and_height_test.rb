@@ -97,10 +97,10 @@ module ThemeCheck
         END
       )
       assert_offenses(<<~END, offenses)
-        The width attribute does not take units. Replace with "100". at templates/index.liquid:1
-        The height attribute does not take units. Replace with "200". at templates/index.liquid:1
-        The width attribute does not take units. Replace with "{{ image.width }}". at templates/index.liquid:2
-        The height attribute does not take units. Replace with "{{ image.height }}". at templates/index.liquid:2
+        The width attribute does not take units. Replace with "100" at templates/index.liquid:1
+        The height attribute does not take units. Replace with "200" at templates/index.liquid:1
+        The width attribute does not take units. Replace with "{{ image.width }}" at templates/index.liquid:2
+        The height attribute does not take units. Replace with "{{ image.height }}" at templates/index.liquid:2
       END
     end
   end
