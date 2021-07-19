@@ -56,7 +56,7 @@ module ThemeCheck
     def get_setting_default_value(setting_id)
       setting = @schema_settings.select { |s| s['id'] == setting_id }
       unless setting.empty?
-        return setting.first['default']
+        return setting.last['default']
       end
       # Setting does not exist
       nil
