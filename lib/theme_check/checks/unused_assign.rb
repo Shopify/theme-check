@@ -46,8 +46,9 @@ module ThemeCheck
       @templates.each_pair do |_, info|
         used = info.collect_used_assigns(@templates)
         info.assign_nodes.each_pair do |name, node|
-          unless used.include?(name)
-            add_offense("`#{name}` is never used", node: node)
+          next if used.include?(name)
+          add_offense("`#{name}` is never used", node: node) do |corrector|
+            corrector.remove(node)
           end
         end
       end

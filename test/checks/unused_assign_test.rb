@@ -74,4 +74,80 @@ class UnusedAssignTest < Minitest::Test
     )
     assert_offenses("", offenses)
   end
+
+  def test_removes_unused_assign
+    expected_sources = {
+      "templates/index.liquid" => "\n",
+    }
+    sources = fix_theme(
+      ThemeCheck::UnusedAssign.new,
+      "templates/index.liquid" => <<~END,
+        {% assign x = 1 %}
+      END
+    )
+    sources.each do |path, source|
+      assert_equal(expected_sources[path], source)
+    end
+  end
+
+  def test_removes_unused_assign_liquid_block
+    expected_sources = {
+      "templates/index.liquid" => <<~END,
+        {% liquid
+          assign x = 1
+          assign y = 2\n  \n%}
+        {{ x }}
+        {{ y }}
+      END
+    }
+    sources = fix_theme(
+      ThemeCheck::UnusedAssign.new,
+      "templates/index.liquid" => <<~END,
+        {% liquid
+          assign x = 1
+          assign y = 2
+          assign z = 3
+        %}
+        {{ x }}
+        {{ y }}
+      END
+    )
+    sources.each do |path, source|
+      assert_equal(expected_sources[path], source)
+    end
+  end
+
+  def test_removes_unused_assign_middle_of_line
+    expected_sources = {
+      "templates/index.liquid" => <<~END,
+        <p>test case</p><p>test case</p>
+      END
+    }
+    sources = fix_theme(
+      ThemeCheck::UnusedAssign.new,
+      "templates/index.liquid" => <<~END,
+        <p>test case</p>{% assign x = 1 %}<p>test case</p>
+      END
+    )
+    sources.each do |path, source|
+      assert_equal(expected_sources[path], source)
+    end
+  end
+
+  def test_removes_unused_assign_leaves_html
+    expected_sources = {
+      "templates/index.liquid" => <<~END,
+        <p>test case</p>
+      END
+    }
+    sources = fix_theme(
+      ThemeCheck::UnusedAssign.new,
+      "templates/index.liquid" => <<~END,
+        <p>test case</p>{% assign x = 1 %}
+      END
+    )
+    sources.each do |path, source|
+      assert_equal(expected_sources[path], source)
+    end
+  end
 end
