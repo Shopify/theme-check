@@ -110,11 +110,13 @@ ParserBlockingScriptTag:
 
 AssetSizeJavaScript:
   enabled: true
+  severity: suggestion
   ignore: []
   threshold_in_bytes: 10_000
 
 AssetSizeCSS:
   enabled: true
+  severity: suggestion
   ignore: []
   threshold_in_bytes: 100_000
 
@@ -144,11 +146,13 @@ HtmlParsingError:
 
 AssetSizeAppBlockJavaScript:
   enabled: true
+  severity: suggestion
   ignore: []
   threshold_in_bytes: 10_000
 
 AssetSizeAppBlockCSS:
   enabled: true
+  severity: suggestion
   ignore: []
   threshold_in_bytes: 100_000
 
