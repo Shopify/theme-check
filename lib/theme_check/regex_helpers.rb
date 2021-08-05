@@ -2,8 +2,11 @@
 
 module ThemeCheck
   module RegexHelpers
-    VARIABLE = /#{Liquid::VariableStart}.*?#{Liquid::VariableEnd}/om
+    LIQUID_TAG = /#{Liquid::TagStart}.*?#{Liquid::TagEnd}/om
+    LIQUID_VARIABLE = /#{Liquid::VariableStart}.*?#{Liquid::VariableEnd}/om
+    LIQUID_TAG_OR_VARIABLE = /#{LIQUID_TAG}|#{LIQUID_VARIABLE}/om
     START_OR_END_QUOTE = /(^['"])|(['"]$)/
+
     def matches(s, re)
       start_at = 0
       matches = []
@@ -16,7 +19,7 @@ module ThemeCheck
 
     def href_to_file_size(href)
       # asset_url (+ optional stylesheet_tag) variables
-      if href =~ /^#{VARIABLE}$/o && href =~ /asset_url/ && href =~ Liquid::QuotedString
+      if href =~ /^#{LIQUID_VARIABLE}$/o && href =~ /asset_url/ && href =~ Liquid::QuotedString
         asset_id = Regexp.last_match(0).gsub(START_OR_END_QUOTE, "")
         asset = @theme.assets.find { |a| a.name.end_with?("/" + asset_id) }
         return if asset.nil?
