@@ -432,6 +432,69 @@ class LanguageServerTest < Minitest::Test
     })
   end
 
+  # This is a repetition of the document_links test but with a path that is URL encoded the same way
+  # that VS Code would URL encode it (spaces to %20, and so on.)
+  def test_handles_encoded_uris
+    template = <<~LIQUID
+      {% render 'a' %}
+    LIQUID
+
+    storage = make_file_system_storage(
+      ".theme-check.yml" => <<~YAML,
+        root: "path with spaces/"
+      YAML
+    )
+
+    send_messages({
+      "jsonrpc" => "2.0",
+      "id" => "123",
+      "method" => "initialize",
+      "params" => {
+        "rootUri" => "file://#{to_uri_s(storage.root)}",
+      },
+    }, {
+      "jsonrpc" => "2.0",
+      "method" => "textDocument/didOpen",
+      "params" => {
+        "textDocument" => {
+          "uri" => "file://#{to_uri_s(storage.path('path with spaces/layout/theme.liquid'))}",
+          "text" => template,
+          "version" => 1,
+        },
+      },
+    }, {
+      "jsonrpc" => "2.0",
+      "id" => 1,
+      "method" => "textDocument/documentLink",
+      "params" => {
+        "textDocument" => {
+          "uri" => "file://#{to_uri_s(storage.path('path with spaces/layout/theme.liquid'))}",
+        },
+      },
+    }, {
+      "jsonrpc" => "2.0",
+      "method" => "exit",
+    })
+
+    assert_responses_include({
+      "jsonrpc" => "2.0",
+      "id" => 1,
+      "result" => [{
+        "target" => "file://#{storage.path('path with spaces/snippets/a.liquid')}",
+        "range" => {
+          "start" => {
+            "line" => 0,
+            "character" => template.index('a'),
+          },
+          "end" => {
+            "line" => 0,
+            "character" => template.index('a') + 1,
+          },
+        },
+      }],
+    })
+  end
+
   private
 
   def send_messages(*messages)
@@ -491,5 +554,14 @@ class LanguageServerTest < Minitest::Test
         ERR
       )
     end
+  end
+
+  # Will URI.encode a string the same way VS Code would. VS Code still
+  # uses the outdated '%20' for spaces so we're also transforming from
+  # '+' -> '%20'.
+  #
+  # Exists because of https://github.com/Shopify/theme-check/issues/360
+  def to_uri_s(path)
+    path.to_s.split('/').map { |x| CGI.escape(x).gsub('+', '%20') }.join('/')
   end
 end
