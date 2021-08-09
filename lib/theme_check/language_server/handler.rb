@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 require "benchmark"
+require "uri"
+require "cgi"
 
 module ThemeCheck
   module LanguageServer
@@ -98,8 +100,10 @@ module ThemeCheck
         path_from_uri(params.dig('textDocument', 'uri'))
       end
 
-      def path_from_uri(uri)
-        uri&.sub('file://', '')&.sub('/c%3A', '')
+      def path_from_uri(uri_string)
+        return if uri_string.nil?
+        uri = URI(uri_string)
+        CGI.unescape(uri.path)
       end
 
       def relative_path_from_text_document_uri(params)
