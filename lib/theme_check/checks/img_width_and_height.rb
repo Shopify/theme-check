@@ -9,8 +9,8 @@ module ThemeCheck
     ENDS_IN_CSS_UNIT = /(cm|mm|in|px|pt|pc|em|ex|ch|rem|vw|vh|vmin|vmax|%)$/i
 
     def on_img(node)
-      width = node.attributes["width"]&.value
-      height = node.attributes["height"]&.value
+      width = node.attributes["width"]
+      height = node.attributes["height"]
 
       record_units_in_field_offenses("width", width, node: node)
       record_units_in_field_offenses("height", height, node: node)

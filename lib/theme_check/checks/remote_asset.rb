@@ -14,7 +14,7 @@ module ThemeCheck
     def on_element(node)
       return unless TAGS.include?(node.name)
 
-      resource_url = node.attributes["src"]&.value || node.attributes["href"]&.value
+      resource_url = node.attributes["src"] || node.attributes["href"]
       return if resource_url.nil? || resource_url.empty?
 
       # Ignore if URL is Liquid, taken care of by AssetUrlFilters check
@@ -25,7 +25,7 @@ module ThemeCheck
 
       # Ignore non-stylesheet rel tags
       rel = node.attributes["rel"]
-      return if rel && rel.value != "stylesheet"
+      return if rel && rel != "stylesheet"
 
       add_offense(
         "Asset should be served by the Shopify CDN for better performance.",

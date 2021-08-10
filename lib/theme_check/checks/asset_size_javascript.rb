@@ -16,7 +16,7 @@ module ThemeCheck
     end
 
     def on_script(node)
-      file_size = src_to_file_size(node.attributes['src']&.value)
+      file_size = src_to_file_size(node.attributes['src'])
       return if file_size.nil?
       return if file_size <= threshold_in_bytes
       add_offense(
@@ -28,7 +28,7 @@ module ThemeCheck
     def src_to_file_size(src)
       # We're kind of intentionally only looking at {{ 'asset' | asset_url }} or full urls in here.
       # More complicated liquid statements are not in scope.
-      if src =~ /^#{VARIABLE}$/o && src =~ /asset_url/ && src =~ Liquid::QuotedString
+      if src =~ /^#{LIQUID_VARIABLE}$/o && src =~ /asset_url/ && src =~ Liquid::QuotedString
         asset_id = Regexp.last_match(0).gsub(START_OR_END_QUOTE, "")
         asset = @theme.assets.find { |a| a.name.end_with?("/" + asset_id) }
         return if asset.nil?

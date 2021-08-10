@@ -8,7 +8,7 @@ module ThemeCheck
 
     def on_script(node)
       return unless node.attributes["src"]
-      return if node.attributes["defer"] || node.attributes["async"] || node.attributes["type"]&.value == "module"
+      return if node.attributes["defer"] || node.attributes["async"] || node.attributes["type"] == "module"
 
       add_offense("Missing async or defer attribute on script tag", node: node)
     end

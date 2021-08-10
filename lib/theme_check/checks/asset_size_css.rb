@@ -13,8 +13,8 @@ module ThemeCheck
     end
 
     def on_link(node)
-      return if node.attributes['rel']&.value != "stylesheet"
-      file_size = href_to_file_size(node.attributes['href']&.value)
+      return if node.attributes['rel'] != "stylesheet"
+      file_size = href_to_file_size(node.attributes['href'])
       return if file_size.nil?
       return if file_size <= threshold_in_bytes
       add_offense(

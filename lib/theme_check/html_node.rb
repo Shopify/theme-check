@@ -4,13 +4,14 @@ require "forwardable"
 module ThemeCheck
   class HtmlNode
     extend Forwardable
-    attr_reader :template
+    include RegexHelpers
+    attr_reader :template, :parent
 
-    def_delegators :@value, :content, :attributes
-
-    def initialize(value, template)
+    def initialize(value, template, placeholder_values = [], parent = nil)
       @value = value
       @template = template
+      @placeholder_values = placeholder_values
+      @parent = parent
     end
 
     def literal?
@@ -22,11 +23,29 @@ module ThemeCheck
     end
 
     def children
-      @value.children.map { |child| HtmlNode.new(child, template) }
+      @children ||= @value
+        .children
+        .map { |child| HtmlNode.new(child, template, @placeholder_values, self) }
     end
 
-    def parent
-      HtmlNode.new(@value.parent, template)
+    def attributes
+      @attributes ||= @value.attributes
+        .map { |k, v| [replace_placeholders(k), replace_placeholders(v.value)] }
+        .to_h
+    end
+
+    def content
+      @content ||= replace_placeholders(@value.content)
+    end
+
+    # @value is not forwarded because we _need_ to replace the
+    # placeholders for the HtmlNode to make sense.
+    def value
+      if literal?
+        content
+      else
+        markup
+      end
     end
 
     def name
@@ -37,20 +56,22 @@ module ThemeCheck
       end
     end
 
-    def value
-      if literal?
-        @value.content
-      else
-        @value
-      end
-    end
-
     def markup
-      @value.to_html
+      @markup ||= replace_placeholders(@value.to_html)
     end
 
     def line_number
       @value.line
+    end
+
+    private
+
+    def replace_placeholders(string)
+      # Replace all {%#{i}####%} with the actual content.
+      string.gsub(LIQUID_TAG) do |match|
+        key = /\d+/.match(match)[0]
+        @placeholder_values[key.to_i]
+      end
     end
   end
 end
