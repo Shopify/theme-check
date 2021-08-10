@@ -29,8 +29,18 @@ module ThemeCheck
     def call_check_method(check, method, *args)
       return unless check.respond_to?(method) && !check.ignored?
 
-      Timeout.timeout(CHECK_METHOD_TIMEOUT) do
+      # If you want to use binding.pry in unit tests, define the
+      # THEME_CHECK_DEBUG environment variable. e.g.
+      #
+      #   $ export THEME_CHECK_DEBUG=true
+      #   $ bundle exec rake tests:in_memory
+      #
+      if ENV['THEME_CHECK_DEBUG']
         check.send(method, *args)
+      else
+        Timeout.timeout(CHECK_METHOD_TIMEOUT) do
+          check.send(method, *args)
+        end
       end
     rescue Liquid::Error
       # Pass-through Liquid errors

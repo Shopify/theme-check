@@ -5,7 +5,7 @@ module ThemeCheck
     def outside_of_strings(markup)
       scanner = StringScanner.new(markup)
 
-      while scanner.scan(/.*?("|')/)
+      while scanner.scan(/.*?("|')/m)
         yield scanner.matched[0..-2]
         quote = scanner.matched[-1] == "'" ? "'" : "\""
         # Skip to the end of the string

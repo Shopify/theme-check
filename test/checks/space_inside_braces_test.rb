@@ -289,6 +289,15 @@ class SpaceInsideBracesTest < Minitest::Test
       ThemeCheck::SpaceInsideBraces.new,
       "templates/index.liquid" => <<~END,
         {{ filter.min_value.value | money_without_currency | replace: '.', '' | replace: ',', '.' }}
+        {{ paginate | default_pagination:
+          next: '<i class="icon icon--right-t"></i><span class="icon-fallback__text">Next Page</span>',
+          previous: '<i class="icon icon--left-t"></i><span class="icon-fallback__text">Previous Page</span>'
+        }}
+        {%
+          render: "my-card",
+          classname: "h-full md:hidden",
+          image: block.settings.mobile-image
+        %}
       END
     )
     assert_offenses('', offenses)
