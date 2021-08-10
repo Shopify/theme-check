@@ -57,7 +57,7 @@ module ThemeCheck
           corrector.insert_before(node, " ")
         end
       end
-      if node.markup[-1] != " "
+      if node.markup[-1] != " " && node.markup[-1] != "\n"
         add_offense("Space missing before '}}'", node: node) do |corrector|
           corrector.insert_after(node, " ")
         end
