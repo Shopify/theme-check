@@ -1,10 +1,10 @@
 # Reject Invalid Tags for Theme App Extension Blocks (`AppBlockValidTags`)
 
-This rule exists to prevent invalid tags from being used in theme app extension blocks which will be rejected when the theme app extension is promoted.
+This rule exists to prevent theme app extension blocks from containing certain tags in their liquid code.
 
 ## Check Details
 
-This rule verifies no invalid tags are used for theme app extension app blocks. Invalid tags include:
+This rule verifies none of the below tags are used in theme app extension blocks.
 
 - `{% javascript %}`
 - `{% stylesheet %}`
@@ -25,8 +25,7 @@ AppBlockValidTags:
 
 ## When Not To Use It
 
-This rule should not be disabled locally since the check will be enforced when
-promoting new versions of the extension.
+This rule should not be disabled locally.
 
 ## Version
 
