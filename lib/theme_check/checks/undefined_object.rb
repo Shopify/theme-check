@@ -55,7 +55,7 @@ module ThemeCheck
       end
     end
 
-    def initialize(exclude_snippets: false)
+    def initialize(exclude_snippets: true)
       @exclude_snippets = exclude_snippets
       @files = {}
     end
