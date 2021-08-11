@@ -9,19 +9,33 @@ module ThemeCheck
     doc docs_url(__FILE__)
 
     REQUIRED_LIQUID_FILES = %w(layout/theme)
-    REQUIRED_TEMPLATE_FILES = %w(
-      index product collection cart blog article page list-collections search 404
+
+    REQUIRED_LIQUID_TEMPLATE_FILES = %w(
       gift_card customers/account customers/activate_account customers/addresses
-      customers/login customers/order customers/register customers/reset_password password
-    )
-      .map { |file| "templates/#{file}" }
+      customers/login customers/order customers/register customers/reset_password
+    ).map { |file| "templates/#{file}" }
+
+    REQUIRED_JSON_TEMPLATE_FILES = %w(
+      index product collection cart blog article page list-collections search 404
+      password
+    ).map { |file| "templates/#{file}" }
+
+    REQUIRED_TEMPLATE_FILES = (REQUIRED_LIQUID_TEMPLATE_FILES + REQUIRED_JSON_TEMPLATE_FILES)
 
     def on_end
       (REQUIRED_LIQUID_FILES - theme.liquid.map(&:name)).each do |file|
-        add_offense("'#{file}.liquid' is missing")
+        add_offense("'#{file}.liquid' is missing") do |corrector|
+          corrector.create(@theme, "#{file}.liquid", "")
+        end
       end
       (REQUIRED_TEMPLATE_FILES - (theme.liquid + theme.json).map(&:name)).each do |file|
-        add_offense("'#{file}.liquid' or '#{file}.json' is missing")
+        add_offense("'#{file}.liquid' or '#{file}.json' is missing") do |corrector|
+          if REQUIRED_LIQUID_TEMPLATE_FILES.include?(file)
+            corrector.create(@theme, "#{file}.liquid", "")
+          else
+            corrector.create(@theme, "#{file}.json", "")
+          end
+        end
       end
     end
   end
