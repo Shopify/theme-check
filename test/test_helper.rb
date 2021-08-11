@@ -70,6 +70,24 @@ module Minitest
       assert_equal(output.chomp, offenses.sort_by(&:location).join("\n"))
     end
 
+    def assert_offenses_with_range(output, offenses)
+      # Making sure nothing blows up in the language_server
+      offenses.each do |offense|
+        assert(offense.start_line)
+        assert(offense.start_column)
+        assert(offense.end_line)
+        assert(offense.end_column)
+      end
+
+      assert_equal(
+        output.chomp,
+        offenses
+          .sort_by(&:location_range)
+          .map(&:to_s_range)
+          .join("\n")
+      )
+    end
+
     def assert_includes_offense(offenses, output)
       assert_includes(offenses.sort_by(&:location).join("\n"), output.chomp)
     end

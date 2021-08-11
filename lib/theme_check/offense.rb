@@ -1,11 +1,32 @@
 # frozen_string_literal: true
 module ThemeCheck
   class Offense
+    include PositionHelper
+
     MAX_SOURCE_EXCERPT_SIZE = 120
 
     attr_reader :check, :message, :template, :node, :markup, :line_number, :correction
 
-    def initialize(check:, message: nil, template: nil, node: nil, markup: nil, line_number: nil, correction: nil)
+    def initialize(
+      check:, # instance of a ThemeCheck::Check
+      message: nil, # error message for the offense
+      template: nil, # Template
+      node: nil, # Node or HtmlNode
+      markup: nil, # string
+      line_number: nil, # line number of the error (1-indexed)
+      # node_markup_offset is the index inside node.markup to start
+      # looking for markup :mindblow:.
+      # This is so we can accurately highlight node substrings.
+      # e.g. if we have the following scenario in which we
+      # want to highlight the middle comma
+      #   * node.markup == "replace ',',', '"
+      #   * markup == ","
+      # Then we need some way of telling our Position class to start
+      # looking for the second comma. This is done with node_markup_offset.
+      # More context can be found in #376.
+      node_markup_offset: 0,
+      correction: nil # block
+    )
       @check = check
       @correction = correction
 
@@ -39,7 +60,13 @@ module ThemeCheck
         @node.line_number
       end
 
-      @position = Position.new(@markup, @template&.source, @line_number)
+      @position = Position.new(
+        @markup,
+        @template&.source,
+        line_number_1_indexed: @line_number,
+        node_markup_offset: node_markup_offset,
+        node_markup: node&.markup
+      )
     end
 
     def source_excerpt
@@ -103,6 +130,11 @@ module ThemeCheck
       tokens.join(":") if tokens.any?
     end
 
+    def location_range
+      tokens = [template&.relative_path, start_index, end_index].compact
+      tokens.join(":") if tokens.any?
+    end
+
     def correctable?
       line_number && correction
     end
@@ -135,6 +167,14 @@ module ThemeCheck
     def to_s
       if template
         "#{message} at #{location}"
+      else
+        message
+      end
+    end
+
+    def to_s_range
+      if template
+        "#{message} at #{location_range}"
       else
         message
       end

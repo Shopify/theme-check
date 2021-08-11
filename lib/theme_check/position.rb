@@ -4,21 +4,125 @@ module ThemeCheck
   class Position
     include PositionHelper
 
-    def initialize(needle, contents, line_number_1_indexed)
-      @needle = needle
-      @contents = contents
+    def initialize(
+      needle_arg,
+      contents_arg,
+      line_number_1_indexed: nil,
+      node_markup: nil,
+      node_markup_offset: 0 # the index of markup inside the node_markup
+    )
+      @needle = needle_arg
+      @contents = contents_arg
       @line_number_1_indexed = line_number_1_indexed
-      @start_row_column = nil
-      @end_row_column = nil
+      @node_markup_offset = node_markup_offset
+      @node_markup = node_markup
+      @strict_position = StrictPosition.new(
+        needle,
+        contents,
+        start_index,
+      )
     end
 
-    def start_line_index
+    def start_line_offset
       from_row_column_to_index(contents, line_number, 0)
+    end
+
+    def start_offset
+      return start_line_offset if @node_markup.nil?
+      node_markup_start = contents.index(@node_markup, start_line_offset)
+      return start_line_offset if node_markup_start.nil?
+      node_markup_start + @node_markup_offset
     end
 
     # 0-indexed, inclusive
     def start_index
-      contents.index(needle, start_line_index) || start_line_index
+      contents.index(needle, start_offset)
+    end
+
+    # 0-indexed, exclusive
+    def end_index
+      @strict_position.end_index
+    end
+
+    # 0-indexed, inclusive
+    def start_row
+      @strict_position.start_row
+    end
+
+    # 0-indexed, inclusive
+    def start_column
+      @strict_position.start_column
+    end
+
+    # 0-indexed, exclusive (both taken together are) therefore you
+    # might end up on a newline character or the next line
+    def end_row
+      @strict_position.end_row
+    end
+
+    def end_column
+      @strict_position.end_column
+    end
+
+    private
+
+    def contents
+      return '' unless @contents.is_a?(String) && !@contents.empty?
+      @contents
+    end
+
+    def line_number
+      return 0 if @line_number_1_indexed.nil?
+      bounded(0, @line_number_1_indexed - 1, contents.lines.size - 1)
+    end
+
+    def needle
+      if has_content_and_line_number_but_no_needle?
+        entire_line_needle
+      elsif contents.empty? || @needle.nil?
+        ''
+      elsif !can_find_needle?
+        entire_line_needle
+      else
+        @needle
+      end
+    end
+
+    def has_content_and_line_number_but_no_needle?
+      @needle.nil? && !contents.empty? && @line_number_1_indexed.is_a?(Integer)
+    end
+
+    def can_find_needle?
+      !!contents.index(@needle)
+    end
+
+    def entire_line_needle
+      contents.lines(chomp: true)[line_number] || ''
+    end
+  end
+
+  # This method is stricter than Position in the sense that it doesn't
+  # accept invalid inputs. Makes for code that is easier to understand.
+  class StrictPosition
+    include PositionHelper
+
+    attr_reader :needle, :contents
+
+    def initialize(needle, contents, start_index)
+      raise ArgumentError, 'Bad start_index' unless start_index.is_a?(Integer)
+      raise ArgumentError, 'Bad contents' unless contents.is_a?(String)
+      raise ArgumentError, 'Bad needle' unless needle.is_a?(String) || !contents.index(needle, start_index)
+
+      @needle = needle
+      @contents = contents
+      @start_index = start_index
+      @start_row_column = nil
+      @end_row_column = nil
+    end
+
+    # 0-indexed, inclusive
+    def start_index
+      @contents.index(needle, @start_index)
     end
 
     # 0-indexed, exclusive
@@ -43,26 +147,6 @@ module ThemeCheck
     end
 
     private
-
-    def contents
-      return '' unless @contents.is_a?(String) && !@contents.empty?
-      @contents
-    end
-
-    def line_number
-      return 0 if @line_number_1_indexed.nil?
-      bounded(0, @line_number_1_indexed - 1, contents.lines.size - 1)
-    end
-
-    def needle
-      if @needle.nil? && !contents.empty? && !@line_number_1_indexed.nil?
-        contents.lines(chomp: true)[line_number] || ''
-      elsif contents.empty? || @needle.nil?
-        ''
-      else
-        @needle
-      end
-    end
 
     def start_row_column
       return @start_row_column unless @start_row_column.nil?
