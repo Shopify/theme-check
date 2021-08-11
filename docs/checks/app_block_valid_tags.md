@@ -1,6 +1,6 @@
-# Reject Invalid Tags for Theme App Extension Blocks (`AppBlockValidTags`)
+# Reject Forbidden Tags from Theme App Extension Blocks (`AppBlockValidTags`)
 
-This rule exists to prevent theme app extension blocks from containing certain tags in their liquid code.
+This rule exists to prevent theme app extension blocks from containing forbidden tags in their liquid code.
 
 ## Check Details
 
@@ -12,7 +12,7 @@ This rule verifies none of the below tags are used in theme app extension blocks
 - `{% layout 'foo' %}`
 - `{% section 'foo' %}`
 
-:-1: **Incorrect** code for this check occurs with the use of any of the above tags in theme app extension blocks.
+:-1: **Incorrect** code for this check occurs with the use of any of the above tags in the liquid code of theme app extension blocks.
 
 ## Check Options
 
