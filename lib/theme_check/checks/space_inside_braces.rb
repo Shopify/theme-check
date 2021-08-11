@@ -14,18 +14,38 @@ module ThemeCheck
       return unless node.markup
       return if :assign == node.type_name
 
-      outside_of_strings(node.markup) do |chunk|
+      outside_of_strings(node.markup) do |chunk, chunk_start|
         chunk.scan(/([,:|]|==|<>|<=|>=|<|>|!=)  +/) do |_match|
-          add_offense("Too many spaces after '#{Regexp.last_match(1)}'", node: node, markup: Regexp.last_match(0))
+          add_offense(
+            "Too many spaces after '#{Regexp.last_match(1)}'",
+            node: node,
+            markup: Regexp.last_match(0),
+            node_markup_offset: chunk_start + Regexp.last_match.begin(0)
+          )
         end
         chunk.scan(/([,:|]|==|<>|<=|>=|<\b|>\b|!=)(\S|\z)/) do |_match|
-          add_offense("Space missing after '#{Regexp.last_match(1)}'", node: node, markup: Regexp.last_match(0))
+          add_offense(
+            "Space missing after '#{Regexp.last_match(1)}'",
+            node: node,
+            markup: Regexp.last_match(0),
+            node_markup_offset: chunk_start + Regexp.last_match.begin(0),
+          )
         end
         chunk.scan(/  (\||==|<>|<=|>=|<|>|!=)+/) do |_match|
-          add_offense("Too many spaces before '#{Regexp.last_match(1)}'", node: node, markup: Regexp.last_match(0))
+          add_offense(
+            "Too many spaces before '#{Regexp.last_match(1)}'",
+            node: node,
+            markup: Regexp.last_match(0),
+            node_markup_offset: chunk_start + Regexp.last_match.begin(0)
+          )
         end
         chunk.scan(/(\A|\S)(?<match>\||==|<>|<=|>=|<|\b>|!=)/) do |_match|
-          add_offense("Space missing before '#{Regexp.last_match(1)}'", node: node, markup: Regexp.last_match(0))
+          add_offense(
+            "Space missing before '#{Regexp.last_match(1)}'",
+            node: node,
+            markup: Regexp.last_match(0),
+            node_markup_offset: chunk_start + Regexp.last_match.begin(0)
+          )
         end
       end
     end

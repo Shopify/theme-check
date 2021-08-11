@@ -303,6 +303,22 @@ class SpaceInsideBracesTest < Minitest::Test
     assert_offenses('', offenses)
   end
 
+  def test_reports_properly
+    offenses = analyze_theme(
+      ThemeCheck::SpaceInsideBraces.new,
+      "templates/index.liquid" => <<~END,
+        {{ 'a' | replace: ', ',',' | split: ',' }}
+        0000000000111111111122222222223333333333
+        0123456789012345678901234567890123456789
+        The two lines above are there to help identify the index
+      END
+    )
+    assert_offenses_with_range(
+      "Space missing after ',' at templates/index.liquid:22:23",
+      offenses
+    )
+  end
+
   def test_dont_report_empty_variables
     offenses = analyze_theme(
       ThemeCheck::SpaceInsideBraces.new,
