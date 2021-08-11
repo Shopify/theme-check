@@ -30,4 +30,22 @@ class RequiredDirectories < Minitest::Test
 
     assert_includes_offense(offenses, "Theme is missing 'locales' directory")
   end
+
+  def test_creates_missing_directories
+    theme = make_theme(
+      "assets/gift-card.js" => "",
+      "config/settings_data.json" => "",
+      "layout/theme.liquid" => "",
+      "sections/footer.liquid" => "",
+      "snippets/comment.liquid" => "",
+      "templates/index.liquid" => ""
+    )
+
+    analyzer = ThemeCheck::Analyzer.new(theme, [ThemeCheck::RequiredDirectories.new], true)
+    analyzer.analyze_theme
+    analyzer.correct_offenses
+
+    missing_directories = ["locales"]
+    assert(missing_directories.all? { |file| theme.storage.files.include?(file) })
+  end
 end
