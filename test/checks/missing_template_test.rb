@@ -71,4 +71,35 @@ class MissingTemplateTest < Minitest::Test
     )
     assert_offenses("", offenses)
   end
+
+  def test_creates_missing_snippet
+    theme = make_theme(
+      "templates/index.liquid" => <<~END,
+        {% include 'one' %}
+        {% render 'two' %}
+      END
+    )
+
+    analyzer = ThemeCheck::Analyzer.new(theme, [ThemeCheck::MissingTemplate.new], true)
+    analyzer.analyze_theme
+    analyzer.correct_offenses
+
+    missing_files = ["snippets/one.liquid", "snippets/two.liquid"]
+    assert(missing_files.all? { |file| theme.storage.files.include?(file) })
+  end
+
+  def test_creates_missing_section
+    theme = make_theme(
+      "templates/index.liquid" => <<~END,
+        {% section 'one' %}
+      END
+    )
+
+    analyzer = ThemeCheck::Analyzer.new(theme, [ThemeCheck::MissingTemplate.new], true)
+    analyzer.analyze_theme
+    analyzer.correct_offenses
+
+    missing_files = ["sections/one.liquid"]
+    assert(missing_files.all? { |file| theme.storage.files.include?(file) })
+  end
 end

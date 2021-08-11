@@ -20,6 +20,9 @@ module ThemeCheck
     end
 
     def write(relative_path, content)
+      reset_memoizers unless file_exists?(relative_path)
+
+      file(relative_path).dirname.mkpath unless file(relative_path).dirname.directory?
       file(relative_path).write(content)
     end
 
@@ -35,6 +38,15 @@ module ThemeCheck
     end
 
     private
+
+    def file_exists?(relative_path)
+      !!@files[relative_path]
+    end
+
+    def reset_memoizers
+      @file_array = nil
+      @directories = nil
+    end
 
     def glob(pattern)
       @root.glob(pattern).reject do |path|

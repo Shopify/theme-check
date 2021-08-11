@@ -27,5 +27,9 @@ module ThemeCheck
       line.insert(node.range[0], insert_before)
       line.insert(node.range[1] + 1 + insert_before.length, insert_after)
     end
+
+    def create(theme, relative_path, content)
+      theme.storage.write(relative_path, content)
+    end
   end
 end
