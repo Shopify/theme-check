@@ -178,6 +178,10 @@ AssetSizeAppBlockCSS:
   ignore: []
   threshold_in_bytes: 100_000
 
+AppBlockValidTags:
+  enabled: false
+  ignore: []
+
 PaginationSize:
   enabled: true
   ignore: []
