@@ -5,6 +5,8 @@ module ThemeCheck
   class Cli
     class Abort < StandardError; end
 
+    FORMATS = [:text, :json]
+
     attr_accessor :path
 
     def initialize
@@ -15,6 +17,7 @@ module ThemeCheck
       @auto_correct = false
       @config_path = nil
       @fail_level = :error
+      @format = :text
     end
 
     def option_parser(parser = OptionParser.new, help: true)
@@ -29,6 +32,10 @@ module ThemeCheck
         "Use the config provided, overriding .theme-check.yml if present",
         "Use :theme_app_extension to use default checks for theme app extensions"
       ) { |path| @config_path = path }
+      @option_parser.on(
+        "-o", "--output FORMAT", FORMATS,
+        "The output format to use. (text|json, default: text)"
+      ) { |format| @format = format.to_sym }
       @option_parser.on(
         "-c", "--category CATEGORY", Check::CATEGORIES, "Only run this category of checks",
         "Runs checks matching all categories when specified more than once"
@@ -166,7 +173,7 @@ module ThemeCheck
     end
 
     def check
-      puts "Checking #{@config.root} ..."
+      STDERR.puts "Checking #{@config.root} ..."
       storage = ThemeCheck::FileSystemStorage.new(@config.root, ignored_patterns: @config.ignored_patterns)
       theme = ThemeCheck::Theme.new(storage)
       if theme.all.empty?
@@ -175,9 +182,18 @@ module ThemeCheck
       analyzer = ThemeCheck::Analyzer.new(theme, @config.enabled_checks, @config.auto_correct)
       analyzer.analyze_theme
       analyzer.correct_offenses
-      ThemeCheck::Printer.new.print(theme, analyzer.offenses, @config.auto_correct)
+      output_with_format(theme, analyzer)
       raise Abort, "" if analyzer.uncorrectable_offenses.any? do |offense|
         offense.check.severity_value <= Check.severity_value(@fail_level)
+      end
+    end
+
+    def output_with_format(theme, analyzer)
+      case @format
+      when :text
+        ThemeCheck::Printer.new.print(theme, analyzer.offenses, @config.auto_correct)
+      when :json
+        ThemeCheck::JsonPrinter.new.print(analyzer.offenses)
       end
     end
   end
