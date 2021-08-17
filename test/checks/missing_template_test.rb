@@ -57,4 +57,18 @@ class MissingTemplateTest < Minitest::Test
     )
     assert_offenses("", offenses)
   end
+
+  def test_ignore_missing
+    offenses = analyze_theme(
+      ThemeCheck::MissingTemplate.new(ignore_missing: [
+        "snippets/icon-*",
+        "sections/*",
+      ]),
+      "templates/index.liquid" => <<~END,
+        {% render 'icon-nope' %}
+        {% section 'anything' %}
+      END
+    )
+    assert_offenses("", offenses)
+  end
 end

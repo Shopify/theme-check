@@ -25,7 +25,32 @@ The default configuration for this check is the following:
 ```yaml
 MissingTemplate:
   enabled: true
+  ignore_missing: []
 ```
+
+### `ignore_missing`
+
+Specify a list of patterns of missing template files to ignore.
+
+While the `ignore` option will ignore all occurrences of `MissingTemplate` according to the file in which they appear, `ignore_missing` allows ignoring all occurrences of `MissingTemplate` based on the target template, the template being rendered.
+
+For example:
+
+```yaml
+MissingTemplate:
+  ignore_missing:
+  - snippets/icon-*
+```
+
+Would ignore offenses on `{% render 'icon-missing' %}` across all theme files.
+
+```yaml
+MissingTemplate:
+  ignore:
+  - templates/index.liquid
+```
+
+Would ignore all `MissingTemplate` in `templates/index.liquid`, no mater the file being rendered.
 
 ## Version
 

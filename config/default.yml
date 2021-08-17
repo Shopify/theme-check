@@ -23,6 +23,7 @@ LiquidTag:
 MissingTemplate:
   enabled: true
   ignore: []
+  ignore_missing: []
 
 NestedSnippet:
   enabled: true
