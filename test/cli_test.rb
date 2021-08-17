@@ -19,6 +19,76 @@ class CliTest < Minitest::Test
     assert_includes(out, "files inspected")
   end
 
+  def test_check_format_json
+    storage = make_file_system_storage(
+      "layout/theme.liquid" => <<~LIQUID,
+        {% assign x = 1 %}
+        {% assign y = 2 %}
+      LIQUID
+      "templates/example.liquid" => <<~LIQUID,
+        {% assign z = 1 %}
+      LIQUID
+      ".theme-check.yml" => <<~YAML,
+        extends: :nothing
+        UnusedAssign:
+          enabled: true
+      YAML
+    )
+
+    out = capture(:stdout) do
+      ThemeCheck::Cli.parse_and_run!([storage.root.to_s, '--output', 'json'])
+    end
+
+    assert_equal(
+      JSON.dump([
+        {
+          "path" => "layout/theme.liquid",
+          "offenses" => [
+            {
+              "check" => "UnusedAssign",
+              "severity" => 1,
+              "start_line" => 0,
+              "start_column" => 3,
+              "end_line" => 0,
+              "end_column" => 16,
+              "message" => "`x` is never used",
+            },
+            {
+              "check" => "UnusedAssign",
+              "severity" => 1,
+              "start_line" => 1,
+              "start_column" => 3,
+              "end_line" => 1,
+              "end_column" => 16,
+              "message" => "`y` is never used",
+            },
+          ],
+          "errorCount" => 0,
+          "suggestionCount" => 2,
+          "styleCount" => 0,
+        },
+        {
+          "path" => "templates/example.liquid",
+          "offenses" => [
+            {
+              "check" => "UnusedAssign",
+              "severity" => 1,
+              "start_line" => 0,
+              "start_column" => 3,
+              "end_line" => 0,
+              "end_column" => 16,
+              "message" => "`z` is never used",
+            },
+          ],
+          "errorCount" => 0,
+          "suggestionCount" => 1,
+          "styleCount" => 0,
+        },
+      ]),
+      out.chomp
+    )
+  end
+
   def test_print
     out = capture(:stdout) do
       ThemeCheck::Cli.parse_and_run!([__dir__ + "/theme", '--print'])
@@ -178,34 +248,5 @@ class CliTest < Minitest::Test
     end
 
     assert_equal(exit_code, err.status)
-  end
-
-  # Ported from active_support/testing/stream
-  def silence_stream(stream)
-    old_stream = stream.dup
-    stream.reopen(IO::NULL)
-    stream.sync = true
-    yield
-  ensure
-    stream.reopen(old_stream)
-    old_stream.close
-  end
-
-  # Ported from active_support/testing/stream
-  def capture(stream)
-    stream = stream.to_s
-    captured_stream = Tempfile.new(stream)
-    stream_io = eval("$#{stream}") # # rubocop:disable Security/Eval
-    origin_stream = stream_io.dup
-    stream_io.reopen(captured_stream)
-
-    yield
-
-    stream_io.rewind
-    captured_stream.read
-  ensure
-    captured_stream.close
-    captured_stream.unlink
-    stream_io.reopen(origin_stream)
   end
 end
