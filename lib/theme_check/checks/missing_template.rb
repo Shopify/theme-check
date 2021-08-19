@@ -17,6 +17,7 @@ module ThemeCheck
         add_missing_offense("snippets/#{template}", node: node)
       end
     end
+
     alias_method :on_render, :on_include
 
     def on_section(node)
@@ -33,7 +34,9 @@ module ThemeCheck
     def add_missing_offense(name, node:)
       path = "#{name}.liquid"
       unless ignore?(path) || theme[name]
-        add_offense("'#{path}' is not found", node: node)
+        add_offense("'#{path}' is not found", node: node) do |corrector|
+          corrector.create(@theme, "#{name}.liquid", "")
+        end
       end
     end
   end
