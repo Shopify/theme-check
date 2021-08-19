@@ -23,7 +23,7 @@ The default configuration is the following:
 
 ```yaml
 AssetSizeAppBlockCSS:
-  enabled: false
+  enabled: true
   threshold_in_bytes: 100_000
 ```
 
