@@ -31,7 +31,7 @@ bundle exec rake
 ## Checking a theme
 
 ```
-bundle exec theme-check /path/to/your/theme
+bin/theme-check /path/to/your/theme
 ```
 
 ## Creating a new "Check"
