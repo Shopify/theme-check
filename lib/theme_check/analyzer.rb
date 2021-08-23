@@ -87,6 +87,7 @@ module ThemeCheck
       if @auto_correct
         offenses.each(&:correct)
         @theme.liquid.each(&:write)
+        @theme.json.each(&:write)
       end
     end
 

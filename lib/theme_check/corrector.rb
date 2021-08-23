@@ -33,8 +33,8 @@ module ThemeCheck
     end
 
     def create_default_locale_json(theme)
-      theme.default_locale_json = JsonFile.new('locales/' + theme.default_locale + '.default.json', theme.storage)
-      theme.default_locale_json.create
+      theme.default_locale_json = JsonFile.new("locales/#{theme.default_locale}.default.json", theme.storage)
+      theme.default_locale_json.update_contents('{}')
     end
   end
 end
