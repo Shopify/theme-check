@@ -13,7 +13,7 @@ module ThemeCheck
       assert_offenses("", offenses)
     end
 
-    def test_reports_lazyload_class
+    def test_does_not_reports_lazyload_class_without_data_src_or_srcset
       offenses = analyze_theme(
         DeprecateLazysizes.new,
         "templates/index.liquid" => <<~END,
@@ -21,10 +21,7 @@ module ThemeCheck
           <img src="a.jpg" class="lazyload otherclass">
         END
       )
-      assert_offenses(<<~END, offenses)
-        Use the native loading=\"lazy\" attribute instead of lazysizes at templates/index.liquid:1
-        Use the native loading=\"lazy\" attribute instead of lazysizes at templates/index.liquid:2
-      END
+      assert_offenses('', offenses)
     end
 
     def test_reports_data_srcset
@@ -44,7 +41,6 @@ module ThemeCheck
       )
       assert_offenses(<<~END, offenses)
         Use the native loading=\"lazy\" attribute instead of lazysizes at templates/index.liquid:1
-        Use the native srcset attribute instead of data-srcset at templates/index.liquid:1
       END
     end
 
@@ -65,8 +61,6 @@ module ThemeCheck
       )
       assert_offenses(<<~END, offenses)
         Use the native loading=\"lazy\" attribute instead of lazysizes at templates/index.liquid:1
-        Use the native srcset attribute instead of data-srcset at templates/index.liquid:1
-        Use the native sizes attribute instead of data-sizes at templates/index.liquid:1
       END
     end
 
@@ -87,9 +81,6 @@ module ThemeCheck
       )
       assert_offenses(<<~END, offenses)
         Use the native loading=\"lazy\" attribute instead of lazysizes at templates/index.liquid:1
-        Use the native srcset attribute instead of data-srcset at templates/index.liquid:1
-        Use the native sizes attribute instead of data-sizes at templates/index.liquid:1
-        Do not set the data-sizes attribute to auto at templates/index.liquid:1
       END
     end
   end

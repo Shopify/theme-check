@@ -10,9 +10,6 @@ This check is aimed at discouraging the use of the lazysizes JavaScript library
 
 ```liquid
 
-<!-- Reports use of "lazyload" class -->
-<img src="a.jpg" class="lazyload">
-
 <!-- Reports use of "data-srcset" and "data-sizes" attribute. Reports data-sizes="auto" -->
 <img
   alt="House by the lake"
