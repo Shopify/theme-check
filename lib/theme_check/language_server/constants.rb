@@ -18,12 +18,12 @@ module ThemeCheck
     PARTIAL_SECTION = partial_tag('section')
 
     ASSET_INCLUDE = %r{
-      \{\%-?\s*'(?<partial>[^']*)'\s*\|\s*asset_url|
-      \{\%-?\s*"(?<partial>[^"]*)"\s*\|\s*asset_url|
+      \{\{-?\s*'(?<partial>[^']*)'\s*\|\s*asset_url|
+      \{\{-?\s*"(?<partial>[^"]*)"\s*\|\s*asset_url|
 
       # in liquid tags the whole line is white space until the asset partial
-      ^\s*'(?<partial>[^']*)'\s*\|\s*asset_url|
-      ^\s*"(?<partial>[^"]*)"\s*\|\s*asset_url
+      ^\s*(?:echo|assign[^=]*\=)\s*'(?<partial>[^']*)'\s*\|\s*asset_url|
+      ^\s*(?:echo|assign[^=]*\=)\s*"(?<partial>[^"]*)"\s*\|\s*asset_url
     }mix
   end
 end

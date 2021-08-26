@@ -80,15 +80,15 @@ module ThemeCheck
 
       def test_makes_links_out_of_asset_url_filters
         content = <<~LIQUID
-          {% '1' | asset_url %}
-          {%- "2" | asset_url -%}
+          {{ '1' | asset_url }}
+          {{- "2" | asset_url -}}
           {% liquid
-            assign x = "x"
-            '3' | asset_url
+            assign x = '3' | asset_url
+            echo '4' | asset_url
           %}
           {%- liquid
-            assign x = "x"
-            "4" | asset_url
+            assign x = "5" | asset_url
+            echo "6" | asset_url
           -%}
         LIQUID
 
@@ -100,6 +100,8 @@ module ThemeCheck
         assert_links_include("2", content, engine.document_links("templates/product.liquid"), "assets", "")
         assert_links_include("3", content, engine.document_links("templates/product.liquid"), "assets", "")
         assert_links_include("4", content, engine.document_links("templates/product.liquid"), "assets", "")
+        assert_links_include("5", content, engine.document_links("templates/product.liquid"), "assets", "")
+        assert_links_include("6", content, engine.document_links("templates/product.liquid"), "assets", "")
       end
 
       def assert_links_include(needle, content, links, directory, extension)
