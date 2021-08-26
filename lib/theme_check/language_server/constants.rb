@@ -10,6 +10,14 @@ module ThemeCheck
       ^\s*render\s+'(?<partial>[^']*)'|
       ^\s*render\s+"(?<partial>[^"]*)"
     }mix
+    PARTIAL_INCLUDE = %r{
+      \{\%-?\s*include\s+'(?<partial>[^']*)'|
+      \{\%-?\s*include\s+"(?<partial>[^"]*)"|
+
+      # in liquid tags the whole line is white space until render
+      ^\s*include\s+'(?<partial>[^']*)'|
+      ^\s*include\s+"(?<partial>[^"]*)"
+    }mix
     ASSET_INCLUDE = %r{
       \{\%-?\s*'(?<partial>[^']*)'\s*\|\s*asset_url|
       \{\%-?\s*"(?<partial>[^"]*)"\s*\|\s*asset_url|

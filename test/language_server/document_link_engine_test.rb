@@ -30,6 +30,30 @@ module ThemeCheck
         assert_links_include("4", content, engine.document_links("templates/product.liquid"), "snippets", ".liquid")
       end
 
+      def test_makes_links_out_of_include_tags
+        content = <<~LIQUID
+          {% include '1' %}
+          {%- include "2" -%}
+          {% liquid
+            assign x = "x"
+            include '3'
+          %}
+          {%- liquid
+            assign x = "x"
+            include "4"
+          -%}
+        LIQUID
+
+        engine = make_engine(
+          "templates/product.liquid" => content,
+        )
+
+        assert_links_include("1", content, engine.document_links("templates/product.liquid"), "snippets", ".liquid")
+        assert_links_include("2", content, engine.document_links("templates/product.liquid"), "snippets", ".liquid")
+        assert_links_include("3", content, engine.document_links("templates/product.liquid"), "snippets", ".liquid")
+        assert_links_include("4", content, engine.document_links("templates/product.liquid"), "snippets", ".liquid")
+      end
+
       def test_makes_links_out_of_asset_url_filters
         content = <<~LIQUID
           {% '1' | asset_url %}
