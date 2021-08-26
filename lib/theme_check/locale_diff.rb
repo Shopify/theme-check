@@ -46,10 +46,12 @@ module ThemeCheck
       other = {} unless other.is_a?(Hash)
       return if pluralization?(default) && pluralization?(other)
 
-      @extra_keys += (other.keys - default.keys).map { |key| path + [key] }
+      shopify_translations = system_translations(path)
+
+      @extra_keys += (other.keys - default.keys - shopify_translations.keys).map { |key| path + [key] }
 
       default.each do |key, default_value|
-        translated_value = other[key]
+        translated_value = other[key] || shopify_translations[key]
         new_path = path + [key]
 
         if translated_value.nil?
@@ -64,6 +66,11 @@ module ThemeCheck
       hash.all? do |key, value|
         PLURALIZATION_KEYS.include?(key) && !value.is_a?(Hash)
       end
+    end
+
+    def system_translations(path)
+      return ShopifyLiquid::SystemTranslations.translations_hash if path.empty?
+      ShopifyLiquid::SystemTranslations.translations_hash.dig(*path) || {}
     end
   end
 end
