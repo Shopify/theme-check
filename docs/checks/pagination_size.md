@@ -37,7 +37,7 @@ N/A
 
 ## Version
 
-This check has been introduced in Theme Check THEME_CHECK_VERSION.
+This check has been introduced in Theme Check 1.3.0.
 
 ## Resources
 

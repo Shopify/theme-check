@@ -1,4 +1,20 @@
 
+v1.3.0 / 2021-08-26
+==================
+
+  * Add `--output json` option for the CLI ([#392](https://github.com/shopify/theme-check/issues/392))
+  * Add PaginationSize check ([#359](https://github.com/shopify/theme-check/issues/359))
+  * Add ConvertIncludeToRender auto corrector ([#341](https://github.com/shopify/theme-check/issues/341))
+  * Add MissingTemplate auto corrector ([#388](https://github.com/shopify/theme-check/issues/388))
+  * Add `MissingTemplate` `ignore_missing` option ([#394](https://github.com/shopify/theme-check/issues/394))
+  * Fix Windows duplicate .bat file problem ([#400](https://github.com/shopify/theme-check/issues/400))
+  * Fix substring highlighting inside nodes ([#386](https://github.com/shopify/theme-check/issues/386))
+  * Add check for forbidden tags in theme app extension blocks ([#383](https://github.com/shopify/theme-check/issues/383))
+  * Improve HTML parsing of liquid attributes ([#381](https://github.com/shopify/theme-check/issues/381))
+  * Handle escaped file URIs in language server ([#360](https://github.com/shopify/theme-check/issues/360)) ([#382](https://github.com/shopify/theme-check/issues/382))
+  * Change asset size errors into suggestions ([#378](https://github.com/shopify/theme-check/issues/378))
+  * Switch to nokogiri 1.12, since it includes html5 support directly now ([#391](https://github.com/shopify/theme-check/issues/391))
+
 v1.2.0 / 2021-07-15
 ==================
 

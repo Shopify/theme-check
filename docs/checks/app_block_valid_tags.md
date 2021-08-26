@@ -29,7 +29,7 @@ This rule should not be disabled locally.
 
 ## Version
 
-This check has been introduced in THEME_CHECK_VERSION
+This check has been introduced in 1.3.0
 
 ## Resources
 
