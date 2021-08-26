@@ -188,3 +188,6 @@ PaginationSize:
   ignore: []
   min_size: 1
   max_size: 50
+
+DeprecatedGlobalAppBlockType:
+  enabled: true
