@@ -55,10 +55,9 @@ module ThemeCheck
       end
 
       def on_text_document_did_open(_id, params)
-        return unless @diagnostics_tracker.first_run?
         relative_path = relative_path_from_text_document_uri(params)
         @storage.write(relative_path, text_document_text(params))
-        analyze_and_send_offenses(text_document_uri(params))
+        analyze_and_send_offenses(text_document_uri(params)) if @diagnostics_tracker.first_run?
       end
 
       def on_text_document_did_save(_id, params)
