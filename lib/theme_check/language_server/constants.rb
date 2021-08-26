@@ -2,22 +2,21 @@
 
 module ThemeCheck
   module LanguageServer
-    PARTIAL_RENDER = %r{
-      \{\%-?\s*render\s+'(?<partial>[^']*)'|
-      \{\%-?\s*render\s+"(?<partial>[^"]*)"|
+    def self.partial_tag(tag)
+      %r{
+        \{\%-?\s*#{tag}\s+'(?<partial>[^']*)'|
+        \{\%-?\s*#{tag}\s+"(?<partial>[^"]*)"|
 
-      # in liquid tags the whole line is white space until render
-      ^\s*render\s+'(?<partial>[^']*)'|
-      ^\s*render\s+"(?<partial>[^"]*)"
-    }mix
-    PARTIAL_INCLUDE = %r{
-      \{\%-?\s*include\s+'(?<partial>[^']*)'|
-      \{\%-?\s*include\s+"(?<partial>[^"]*)"|
+        # in liquid tags the whole line is white space until the tag
+        ^\s*#{tag}\s+'(?<partial>[^']*)'|
+        ^\s*#{tag}\s+"(?<partial>[^"]*)"
+      }mix
+    end
 
-      # in liquid tags the whole line is white space until render
-      ^\s*include\s+'(?<partial>[^']*)'|
-      ^\s*include\s+"(?<partial>[^"]*)"
-    }mix
+    PARTIAL_RENDER = partial_tag('render')
+    PARTIAL_INCLUDE = partial_tag('include')
+    PARTIAL_SECTION = partial_tag('section')
+
     ASSET_INCLUDE = %r{
       \{\%-?\s*'(?<partial>[^']*)'\s*\|\s*asset_url|
       \{\%-?\s*"(?<partial>[^"]*)"\s*\|\s*asset_url|
