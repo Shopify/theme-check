@@ -23,9 +23,9 @@ module ThemeCheck
       return if resource_url =~ RELATIVE_PATH
       return if url_hosted_by_shopify?(resource_url)
 
-      # Ignore non-stylesheet rel tags
+      # Ignore non-stylesheet link tags
       rel = node.attributes["rel"]
-      return if rel && rel != "stylesheet"
+      return if node.name == "link" && rel != "stylesheet"
 
       add_offense(
         "Asset should be served by the Shopify CDN for better performance.",
