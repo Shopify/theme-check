@@ -21,19 +21,35 @@ module ThemeCheck
       # Ignored, handled in ValidSchema.
     end
 
-    def on_string(node)
+    def on_case(node)
       if node.value == INVALID_GLOBAL_APP_BLOCK_TYPE
-        add_offense(
-          "Deprecated '#{INVALID_GLOBAL_APP_BLOCK_TYPE}' block type, use '#{VALID_GLOBAL_APP_BLOCK_TYPE}' block type instead.",
-          node: node
-        )
+        report_offense(node)
+      end
+    end
+
+    def on_condition(node)
+      if node.value.right == INVALID_GLOBAL_APP_BLOCK_TYPE || node.value.left == INVALID_GLOBAL_APP_BLOCK_TYPE
+        report_offense(node)
+      end
+    end
+
+    def on_variable(node)
+      if node.value.name == INVALID_GLOBAL_APP_BLOCK_TYPE
+        report_offense(node)
       end
     end
 
     private
 
+    def report_offense(node)
+      add_offense(
+        "Deprecated '#{INVALID_GLOBAL_APP_BLOCK_TYPE}' block type, use '#{VALID_GLOBAL_APP_BLOCK_TYPE}' block type instead.",
+        node: node
+      )
+    end
+
     def block_types_from(schema)
-      schema["blocks"].map do |block|
+      schema.fetch("blocks", []).map do |block|
         block.fetch("type", "")
       end
     end
