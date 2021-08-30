@@ -7,10 +7,13 @@ module ThemeCheck
 
     def on_img(node)
       class_list = node.attributes["class"]&.split(" ")
+      has_loading_lazy = node.attributes["loading"] == "lazy"
+      has_native_source = node.attributes["src"] || node.attributes["srcset"]
+      return if has_native_source && has_loading_lazy
+      has_lazysize_source = node.attributes["data-srcset"] || node.attributes["data-src"]
+      has_lazysize_class = class_list&.include?("lazyload")
+      return unless has_lazysize_class && has_lazysize_source
       add_offense("Use the native loading=\"lazy\" attribute instead of lazysizes", node: node) if class_list&.include?("lazyload")
-      add_offense("Use the native srcset attribute instead of data-srcset", node: node) if node.attributes["data-srcset"]
-      add_offense("Use the native sizes attribute instead of data-sizes", node: node) if node.attributes["data-sizes"]
-      add_offense("Do not set the data-sizes attribute to auto", node: node) if node.attributes["data-sizes"] == "auto"
     end
   end
 end
