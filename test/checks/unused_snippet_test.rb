@@ -36,4 +36,24 @@ class UnusedSnippetTest < Minitest::Test
     )
     assert_offenses("", offenses)
   end
+
+  def test_removes_unused_snippets
+    theme = make_theme(
+      "templates/index.liquid" => <<~END,
+        {% include 'muffin' %}
+      END
+      "snippets/muffin.liquid" => <<~END,
+        Here's a muffin
+      END
+      "snippets/unused.liquid" => <<~END,
+        This is not used
+      END
+    )
+
+    analyzer = ThemeCheck::Analyzer.new(theme, [ThemeCheck::UnusedSnippet.new], true)
+    analyzer.analyze_theme
+    analyzer.correct_offenses
+
+    refute(theme.storage.files.include?("snippets/unused.liquid"))
+  end
 end

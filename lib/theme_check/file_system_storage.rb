@@ -26,6 +26,11 @@ module ThemeCheck
       file(relative_path).write(content)
     end
 
+    def remove(relative_path)
+      file(relative_path).delete
+      reset_memoizers
+    end
+
     def files
       @file_array ||= glob("**/*")
         .map { |path| path.relative_path_from(@root).to_s }
