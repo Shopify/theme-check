@@ -20,6 +20,17 @@ module ThemeCheck
       @parser_error
     end
 
+    def update_contents(new_content = '{}')
+      @content = new_content
+    end
+
+    def write
+      if source != @content
+        @storage.write(@relative_path, content)
+        @source = content
+      end
+    end
+
     def json?
       true
     end

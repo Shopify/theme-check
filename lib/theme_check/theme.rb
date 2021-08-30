@@ -7,7 +7,8 @@ module ThemeCheck
     LIQUID_REGEX = /\.liquid$/i
     JSON_REGEX = /\.json$/i
 
-    attr_accessor :storage
+    attr_reader :storage
+    attr_writer :default_locale_json
 
     def initialize(storage)
       @storage = storage
