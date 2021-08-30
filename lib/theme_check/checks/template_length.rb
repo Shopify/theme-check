@@ -5,7 +5,7 @@ module ThemeCheck
     category :liquid
     doc docs_url(__FILE__)
 
-    def initialize(max_length: 500, exclude_schema: true, exclude_stylesheet: true, exclude_javascript: true)
+    def initialize(max_length: 600, exclude_schema: true, exclude_stylesheet: true, exclude_javascript: true)
       @max_length = max_length
       @exclude_schema = exclude_schema
       @exclude_stylesheet = exclude_stylesheet
