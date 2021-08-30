@@ -2,21 +2,28 @@
 
 module ThemeCheck
   module LanguageServer
-    PARTIAL_RENDER = %r{
-      \{\%-?\s*render\s+'(?<partial>[^']*)'|
-      \{\%-?\s*render\s+"(?<partial>[^"]*)"|
+    def self.partial_tag(tag)
+      %r{
+        \{\%-?\s*#{tag}\s+'(?<partial>[^']*)'|
+        \{\%-?\s*#{tag}\s+"(?<partial>[^"]*)"|
 
-      # in liquid tags the whole line is white space until render
-      ^\s*render\s+'(?<partial>[^']*)'|
-      ^\s*render\s+"(?<partial>[^"]*)"
-    }mix
+        # in liquid tags the whole line is white space until the tag
+        ^\s*#{tag}\s+'(?<partial>[^']*)'|
+        ^\s*#{tag}\s+"(?<partial>[^"]*)"
+      }mix
+    end
+
+    PARTIAL_RENDER = partial_tag('render')
+    PARTIAL_INCLUDE = partial_tag('include')
+    PARTIAL_SECTION = partial_tag('section')
+
     ASSET_INCLUDE = %r{
-      \{\%-?\s*'(?<partial>[^']*)'\s*\|\s*asset_url|
-      \{\%-?\s*"(?<partial>[^"]*)"\s*\|\s*asset_url|
+      \{\{-?\s*'(?<partial>[^']*)'\s*\|\s*asset_url|
+      \{\{-?\s*"(?<partial>[^"]*)"\s*\|\s*asset_url|
 
       # in liquid tags the whole line is white space until the asset partial
-      ^\s*'(?<partial>[^']*)'\s*\|\s*asset_url|
-      ^\s*"(?<partial>[^"]*)"\s*\|\s*asset_url
+      ^\s*(?:echo|assign[^=]*\=)\s*'(?<partial>[^']*)'\s*\|\s*asset_url|
+      ^\s*(?:echo|assign[^=]*\=)\s*"(?<partial>[^"]*)"\s*\|\s*asset_url
     }mix
   end
 end
