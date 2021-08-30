@@ -45,7 +45,7 @@ SyntaxError:
 TemplateLength:
   enabled: true
   ignore: []
-  max_length: 500
+  max_length: 600
   # Exclude content of {% schema %} in line count
   exclude_schema: true
   # Exclude content of {% stylesheet %} in line count
