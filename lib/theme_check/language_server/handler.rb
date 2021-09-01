@@ -77,16 +77,6 @@ module ThemeCheck
         send_response(id, completions(relative_path, line, col))
       end
 
-      def path_from_uri(uri_string)
-        return if uri_string.nil?
-        uri = URI(uri_string)
-        path = CGI.unescape(uri.path)
-        # On Windows, VS Code sends the URLs as file:///C:/...
-        # I don't think that /C:/1234 is a valid path in ruby?
-        path = path.sub(%r{^/([a-z]:/)}i, '\1')
-        path
-      end
-
       private
 
       def in_memory_storage(root)
@@ -107,7 +97,7 @@ module ThemeCheck
       end
 
       def text_document_uri(params)
-        path_from_uri(params.dig('textDocument', 'uri'))
+        file_path(params.dig('textDocument', 'uri'))
       end
 
       def relative_path_from_text_document_uri(params)
@@ -117,9 +107,9 @@ module ThemeCheck
       def root_path_from_params(params)
         root_uri = params["rootUri"]
         root_path = params["rootPath"]
-        if !root_uri.nil?
-          path_from_uri(root_uri)
-        elsif !root_path.nil?
+        if root_uri
+          file_path(root_uri)
+        elsif root_path
           root_path
         end
       end

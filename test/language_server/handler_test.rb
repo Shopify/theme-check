@@ -46,11 +46,6 @@ module ThemeCheck
         })
       end
 
-      def test_path_from_uri
-        assert_equal("/Users/foo", @handler.path_from_uri(file_uri("/Users/foo")))
-        assert_equal("C:/Users/bar", @handler.path_from_uri(file_uri("C:/Users/bar")))
-      end
-
       def test_handle_document_did_open
         initialize!(1, nil, @storage.root)
         @handler.on_text_document_did_open(nil, {
