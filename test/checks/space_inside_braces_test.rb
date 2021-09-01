@@ -43,8 +43,8 @@ class SpaceInsideBracesTest < Minitest::Test
       END
     )
     assert_offenses(<<~END, offenses)
-      Too many spaces after ',' at templates/index.liquid:1
       Space missing after ':' at templates/index.liquid:1
+      Too many spaces after ',' at templates/index.liquid:1
     END
   end
 

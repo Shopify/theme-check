@@ -20,8 +20,8 @@ class DeprecateBgsizesTest < Minitest::Test
       END
     )
     assert_offenses(<<~END, offenses)
-      Use the native loading=\"lazy\" attribute instead of lazysizes at templates/index.liquid:1
       Use the CSS imageset attribute instead of data-bgset at templates/index.liquid:1
+      Use the native loading=\"lazy\" attribute instead of lazysizes at templates/index.liquid:1
     END
   end
 end

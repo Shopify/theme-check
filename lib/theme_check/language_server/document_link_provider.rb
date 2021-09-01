@@ -5,6 +5,7 @@ module ThemeCheck
     class DocumentLinkProvider
       include RegexHelpers
       include PositionHelper
+      include URIHelper
 
       class << self
         attr_accessor :partial_regexp, :destination_directory, :destination_postfix
@@ -63,7 +64,7 @@ module ThemeCheck
       end
 
       def file_link(partial)
-        "file://#{@storage.path(destination_directory + '/' + partial + destination_postfix)}"
+        file_uri(@storage.path(destination_directory + '/' + partial + destination_postfix))
       end
     end
   end

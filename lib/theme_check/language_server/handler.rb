@@ -1,11 +1,12 @@
 # frozen_string_literal: true
+
 require "benchmark"
-require "uri"
-require "cgi"
 
 module ThemeCheck
   module LanguageServer
     class Handler
+      include URIHelper
+
       CAPABILITIES = {
         completionProvider: {
           triggerCharacters: ['.', '{{ ', '{% '],
@@ -26,7 +27,7 @@ module ThemeCheck
       end
 
       def on_initialize(id, params)
-        @root_path = path_from_uri(params["rootUri"]) || params["rootPath"]
+        @root_path = root_path_from_params(params)
 
         # Tell the client we don't support anything if there's no rootPath
         return send_response(id, { capabilities: {} }) if @root_path.nil?
@@ -96,17 +97,21 @@ module ThemeCheck
       end
 
       def text_document_uri(params)
-        path_from_uri(params.dig('textDocument', 'uri'))
-      end
-
-      def path_from_uri(uri_string)
-        return if uri_string.nil?
-        uri = URI(uri_string)
-        CGI.unescape(uri.path)
+        file_path(params.dig('textDocument', 'uri'))
       end
 
       def relative_path_from_text_document_uri(params)
         @storage.relative_path(text_document_uri(params))
+      end
+
+      def root_path_from_params(params)
+        root_uri = params["rootUri"]
+        root_path = params["rootPath"]
+        if root_uri
+          file_path(root_uri)
+        elsif root_path
+          root_path
+        end
       end
 
       def text_document_text(params)
@@ -174,7 +179,7 @@ module ThemeCheck
       def send_diagnostic(path, offenses)
         # https://microsoft.github.io/language-server-protocol/specifications/specification-current/#notificationMessage
         send_notification('textDocument/publishDiagnostics', {
-          uri: "file://#{path}",
+          uri: file_uri(path),
           diagnostics: offenses.map { |offense| offense_to_diagnostic(offense) },
         })
       end

@@ -25,6 +25,15 @@ module ThemeCheck
         @out = out_stream
         @err = err_stream
 
+        # Because programming is fun,
+        #
+        # Ruby on Windows turns \n into \r\n. Which means that \r\n
+        # gets turned into \r\r\n. Which means that the protocol
+        # breaks on windows unless we turn STDOUT into binary mode.
+        #
+        # Hours wasted: 9.
+        @out.binmode
+
         @out.sync = true # do not buffer
         @err.sync = true # do not buffer
 
@@ -52,19 +61,8 @@ module ThemeCheck
         response_body = JSON.dump(response)
         log(JSON.pretty_generate(response)) if $DEBUG
 
-        # Because programming is fun,
-        #
-        # Ruby on Windows turns \n into \r\n. Which means that \r\n
-        # gets turned into \r\r\n. Which means that the protocol
-        # breaks on windows unless we turn STDOUT into binary mode and
-        # set the encoding manually (yuk!) or we do this little hack
-        # here and put \n which gets transformed into \r\n on windows
-        # only...
-        #
-        # Hours wasted: 8.
-        eol = Gem.win_platform? ? "\n" : "\r\n"
-        @out.write("Content-Length: #{response_body.bytesize}#{eol}")
-        @out.write(eol)
+        @out.write("Content-Length: #{response_body.bytesize}\r\n")
+        @out.write("\r\n")
         @out.write(response_body)
         @out.flush
       end
