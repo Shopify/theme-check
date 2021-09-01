@@ -15,6 +15,7 @@ module ThemeCheck
 
           <!-- setting size -->
           {%- paginate collection.products by section.settings.products_per_page -%}
+          {%- paginate collection.products by section.settings.products_per_page_as_string -%}
           {% endpaginate %}
           {% schema %}
             {
@@ -25,10 +26,17 @@ module ThemeCheck
                         "id": "products_per_page",
                         "label": "Products per Page",
                         "default": 12
+                    },
+                    {
+                        "type": "number",
+                        "id": "products_per_page_as_string",
+                        "label": "Products per Page",
+                        "default": "12"
                     }
+
                 ]
             }
-            {% endschema %}
+          {% endschema %}
         END
       )
       assert_offenses("", offenses)
