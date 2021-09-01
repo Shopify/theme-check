@@ -36,5 +36,15 @@ module ThemeCheck
       theme.default_locale_json = JsonFile.new("locales/#{theme.default_locale}.default.json", theme.storage)
       theme.default_locale_json.update_contents('{}')
     end
+
+    def add_default_translation_key(file, key, value)
+      hash = file.content
+      key.reduce(hash) do |pointer, token|
+        return pointer[token] = value if token == key.last
+        pointer[token] = {} unless pointer.key?(token)
+        pointer[token]
+      end
+      file.update_contents(hash)
+    end
   end
 end

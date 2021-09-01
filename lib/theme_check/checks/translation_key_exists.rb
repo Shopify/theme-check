@@ -29,7 +29,9 @@ module ThemeCheck
           "'#{key_node.value}' does not have a matching entry in '#{@theme.default_locale_json.relative_path}'",
           node: node,
           markup: key_node.value,
-        )
+        ) do |corrector|
+          corrector.add_default_translation_key(@theme.default_locale_json, key_node.value.split("."), "TODO")
+        end
       end
     end
 

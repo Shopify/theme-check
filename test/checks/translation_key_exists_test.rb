@@ -68,4 +68,65 @@ class TranslationKeyExistsTest < Minitest::Test
 
     assert_offenses('', offenses)
   end
+
+  def test_creates_missing_keys
+    theme = make_theme(
+      "locales/en.default.json" => JSON.dump({}),
+      "templates/index.liquid" => <<~END,
+        {{"unknownkey" | t}}
+        {{"unknown.nested.key" | t}}
+        {{"unknownkey" | translate}}
+      END
+    )
+
+    analyzer = ThemeCheck::Analyzer.new(theme, [ThemeCheck::TranslationKeyExists.new], true)
+    analyzer.analyze_theme
+    analyzer.correct_offenses
+
+    expected = { "unknownkey" => "TODO", "unknown" => { "nested" => { "key" => "TODO" } } }
+    actual = theme.default_locale_json.content
+
+    assert_equal(expected, actual)
+  end
+
+  def test_creates_nested_missing_keys
+    theme = make_theme(
+      "locales/en.default.json" => JSON.dump({
+        key: "TODO",
+        nested: { key: "TODO" },
+        samplekey: { unknownkey: { key: "TODO" } },
+      }),
+      "templates/index.liquid" => <<~END,
+        {{"unknownkey" | t}}
+        {{"nested.unknownkey" | t}}
+        {{"samplekey.unknownkey.sample" | translate}}
+        {{"samplekey.example.sample" | translate}}
+      END
+    )
+
+    analyzer = ThemeCheck::Analyzer.new(theme, [ThemeCheck::TranslationKeyExists.new], true)
+    analyzer.analyze_theme
+    analyzer.correct_offenses
+
+    expected = {
+      "key" => "TODO",
+      "nested" => {
+        "key" => "TODO",
+        "unknownkey" => "TODO",
+      },
+      "samplekey" => {
+        "unknownkey" => {
+          "key" => "TODO",
+          "sample" => "TODO",
+        },
+        "example" => {
+          "sample" => "TODO",
+        },
+      },
+      "unknownkey" => "TODO",
+    }
+    actual = theme.default_locale_json.content
+
+    assert_equal(expected, actual)
+  end
 end
