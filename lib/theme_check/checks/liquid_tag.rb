@@ -13,7 +13,7 @@ module ThemeCheck
     end
 
     def on_tag(node)
-      if !node.inside_liquid_tag?
+      if node.inside_liquid_tag?
         reset_consecutive_statements
       # Ignore comments
       elsif !node.comment?

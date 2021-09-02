@@ -116,7 +116,7 @@ module Minitest
       assert_equal(
         output.chomp,
         offenses
-          .sort_by(&:location_range)
+          .sort_by { |o| [o.location_range, o.message].join(' ') }
           .map(&:to_s_range)
           .join("\n")
       )
