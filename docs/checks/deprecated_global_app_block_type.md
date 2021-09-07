@@ -51,7 +51,7 @@ It is discouraged to disable this check.
 
 ## Version
 
-This check has been introduced in Theme Check THEME_CHECK_VERSION.
+This check has been introduced in Theme Check 1.5.0.
 
 ## Resources
 
