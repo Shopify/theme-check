@@ -19,6 +19,9 @@ end
 group :development do
   gem 'guard'
   gem 'guard-minitest'
+  gem 'ruby-prof'
+  gem 'ruby-prof-flamegraph'
+  gem 'solargraph'
 end
 
 gem 'rubocop', '~> 1.12.0', require: false

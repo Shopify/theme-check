@@ -3,9 +3,13 @@ require 'json'
 
 module ThemeCheck
   class JsonPrinter
+    def initialize(out_stream = STDOUT)
+      @out = out_stream
+    end
+
     def print(offenses)
       json = offenses_by_path(offenses)
-      puts JSON.dump(json)
+      @out.puts JSON.dump(json)
     end
 
     def offenses_by_path(offenses)
