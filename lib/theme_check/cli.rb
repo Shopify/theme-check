@@ -78,6 +78,15 @@ module ThemeCheck
         "Print Theme Check version"
       ) { @command = :version }
 
+      if ENV["THEME_CHECK_DEBUG"]
+        @option_parser.separator("")
+        @option_parser.separator("Debugging:")
+        @option_parser.on(
+          "--profile",
+          "Output a profile to STDOUT compatible with FlameGraph."
+        ) { @command = :profile }
+      end
+
       @option_parser.separator("")
       @option_parser.separator(<<~EOS)
         Description:
@@ -172,7 +181,7 @@ module ThemeCheck
       puts option_parser.to_s
     end
 
-    def check
+    def check(out_stream = STDOUT)
       STDERR.puts "Checking #{@config.root} ..."
       storage = ThemeCheck::FileSystemStorage.new(@config.root, ignored_patterns: @config.ignored_patterns)
       theme = ThemeCheck::Theme.new(storage)
@@ -182,18 +191,32 @@ module ThemeCheck
       analyzer = ThemeCheck::Analyzer.new(theme, @config.enabled_checks, @config.auto_correct)
       analyzer.analyze_theme
       analyzer.correct_offenses
-      output_with_format(theme, analyzer)
+      output_with_format(theme, analyzer, out_stream)
       raise Abort, "" if analyzer.uncorrectable_offenses.any? do |offense|
         offense.check.severity_value <= Check.severity_value(@fail_level)
       end
     end
 
-    def output_with_format(theme, analyzer)
+    def profile
+      require 'ruby-prof-flamegraph'
+
+      result = RubyProf.profile do
+        check(STDERR)
+      end
+
+      # Print a graph profile to text
+      printer = RubyProf::FlameGraphPrinter.new(result)
+      printer.print(STDOUT, {})
+    rescue LoadError
+      STDERR.puts "Profiling is only available in development"
+    end
+
+    def output_with_format(theme, analyzer, out_stream)
       case @format
       when :text
-        ThemeCheck::Printer.new.print(theme, analyzer.offenses, @config.auto_correct)
+        ThemeCheck::Printer.new(out_stream).print(theme, analyzer.offenses, @config.auto_correct)
       when :json
-        ThemeCheck::JsonPrinter.new.print(analyzer.offenses)
+        ThemeCheck::JsonPrinter.new(out_stream).print(analyzer.offenses)
       end
     end
   end

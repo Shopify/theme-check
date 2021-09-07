@@ -65,3 +65,61 @@ MyNewCheckName:
   ignore: []
   muffin_mode: true
 ```
+
+## Debugging
+
+A couple of things are turned on when the `THEME_CHECK_DEBUG` environment variable is set.
+
+1. The check timeout is turned off. This means you can add `binding.pry` in tests and properly debug with `bundle exec rake tests:in_memory`
+2. The `--profile` flag appears. You can now create Flamegraphs to inspect performance.
+
+```
+export THEME_CHECK_DEBUG=true
+
+# The following will behave slightly differently
+bin/theme-check ../dawn
+bundle exec rake tests:in_memory
+
+# The following becomes available
+bin/theme-check --profile ../dawn
+
+# The LanguageServer will log the JSONRPC calls to STDERR
+bin/theme-check-language-server
+```
+
+### Profiling
+
+`ruby-prof` and `ruby-prof-flamegraph` are both included as development dependencies.
+
+#### Flamegraph
+
+With the `--profile` flag, you can run theme-check on a theme and the `ruby-prof-flamegraph` printer will output profiling information in a format [Flamegraph](/brendangregg/FlameGraph) understands.
+
+
+**Setup:** 
+
+```bash
+# clone the FlameGraph repo somewhere
+git clone https://github.com/brendangregg/FlameGraph.git
+
+# the flamegraph.pl perl script is in that repo
+alias flamegraph=/path/to/FlameGraph/flamegraph.pl
+```
+
+**Profiling:**
+
+```
+# run theme-check with --profile
+# pass the output to flamegraph
+# dump the output into an svg file
+bin/theme-check --profile ../dawn \
+  | flamegraph --countname=ms --width=1750 \
+  > /tmp/fg.svg
+
+# open the svg file in Chrome to look at the flamegraph
+chrome /tmp/fg.svg
+```
+
+What you'll see is an interactive version of the following image:
+
+![flamegraph](docs/flamegraph.svg)
