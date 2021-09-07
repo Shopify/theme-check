@@ -1,4 +1,17 @@
 
+v1.5.0 / 2021-09-07
+==================
+
+### Features
+
+  * Add [DeprecatedGlobalAppBlockType](docs/checks/deprecated_global_app_block_type.md) ([#402](https://github.com/shopify/theme-check/issues/402))
+
+### Fixes
+
+  * Add Windows CI
+  * Fix multiple Windows bugs ([#413](https://github.com/shopify/theme-check/issues/413), [#415](https://github.com/shopify/theme-check/issues/415))
+  * Fix pagination size as string bug in PaginationSize ([#417](https://github.com/shopify/theme-check/issues/417),  [#421](https://github.com/shopify/theme-check/issues/421))
+
 v1.4.0 / 2021-08-30
 ==================
 
