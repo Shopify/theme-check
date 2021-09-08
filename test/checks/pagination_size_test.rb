@@ -15,8 +15,16 @@ module ThemeCheck
 
           <!-- setting size -->
           {%- paginate collection.products by section.settings.products_per_page -%}
+          {%- endpaginate -%}
+
           {%- paginate collection.products by section.settings.products_per_page_as_string -%}
           {% endpaginate %}
+
+          <!-- dynamic size -->
+          {%- assign products_per_page = section.settings.products_per_page -%}
+          {%- paginate collection.products by products_per_page -%}
+          {% endpaginate %}
+
           {% schema %}
             {
                 "name": "test",
@@ -28,12 +36,11 @@ module ThemeCheck
                         "default": 12
                     },
                     {
-                        "type": "number",
+                        "type": "text",
                         "id": "products_per_page_as_string",
                         "label": "Products per Page",
                         "default": "12"
                     }
-
                 ]
             }
           {% endschema %}
