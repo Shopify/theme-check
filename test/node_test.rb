@@ -74,8 +74,20 @@ module ThemeCheck
         pre text{%
           assign x = 6
         %}
+        {% liquid
+          assign x = 7
+        %}
+        {%- liquid
+          assign x = 8
+        -%}
         {{- yes }}
         {{ no }}
+        {{-
+          foo
+        }}
+        {{
+          bar
+        -}}
       END
       node = find(root) { |n| n.markup =~ /assign x = 1/ }
       assert(node.whitespace_trimmed_start?)
@@ -89,9 +101,18 @@ module ThemeCheck
       assert(node.whitespace_trimmed_start?)
       node = find(root) { |n| n.markup =~ /assign x = 6/ }
       refute(node.whitespace_trimmed_start?)
+      # doesn't make sense in liquid tags
+      node = find(root) { |n| n.markup =~ /assign x = 7/ }
+      refute(node.whitespace_trimmed_start?)
+      node = find(root) { |n| n.markup =~ /assign x = 8/ }
+      refute(node.whitespace_trimmed_start?)
       node = find(root) { |n| n.markup =~ /yes/ }
       assert(node.whitespace_trimmed_start?)
       node = find(root) { |n| n.markup =~ /no/ }
+      refute(node.whitespace_trimmed_start?)
+      node = find(root) { |n| n.markup =~ /foo/ }
+      assert(node.whitespace_trimmed_start?)
+      node = find(root) { |n| n.markup =~ /bar/ }
       refute(node.whitespace_trimmed_start?)
     end
 
@@ -111,8 +132,20 @@ module ThemeCheck
         pre text{%
           assign x = 6
         %}
+        {% liquid
+          assign x = 7
+        %}
+        {%- liquid
+          assign x = 8
+        -%}
         {{ yes -}}
         {{ no }}
+        {{-
+          foo
+        }}
+        {{
+          bar
+        -}}
       END
       node = find(root) { |n| n.markup =~ /assign x = 1/ }
       assert(node.whitespace_trimmed_end?)
@@ -126,10 +159,19 @@ module ThemeCheck
       assert(node.whitespace_trimmed_end?)
       node = find(root) { |n| n.markup =~ /assign x = 6/ }
       refute(node.whitespace_trimmed_end?)
+      # doesn't make sense in liquid tags
+      node = find(root) { |n| n.markup =~ /assign x = 7/ }
+      refute(node.whitespace_trimmed_end?)
+      node = find(root) { |n| n.markup =~ /assign x = 8/ }
+      refute(node.whitespace_trimmed_end?)
       node = find(root) { |n| n.markup =~ /yes/ }
       assert(node.whitespace_trimmed_end?)
       node = find(root) { |n| n.markup =~ /no/ }
       refute(node.whitespace_trimmed_end?)
+      node = find(root) { |n| n.markup =~ /foo/ }
+      refute(node.whitespace_trimmed_end?)
+      node = find(root) { |n| n.markup =~ /bar/ }
+      assert(node.whitespace_trimmed_end?)
     end
 
     private

@@ -136,7 +136,7 @@ module ThemeCheck
 
     # Is this node inside a tag or variable that starts by removing whitespace. i.e. {%- or {{-
     def whitespace_trimmed_start?
-      @whitespace_trimmed_start ||= if line_number && source
+      @whitespace_trimmed_start ||= if line_number && source && !inside_liquid_tag?
         i = 1
         i += 1 while source[start_index - i] =~ WHITESPACE && i < start_index
         source[start_index - i] == "-"
@@ -147,7 +147,7 @@ module ThemeCheck
 
     # Is this node inside a tag or variable ends starts by removing whitespace. i.e. -%} or -}}
     def whitespace_trimmed_end?
-      @whitespace_trimmed_end ||= if line_number && source
+      @whitespace_trimmed_end ||= if line_number && source && !inside_liquid_tag?
         i = 0
         i += 1 while source[end_index + i] =~ WHITESPACE && i < source.size
         source[end_index + i] == "-"
