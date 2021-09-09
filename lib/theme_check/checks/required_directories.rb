@@ -18,7 +18,9 @@ module ThemeCheck
     private
 
     def add_missing_directories_offense(directory)
-      add_offense("Theme is missing '#{directory}' directory")
+      add_offense("Theme is missing '#{directory}' directory") do |corrector|
+        corrector.mkdir(@theme, directory)
+      end
     end
   end
 end

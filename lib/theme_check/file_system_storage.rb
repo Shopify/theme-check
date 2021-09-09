@@ -26,6 +26,12 @@ module ThemeCheck
       file(relative_path).write(content)
     end
 
+    def mkdir(relative_path)
+      reset_memoizers unless file_exists?(relative_path)
+
+      file(relative_path).mkpath unless file(relative_path).directory?
+    end
+
     def files
       @file_array ||= glob("**/*")
         .map { |path| path.relative_path_from(@root).to_s }

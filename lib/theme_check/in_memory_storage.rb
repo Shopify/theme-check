@@ -23,6 +23,10 @@ module ThemeCheck
       @files[relative_path] = content
     end
 
+    def mkdir(relative_path)
+      @files[relative_path] = nil
+    end
+
     def files
       @files.keys
     end
