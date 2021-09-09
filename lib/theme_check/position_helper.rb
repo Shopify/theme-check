@@ -19,9 +19,10 @@ module ThemeCheck
       return [0, 0] unless content.is_a?(String) && !content.empty?
       return [0, 0] unless index.is_a?(Integer)
       safe_index = bounded(0, index, content.size - 1)
-      lines = content[0..safe_index].lines
-      row = lines.size - 1
-      col = lines.last.size - 1
+      content_up_to_index = content[0...safe_index]
+      row = content_up_to_index.count("\n")
+      col = 0
+      col += 1 while (safe_index -= 1) && safe_index >= 0 && content[safe_index] != "\n"
       [row, col]
     end
 

@@ -24,6 +24,7 @@ module ThemeCheck
         assert_equal(content.index('m'), from_row_column_to_index(content, 1, 5))
         assert_equal(content.index('r'), from_row_column_to_index(content, 2, 1))
         assert_equal(content.index('z'), from_row_column_to_index(content, 5, 1))
+        assert_equal(content.index("\n"), from_row_column_to_index(content, 0, 7))
       end
 
       def test_convert_index_to_row_column
@@ -33,6 +34,7 @@ module ThemeCheck
         assert_equal([1, 5], from_index_to_row_column(content, content.index('m')))
         assert_equal([2, 1], from_index_to_row_column(content, content.index('r')))
         assert_equal([5, 1], from_index_to_row_column(content, content.index('z')))
+        assert_equal([0, 7], from_index_to_row_column(content, content.index("\n")))
       end
 
       def test_handles_empty_content_gracefully
