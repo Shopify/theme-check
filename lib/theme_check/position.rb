@@ -16,22 +16,22 @@ module ThemeCheck
       @line_number_1_indexed = line_number_1_indexed
       @node_markup_offset = node_markup_offset
       @node_markup = node_markup
-      @strict_position = StrictPosition.new(
+    end
+
+    def start_line_offset
+      @start_line_offset ||= from_row_column_to_index(contents, line_number, 0)
+    end
+
+    def start_offset
+      @start_offset ||= compute_start_offset
+    end
+
+    def strict_position
+      @strict_position ||= StrictPosition.new(
         needle,
         contents,
         start_index,
       )
-    end
-
-    def start_line_offset
-      from_row_column_to_index(contents, line_number, 0)
-    end
-
-    def start_offset
-      return start_line_offset if @node_markup.nil?
-      node_markup_start = contents.index(@node_markup, start_line_offset)
-      return start_line_offset if node_markup_start.nil?
-      node_markup_start + @node_markup_offset
     end
 
     # 0-indexed, inclusive
@@ -41,39 +41,50 @@ module ThemeCheck
 
     # 0-indexed, exclusive
     def end_index
-      @strict_position.end_index
+      strict_position.end_index
     end
 
     # 0-indexed, inclusive
     def start_row
-      @strict_position.start_row
+      strict_position.start_row
     end
 
     # 0-indexed, inclusive
     def start_column
-      @strict_position.start_column
+      strict_position.start_column
     end
 
     # 0-indexed, exclusive (both taken together are) therefore you
     # might end up on a newline character or the next line
     def end_row
-      @strict_position.end_row
+      strict_position.end_row
     end
 
     def end_column
-      @strict_position.end_column
+      strict_position.end_column
     end
 
     private
+
+    def compute_start_offset
+      return start_line_offset if @node_markup.nil?
+      node_markup_start = contents.index(@node_markup, start_line_offset)
+      return start_line_offset if node_markup_start.nil?
+      node_markup_start + @node_markup_offset
+    end
 
     def contents
       return '' unless @contents.is_a?(String) && !@contents.empty?
       @contents
     end
 
+    def content_line_count
+      @content_line_count ||= contents.count("\n")
+    end
+
     def line_number
       return 0 if @line_number_1_indexed.nil?
-      bounded(0, @line_number_1_indexed - 1, contents.lines.size - 1)
+      bounded(0, @line_number_1_indexed - 1, content_line_count)
     end
 
     def needle
