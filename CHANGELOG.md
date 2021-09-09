@@ -1,4 +1,9 @@
 
+v1.5.1 / 2021-09-08
+===================
+
+  * Fix PaginationSize issue ([#429](https://github.com/shopify/theme-check/issues/429), [#428](https://github.com/shopify/theme-check/issues/428))
+
 v1.5.0 / 2021-09-07
 ==================
 
