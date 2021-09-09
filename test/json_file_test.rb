@@ -32,6 +32,15 @@ class JsonFileTest < Minitest::Test
     assert_instance_of(JSON::ParserError, @json.parse_error)
   end
 
+  def test_write
+    storage = make_storage("a.json" => '{ "hello": "world" }')
+    expected = { hello: "friend" }
+    @json = ThemeCheck::JsonFile.new("a.json", storage)
+    @json.update_contents(expected)
+    @json.write
+    assert_equal(JSON.pretty_generate(expected), storage.read("a.json"))
+  end
+
   private
 
   def make_json_file(name, content)

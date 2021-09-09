@@ -20,14 +20,19 @@ module ThemeCheck
       @parser_error
     end
 
-    def update_contents(new_content = '{}')
+    def update_contents(new_content = {})
+      raise ArgumentError if new_content.is_a?(String)
       @content = new_content
     end
 
     def write
-      if source != @content
-        @storage.write(@relative_path, content)
-        @source = content
+      pretty = JSON.pretty_generate(@content)
+      if source.rstrip != pretty.rstrip
+        # Most editors add a trailing \n at the end of files. Here we
+        # try to maintain the convention.
+        eof = source.end_with?("\n") ? "\n" : ""
+        @storage.write(@relative_path, pretty + eof)
+        @source = pretty
       end
     end
 
