@@ -2,6 +2,7 @@
 v1.5.2 / 2021-09-09
 ===================
 
+  * Handle invalid URIs in RemoteAssetFile ([#418](https://github.com/shopify/theme-check/issues/418), [#438](https://github.com/shopify/theme-check/issues/438))
   * Fix `Bad start_index` error in SpaceInsideBraces ([#423](https://github.com/shopify/theme-check/issues/423))
   * Autocorrect missing directories ([#389](https://github.com/shopify/theme-check/issues/389))
 
