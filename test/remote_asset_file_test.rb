@@ -4,6 +4,7 @@ require "test_helper"
 module ThemeCheck
   class RemoteAssetFileTest < Minitest::Test
     FakeResponse = Struct.new(:body)
+
     def setup
       @src = 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js'
       @asset = RemoteAssetFile.from_src(@src)
@@ -21,6 +22,12 @@ module ThemeCheck
         .returns(FakeResponse.new("..."))
       assert_equal("...", @asset.content)
       assert_equal(3, @asset.gzipped_size)
+    end
+
+    def test_handles_invalid_uris
+      asset = RemoteAssetFile.from_src("https://{{ settings.url }}")
+      refute(asset.gzipped_size)
+      refute(asset.content)
     end
   end
 end
