@@ -24,7 +24,9 @@ module ThemeCheck
 
     def on_end
       missing_snippets.each do |template|
-        add_offense("This template is not used", template: template)
+        add_offense("This template is not used", template: template) do |corrector|
+          corrector.remove(@theme, template.relative_path.to_s)
+        end
       end
     end
 

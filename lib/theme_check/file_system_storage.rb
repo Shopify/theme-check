@@ -26,6 +26,11 @@ module ThemeCheck
       file(relative_path).write(content)
     end
 
+    def remove(relative_path)
+      file(relative_path).delete
+      reset_memoizers
+    end
+
     def mkdir(relative_path)
       reset_memoizers unless file_exists?(relative_path)
 
