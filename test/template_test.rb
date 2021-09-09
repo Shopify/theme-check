@@ -28,6 +28,6 @@ class TemplateTest < Minitest::Test
   end
 
   def test_excerpt
-    assert_equal("{{ 1 + 2 }}", @template.excerpt(3))
+    assert_equal("{{ 1 + 2 }}", @template.source_excerpt(3))
   end
 end

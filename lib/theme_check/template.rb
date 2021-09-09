@@ -3,10 +3,11 @@
 module ThemeCheck
   class Template < ThemeFile
     def write
-      content = updated_content
+      content = rewriter.to_s
       if source != content
         @storage.write(@relative_path, content)
         @source = content
+        @rewriter = nil
       end
     end
 
@@ -26,28 +27,13 @@ module ThemeCheck
       name.start_with?('snippets')
     end
 
-    def lines
-      # Retain trailing newline character
-      @lines ||= source.split("\n", -1)
-    end
-
-    # Not entirely obvious but lines is mutable, corrections are to be
-    # applied on @lines.
-    def updated_content
-      lines.join("\n")
-    end
-
-    def excerpt(line)
-      lines[line - 1].strip
+    def rewriter
+      @rewriter ||= TemplateRewriter.new(@relative_path, source)
     end
 
     def source_excerpt(line)
       original_lines = source.split("\n")
       original_lines[line - 1].strip
-    end
-
-    def full_line(line)
-      lines[line - 1]
     end
 
     def parse

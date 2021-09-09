@@ -7,25 +7,20 @@ module ThemeCheck
     end
 
     def insert_after(node, content)
-      line = @template.full_line(node.line_number)
-      line.insert(node.range[1] + 1, content)
+      @template.rewriter.insert_after(node, content)
     end
 
     def insert_before(node, content)
-      line = @template.full_line(node.line_number)
-      line.insert(node.range[0], content)
+      @template.rewriter.insert_before(node, content)
     end
 
     def replace(node, content)
-      line = @template.full_line(node.line_number)
-      line[node.range[0]..node.range[1]] = content
+      @template.rewriter.replace(node, content)
       node.markup = content
     end
 
     def wrap(node, insert_before, insert_after)
-      line = @template.full_line(node.line_number)
-      line.insert(node.range[0], insert_before)
-      line.insert(node.range[1] + 1 + insert_before.length, insert_after)
+      @template.rewriter.wrap(node, insert_before, insert_after)
     end
 
     def create(theme, relative_path, content)
