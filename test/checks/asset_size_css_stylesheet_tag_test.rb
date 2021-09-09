@@ -14,6 +14,7 @@ module ThemeCheck
             <html>
               <head>
                 {{ 'theme.css' | asset_url | stylesheet_tag }}
+                {{ "https://example.com" | stylesheet_tag }}
               </head>
             </html>
           END
@@ -32,12 +33,14 @@ module ThemeCheck
           <html>
             <head>
               {{ 'theme.css' | asset_url | stylesheet_tag }}
+              {{ "https://example.com" | stylesheet_tag }}
             </head>
           </html>
         END
       )
       assert_offenses(<<~END, offenses)
         CSS on every page load exceeding compressed size threshold (2 Bytes). at templates/index.liquid:3
+        CSS on every page load exceeding compressed size threshold (2 Bytes). at templates/index.liquid:4
       END
     end
 
