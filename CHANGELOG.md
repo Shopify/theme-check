@@ -1,4 +1,10 @@
 
+v1.5.2 / 2021-09-09
+===================
+
+  * Fix `Bad start_index` error in SpaceInsideBraces ([#423](https://github.com/shopify/theme-check/issues/423))
+  * Autocorrect missing directories ([#389](https://github.com/shopify/theme-check/issues/389))
+
 v1.5.1 / 2021-09-08
 ===================
 
