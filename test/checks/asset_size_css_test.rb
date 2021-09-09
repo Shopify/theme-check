@@ -43,7 +43,6 @@ module ThemeCheck
             <html>
               <head>
                 <link href="{{ 'theme.css' | asset_url }}" rel="stylesheet">
-                {{ 'theme.css' | asset_url | stylesheet_tag }}
               </head>
             </html>
           END
