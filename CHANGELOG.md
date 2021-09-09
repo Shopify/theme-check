@@ -1,4 +1,42 @@
 
+v1.5.2 / 2021-09-09
+===================
+
+  * Handle invalid URIs in RemoteAssetFile ([#418](https://github.com/shopify/theme-check/issues/418), [#438](https://github.com/shopify/theme-check/issues/438))
+  * Fix `Bad start_index` error in SpaceInsideBraces ([#423](https://github.com/shopify/theme-check/issues/423))
+  * Autocorrect missing directories ([#389](https://github.com/shopify/theme-check/issues/389))
+
+v1.5.1 / 2021-09-08
+===================
+
+  * Fix PaginationSize issue ([#429](https://github.com/shopify/theme-check/issues/429), [#428](https://github.com/shopify/theme-check/issues/428))
+
+v1.5.0 / 2021-09-07
+==================
+
+### Features
+
+  * Add [DeprecatedGlobalAppBlockType](docs/checks/deprecated_global_app_block_type.md) ([#402](https://github.com/shopify/theme-check/issues/402))
+
+### Fixes
+
+  * Add Windows CI
+  * Fix multiple Windows bugs ([#413](https://github.com/shopify/theme-check/issues/413), [#415](https://github.com/shopify/theme-check/issues/415))
+  * Fix pagination size as string bug in PaginationSize ([#417](https://github.com/shopify/theme-check/issues/417),  [#421](https://github.com/shopify/theme-check/issues/421))
+
+v1.4.0 / 2021-08-30
+==================
+
+  * Add new object drop: `predictive_search`
+  * Bump `TemplateLength` `max_length` default
+  * Fix `RemoteAsset` incorrectly firing on structured data elements [#393](https://github.com/Shopify/theme-check/issues/393)
+  * Fix document links not working on open
+  * Fix `asset_url` document links
+  * Use better heuristics for `DeprecateLazysizes`
+  * Add support for `section` document links
+  * Add support for `include` document links
+  * Automatically creates the default translation file (`locales/en.default.json`) if it doesn't already exist.
+
 v1.3.0 / 2021-08-26
 ==================
 

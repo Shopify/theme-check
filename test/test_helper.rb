@@ -96,7 +96,12 @@ module Minitest
         assert(offense.end_column)
       end
 
-      assert_equal(output.chomp, offenses.sort_by(&:location).join("\n"))
+      assert_equal(
+        output.chomp,
+        offenses
+          .sort_by { |o| [o.location, o.message].join(' ') }
+          .join("\n")
+      )
     end
 
     def assert_offenses_with_range(output, offenses)
@@ -111,7 +116,7 @@ module Minitest
       assert_equal(
         output.chomp,
         offenses
-          .sort_by(&:location_range)
+          .sort_by { |o| [o.location_range, o.message].join(' ') }
           .map(&:to_s_range)
           .join("\n")
       )

@@ -7,14 +7,24 @@ class SpaceInsideBracesTest < Minitest::Test
       ThemeCheck::SpaceInsideBraces.new,
       "templates/index.liquid" => <<~END,
         {% assign x = 1%}
+        {% assign x = 2-%}
+        {%- assign x = 3%}
+        {%- assign x = 4-%}
         {{ x}}
+        {{ x-}}
         {{x }}
+        {{-x }}
       END
     )
     assert_offenses(<<~END, offenses)
       Space missing before '%}' at templates/index.liquid:1
-      Space missing before '}}' at templates/index.liquid:2
-      Space missing after '{{' at templates/index.liquid:3
+      Space missing before '-%}' at templates/index.liquid:2
+      Space missing before '%}' at templates/index.liquid:3
+      Space missing before '-%}' at templates/index.liquid:4
+      Space missing before '}}' at templates/index.liquid:5
+      Space missing before '-}}' at templates/index.liquid:6
+      Space missing after '{{' at templates/index.liquid:7
+      Space missing after '{{-' at templates/index.liquid:8
     END
   end
 
@@ -23,14 +33,20 @@ class SpaceInsideBracesTest < Minitest::Test
       ThemeCheck::SpaceInsideBraces.new,
       "templates/index.liquid" => <<~END,
         {{  x }}
+        {{-  x }}
         {% assign x = 1  %}
+        {% assign x = 1  -%}
         {{ x  }}
+        {{ x  -}}
       END
     )
     assert_offenses(<<~END, offenses)
       Too many spaces after '{{' at templates/index.liquid:1
-      Too many spaces before '%}' at templates/index.liquid:2
-      Too many spaces before '}}' at templates/index.liquid:3
+      Too many spaces after '{{-' at templates/index.liquid:2
+      Too many spaces before '%}' at templates/index.liquid:3
+      Too many spaces before '-%}' at templates/index.liquid:4
+      Too many spaces before '}}' at templates/index.liquid:5
+      Too many spaces before '-}}' at templates/index.liquid:6
     END
   end
 
@@ -43,8 +59,8 @@ class SpaceInsideBracesTest < Minitest::Test
       END
     )
     assert_offenses(<<~END, offenses)
-      Too many spaces after ',' at templates/index.liquid:1
       Space missing after ':' at templates/index.liquid:1
+      Too many spaces after ',' at templates/index.liquid:1
     END
   end
 
@@ -303,18 +319,79 @@ class SpaceInsideBracesTest < Minitest::Test
     assert_offenses('', offenses)
   end
 
-  def test_reports_properly
+  def test_reports_correct_location_range
+    [
+      {
+        #          The two lines below are there to help identify the index
+        #          0000000000111111111122222222223333333333
+        #          0123456789012345678901234567890123456789
+        template: "{{all_products }}",
+        expected: "Space missing after '{{' at templates/index.liquid:2:3",
+      },
+      {
+        template: "{{   all_products }}",
+        expected: "Too many spaces after '{{' at templates/index.liquid:2:5",
+      },
+      {
+        template: "{{ all_products}}",
+        expected: "Space missing before '}}' at templates/index.liquid:14:15",
+      },
+      {
+        template: "{{ all_products   }}",
+        expected: "Too many spaces before '}}' at templates/index.liquid:15:18",
+      },
+      {
+        template: "{{ 'a' | replace: ', ',',' | split: ',' }}",
+        expected: "Space missing after ',' at templates/index.liquid:22:23",
+      },
+      {
+        template: "{% assign x = n-%}",
+        expected: "Space missing before '-%}' at templates/index.liquid:14:15",
+      },
+      {
+        template: "{% assign x = n  -%}",
+        expected: "Too many spaces before '-%}' at templates/index.liquid:15:17",
+      },
+      {
+        template: '{%- if x !=  "x" -%}{%- endif -%}',
+        expected: "Too many spaces after '!=' at templates/index.liquid:11:13",
+      },
+      {
+        template: '{%- if x  != "x" -%}{%- endif -%}',
+        expected: "Too many spaces before '!=' at templates/index.liquid:8:10",
+      },
+      {
+        template: '{%- if x !="x" -%}{%- endif -%}',
+        expected: "Space missing after '!=' at templates/index.liquid:9:11",
+      },
+      {
+        template: '{%- if x!= "x" -%}{%- endif -%}',
+        expected: "Space missing before '!=' at templates/index.liquid:8:10",
+      },
+    ].each do |test_desc|
+      offenses = analyze_theme(
+        ThemeCheck::SpaceInsideBraces.new,
+        "templates/index.liquid" => test_desc[:template]
+      )
+      assert_offenses_with_range(
+        test_desc[:expected],
+        offenses
+      )
+    end
+  end
+
+  def test_reports_properly_at_end_tag
     offenses = analyze_theme(
       ThemeCheck::SpaceInsideBraces.new,
       "templates/index.liquid" => <<~END,
-        {{ 'a' | replace: ', ',',' | split: ',' }}
-        0000000000111111111122222222223333333333
-        0123456789012345678901234567890123456789
+        {% assign x = n-%}
+        00000000001111111
+        01234567890123456
         The two lines above are there to help identify the index
       END
     )
     assert_offenses_with_range(
-      "Space missing after ',' at templates/index.liquid:22:23",
+      "Space missing before '-%}' at templates/index.liquid:14:15",
       offenses
     )
   end

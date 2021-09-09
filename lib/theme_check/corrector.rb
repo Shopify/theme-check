@@ -39,6 +39,9 @@ module ThemeCheck
 
     def remove(theme, relative_path)
       theme.storage.remove(relative_path)
+
+    def mkdir(theme, relative_path)
+      theme.storage.mkdir(relative_path)
     end
   end
 end

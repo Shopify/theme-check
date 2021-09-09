@@ -27,6 +27,10 @@ module ThemeCheck
       @files.delete(relative_path)
     end
 
+    def mkdir(relative_path)
+      @files[relative_path] = nil
+    end
+
     def files
       @files.keys
     end

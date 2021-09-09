@@ -1,7 +1,10 @@
 # frozen_string_literal: true
+
 require "test_helper"
 
 class LanguageServerTest < Minitest::Test
+  include ThemeCheck::LanguageServer::URIHelper
+
   def setup
     @in = StringIO.new
     @out = StringIO.new
@@ -62,7 +65,7 @@ class LanguageServerTest < Minitest::Test
       "id" => "123",
       "method" => "initialize",
       "params" => {
-        "rootPath" => storage.root,
+        "rootUri" => file_uri(storage.root),
       },
     }, {
       "jsonrpc" => "2.0",
@@ -73,7 +76,7 @@ class LanguageServerTest < Minitest::Test
       "method" => "textDocument/didOpen",
       "params" => {
         "textDocument" => {
-          "uri" => "file://#{storage.path('layout/theme.liquid')}",
+          "uri" => file_uri(storage.path('layout/theme.liquid')),
           "version" => 1,
         },
       },
@@ -92,7 +95,7 @@ class LanguageServerTest < Minitest::Test
       "jsonrpc" => "2.0",
       "method" => "textDocument/publishDiagnostics",
       "params" => {
-        "uri" => "file://#{storage.path('layout/theme.liquid')}",
+        "uri" => file_uri(storage.path('layout/theme.liquid')),
         "diagnostics" => [{
           "range" => {
             "start" => {
@@ -128,14 +131,14 @@ class LanguageServerTest < Minitest::Test
       "id" => "123",
       "method" => "initialize",
       "params" => {
-        "rootPath" => storage.root,
+        "rootUri" => file_uri(storage.root),
       },
     }, {
       "jsonrpc" => "2.0",
       "method" => "textDocument/didSave",
       "params" => {
         "textDocument" => {
-          "uri" => "file://#{storage.path('layout/theme.liquid')}",
+          "uri" => file_uri(storage.path('layout/theme.liquid')),
           "version" => 1,
         },
       },
@@ -154,7 +157,7 @@ class LanguageServerTest < Minitest::Test
       "jsonrpc" => "2.0",
       "method" => "textDocument/publishDiagnostics",
       "params" => {
-        "uri" => "file://#{storage.path('layout/theme.liquid')}",
+        "uri" => file_uri(storage.path('layout/theme.liquid')),
         "diagnostics" => [{
           "range" => {
             "start" => {
@@ -190,14 +193,14 @@ class LanguageServerTest < Minitest::Test
       "id" => "123",
       "method" => "initialize",
       "params" => {
-        "rootPath" => storage.root,
+        "rootUri" => file_uri(storage.root),
       },
     }, {
       "jsonrpc" => "2.0",
       "method" => "textDocument/didOpen",
       "params" => {
         "textDocument" => {
-          "uri" => "file://#{storage.path("src/layout/theme.liquid")}",
+          "uri" => file_uri(storage.path("src/layout/theme.liquid")),
           "version" => 1,
         },
       },
@@ -221,14 +224,14 @@ class LanguageServerTest < Minitest::Test
       "id" => "123",
       "method" => "initialize",
       "params" => {
-        "rootPath" => storage.root,
+        "rootUri" => file_uri(storage.root),
       },
     }, {
       "jsonrpc" => "2.0",
       "method" => "textDocument/didOpen",
       "params" => {
         "textDocument" => {
-          "uri" => "file://#{storage.path('layout/theme.liquid')}",
+          "uri" => file_uri(storage.path('layout/theme.liquid')),
           "text" => template,
           "version" => 1,
         },
@@ -239,7 +242,7 @@ class LanguageServerTest < Minitest::Test
       "method" => "textDocument/documentLink",
       "params" => {
         "textDocument" => {
-          "uri" => "file://#{storage.path('layout/theme.liquid')}",
+          "uri" => file_uri(storage.path('layout/theme.liquid')),
         },
       },
     }, {
@@ -251,7 +254,7 @@ class LanguageServerTest < Minitest::Test
       "jsonrpc" => "2.0",
       "id" => 1,
       "result" => [{
-        "target" => "file://#{storage.path('snippets/a.liquid')}",
+        "target" => file_uri(storage.path('snippets/a.liquid')),
         "range" => {
           "start" => {
             "line" => 0,
@@ -282,14 +285,14 @@ class LanguageServerTest < Minitest::Test
       "id" => "123",
       "method" => "initialize",
       "params" => {
-        "rootPath" => storage.root,
+        "rootUri" => file_uri(storage.root),
       },
     }, {
       "jsonrpc" => "2.0",
       "method" => "textDocument/didOpen",
       "params" => {
         "textDocument" => {
-          "uri" => "file://#{storage.path('src/theme/layout/theme.liquid')}",
+          "uri" => file_uri(storage.path('src/theme/layout/theme.liquid')),
           "text" => template,
           "version" => 1,
         },
@@ -300,7 +303,7 @@ class LanguageServerTest < Minitest::Test
       "method" => "textDocument/documentLink",
       "params" => {
         "textDocument" => {
-          "uri" => "file://#{storage.path('src/theme/layout/theme.liquid')}",
+          "uri" => file_uri(storage.path('src/theme/layout/theme.liquid')),
         },
       },
     }, {
@@ -312,7 +315,7 @@ class LanguageServerTest < Minitest::Test
       "jsonrpc" => "2.0",
       "id" => 1,
       "result" => [{
-        "target" => "file://#{storage.path('src/theme/snippets/a.liquid')}",
+        "target" => file_uri(storage.path('src/theme/snippets/a.liquid')),
         "range" => {
           "start" => {
             "line" => 0,
@@ -344,14 +347,14 @@ class LanguageServerTest < Minitest::Test
       "id" => "123",
       "method" => "initialize",
       "params" => {
-        "rootPath" => storage.root,
+        "rootUri" => file_uri(storage.root),
       },
     }, {
       "jsonrpc" => "2.0",
       "method" => "textDocument/didSave",
       "params" => {
         "textDocument" => {
-          "uri" => "file://#{storage.path('layout/theme.liquid')}",
+          "uri" => file_uri(storage.path('layout/theme.liquid')),
           "version" => 1,
         },
       },
@@ -360,7 +363,7 @@ class LanguageServerTest < Minitest::Test
       "method" => "textDocument/didSave",
       "params" => {
         "textDocument" => {
-          "uri" => "file://#{storage.path('layout/theme.liquid')}",
+          "uri" => file_uri(storage.path('layout/theme.liquid')),
           "version" => 1,
         },
       },
@@ -380,7 +383,7 @@ class LanguageServerTest < Minitest::Test
       "jsonrpc" => "2.0",
       "method" => "textDocument/publishDiagnostics",
       "params" => {
-        "uri" => "file://#{storage.path('layout/theme.liquid')}",
+        "uri" => file_uri(storage.path('layout/theme.liquid')),
         "diagnostics" => [{
           "range" => {
             "start" => {
@@ -406,7 +409,7 @@ class LanguageServerTest < Minitest::Test
       "jsonrpc" => "2.0",
       "method" => "textDocument/publishDiagnostics",
       "params" => {
-        "uri" => "file://#{storage.path('layout/theme.liquid')}",
+        "uri" => file_uri(storage.path('layout/theme.liquid')),
         "diagnostics" => [],
       },
     })
@@ -450,14 +453,14 @@ class LanguageServerTest < Minitest::Test
       "id" => "123",
       "method" => "initialize",
       "params" => {
-        "rootUri" => "file://#{to_uri_s(storage.root)}",
+        "rootUri" => file_uri(storage.root),
       },
     }, {
       "jsonrpc" => "2.0",
       "method" => "textDocument/didOpen",
       "params" => {
         "textDocument" => {
-          "uri" => "file://#{to_uri_s(storage.path('path with spaces/layout/theme.liquid'))}",
+          "uri" => file_uri(storage.path('path with spaces/layout/theme.liquid')),
           "text" => template,
           "version" => 1,
         },
@@ -468,7 +471,7 @@ class LanguageServerTest < Minitest::Test
       "method" => "textDocument/documentLink",
       "params" => {
         "textDocument" => {
-          "uri" => "file://#{to_uri_s(storage.path('path with spaces/layout/theme.liquid'))}",
+          "uri" => file_uri(storage.path('path with spaces/layout/theme.liquid')),
         },
       },
     }, {
@@ -480,7 +483,7 @@ class LanguageServerTest < Minitest::Test
       "jsonrpc" => "2.0",
       "id" => 1,
       "result" => [{
-        "target" => "file://#{storage.path('path with spaces/snippets/a.liquid')}",
+        "target" => file_uri(storage.path('path with spaces/snippets/a.liquid')),
         "range" => {
           "start" => {
             "line" => 0,
@@ -533,7 +536,8 @@ class LanguageServerTest < Minitest::Test
 
         Actual response:
 
-        #{JSON.pretty_generate(actual_response)}"
+        #{JSON.pretty_generate(actual_response)}
+
       ERR
     end
   end
@@ -550,18 +554,10 @@ class LanguageServerTest < Minitest::Test
 
           in the following responses:
 
-          #{JSON.pretty_generate(actual_responses)}"
+          #{JSON.pretty_generate(actual_responses)}
+
         ERR
       )
     end
-  end
-
-  # Will URI.encode a string the same way VS Code would. VS Code still
-  # uses the outdated '%20' for spaces so we're also transforming from
-  # '+' -> '%20'.
-  #
-  # Exists because of https://github.com/Shopify/theme-check/issues/360
-  def to_uri_s(path)
-    path.to_s.split('/').map { |x| CGI.escape(x).gsub('+', '%20') }.join('/')
   end
 end

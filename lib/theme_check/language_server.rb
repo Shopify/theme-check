@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 require_relative "language_server/protocol"
 require_relative "language_server/constants"
+require_relative "language_server/uri_helper"
 require_relative "language_server/handler"
 require_relative "language_server/server"
 require_relative "language_server/tokens"

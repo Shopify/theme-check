@@ -36,16 +36,32 @@ module ThemeCheck
       # Ignored, handled in ValidSchema.
     end
 
+    ##
+    # Section settings look like:
+    #   #<Liquid::VariableLookup:0x00007fd699c50c48 @name="section", @lookups=["settings", "products_per_page"], @command_flags=0>
+    def size_is_a_section_setting?(size)
+      size.is_a?(Liquid::VariableLookup) &&
+        size.name == 'section' &&
+        size.lookups.first == 'settings'
+    end
+
+    ##
+    # We'll work with either an explicit value, or the default value of the section setting.
+    def get_value(size)
+      return size if size.is_a?(Numeric)
+      return get_setting_default_value(size) if size_is_a_section_setting?(size)
+    end
+
     def after_document(_node)
       @paginations.each_pair do |size, nodes|
-        numerical_size = if size.is_a?(Numeric)
-          size
-        else
-          get_setting_default_value(size.lookups.last)
-        end
-        if numerical_size.nil?
+        # Validate presence of default section setting.
+        if size_is_a_section_setting?(size) && !get_setting_default_value(size)
           nodes.each { |node| add_offense("Default pagination size should be defined in the section settings", node: node) }
-        elsif numerical_size > @max_size || numerical_size < @min_size || !numerical_size.is_a?(Integer)
+        end
+
+        # Validate if size is within range.
+        next unless (numerical_size = get_value(size))
+        if numerical_size > @max_size || numerical_size < @min_size || !numerical_size.is_a?(Integer)
           nodes.each { |node| add_offense("Pagination size must be a positive integer between #{@min_size} and #{@max_size}", node: node) }
         end
       end
@@ -53,13 +69,16 @@ module ThemeCheck
 
     private
 
-    def get_setting_default_value(setting_id)
-      setting = @schema_settings.select { |s| s['id'] == setting_id }
-      unless setting.empty?
-        return setting.last['default']
-      end
-      # Setting does not exist
-      nil
+    def get_setting_default_value(variable_lookup)
+      setting = @schema_settings.select { |s| s['id'] == variable_lookup.lookups.last }
+
+      # Setting does not exist.
+      return nil if setting.empty?
+
+      default_value = setting.last['default'].to_i
+      return nil if default_value == 0
+
+      default_value
     end
   end
 end

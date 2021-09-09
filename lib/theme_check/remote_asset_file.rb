@@ -17,6 +17,8 @@ module ThemeCheck
 
       def uri(src)
         URI.parse(src.sub(%r{^//}, "https://"))
+      rescue URI::InvalidURIError
+        nil
       end
     end
 
@@ -26,6 +28,7 @@ module ThemeCheck
     end
 
     def content
+      return if @uri.nil?
       return @content unless @content.nil?
 
       res = Net::HTTP.start(@uri.hostname, @uri.port, use_ssl: @uri.scheme == 'https') do |http|
@@ -41,6 +44,7 @@ module ThemeCheck
     end
 
     def gzipped_size
+      return if @uri.nil?
       @gzipped_size ||= content.bytesize
     end
   end

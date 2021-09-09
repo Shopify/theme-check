@@ -4,16 +4,16 @@ on: [push]
 
 jobs:
   test:
-    runs-on: macos-latest
+    runs-on: ${{ matrix.platform }}
 
     strategy:
       matrix:
+        platform: [ubuntu-latest, windows-latest]
         version:
           - 3.0.0
-          - 2.7.1
           - 2.6.6
 
-    name: Ruby ${{ matrix.version }}
+    name: Ruby ${{ matrix.platform }} ${{ matrix.version }}
 
     steps:
     - uses: actions/checkout@v2

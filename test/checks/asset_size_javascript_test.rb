@@ -8,14 +8,15 @@ module ThemeCheck
         "assets/theme.js" => "console.log('hello world'); console.log('Oh. Hi Mark!')",
       })
 
+      refute_has_file_size("https://{{ settings.url }}", theme)
+      refute_has_file_size("{{ 'this_file_does_not_exist.js' | asset_url }}", theme)
+      refute_has_file_size("{% if on_product %}https://hello.world{% else %}https://hi.world{% endif %}", theme)
+
       assert_has_file_size("{{ 'theme.js' | asset_url }}", theme)
       RemoteAssetFile.any_instance.expects(:gzipped_size).times(3).returns(42)
       assert_has_file_size("https://example.com/foo.js", theme)
       assert_has_file_size("http://example.com/foo.js", theme)
       assert_has_file_size("//example.com/foo.js", theme)
-
-      refute_has_file_size("{{ 'this_file_does_not_exist.js' | asset_url }}", theme)
-      refute_has_file_size("{% if on_product %}https://hello.world{% else %}https://hi.world{% endif %}", theme)
     end
 
     def assert_has_file_size(src, theme)
