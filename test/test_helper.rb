@@ -68,7 +68,7 @@ module Minitest
       files.each_pair do |name, content|
         path = dir.join(name)
         path.parent.mkpath
-        path.write(content)
+        path.write(content, mode: 'w+b')
       end
       at_exit { dir.rmtree }
       ThemeCheck::FileSystemStorage.new(dir)

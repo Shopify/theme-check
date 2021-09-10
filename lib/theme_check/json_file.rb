@@ -31,7 +31,7 @@ module ThemeCheck
         # Most editors add a trailing \n at the end of files. Here we
         # try to maintain the convention.
         eof = source.end_with?("\n") ? "\n" : ""
-        @storage.write(@relative_path, pretty + eof)
+        @storage.write(@relative_path, pretty.gsub("\n", @eol) + eof)
         @source = pretty
       end
     end

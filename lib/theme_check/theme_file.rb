@@ -6,6 +6,8 @@ module ThemeCheck
     def initialize(relative_path, storage)
       @relative_path = relative_path
       @storage = storage
+      @source = nil
+      @eol = "\n"
     end
 
     def path
@@ -20,8 +22,23 @@ module ThemeCheck
       relative_path.sub_ext('').to_s
     end
 
+    # For the corrector to work properly, we should have a
+    # simple mental model of the internal representation of eol
+    # characters (Windows uses \r\n, Linux uses \n).
+    #
+    # Parser::Source::Buffer strips the \r from the source file, so if
+    # you are autocorrecting the file you might lose that info and
+    # cause a git diff. It also makes the node.start_index/end_index
+    # calculation break. That's not cool.
+    #
+    # So in here we track whether the source file has \r\n in it and
+    # we'll make sure that the file we write has the same eol as the
+    # source file.
     def source
-      @source ||= @storage.read(@relative_path)
+      return @source if @source
+      @source = @storage.read(@relative_path)
+      @eol = @source.include?("\r\n") ? "\r\n" : "\n"
+      @source = @source.gsub("\r\n", "\n")
     end
 
     def json?

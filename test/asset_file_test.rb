@@ -14,10 +14,6 @@ class AssetFileTest < Minitest::Test
     assert_equal("assets/theme.js", @asset.relative_path.to_s)
   end
 
-  def test_content
-    assert_equal("", @asset.content)
-  end
-
   def test_gzipped_size
     assert_equal(20, @asset.gzipped_size)
   end

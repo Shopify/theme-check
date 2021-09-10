@@ -191,7 +191,10 @@ module ThemeCheck
       analyzer = ThemeCheck::Analyzer.new(theme, @config.enabled_checks, @config.auto_correct)
       analyzer.analyze_theme
       analyzer.correct_offenses
-      output_with_format(theme, analyzer, out_stream)
+      print_with_format(theme, analyzer, out_stream)
+      # corrections are committed after printing so that the
+      # source_excerpts are still pointing to the uncorrected source.
+      analyzer.write_corrections
       raise Abort, "" if analyzer.uncorrectable_offenses.any? do |offense|
         offense.check.severity_value <= Check.severity_value(@fail_level)
       end
@@ -211,7 +214,7 @@ module ThemeCheck
       STDERR.puts "Profiling is only available in development"
     end
 
-    def output_with_format(theme, analyzer, out_stream)
+    def print_with_format(theme, analyzer, out_stream)
       case @format
       when :text
         ThemeCheck::Printer.new(out_stream).print(theme, analyzer.offenses, @config.auto_correct)

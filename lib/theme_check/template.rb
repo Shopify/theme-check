@@ -5,7 +5,7 @@ module ThemeCheck
     def write
       content = rewriter.to_s
       if source != content
-        @storage.write(@relative_path, content)
+        @storage.write(@relative_path, content.gsub("\n", @eol))
         @source = content
         @rewriter = nil
       end
