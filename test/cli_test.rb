@@ -152,10 +152,13 @@ class CliTest < Minitest::Test
   end
 
   def test_auto_correct
+    storage = make_file_system_storage(
+      "templats/theme.liquid" => <<~LIQUID,
+        {{ content_for_header }}
+      LIQUID
+    )
     out = capture(:stdout) do
-      assert_raises(ThemeCheck::Cli::Abort) do
-        ThemeCheck::Cli.parse_and_run!([__dir__ + "/theme", "-a"])
-      end
+      ThemeCheck::Cli.parse_and_run!([storage.root.to_s, "-a"])
     end
     assert_includes(out, "corrected")
   end
