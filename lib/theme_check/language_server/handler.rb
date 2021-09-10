@@ -6,6 +6,7 @@ module ThemeCheck
   module LanguageServer
     class Handler
       include URIHelper
+      include PositionHelper
 
       CAPABILITIES = {
         completionProvider: {
@@ -15,15 +16,18 @@ module ThemeCheck
         documentLinkProvider: true,
         textDocumentSync: {
           openClose: true,
-          change: TextDocumentSyncKind::FULL,
+          change: TextDocumentSyncKind::INCREMENTAL,
           willSave: false,
           save: true,
         },
       }
 
+      attr_reader :storage
+
       def initialize(server)
         @server = server
         @diagnostics_tracker = DiagnosticsTracker.new
+        @storage = nil
       end
 
       def on_initialize(id, params)
@@ -47,7 +51,26 @@ module ThemeCheck
 
       def on_text_document_did_change(_id, params)
         relative_path = relative_path_from_text_document_uri(params)
-        @storage.write(relative_path, content_changes_text(params))
+        content = @storage.read(relative_path)
+        content_changes(params).each do |change|
+          # We support incremental changes
+          if (range = change.dig('range'))
+            start_index = from_row_column_to_index(
+              content,
+              range.dig('start', 'line'),
+              range.dig('start', 'character'),
+            )
+            end_index = from_row_column_to_index(
+              content,
+              range.dig('end', 'line'),
+              range.dig('end', 'character'),
+            )
+            content[start_index..end_index] = change.dig('text')
+          else
+            content = change.dig('text')
+          end
+        end
+        @storage.write(relative_path, content)
       end
 
       def on_text_document_did_close(_id, params)
@@ -118,8 +141,8 @@ module ThemeCheck
         params.dig('textDocument', 'text')
       end
 
-      def content_changes_text(params)
-        params.dig('contentChanges', 0, 'text')
+      def content_changes(params)
+        params.dig('contentChanges')
       end
 
       def config_for_path(path)
