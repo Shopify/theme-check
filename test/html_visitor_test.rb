@@ -157,6 +157,59 @@ module ThemeCheck
       end
     end
 
+    def test_weird_edge_cases_shouldnt_throw
+      @attribute_checker = HTMLAttributeIntegrityMockCheck.new
+      @visitor = HtmlVisitor.new(Checks.new([@attribute_checker]))
+      template = parse_liquid(<<~END)
+        <html>
+          <b x={% %} y="{{ }}" z="{{}}" a="{{}}" b="{{}}" c="{{}}" d="{{}}"></b>
+          <b x={% %} y="{{ }}" z="{{}}" a="{{}}" b="{{}}" c="{{}}" d="{{}}"></b>
+          <b x={% %} y="{{ }}" z="{{}}" a="{{}}" b="{{}}" c="{{}}" d="{{}}"></b>
+        </html>
+      END
+      @visitor.visit_template(template)
+      [
+        {
+          name: "b",
+          attributes: {
+            "a" => "{{}}",
+            "b" => "{{}}",
+            "c" => "{{}}",
+            "d" => "{{}}",
+            "x" => "{% %}",
+            "y" => "{{ }}",
+            "z" => "{{}}",
+          },
+        },
+        {
+          name: "b",
+          attributes: {
+            "a" => "{{}}",
+            "b" => "{{}}",
+            "c" => "{{}}",
+            "d" => "{{}}",
+            "x" => "{% %}",
+            "y" => "{{ }}",
+            "z" => "{{}}",
+          },
+        },
+        {
+          name: "b",
+          attributes: {
+            "a" => "{{}}",
+            "b" => "{{}}",
+            "c" => "{{}}",
+            "d" => "{{}}",
+            "x" => "{% %}",
+            "y" => "{{ }}",
+            "z" => "{{}}",
+          },
+        },
+      ].each_with_index do |element, i|
+        assert_equal(element, @attribute_checker.elements[i], "i #{i}")
+      end
+    end
+
     class HTMLAttributeIntegrityMockCheck < Check
       attr_reader :elements
 

@@ -5,6 +5,7 @@ module ThemeCheck
     LIQUID_TAG = /#{Liquid::TagStart}.*?#{Liquid::TagEnd}/om
     LIQUID_VARIABLE = /#{Liquid::VariableStart}.*?#{Liquid::VariableEnd}/om
     LIQUID_TAG_OR_VARIABLE = /#{LIQUID_TAG}|#{LIQUID_VARIABLE}/om
+    HTML_LIQUID_PLACEHOLDER = /≬[0-9a-z]+#*≬/m
     START_OR_END_QUOTE = /(^['"])|(['"]$)/
 
     def matches(s, re)
