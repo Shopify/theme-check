@@ -7,19 +7,23 @@ module ThemeCheck
 
     def on_schema(node)
       schema = JSON.parse(node.value.nodelist.join)
-
+      
       # Get all locales used in the schema
       used_locales = Set.new([theme.default_locale])
+      
       visit_object(schema) do |_, locales|
         used_locales += locales
       end
       used_locales = used_locales.to_a
-
+      # binding.pry
       # Check all used locales are defined in each localized keys
       visit_object(schema) do |key, locales|
         missing = used_locales - locales
+        # binding.pry
         if missing.any?
-          add_offense("#{key} missing translations for #{missing.join(', ')}", node: node)
+          add_offense("#{key} missing translations for #{missing.join(', ')}", node: node) do |corrector|
+
+          end
         end
       end
 
@@ -47,8 +51,9 @@ module ThemeCheck
 
     def visit_object(object, top_path = [], &block)
       return unless object.is_a?(Hash)
+      
       top_path += [object["id"]] if object["id"].is_a?(String)
-
+      
       object.each_pair do |key, value|
         path = top_path + [key]
 
