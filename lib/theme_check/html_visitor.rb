@@ -9,12 +9,11 @@ module ThemeCheck
 
     def initialize(checks)
       @checks = checks
-      @placeholder_values = []
     end
 
     def visit_template(template)
-      doc = parse(template)
-      visit(HtmlNode.new(doc, template, @placeholder_values))
+      doc, placeholder_values = parse(template)
+      visit(HtmlNode.new(doc, template, placeholder_values))
     rescue ArgumentError => e
       call_checks(:on_parse_error, e, template)
     end
@@ -22,6 +21,7 @@ module ThemeCheck
     private
 
     def parse(template)
+      placeholder_values = []
       parseable_source = +template.source.clone
 
       # Replace all liquid tags with ≬{i}######≬ to prevent the HTML
@@ -37,12 +37,15 @@ module ThemeCheck
       # Didn't go with base64 because of the `=` character that would have messed with HTML parsing.
       matches(parseable_source, LIQUID_TAG_OR_VARIABLE).each do |m|
         value = m[0]
-        @placeholder_values.push(value)
-        key = (@placeholder_values.size - 1).to_s(36)
+        placeholder_values.push(value)
+        key = (placeholder_values.size - 1).to_s(36)
         parseable_source[m.begin(0)...m.end(0)] = "≬#{key.ljust(m.end(0) - m.begin(0) - 2, '#')}≬"
       end
 
-      Nokogiri::HTML5.fragment(parseable_source, max_tree_depth: 400, max_attributes: 400)
+      [
+        Nokogiri::HTML5.fragment(parseable_source, max_tree_depth: 400, max_attributes: 400),
+        placeholder_values,
+      ]
     end
 
     def visit(node)
