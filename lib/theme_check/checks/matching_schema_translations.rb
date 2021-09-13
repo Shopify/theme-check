@@ -19,7 +19,7 @@ module ThemeCheck
       # Check all used locales are defined in each localized keys
       visit_object(schema) do |key, locales|
         missing = used_locales - locales
-        binding.pry
+        
         if missing.any?
           add_offense("#{key} missing translations for #{missing.join(', ')}", node: node) do |corrector|
             puts "here!"
