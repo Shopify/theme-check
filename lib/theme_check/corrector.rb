@@ -51,5 +51,9 @@ module ThemeCheck
         pointer[token]
       }
     end
+
+    def here
+      puts "here!"
+    end
   end
 end

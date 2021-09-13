@@ -2,7 +2,7 @@
 module ThemeCheck
   class MatchingSchemaTranslations < LiquidCheck
     severity :suggestion
-    category :translation
+    category :liquid, :translation
     doc docs_url(__FILE__)
 
     def on_schema(node)
@@ -15,14 +15,14 @@ module ThemeCheck
         used_locales += locales
       end
       used_locales = used_locales.to_a
-      # binding.pry
+      
       # Check all used locales are defined in each localized keys
       visit_object(schema) do |key, locales|
         missing = used_locales - locales
-        # binding.pry
+        binding.pry
         if missing.any?
           add_offense("#{key} missing translations for #{missing.join(', ')}", node: node) do |corrector|
-
+            puts "here!"
           end
         end
       end
