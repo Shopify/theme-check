@@ -77,29 +77,36 @@ class MatchingSchemaTranslationsTest < Minitest::Test
       END
     )
 
+    expected_theme = make_theme(
+      "sections/product.liquid" => <<~END,
+        {% schema %}
+          {
+            "name": {
+              "en": "Hello",
+              "fr": "Bonjour"
+            },
+            "settings": [
+              {
+                "id": "product",
+                "label": {
+                  "en": "Product",
+                  "fr": "Produit"
+                }
+              }
+            ]
+          }
+        {% endschema %}
+      END
+    )
+
     analyzer = ThemeCheck::Analyzer.new(theme, [ThemeCheck::TranslationKeyExists.new], true)
     analyzer.analyze_theme
     analyzer.correct_offenses
 
-    expected = {
-      "name" => {
-        "en" => "Hello",
-        "fr" => "Bonjour"
-      },
-      "settings" => [{
-          "id" => "product",
-          "label" => {
-            "en" => "Product",
-            "fr" => "Produit",
-          }
-      }]
-    }
     #make sure expected and actual are of the same type
     actual = theme.storage.read("sections/product.liquid")
-    
-    assert_offenses(<<~END, offenses)
-      settings.product.label missing translations for fr at sections/product.liquid:1
-    END
+    expected = expected_theme.storage.read("sections/product.liquid")
+    assert_equals(actual, expected)
   end
 
   def test_locales
