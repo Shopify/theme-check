@@ -8,15 +8,23 @@ jobs:
 
     strategy:
       matrix:
-        platform: [ubuntu-latest, windows-latest]
+        platform:
+          - ubuntu-latest
+          - windows-latest
         version:
           - 3.0.0
           - 2.6.6
+        theme:
+          - Shopify/dawn
 
     name: Ruby ${{ matrix.platform }} ${{ matrix.version }}
 
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/checkout@v2
+      with:
+        repository: ${{ matrix.theme }}
+        path: ./crash-test-theme
     - name: Set up Ruby ${{ matrix.version }}
       uses: ruby/setup-ruby@v1
       with:
@@ -30,6 +38,6 @@ jobs:
       run: bundle install --jobs=3 --retry=3 --path=vendor/bundle
     - name: Run tests
       run: bundle exec rake
-    - name: Test runtime
-      # Testing that runtime can execute, not testing the results themselves
-      run: bundle exec theme-check ./test/theme | grep -q "files inspected"
+    - name: Crash test
+      run: |
+        bundle exec theme-check --fail-level crash ./crash-test-theme
