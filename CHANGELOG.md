@@ -1,4 +1,21 @@
 
+v1.6.0 / 2021-09-14
+===================
+
+### Features
+
+  * Add `--auto-correct` support to `TranslationKeyExists` (add missing translation as TODO to default locale) ([#422](https://github.com/shopify/theme-check/issues/422))
+  * Add `--auto-correct` support to `UnusedSnippet` (delete unused file) ([#416](https://github.com/shopify/theme-check/issues/416))
+  * Add `--auto-correct` support to `MissingRequiredTemplateFiles` (create missing files) ([#385](https://github.com/shopify/theme-check/issues/385))
+
+### Fixes
+
+  * Fix `undefined method [] of nil` in `replace_placeholders` ([#441](https://github.com/shopify/theme-check/issues/441), [#444](https://github.com/shopify/theme-check/issues/444))
+  * Disable ConvertIncludeToRender corrector until we fix [#445](https://github.com/shopify/theme-check/issues/445) ([#446](https://github.com/shopify/theme-check/issues/446))
+  * Fix a couple of correction bugs ([#442](https://github.com/shopify/theme-check/issues/442), [#439](https://github.com/shopify/theme-check/issues/439))
+  * Fix `AssetSizeCSS` error when size is nil ([#419](https://github.com/shopify/theme-check/issues/419))
+  * Write JSON to file, not a Ruby Hash. ([#434](https://github.com/shopify/theme-check/issues/434), [#432](https://github.com/shopify/theme-check/issues/432))
+
 v1.5.2 / 2021-09-09
 ===================
 

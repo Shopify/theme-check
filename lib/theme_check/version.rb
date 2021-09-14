@@ -1,4 +1,4 @@
 # frozen_string_literal: true
 module ThemeCheck
-  VERSION = "1.5.2"
+  VERSION = "1.6.0"
 end
