@@ -2,7 +2,7 @@
 require "forwardable"
 
 module ThemeCheck
-  class HtmlNode
+  class HtmlNode < Node
     extend Forwardable
     include RegexHelpers
     attr_reader :template, :parent
@@ -12,30 +12,6 @@ module ThemeCheck
       @template = template
       @placeholder_values = placeholder_values
       @parent = parent
-    end
-
-    def literal?
-      @value.name == "text"
-    end
-
-    def element?
-      @value.element?
-    end
-
-    def children
-      @children ||= @value
-        .children
-        .map { |child| HtmlNode.new(child, template, @placeholder_values, self) }
-    end
-
-    def attributes
-      @attributes ||= @value.attributes
-        .map { |k, v| [replace_placeholders(k), replace_placeholders(v.value)] }
-        .to_h
-    end
-
-    def content
-      @content ||= replace_placeholders(@value.content)
     end
 
     # @value is not forwarded because we _need_ to replace the
@@ -48,12 +24,10 @@ module ThemeCheck
       end
     end
 
-    def name
-      if @value.name == "#document-fragment"
-        "document"
-      else
-        @value.name
-      end
+    def children
+      @children ||= @value
+        .children
+        .map { |child| HtmlNode.new(child, template, @placeholder_values, self) }
     end
 
     def markup
@@ -62,6 +36,40 @@ module ThemeCheck
 
     def line_number
       @value.line
+    end
+
+    def start_index
+      raise NotImplementedError
+    end
+
+    def end_index
+      raise NotImplementedError
+    end
+
+    def literal?
+      @value.name == "text"
+    end
+
+    def element?
+      @value.element?
+    end
+
+    def attributes
+      @attributes ||= @value.attributes
+        .map { |k, v| [replace_placeholders(k), replace_placeholders(v.value)] }
+        .to_h
+    end
+
+    def content
+      @content ||= replace_placeholders(@value.content)
+    end
+
+    def name
+      if @value.name == "#document-fragment"
+        "document"
+      else
+        @value.name
+      end
     end
 
     private

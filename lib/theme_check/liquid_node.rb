@@ -2,7 +2,7 @@
 
 module ThemeCheck
   # A node from the Liquid AST, the result of parsing a template.
-  class LiquidNode
+  class LiquidNode < Node
     attr_reader :value, :parent, :template
 
     def initialize(value, parent, template)
@@ -12,21 +12,6 @@ module ThemeCheck
       @template = template
       @tag_markup = nil
       @line_number_offset = 0
-    end
-
-    # The original source code of the node. Doesn't contain wrapping braces.
-    def markup
-      if tag?
-        tag_markup
-      elsif @value.instance_variable_defined?(:@markup)
-        @value.instance_variable_get(:@markup)
-      end
-    end
-
-    def markup=(markup)
-      if @value.instance_variable_defined?(:@markup)
-        @value.instance_variable_set(:@markup, markup)
-      end
     end
 
     # Array of children nodes.
@@ -54,6 +39,39 @@ module ThemeCheck
         end
         nodes.map { |node| LiquidNode.new(node, self, @template) }
       end
+    end
+
+    # The original source code of the node. Doesn't contain wrapping braces.
+    def markup
+      if tag?
+        tag_markup
+      elsif @value.instance_variable_defined?(:@markup)
+        @value.instance_variable_get(:@markup)
+      end
+    end
+
+    def markup=(markup)
+      if @value.instance_variable_defined?(:@markup)
+        @value.instance_variable_set(:@markup, markup)
+      end
+    end
+
+    # Most nodes have a line number, but it's not guaranteed.
+    def line_number
+      if tag? && @value.respond_to?(:line_number)
+        markup # initialize the line_number_offset
+        @value.line_number - @line_number_offset
+      elsif @value.respond_to?(:line_number)
+        @value.line_number
+      end
+    end
+
+    def start_index
+      position.start_index
+    end
+
+    def end_index
+      position.end_index
     end
 
     # Literals are hard-coded values in the template.
@@ -94,16 +112,6 @@ module ThemeCheck
     # A block of type of node?
     def block?
       block_tag? || block_body? || document?
-    end
-
-    # Most nodes have a line number, but it's not guaranteed.
-    def line_number
-      if tag? && @value.respond_to?(:line_number)
-        markup # initialize the line_number_offset
-        @value.line_number - @line_number_offset
-      elsif @value.respond_to?(:line_number)
-        @value.line_number
-      end
     end
 
     # The `:under_score_name` of this type of node. Used to dispatch to the `on_<type_name>`
@@ -156,22 +164,6 @@ module ThemeCheck
       end
     end
 
-    def position
-      @position ||= Position.new(
-        markup,
-        template&.source,
-        line_number_1_indexed: line_number
-      )
-    end
-
-    def start_index
-      position.start_index
-    end
-
-    def end_index
-      position.end_index
-    end
-
     def start_token
       return "" if inside_liquid_tag?
       output = ""
@@ -191,6 +183,14 @@ module ThemeCheck
     end
 
     private
+
+    def position
+      @position ||= Position.new(
+        markup,
+        template&.source,
+        line_number_1_indexed: line_number
+      )
+    end
 
     # Here we're hacking around a glorious bug in Liquid that makes it so the
     # line_number and markup of a tag is wrong if there's whitespace
