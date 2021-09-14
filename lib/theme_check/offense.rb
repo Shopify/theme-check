@@ -10,7 +10,7 @@ module ThemeCheck
     def initialize(
       check:, # instance of a ThemeCheck::Check
       message: nil, # error message for the offense
-      template: nil, # Template
+      template: nil, # ThemeFile
       node: nil, # Node
       markup: nil, # string
       line_number: nil, # line number of the error (1-indexed)

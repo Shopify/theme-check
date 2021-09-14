@@ -23,7 +23,7 @@ module ThemeCheck
     def liquid
       @liquid ||= @storage.files
         .select { |path| LIQUID_REGEX.match?(path) }
-        .map { |path| Template.new(path, @storage) }
+        .map { |path| LiquidFile.new(path, @storage) }
     end
 
     def json

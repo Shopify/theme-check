@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ThemeCheck
-  class Template < ThemeFile
+  class LiquidFile < ThemeFile
     def write
       content = rewriter.to_s
       if source != content

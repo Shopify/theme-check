@@ -40,7 +40,7 @@ module Minitest
 
     def parse_liquid(code)
       storage = make_storage("file.liquid" => code)
-      ThemeCheck::Template.new("file.liquid", storage)
+      ThemeCheck::LiquidFile.new("file.liquid", storage)
     end
 
     def liquid_c_enabled?

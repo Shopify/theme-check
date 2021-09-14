@@ -17,17 +17,17 @@ module ThemeCheck
           "#<#{code_name} template=\"#{template.path}\" #{whole_theme? ? 'whole_theme' : 'single_file'}>"
         end
       end
-      Template = Struct.new(:path)
+      LiquidFile = Struct.new(:path)
 
       class WholeThemeOffense < Offense
         def initialize(code_name, path)
-          super(code_name, Template.new(Pathname.new(path)), true)
+          super(code_name, LiquidFile.new(Pathname.new(path)), true)
         end
       end
 
       class SingleFileOffense < Offense
         def initialize(code_name, path)
-          super(code_name, Template.new(Pathname.new(path)), false)
+          super(code_name, LiquidFile.new(Pathname.new(path)), false)
         end
       end
 

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 require "test_helper"
 
-class TemplateTest < Minitest::Test
+class LiquidTemplateTest < Minitest::Test
   def setup
-    @template = ThemeCheck::Template.new(
+    @template = ThemeCheck::LiquidFile.new(
       "templates/index.liquid",
       make_storage("templates/index.liquid" => <<~LIQUID)
         <h1>Title</h1>

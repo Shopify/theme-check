@@ -24,7 +24,7 @@ class ThemeTest < Minitest::Test
 
   def test_liquid
     assert_equal(3, @theme.liquid.size)
-    assert(@theme.liquid.all? { |a| a.instance_of?(ThemeCheck::Template) })
+    assert(@theme.liquid.all? { |a| a.instance_of?(ThemeCheck::LiquidFile) })
   end
 
   def test_json
