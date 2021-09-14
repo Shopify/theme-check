@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 require "test_helper"
 
-class VisitorTest < Minitest::Test
+class LiquidVisitorTest < Minitest::Test
   def setup
     @tracer = TracerCheck.new
-    @visitor = ThemeCheck::Visitor.new(ThemeCheck::Checks.new([@tracer]), ThemeCheck::DisabledChecks.new)
+    @visitor = ThemeCheck::LiquidVisitor.new(ThemeCheck::Checks.new([@tracer]), ThemeCheck::DisabledChecks.new)
   end
 
   def run

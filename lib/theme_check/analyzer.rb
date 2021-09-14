@@ -32,7 +32,7 @@ module ThemeCheck
     def analyze_theme
       reset
 
-      liquid_visitor = Visitor.new(@liquid_checks, @disabled_checks)
+      liquid_visitor = LiquidVisitor.new(@liquid_checks, @disabled_checks)
       html_visitor = HtmlVisitor.new(@html_checks)
       ThemeCheck.with_liquid_c_disabled do
         @theme.liquid.each do |template|
@@ -51,7 +51,7 @@ module ThemeCheck
 
       ThemeCheck.with_liquid_c_disabled do
         # Call all checks that run on the whole theme
-        liquid_visitor = Visitor.new(@liquid_checks.whole_theme, @disabled_checks)
+        liquid_visitor = LiquidVisitor.new(@liquid_checks.whole_theme, @disabled_checks)
         html_visitor = HtmlVisitor.new(@html_checks.whole_theme)
         @theme.liquid.each do |template|
           liquid_visitor.visit_template(template)
@@ -60,7 +60,7 @@ module ThemeCheck
         @theme.json.each { |json_file| @json_checks.whole_theme.call(:on_file, json_file) }
 
         # Call checks that run on a single files, only on specified file
-        liquid_visitor = Visitor.new(@liquid_checks.single_file, @disabled_checks)
+        liquid_visitor = LiquidVisitor.new(@liquid_checks.single_file, @disabled_checks)
         html_visitor = HtmlVisitor.new(@html_checks.single_file)
         files.each do |file|
           if file.liquid?

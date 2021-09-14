@@ -50,7 +50,7 @@ module ThemeCheck
       @on_end_check = OnEndCheck.new
       @checks = Checks.new([@assign_check, @regex_check, @on_end_check])
       @disabled_checks = DisabledChecks.new
-      @visitor = Visitor.new(@checks, @disabled_checks)
+      @visitor = LiquidVisitor.new(@checks, @disabled_checks)
     end
 
     def test_ignore_all_checks

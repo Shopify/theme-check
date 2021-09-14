@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 module ThemeCheck
-  class Visitor
+  class LiquidVisitor
     attr_reader :checks
 
     def initialize(checks, disabled_checks)
