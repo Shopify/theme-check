@@ -157,56 +157,29 @@ module ThemeCheck
       end
     end
 
-    def test_weird_edge_cases_shouldnt_throw
+    def test_index_should_not_bleed_for_large_enough_number_of_tags_in_a_file
       @attribute_checker = HTMLAttributeIntegrityMockCheck.new
       @visitor = HtmlVisitor.new(Checks.new([@attribute_checker]))
+      number_of_tags = 2000
+      number_of_html_tags = number_of_tags / 5
       template = parse_liquid(<<~END)
         <html>
-          <b x={% %} y="{{ }}" z="{{}}" a="{{}}" b="{{}}" c="{{}}" d="{{}}"></b>
-          <b x={% %} y="{{ }}" z="{{}}" a="{{}}" b="{{}}" c="{{}}" d="{{}}"></b>
-          <b x={% %} y="{{ }}" z="{{}}" a="{{}}" b="{{}}" c="{{}}" d="{{}}"></b>
+          #{"<b x={% %} y='{{ }}' z='{{}}' a='{{}}' b='{{}}'></b>\n" * number_of_html_tags}
         </html>
       END
       @visitor.visit_template(template)
-      [
-        {
-          name: "b",
-          attributes: {
-            "a" => "{{}}",
-            "b" => "{{}}",
-            "c" => "{{}}",
-            "d" => "{{}}",
-            "x" => "{% %}",
-            "y" => "{{ }}",
-            "z" => "{{}}",
-          },
+      expected = {
+        name: "b",
+        attributes: {
+          "a" => "{{}}",
+          "b" => "{{}}",
+          "x" => "{% %}",
+          "y" => "{{ }}",
+          "z" => "{{}}",
         },
-        {
-          name: "b",
-          attributes: {
-            "a" => "{{}}",
-            "b" => "{{}}",
-            "c" => "{{}}",
-            "d" => "{{}}",
-            "x" => "{% %}",
-            "y" => "{{ }}",
-            "z" => "{{}}",
-          },
-        },
-        {
-          name: "b",
-          attributes: {
-            "a" => "{{}}",
-            "b" => "{{}}",
-            "c" => "{{}}",
-            "d" => "{{}}",
-            "x" => "{% %}",
-            "y" => "{{ }}",
-            "z" => "{{}}",
-          },
-        },
-      ].each_with_index do |element, i|
-        assert_equal(element, @attribute_checker.elements[i], "i #{i}")
+      }
+      number_of_html_tags.times do |i|
+        assert_equal(expected, @attribute_checker.elements[i], "i #{i}")
       end
     end
 
