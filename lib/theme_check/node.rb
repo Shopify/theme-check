@@ -6,7 +6,7 @@ module ThemeCheck
       raise NotImplementedError
     end
 
-    def template
+    def theme_file
       raise NotImplementedError
     end
 

@@ -11,18 +11,18 @@ module ThemeCheck
       @checks = checks
     end
 
-    def visit_template(template)
-      doc, placeholder_values = parse(template)
-      visit(HtmlNode.new(doc, template, placeholder_values))
+    def visit_liquid_file(liquid_file)
+      doc, placeholder_values = parse(liquid_file)
+      visit(HtmlNode.new(doc, liquid_file, placeholder_values))
     rescue ArgumentError => e
-      call_checks(:on_parse_error, e, template)
+      call_checks(:on_parse_error, e, liquid_file)
     end
 
     private
 
-    def parse(template)
+    def parse(liquid_file)
       placeholder_values = []
-      parseable_source = +template.source.clone
+      parseable_source = +liquid_file.source.clone
 
       # Replace all non-empty liquid tags with ≬{i}######≬ to prevent the HTML
       # parser from freaking out. We transparently replace those placeholders in

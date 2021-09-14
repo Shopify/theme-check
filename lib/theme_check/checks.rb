@@ -47,7 +47,7 @@ module ThemeCheck
       raise
     rescue => e
       node = args.first
-      template = node.respond_to?(:template) ? node.template.relative_path : "?"
+      theme_file = node.respond_to?(:theme_file) ? node.theme_file.relative_path : "?"
       markup = node.respond_to?(:markup) ? node.markup : ""
       node_class = node.respond_to?(:value) ? node.value.class : "?"
       line_number = node.respond_to?(:line_number) ? node.line_number : "?"
@@ -59,7 +59,7 @@ module ThemeCheck
           #{e.backtrace.join("\n  ")}
         ```
 
-        Template: `#{template}`
+        Theme File: `#{theme_file}`
         Node: `#{node_class}`
         Markup:
         ```

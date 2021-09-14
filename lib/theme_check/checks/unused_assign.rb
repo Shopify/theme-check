@@ -25,21 +25,21 @@ module ThemeCheck
     end
 
     def on_document(node)
-      @templates[node.template.name] = TemplateInfo.new(Set.new, {}, Set.new)
+      @templates[node.theme_file.name] = TemplateInfo.new(Set.new, {}, Set.new)
     end
 
     def on_assign(node)
-      @templates[node.template.name].assign_nodes[node.value.to] = node
+      @templates[node.theme_file.name].assign_nodes[node.value.to] = node
     end
 
     def on_include(node)
       if node.value.template_name_expr.is_a?(String)
-        @templates[node.template.name].includes << "snippets/#{node.value.template_name_expr}"
+        @templates[node.theme_file.name].includes << "snippets/#{node.value.template_name_expr}"
       end
     end
 
     def on_variable_lookup(node)
-      @templates[node.template.name].used_assigns << node.value.name
+      @templates[node.theme_file.name].used_assigns << node.value.name
     end
 
     def on_end

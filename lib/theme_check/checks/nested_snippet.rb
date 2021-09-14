@@ -26,12 +26,12 @@ module ThemeCheck
     end
 
     def on_document(node)
-      @templates[node.template.name] = TemplateInfo.new(Set.new)
+      @templates[node.theme_file.name] = TemplateInfo.new(Set.new)
     end
 
     def on_include(node)
       if node.value.template_name_expr.is_a?(String)
-        @templates[node.template.name].includes << node
+        @templates[node.theme_file.name].includes << node
       end
     end
     alias_method :on_render, :on_include

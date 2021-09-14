@@ -5,11 +5,11 @@ module ThemeCheck
   class HtmlNode < Node
     extend Forwardable
     include RegexHelpers
-    attr_reader :template, :parent
+    attr_reader :theme_file, :parent
 
-    def initialize(value, template, placeholder_values = [], parent = nil)
+    def initialize(value, theme_file, placeholder_values = [], parent = nil)
       @value = value
-      @template = template
+      @theme_file = theme_file
       @placeholder_values = placeholder_values
       @parent = parent
     end
@@ -27,7 +27,7 @@ module ThemeCheck
     def children
       @children ||= @value
         .children
-        .map { |child| HtmlNode.new(child, template, @placeholder_values, self) }
+        .map { |child| HtmlNode.new(child, theme_file, @placeholder_values, self) }
     end
 
     def markup

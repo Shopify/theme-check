@@ -62,22 +62,22 @@ module ThemeCheck
 
     def on_document(node)
       return if ignore?(node)
-      @files[node.template.name] = TemplateInfo.new
+      @files[node.theme_file.name] = TemplateInfo.new
     end
 
     def on_assign(node)
       return if ignore?(node)
-      @files[node.template.name].all_assigns[node.value.to] = node
+      @files[node.theme_file.name].all_assigns[node.value.to] = node
     end
 
     def on_capture(node)
       return if ignore?(node)
-      @files[node.template.name].all_captures[node.value.instance_variable_get('@to')] = node
+      @files[node.theme_file.name].all_captures[node.value.instance_variable_get('@to')] = node
     end
 
     def on_for(node)
       return if ignore?(node)
-      @files[node.template.name].all_forloops[node.value.variable_name] = node
+      @files[node.theme_file.name].all_forloops[node.value.variable_name] = node
     end
 
     def on_include(_node)
@@ -90,7 +90,7 @@ module ThemeCheck
       return unless node.value.template_name_expr.is_a?(String)
 
       snippet_name = "snippets/#{node.value.template_name_expr}"
-      @files[node.template.name].add_render(
+      @files[node.theme_file.name].add_render(
         name: snippet_name,
         node: node,
       )
@@ -98,7 +98,7 @@ module ThemeCheck
 
     def on_variable_lookup(node)
       return if ignore?(node)
-      @files[node.template.name].add_variable_lookup(
+      @files[node.theme_file.name].add_variable_lookup(
         name: node.value.name,
         node: node,
       )
@@ -130,7 +130,7 @@ module ThemeCheck
     private
 
     def ignore?(node)
-      @exclude_snippets && node.template.snippet?
+      @exclude_snippets && node.theme_file.snippet?
     end
 
     def each_template

@@ -5,12 +5,12 @@ module ThemeCheck
 
     MAX_SOURCE_EXCERPT_SIZE = 120
 
-    attr_reader :check, :message, :template, :node, :markup, :line_number, :correction
+    attr_reader :check, :message, :theme_file, :node, :markup, :line_number, :correction
 
     def initialize(
       check:, # instance of a ThemeCheck::Check
       message: nil, # error message for the offense
-      template: nil, # ThemeFile
+      theme_file: nil, # ThemeFile
       node: nil, # Node
       markup: nil, # string
       line_number: nil, # line number of the error (1-indexed)
@@ -39,11 +39,11 @@ module ThemeCheck
       end
 
       @node = node
-      @template = nil
+      @theme_file = nil
       if node
-        @template = node.template
-      elsif template
-        @template = template
+        @theme_file = node.theme_file
+      elsif theme_file
+        @theme_file = theme_file
       end
 
       @markup = if markup
@@ -62,7 +62,7 @@ module ThemeCheck
 
       @position = Position.new(
         @markup,
-        @template&.source,
+        @theme_file&.source,
         line_number_1_indexed: @line_number,
         node_markup_offset: node_markup_offset,
         node_markup: node&.markup
@@ -72,7 +72,7 @@ module ThemeCheck
     def source_excerpt
       return unless line_number
       @source_excerpt ||= begin
-        excerpt = template.source_excerpt(line_number)
+        excerpt = theme_file.source_excerpt(line_number)
         if excerpt.size > MAX_SOURCE_EXCERPT_SIZE
           excerpt[0, MAX_SOURCE_EXCERPT_SIZE - 3] + '...'
         else
@@ -126,12 +126,12 @@ module ThemeCheck
     end
 
     def location
-      tokens = [template&.relative_path, line_number].compact
+      tokens = [theme_file&.relative_path, line_number].compact
       tokens.join(":") if tokens.any?
     end
 
     def location_range
-      tokens = [template&.relative_path, start_index, end_index].compact
+      tokens = [theme_file&.relative_path, start_index, end_index].compact
       tokens.join(":") if tokens.any?
     end
 
@@ -141,7 +141,7 @@ module ThemeCheck
 
     def correct
       if correctable?
-        corrector = Corrector.new(template: template)
+        corrector = Corrector.new(theme_file: theme_file)
         correction.call(corrector)
       end
     rescue => e
@@ -191,7 +191,7 @@ module ThemeCheck
     alias_method :eql?, :==
 
     def to_s
-      if template
+      if theme_file
         "#{message} at #{location}"
       else
         message
@@ -199,7 +199,7 @@ module ThemeCheck
     end
 
     def to_s_range
-      if template
+      if theme_file
         "#{message} at #{location_range}"
       else
         message
@@ -209,7 +209,7 @@ module ThemeCheck
     def to_h
       {
         check: check.code_name,
-        path: template&.relative_path,
+        path: theme_file&.relative_path,
         severity: check.severity_value,
         start_line: start_line,
         start_column: start_column,

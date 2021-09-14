@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
 module ThemeCheck
-  # A node from the Liquid AST, the result of parsing a template.
+  # A node from the Liquid AST, the result of parsing a liquid file.
   class LiquidNode < Node
-    attr_reader :value, :parent, :template
+    attr_reader :value, :parent, :theme_file
 
-    def initialize(value, parent, template)
+    def initialize(value, parent, theme_file)
       raise ArgumentError, "Expected a Liquid AST Node" if value.is_a?(LiquidNode)
       @value = value
       @parent = parent
-      @template = template
+      @theme_file = theme_file
       @tag_markup = nil
       @line_number_offset = 0
     end
@@ -37,7 +37,7 @@ module ThemeCheck
             node
           end
         end
-        nodes.map { |node| LiquidNode.new(node, self, @template) }
+        nodes.map { |node| LiquidNode.new(node, self, @theme_file) }
       end
     end
 
@@ -74,7 +74,7 @@ module ThemeCheck
       position.end_index
     end
 
-    # Literals are hard-coded values in the template.
+    # Literals are hard-coded values in the liquid file.
     def literal?
       @value.is_a?(String) || @value.is_a?(Integer)
     end
@@ -93,7 +93,7 @@ module ThemeCheck
       @value.is_a?(Liquid::Comment)
     end
 
-    # Top level node of every template.
+    # Top level node of every liquid_file.
     def document?
       @value.is_a?(Liquid::Document)
     end
@@ -121,7 +121,7 @@ module ThemeCheck
     end
 
     def source
-      template&.source
+      theme_file&.source
     end
 
     WHITESPACE = /\s/
@@ -187,7 +187,7 @@ module ThemeCheck
     def position
       @position ||= Position.new(
         markup,
-        template&.source,
+        theme_file&.source,
         line_number_1_indexed: line_number
       )
     end
@@ -207,7 +207,7 @@ module ThemeCheck
     # And the line number is the one of 'foo'\n%}. Yay!
     #
     # This breaks any kind of position logic we have since that string
-    # does not exist in the template.
+    # does not exist in the theme_file.
     def tag_markup
       return @value.tag_name if @value.instance_variable_get('@markup').empty?
       return @tag_markup if @tag_markup

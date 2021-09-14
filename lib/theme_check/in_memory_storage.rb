@@ -2,7 +2,7 @@
 
 # An in-memory storage is not written to disk. The reasons why you'd
 # want to do that are your own. The idea is to not write to disk
-# something that doesn't need to be there. If you have your template
+# something that doesn't need to be there. If you have your theme
 # as a big hash already, leave it like that and save yourself some IO.
 module ThemeCheck
   class InMemoryStorage < Storage

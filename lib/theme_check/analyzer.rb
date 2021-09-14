@@ -35,9 +35,9 @@ module ThemeCheck
       liquid_visitor = LiquidVisitor.new(@liquid_checks, @disabled_checks)
       html_visitor = HtmlVisitor.new(@html_checks)
       ThemeCheck.with_liquid_c_disabled do
-        @theme.liquid.each do |template|
-          liquid_visitor.visit_template(template)
-          html_visitor.visit_template(template)
+        @theme.liquid.each do |liquid_file|
+          liquid_visitor.visit_liquid_file(liquid_file)
+          html_visitor.visit_liquid_file(liquid_file)
         end
       end
 
@@ -53,21 +53,21 @@ module ThemeCheck
         # Call all checks that run on the whole theme
         liquid_visitor = LiquidVisitor.new(@liquid_checks.whole_theme, @disabled_checks)
         html_visitor = HtmlVisitor.new(@html_checks.whole_theme)
-        @theme.liquid.each do |template|
-          liquid_visitor.visit_template(template)
-          html_visitor.visit_template(template)
+        @theme.liquid.each do |liquid_file|
+          liquid_visitor.visit_liquid_file(liquid_file)
+          html_visitor.visit_liquid_file(liquid_file)
         end
         @theme.json.each { |json_file| @json_checks.whole_theme.call(:on_file, json_file) }
 
         # Call checks that run on a single files, only on specified file
         liquid_visitor = LiquidVisitor.new(@liquid_checks.single_file, @disabled_checks)
         html_visitor = HtmlVisitor.new(@html_checks.single_file)
-        files.each do |file|
-          if file.liquid?
-            liquid_visitor.visit_template(file)
-            html_visitor.visit_template(file)
-          elsif file.json?
-            @json_checks.single_file.call(:on_file, file)
+        files.each do |theme_file|
+          if theme_file.liquid?
+            liquid_visitor.visit_liquid_file(theme_file)
+            html_visitor.visit_liquid_file(theme_file)
+          elsif theme_file.json?
+            @json_checks.single_file.call(:on_file, theme_file)
           end
         end
       end

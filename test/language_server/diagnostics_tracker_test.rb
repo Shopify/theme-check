@@ -6,7 +6,7 @@ module ThemeCheck
     class DiagnosticsTrackerTest < Minitest::Test
       Offense = Struct.new(
         :code_name,
-        :template,
+        :theme_file,
         :whole_theme?,
       ) do
         def single_file?
@@ -14,7 +14,7 @@ module ThemeCheck
         end
 
         def inspect
-          "#<#{code_name} template=\"#{template.path}\" #{whole_theme? ? 'whole_theme' : 'single_file'}>"
+          "#<#{code_name} theme_file=\"#{theme_file.path}\" #{whole_theme? ? 'whole_theme' : 'single_file'}>"
         end
       end
       LiquidFile = Struct.new(:path)

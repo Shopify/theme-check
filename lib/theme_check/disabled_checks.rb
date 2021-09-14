@@ -11,8 +11,8 @@ module ThemeCheck
 
     def initialize
       @disabled_checks = Hash.new do |hash, key|
-        template, check_name = key
-        hash[key] = DisabledCheck.new(template, check_name)
+        theme_file, check_name = key
+        hash[key] = DisabledCheck.new(theme_file, check_name)
       end
     end
 
@@ -20,26 +20,26 @@ module ThemeCheck
       text = comment_text(node)
       if start_disabling?(text)
         checks_from_text(text).each do |check_name|
-          disabled = @disabled_checks[[node.template, check_name]]
+          disabled = @disabled_checks[[node.theme_file, check_name]]
           disabled.start_index = node.start_index
           disabled.first_line = true if node.line_number == 1
         end
       elsif stop_disabling?(text)
         checks_from_text(text).each do |check_name|
-          disabled = @disabled_checks[[node.template, check_name]]
+          disabled = @disabled_checks[[node.theme_file, check_name]]
           next unless disabled
           disabled.end_index = node.end_index
         end
       end
     end
 
-    def disabled?(check, template, check_name, index)
+    def disabled?(check, theme_file, check_name, index)
       return true if check.ignored_patterns&.any? do |pattern|
-        template.relative_path.fnmatch?(pattern)
+        theme_file.relative_path.fnmatch?(pattern)
       end
 
-      @disabled_checks[[template, :all]]&.disabled?(index) ||
-        @disabled_checks[[template, check_name]]&.disabled?(index)
+      @disabled_checks[[theme_file, :all]]&.disabled?(index) ||
+        @disabled_checks[[theme_file, check_name]]&.disabled?(index)
     end
 
     def checks_missing_end_index
@@ -51,7 +51,7 @@ module ThemeCheck
     def remove_disabled_offenses(checks)
       checks.disableable.each do |check|
         check.offenses.reject! do |offense|
-          disabled?(check, offense.template, offense.code_name, offense.start_index)
+          disabled?(check, offense.theme_file, offense.code_name, offense.start_index)
         end
       end
     end

@@ -325,53 +325,53 @@ class SpaceInsideBracesTest < Minitest::Test
         #          The two lines below are there to help identify the index
         #          0000000000111111111122222222223333333333
         #          0123456789012345678901234567890123456789
-        template: "{{all_products }}",
+        liquid: "{{all_products }}",
         expected: "Space missing after '{{' at templates/index.liquid:2:3",
       },
       {
-        template: "{{   all_products }}",
+        liquid: "{{   all_products }}",
         expected: "Too many spaces after '{{' at templates/index.liquid:2:5",
       },
       {
-        template: "{{ all_products}}",
+        liquid: "{{ all_products}}",
         expected: "Space missing before '}}' at templates/index.liquid:14:15",
       },
       {
-        template: "{{ all_products   }}",
+        liquid: "{{ all_products   }}",
         expected: "Too many spaces before '}}' at templates/index.liquid:15:18",
       },
       {
-        template: "{{ 'a' | replace: ', ',',' | split: ',' }}",
+        liquid: "{{ 'a' | replace: ', ',',' | split: ',' }}",
         expected: "Space missing after ',' at templates/index.liquid:22:23",
       },
       {
-        template: "{% assign x = n-%}",
+        liquid: "{% assign x = n-%}",
         expected: "Space missing before '-%}' at templates/index.liquid:14:15",
       },
       {
-        template: "{% assign x = n  -%}",
+        liquid: "{% assign x = n  -%}",
         expected: "Too many spaces before '-%}' at templates/index.liquid:15:17",
       },
       {
-        template: '{%- if x !=  "x" -%}{%- endif -%}',
+        liquid: '{%- if x !=  "x" -%}{%- endif -%}',
         expected: "Too many spaces after '!=' at templates/index.liquid:11:13",
       },
       {
-        template: '{%- if x  != "x" -%}{%- endif -%}',
+        liquid: '{%- if x  != "x" -%}{%- endif -%}',
         expected: "Too many spaces before '!=' at templates/index.liquid:8:10",
       },
       {
-        template: '{%- if x !="x" -%}{%- endif -%}',
+        liquid: '{%- if x !="x" -%}{%- endif -%}',
         expected: "Space missing after '!=' at templates/index.liquid:9:11",
       },
       {
-        template: '{%- if x!= "x" -%}{%- endif -%}',
+        liquid: '{%- if x!= "x" -%}{%- endif -%}',
         expected: "Space missing before '!=' at templates/index.liquid:8:10",
       },
     ].each do |test_desc|
       offenses = analyze_theme(
         ThemeCheck::SpaceInsideBraces.new,
-        "templates/index.liquid" => test_desc[:template]
+        "templates/index.liquid" => test_desc[:liquid]
       )
       assert_offenses_with_range(
         test_desc[:expected],

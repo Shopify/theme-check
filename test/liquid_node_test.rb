@@ -182,8 +182,8 @@ module ThemeCheck
     private
 
     def root_node(code)
-      template = parse_liquid(code)
-      LiquidNode.new(template.root, nil, template)
+      theme_file = parse_liquid(code)
+      LiquidNode.new(theme_file.root, nil, theme_file)
     end
 
     def find(node, &block)

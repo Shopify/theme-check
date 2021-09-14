@@ -8,10 +8,10 @@ module ThemeCheck
       @disabled_checks = disabled_checks
     end
 
-    def visit_template(template)
-      visit(LiquidNode.new(template.root, nil, template))
+    def visit_liquid_file(liquid_file)
+      visit(LiquidNode.new(liquid_file.root, nil, liquid_file))
     rescue Liquid::Error => exception
-      exception.template_name = template.name
+      exception.template_name = liquid_file.name
       call_checks(:on_error, exception)
     end
 

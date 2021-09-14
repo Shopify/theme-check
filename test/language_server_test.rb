@@ -22,7 +22,7 @@ class LanguageServerTest < Minitest::Test
     :code_name,
     :severity,
     :message,
-    :template,
+    :theme_file,
     :start_column,
     :end_column,
     :start_line,
@@ -213,7 +213,7 @@ class LanguageServerTest < Minitest::Test
   end
 
   def test_document_link_response
-    template = <<~LIQUID
+    contents = <<~LIQUID
       {% render 'a' %}
     LIQUID
 
@@ -232,7 +232,7 @@ class LanguageServerTest < Minitest::Test
       "params" => {
         "textDocument" => {
           "uri" => file_uri(storage.path('layout/theme.liquid')),
-          "text" => template,
+          "text" => contents,
           "version" => 1,
         },
       },
@@ -258,11 +258,11 @@ class LanguageServerTest < Minitest::Test
         "range" => {
           "start" => {
             "line" => 0,
-            "character" => template.index('a'),
+            "character" => contents.index('a'),
           },
           "end" => {
             "line" => 0,
-            "character" => template.index('a') + 1,
+            "character" => contents.index('a') + 1,
           },
         },
       }],
@@ -270,7 +270,7 @@ class LanguageServerTest < Minitest::Test
   end
 
   def test_document_links_from_correct_root
-    template = <<~LIQUID
+    contents = <<~LIQUID
       {% render 'a' %}
     LIQUID
 
@@ -293,7 +293,7 @@ class LanguageServerTest < Minitest::Test
       "params" => {
         "textDocument" => {
           "uri" => file_uri(storage.path('src/theme/layout/theme.liquid')),
-          "text" => template,
+          "text" => contents,
           "version" => 1,
         },
       },
@@ -319,11 +319,11 @@ class LanguageServerTest < Minitest::Test
         "range" => {
           "start" => {
             "line" => 0,
-            "character" => template.index('a'),
+            "character" => contents.index('a'),
           },
           "end" => {
             "line" => 0,
-            "character" => template.index('a') + 1,
+            "character" => contents.index('a') + 1,
           },
         },
       }],
@@ -438,7 +438,7 @@ class LanguageServerTest < Minitest::Test
   # This is a repetition of the document_links test but with a path that is URL encoded the same way
   # that VS Code would URL encode it (spaces to %20, and so on.)
   def test_handles_encoded_uris
-    template = <<~LIQUID
+    contents = <<~LIQUID
       {% render 'a' %}
     LIQUID
 
@@ -461,7 +461,7 @@ class LanguageServerTest < Minitest::Test
       "params" => {
         "textDocument" => {
           "uri" => file_uri(storage.path('path with spaces/layout/theme.liquid')),
-          "text" => template,
+          "text" => contents,
           "version" => 1,
         },
       },
@@ -487,11 +487,11 @@ class LanguageServerTest < Minitest::Test
         "range" => {
           "start" => {
             "line" => 0,
-            "character" => template.index('a'),
+            "character" => contents.index('a'),
           },
           "end" => {
             "line" => 0,
-            "character" => template.index('a') + 1,
+            "character" => contents.index('a') + 1,
           },
         },
       }],

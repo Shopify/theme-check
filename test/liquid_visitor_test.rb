@@ -13,10 +13,10 @@ class LiquidVisitorTest < Minitest::Test
   end
 
   def test_assign
-    template = parse_liquid(<<~END)
+    theme_file = parse_liquid(<<~END)
       {% assign x = 'hello' %}
     END
-    @visitor.visit_template(template)
+    @visitor.visit_liquid_file(theme_file)
     assert_equal([
       :on_document,
       :on_tag,
@@ -32,13 +32,13 @@ class LiquidVisitorTest < Minitest::Test
   end
 
   def test_if
-    template = parse_liquid(<<~END)
+    theme_file = parse_liquid(<<~END)
       {% if x == 'condition' %}
         {% assign x = 'hello' %}
       {% else %}
       {% endif %}
     END
-    @visitor.visit_template(template)
+    @visitor.visit_liquid_file(theme_file)
     assert_equal([
       :on_document,
       :on_tag,
@@ -69,12 +69,12 @@ class LiquidVisitorTest < Minitest::Test
   end
 
   def test_schema
-    template = parse_liquid(<<~END)
+    theme_file = parse_liquid(<<~END)
       {% schema %}
         { "muffin": true }
       {% endschema %}
     END
-    @visitor.visit_template(template)
+    @visitor.visit_liquid_file(theme_file)
     assert_equal([
       :on_document,
       :on_tag,
@@ -88,12 +88,12 @@ class LiquidVisitorTest < Minitest::Test
   end
 
   def test_paginate
-    template = parse_liquid(<<~END)
+    theme_file = parse_liquid(<<~END)
       {% paginate products by x %}
         {{ product.name }}
       {% endpaginate %}
     END
-    @visitor.visit_template(template)
+    @visitor.visit_liquid_file(theme_file)
     assert_equal([
       :on_document,
       :on_tag,
@@ -115,11 +115,11 @@ class LiquidVisitorTest < Minitest::Test
   end
 
   def test_form
-    template = parse_liquid(<<~END)
+    theme_file = parse_liquid(<<~END)
       {% form 'type', object, key: value %}
       {% endform %}
     END
-    @visitor.visit_template(template)
+    @visitor.visit_liquid_file(theme_file)
     assert_equal([
       :on_document,
       :on_tag,

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 module ThemeCheck
-  # Reports missing include/render/section template
+  # Reports missing include/render/section liquid file
   class MissingTemplate < LiquidCheck
     severity :suggestion
     category :liquid
@@ -12,17 +12,17 @@ module ThemeCheck
     end
 
     def on_include(node)
-      template = node.value.template_name_expr
-      if template.is_a?(String)
-        add_missing_offense("snippets/#{template}", node: node)
+      snippet = node.value.template_name_expr
+      if snippet.is_a?(String)
+        add_missing_offense("snippets/#{snippet}", node: node)
       end
     end
 
     alias_method :on_render, :on_include
 
     def on_section(node)
-      template = node.value.section_name
-      add_missing_offense("sections/#{template}", node: node)
+      section = node.value.section_name
+      add_missing_offense("sections/#{section}", node: node)
     end
 
     private

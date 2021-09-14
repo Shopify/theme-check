@@ -20,7 +20,7 @@ module ThemeCheck
       end
 
       def on_document(node)
-        source = node.template.source
+        source = node.theme_file.source
         matches(source, @regex).each do |match|
           offenses << Offense.new(
             check: self,
@@ -36,11 +36,11 @@ module ThemeCheck
     # A check that uses the on_end callback
     class OnEndCheck < Check
       def on_document(node)
-        @template = node.template
+        @theme_file = node.theme_file
       end
 
       def on_end
-        offenses << Offense.new(check: self, message: "on_end used", template: @template)
+        offenses << Offense.new(check: self, message: "on_end used", theme_file: @theme_file)
       end
     end
 
@@ -54,13 +54,13 @@ module ThemeCheck
     end
 
     def test_ignore_all_checks
-      template = parse_liquid(<<~END)
+      liquid_file = parse_liquid(<<~END)
         {% comment %}theme-check-disable{% endcomment %}
         {% assign x = 'x' %}
         RegexError 1
         {% comment %}theme-check-enable{% endcomment %}
       END
-      @visitor.visit_template(template)
+      @visitor.visit_liquid_file(liquid_file)
       @disabled_checks.remove_disabled_offenses(@checks)
 
       assert_empty(@assign_check.offenses)
@@ -68,12 +68,12 @@ module ThemeCheck
     end
 
     def test_ignore_all_checks_without_end
-      template = parse_liquid(<<~END)
+      liquid_file = parse_liquid(<<~END)
         {% comment %}theme-check-disable{% endcomment %}
         {% assign x = 'x' %}
         RegexError 1
       END
-      @visitor.visit_template(template)
+      @visitor.visit_liquid_file(liquid_file)
       @disabled_checks.remove_disabled_offenses(@checks)
 
       assert_empty(@assign_check.offenses)
@@ -81,7 +81,7 @@ module ThemeCheck
     end
 
     def test_ignore_all_checks_between_bounds
-      template = parse_liquid(<<~END)
+      liquid_file = parse_liquid(<<~END)
         {% assign x = 'x' %}
         RegexError 1
         {% comment %}theme-check-disable{% endcomment %}
@@ -91,7 +91,7 @@ module ThemeCheck
         {% assign z = 'z' %}
         RegexError 3
       END
-      @visitor.visit_template(template)
+      @visitor.visit_liquid_file(liquid_file)
       @disabled_checks.remove_disabled_offenses(@checks)
 
       assert_includes(@assign_check.offenses.map(&:markup), "assign x = 'x' ")
@@ -103,13 +103,13 @@ module ThemeCheck
     end
 
     def test_ignore_specific_checks
-      template = parse_liquid(<<~END)
+      liquid_file = parse_liquid(<<~END)
         {% comment %}theme-check-disable AssignCheck{% endcomment %}
         {% assign x = 'x' %}
         RegexError 1
         {% comment %}theme-check-enable AssignCheck{% endcomment %}
       END
-      @visitor.visit_template(template)
+      @visitor.visit_liquid_file(liquid_file)
       @disabled_checks.remove_disabled_offenses(@checks)
 
       assert_empty(@assign_check.offenses)
@@ -117,13 +117,13 @@ module ThemeCheck
     end
 
     def test_ignore_multiple_checks
-      template = parse_liquid(<<~END)
+      liquid_file = parse_liquid(<<~END)
         {% comment %}theme-check-disable AssignCheck, RegexCheck{% endcomment %}
         {% assign x = 'x' %}
         RegexError 1
         {% comment %}theme-check-enable AssignCheck, RegexCheck{% endcomment %}
       END
-      @visitor.visit_template(template)
+      @visitor.visit_liquid_file(liquid_file)
       @disabled_checks.remove_disabled_offenses(@checks)
 
       assert_empty(@assign_check.offenses)
@@ -131,7 +131,7 @@ module ThemeCheck
     end
 
     def test_enable_specific_checks_individually
-      template = parse_liquid(<<~END)
+      liquid_file = parse_liquid(<<~END)
         {% comment %}theme-check-disable AssignCheck, RegexCheck{% endcomment %}
         {% assign x = 'x' %}
         RegexError 1
@@ -142,7 +142,7 @@ module ThemeCheck
         {% assign z = 'z' %}
         RegexError 3
       END
-      @visitor.visit_template(template)
+      @visitor.visit_liquid_file(liquid_file)
       @disabled_checks.remove_disabled_offenses(@checks)
 
       refute_empty(@assign_check.offenses)
@@ -157,13 +157,13 @@ module ThemeCheck
     end
 
     def test_comments_can_have_spaces
-      template = parse_liquid(<<~END)
+      liquid_file = parse_liquid(<<~END)
         {% comment %} theme-check-disable {% endcomment %}
         {% assign x = 'x' %}
         RegexError 1
         {% comment %} theme-check-enable {% endcomment %}
       END
-      @visitor.visit_template(template)
+      @visitor.visit_liquid_file(liquid_file)
       @disabled_checks.remove_disabled_offenses(@checks)
 
       assert_empty(@assign_check.offenses)
@@ -172,7 +172,7 @@ module ThemeCheck
 
     def test_ignore_disable_check_that_cant_be_disabled
       RegexCheck.can_disable(false)
-      template = parse_liquid(<<~END)
+      liquid_file = parse_liquid(<<~END)
         {% comment %} theme-check-disable {% endcomment %}
         RegexError 1
         {% comment %} theme-check-enable {% endcomment %}
@@ -180,7 +180,7 @@ module ThemeCheck
         RegexError 2
         {% comment %} theme-check-enable RegexCheck {% endcomment %}
       END
-      @visitor.visit_template(template)
+      @visitor.visit_liquid_file(liquid_file)
       @disabled_checks.remove_disabled_offenses(@checks)
       RegexCheck.can_disable(true)
 
@@ -190,28 +190,28 @@ module ThemeCheck
     end
 
     def test_can_disable_check_that_run_on_end
-      template = parse_liquid(<<~END)
+      liquid_file = parse_liquid(<<~END)
         {% comment %}theme-check-disable OnEndCheck{% endcomment %}
         Hello there
       END
-      @visitor.visit_template(template)
+      @visitor.visit_liquid_file(liquid_file)
       @checks.call(:on_end)
       @disabled_checks.remove_disabled_offenses(@checks)
 
-      assert_empty(@on_end_check.offenses.map(&:template))
+      assert_empty(@on_end_check.offenses.map(&:theme_file))
     end
 
     def test_can_ignore_check_using_pattern
-      template = parse_liquid(<<~END)
+      liquid_file = parse_liquid(<<~END)
         {% assign x = 'x' %}
       END
       @assign_check.ignored_patterns = [
-        template.relative_path.to_s,
+        liquid_file.relative_path.to_s,
       ]
-      @visitor.visit_template(template)
+      @visitor.visit_liquid_file(liquid_file)
       @disabled_checks.remove_disabled_offenses(@checks)
 
-      assert_empty(@assign_check.offenses.map(&:template))
+      assert_empty(@assign_check.offenses.map(&:theme_file))
     end
   end
 end

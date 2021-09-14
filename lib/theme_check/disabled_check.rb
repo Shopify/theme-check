@@ -4,11 +4,11 @@
 # We'll use the node position to figure out if the test is disabled or not.
 module ThemeCheck
   class DisabledCheck
-    attr_reader :name, :template, :ranges
+    attr_reader :name, :theme_file, :ranges
     attr_accessor :first_line
 
-    def initialize(template, name)
-      @template = template
+    def initialize(theme_file, name)
+      @theme_file = theme_file
       @name = name
       @ranges = []
       @first_line = false
