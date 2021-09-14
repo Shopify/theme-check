@@ -9,10 +9,21 @@ module ThemeCheck
       @content = nil
     end
 
-    alias_method :content, :source
+    def rewriter
+      @rewriter ||= TemplateRewriter.new(@relative_path, source)
+    end
+
+    def write
+      content = rewriter.to_s
+      if source != content
+        @storage.write(@relative_path, content.gsub("\n", @eol))
+        @source = content
+        @rewriter = nil
+      end
+    end
 
     def gzipped_size
-      @gzipped_size ||= Zlib.gzip(content).bytesize
+      @gzipped_size ||= Zlib.gzip(source).bytesize
     end
 
     def name

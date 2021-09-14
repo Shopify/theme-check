@@ -144,6 +144,32 @@ module ThemeCheck
         corrector = Corrector.new(template: template)
         correction.call(corrector)
       end
+    rescue => e
+      ThemeCheck.bug(<<~EOS)
+        Exception while running `Offense#correct`:
+        ```
+        #{e.class}: #{e.message}
+          #{e.backtrace.join("\n  ")}
+        ```
+
+        Offense:
+        ```
+        #{JSON.pretty_generate(to_h)}
+        ```
+        Check options:
+        ```
+        #{check.options.pretty_inspect}
+        ```
+        Markup:
+        ```
+        #{markup}
+        ```
+        Node.Markup:
+        ```
+        #{node&.markup}
+        ```
+      EOS
+      exit(2)
     end
 
     def whole_theme?

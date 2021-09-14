@@ -16,14 +16,14 @@ module ThemeCheck
     end
 
     def read(relative_path)
-      file(relative_path).read
+      file(relative_path).read(mode: 'rb', encoding: 'UTF-8')
     end
 
     def write(relative_path, content)
       reset_memoizers unless file_exists?(relative_path)
 
       file(relative_path).dirname.mkpath unless file(relative_path).dirname.directory?
-      file(relative_path).write(content)
+      file(relative_path).write(content, mode: 'w+b', encoding: 'UTF-8')
     end
 
     def remove(relative_path)

@@ -156,17 +156,20 @@ module ThemeCheck
       end
     end
 
-    def range
-      start = template.full_line(line_number).index(markup)
-      [start, start + markup.length - 1]
-    end
-
     def position
       @position ||= Position.new(
         markup,
         template&.source,
         line_number_1_indexed: line_number
       )
+    end
+
+    def start_index
+      position.start_index
+    end
+
+    def end_index
+      position.end_index
     end
 
     def start_token
@@ -185,14 +188,6 @@ module ThemeCheck
       output += "}}" if variable?
       output += "%}" if tag?
       output
-    end
-
-    def start_index
-      position.start_index
-    end
-
-    def end_index
-      position.end_index
     end
 
     private

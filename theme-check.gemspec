@@ -26,4 +26,5 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency('liquid', '>= 5.0.1')
   spec.add_dependency('nokogiri', '>= 1.12')
+  spec.add_dependency('parser', '~> 3')
 end

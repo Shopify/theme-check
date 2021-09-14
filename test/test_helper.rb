@@ -68,7 +68,7 @@ module Minitest
       files.each_pair do |name, content|
         path = dir.join(name)
         path.parent.mkpath
-        path.write(content)
+        path.write(content, mode: 'w+b')
       end
       at_exit { dir.rmtree }
       ThemeCheck::FileSystemStorage.new(dir)
@@ -83,7 +83,7 @@ module Minitest
       analyzer = ThemeCheck::Analyzer.new(theme, check_classes, true)
       analyzer.analyze_theme
       analyzer.correct_offenses
-      sources = theme.liquid.map { |template| [template.relative_path.to_s, template.updated_content] }
+      sources = theme.liquid.map { |template| [template.relative_path.to_s, template.rewriter.to_s] }
       Hash[*sources.flatten]
     end
 

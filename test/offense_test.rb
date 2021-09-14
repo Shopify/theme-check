@@ -55,13 +55,15 @@ class OffenseTest < Minitest::Test
     node = stub(
       template: @theme["templates/index"],
       line_number: 2,
+      start_index: @theme["templates/index"].source.index('1'),
+      end_index: @theme["templates/index"].source.index('2 ') + 2,
       markup: "1 + 2",
-      range: [4, 10]
     )
     offense = ThemeCheck::Offense.new(check: Bogus.new, node: node, correction: proc { |c| c.insert_after(node, "abc") })
     offense.correct
 
-    assert_equal("{{ 1 + 2 abc}}", node.template.excerpt(node.line_number))
+    node.template.write
+    assert_equal("{{ 1 + 2 abc}}", node.template.source_excerpt(2))
   end
 
   def test_location
