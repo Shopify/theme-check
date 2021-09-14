@@ -22,7 +22,7 @@ module ThemeCheck
         
         if missing.any?
           add_offense("#{key} missing translations for #{missing.join(', ')}", node: node) do |corrector|
-            puts "here!"
+            puts "here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
           end
         end
       end
@@ -45,7 +45,9 @@ module ThemeCheck
           diff.add_as_offenses(self, key_prefix: ["locales", name], node: node)
         end
       else
-        add_offense("Missing default locale in key: locales", node: node)
+        add_offense("Missing default locale in key: locales", node: node) do |corrector|
+          puts "here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+        end
       end
     end
 
