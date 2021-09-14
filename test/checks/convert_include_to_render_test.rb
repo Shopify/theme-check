@@ -25,17 +25,28 @@ class ConvertIncludeToRenderTest < Minitest::Test
   end
 
   def test_corrects_include
-    expected_sources = {
-      "templates/index.liquid" => <<~END,
-        {% render 'templates/foo.liquid' %}
-      END
-    }
+    skip
     sources = fix_theme(
       ThemeCheck::ConvertIncludeToRender.new,
       "templates/index.liquid" => <<~END,
-        {% include 'templates/foo.liquid' %}
+        {% include 'foo.liquid' %}
+        {% assign greeting = "hello world" %}
+        {% include 'greeting.liquid' %}
+      END
+      "snippets/greeting.liquid" => <<~END,
+        {{ greeting }}
       END
     )
+    expected_sources = {
+      "templates/index.liquid" => <<~END,
+        {% render 'foo.liquid' %}
+        {% assign greeting = "hello world" %}
+        {% render 'greeting.liquid', greeting: greeting %}
+      END
+      "snippets/greeting.liquid" => <<~END,
+        {{ greeting }}
+      END
+    }
     sources.each do |path, source|
       assert_equal(expected_sources[path], source)
     end
