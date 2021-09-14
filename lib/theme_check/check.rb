@@ -46,7 +46,7 @@ module ThemeCheck
       end
 
       def severity_value(severity)
-        SEVERITY_VALUES[severity]
+        SEVERITY_VALUES[severity] || -1
       end
 
       def categories(*categories)

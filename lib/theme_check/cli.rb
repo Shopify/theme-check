@@ -49,7 +49,7 @@ module ThemeCheck
         "Automatically fix offenses"
       ) { @auto_correct = true }
       @option_parser.on(
-        "--fail-level SEVERITY", Check::SEVERITIES,
+        "--fail-level SEVERITY", [:crash] + Check::SEVERITIES,
         "Minimum severity (error|suggestion|style) for exit with error code"
       ) do |severity|
         @fail_level = severity.to_sym
