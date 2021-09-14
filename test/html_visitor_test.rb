@@ -157,6 +157,32 @@ module ThemeCheck
       end
     end
 
+    def test_index_should_not_bleed_for_large_enough_number_of_tags_in_a_file
+      @attribute_checker = HTMLAttributeIntegrityMockCheck.new
+      @visitor = HtmlVisitor.new(Checks.new([@attribute_checker]))
+      number_of_tags = 2000
+      number_of_html_tags = number_of_tags / 5
+      template = parse_liquid(<<~END)
+        <html>
+          #{"<b x={% %} y='{{ }}' z='{{}}' a='{{}}' b='{{}}'></b>\n" * number_of_html_tags}
+        </html>
+      END
+      @visitor.visit_template(template)
+      expected = {
+        name: "b",
+        attributes: {
+          "a" => "{{}}",
+          "b" => "{{}}",
+          "x" => "{% %}",
+          "y" => "{{ }}",
+          "z" => "{{}}",
+        },
+      }
+      number_of_html_tags.times do |i|
+        assert_equal(expected, @attribute_checker.elements[i], "i #{i}")
+      end
+    end
+
     class HTMLAttributeIntegrityMockCheck < Check
       attr_reader :elements
 

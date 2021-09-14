@@ -67,10 +67,10 @@ module ThemeCheck
     private
 
     def replace_placeholders(string)
-      # Replace all {%#{i}####%} with the actual content.
-      string.gsub(LIQUID_TAG) do |match|
-        key = /\d+/.match(match)[0]
-        @placeholder_values[key.to_i]
+      # Replace all ≬{i}####≬ with the actual content.
+      string.gsub(HTML_LIQUID_PLACEHOLDER) do |match|
+        key = /[0-9a-z]+/.match(match)[0]
+        @placeholder_values[key.to_i(36)]
       end
     end
   end
