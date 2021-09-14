@@ -74,6 +74,24 @@ module ThemeCheck
       position.end_index
     end
 
+    def render_start_tag
+      "#{start_token} #{@value.raw}#{end_token}"
+    end
+
+    def render_end_tag
+      "#{start_token} #{@value.block_delimiter} #{end_token}"
+    end
+
+    def block_body_start_index
+      return unless block_tag?
+      block_regex.begin(:body)
+    end
+
+    def block_body_end_index
+      return unless block_tag?
+      block_regex.end(:body)
+    end
+
     # Literals are hard-coded values in the liquid file.
     def literal?
       @value.is_a?(String) || @value.is_a?(Integer)
@@ -183,6 +201,11 @@ module ThemeCheck
     end
 
     private
+
+    def block_regex
+      return unless block_tag?
+      /(?<start_token>#{render_start_tag})(?<body>.*)(?<end_token>#{render_end_tag})/m.match(source)
+    end
 
     def position
       @position ||= Position.new(

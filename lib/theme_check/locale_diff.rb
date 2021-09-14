@@ -14,24 +14,43 @@ module ThemeCheck
       visit_object(@default, @other, [])
     end
 
-    def add_as_offenses(check, key_prefix: [], node: nil, theme_file: nil)
+    def add_as_offenses(check, key_prefix: [], node: nil, theme_file: nil, schema: {})
       if extra_keys.any?
-        add_keys_offense(check, "Extra translation keys", extra_keys,
-          key_prefix: key_prefix, node: node, theme_file: theme_file)
+        remove_extra_keys_offense(check, "Extra translation keys", extra_keys,
+          key_prefix: key_prefix, node: node, theme_file: theme_file, schema: schema)
       end
 
       if missing_keys.any?
-        add_keys_offense(check, "Missing translation keys", missing_keys,
-          key_prefix: key_prefix, node: node, theme_file: theme_file)
+        add_missing_keys_offense(check, "Missing translation keys", missing_keys,
+          key_prefix: key_prefix, node: node, theme_file: theme_file, schema: schema)
       end
     end
 
     private
 
-    def add_keys_offense(check, cause, keys, key_prefix:, node: nil, theme_file: nil)
-      message = "#{cause}: #{format_keys(key_prefix, keys)}"
+    def remove_extra_keys_offense(check, cause, extra_keys, key_prefix:, node: nil, theme_file: nil, schema: {})
+      message = "#{cause}: #{format_keys(key_prefix, extra_keys)}"
       if node
-        check.add_offense(message, node: node)
+        check.add_offense(message, node: node) do |corrector|
+          extra_keys.each do |k|
+            corrector.remove_key(schema, key_prefix + k)
+          end
+          corrector.replace_block_body(node, schema)
+        end
+      else
+        check.add_offense(message, theme_file: theme_file)
+      end
+    end
+
+    def add_missing_keys_offense(check, cause, missing_keys, key_prefix:, node: nil, theme_file: nil, schema: {})
+      message = "#{cause}: #{format_keys(key_prefix, missing_keys)}"
+      if node
+        check.add_offense(message, node: node) do |corrector|
+          missing_keys.each do |k|
+            corrector.add_key(schema, key_prefix + k, "TODO")
+          end
+          corrector.replace_block_body(node, schema)
+        end
       else
         check.add_offense(message, theme_file: theme_file)
       end

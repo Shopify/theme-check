@@ -64,6 +64,10 @@ module ThemeCheck
       strict_position.end_column
     end
 
+    def content_line_count
+      @content_line_count ||= contents.count("\n")
+    end
+
     private
 
     def compute_start_offset
@@ -76,10 +80,6 @@ module ThemeCheck
     def contents
       return '' unless @contents.is_a?(String) && !@contents.empty?
       @contents
-    end
-
-    def content_line_count
-      @content_line_count ||= contents.count("\n")
     end
 
     def line_number
