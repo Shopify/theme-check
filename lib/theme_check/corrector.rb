@@ -44,5 +44,15 @@ module ThemeCheck
     def mkdir(theme, relative_path)
       theme.storage.mkdir(relative_path)
     end
+
+    def add_default_translation_key(file, key, value)
+      hash = file.content
+      key.reduce(hash) do |pointer, token|
+        return pointer[token] = value if token == key.last
+        pointer[token] = {} unless pointer.key?(token)
+        pointer[token]
+      end
+      file.update_contents(hash)
+    end
   end
 end
