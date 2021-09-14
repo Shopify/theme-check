@@ -28,7 +28,7 @@ module ThemeCheck
     end
 
     def rewriter
-      @rewriter ||= TemplateRewriter.new(@relative_path, source)
+      @rewriter ||= ThemeFileRewriter.new(@relative_path, source)
     end
 
     def source_excerpt(line)

@@ -3,7 +3,7 @@
 require 'parser'
 
 module ThemeCheck
-  class TemplateRewriter
+  class ThemeFileRewriter
     def initialize(name, source)
       @buffer = Parser::Source::Buffer.new(name, source: source)
       @rewriter = Parser::Source::TreeRewriter.new(
