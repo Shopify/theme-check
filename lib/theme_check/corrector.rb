@@ -53,7 +53,7 @@ module ThemeCheck
     end
 
     def here
-      puts "here!"
+      puts "here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
     end
   end
 end

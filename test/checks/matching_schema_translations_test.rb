@@ -99,8 +99,6 @@ class MatchingSchemaTranslationsTest < Minitest::Test
       END
     )
 
-    binding.pry
-
     analyzer = ThemeCheck::Analyzer.new(theme, [ThemeCheck::MatchingSchemaTranslations.new], true)
     analyzer.analyze_theme
     analyzer.correct_offenses
