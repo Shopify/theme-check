@@ -2,11 +2,11 @@
 
 module ThemeCheck
   # A node from the Liquid AST, the result of parsing a template.
-  class Node
+  class LiquidNode
     attr_reader :value, :parent, :template
 
     def initialize(value, parent, template)
-      raise ArgumentError, "Expected a Liquid AST Node" if value.is_a?(Node)
+      raise ArgumentError, "Expected a Liquid AST Node" if value.is_a?(LiquidNode)
       @value = value
       @parent = parent
       @template = template
@@ -52,7 +52,7 @@ module ThemeCheck
             node
           end
         end
-        nodes.map { |node| Node.new(node, self, @template) }
+        nodes.map { |node| LiquidNode.new(node, self, @template) }
       end
     end
 

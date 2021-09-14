@@ -2,7 +2,7 @@
 require "test_helper"
 
 module ThemeCheck
-  class NodeTest < Minitest::Test
+  class LiquidNodeTest < Minitest::Test
     def test_markup
       root = root_node(<<~END)
         <ul class="{% if true %}list{% endif %}>
@@ -183,7 +183,7 @@ module ThemeCheck
 
     def root_node(code)
       template = parse_liquid(code)
-      Node.new(template.root, nil, template)
+      LiquidNode.new(template.root, nil, template)
     end
 
     def find(node, &block)

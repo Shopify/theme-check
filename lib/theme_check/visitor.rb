@@ -9,7 +9,7 @@ module ThemeCheck
     end
 
     def visit_template(template)
-      visit(Node.new(template.root, nil, template))
+      visit(LiquidNode.new(template.root, nil, template))
     rescue Liquid::Error => exception
       exception.template_name = template.name
       call_checks(:on_error, exception)

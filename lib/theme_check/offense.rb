@@ -11,7 +11,7 @@ module ThemeCheck
       check:, # instance of a ThemeCheck::Check
       message: nil, # error message for the offense
       template: nil, # Template
-      node: nil, # Node or HtmlNode
+      node: nil, # LiquidNode or HtmlNode
       markup: nil, # string
       line_number: nil, # line number of the error (1-indexed)
       # node_markup_offset is the index inside node.markup to start
