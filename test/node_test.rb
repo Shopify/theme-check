@@ -42,7 +42,10 @@ module ThemeCheck
             render
             'foo'
           %}
-          {% comment %}hi{% endcomment %}
+          <div class="form-vertical">{%form 'recover_customer_password'%}{%comment%}
+            Add a hidden span to indicate the form was submitted succesfully.
+          {%endcomment%}
+          {%endform%}
           # weird implementation edge case (markup is present before tag on the same line)
           a {% if a %}{% endif %}
       END
@@ -53,6 +56,8 @@ module ThemeCheck
       node = find(root) { |n| n.type_name == :echo }
       assert(node.inside_liquid_tag?)
       node = find(root) { |n| n.type_name == :render }
+      refute(node.inside_liquid_tag?)
+      node = find(root) { |n| n.type_name == :comment }
       refute(node.inside_liquid_tag?)
       node = find(root) { |n| n.markup =~ /if a/ }
       refute(node.inside_liquid_tag?)
@@ -182,9 +187,11 @@ module ThemeCheck
     end
 
     def find(node, &block)
-      return node if yield node
+      return node if block.call(node)
       return nil if node.children.nil? || node.children.empty?
-      node.children.find { |n| find(n, &block) }
+      node.children
+        .map { |n| find(n, &block) }
+        .find { |n| !n.nil? }
     end
   end
 end
