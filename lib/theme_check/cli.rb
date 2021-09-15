@@ -186,7 +186,7 @@ module ThemeCheck
       storage = ThemeCheck::FileSystemStorage.new(@config.root, ignored_patterns: @config.ignored_patterns)
       theme = ThemeCheck::Theme.new(storage)
       if theme.all.empty?
-        raise Abort, "No templates found."
+        raise Abort, "No theme files found."
       end
       analyzer = ThemeCheck::Analyzer.new(theme, @config.enabled_checks, @config.auto_correct)
       analyzer.analyze_theme

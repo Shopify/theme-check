@@ -40,7 +40,7 @@ module Minitest
 
     def parse_liquid(code)
       storage = make_storage("file.liquid" => code)
-      ThemeCheck::Template.new("file.liquid", storage)
+      ThemeCheck::LiquidFile.new("file.liquid", storage)
     end
 
     def liquid_c_enabled?
@@ -83,7 +83,7 @@ module Minitest
       analyzer = ThemeCheck::Analyzer.new(theme, check_classes, true)
       analyzer.analyze_theme
       analyzer.correct_offenses
-      sources = theme.liquid.map { |template| [template.relative_path.to_s, template.rewriter.to_s] }
+      sources = theme.liquid.map { |theme_file| [theme_file.relative_path.to_s, theme_file.rewriter.to_s] }
       Hash[*sources.flatten]
     end
 

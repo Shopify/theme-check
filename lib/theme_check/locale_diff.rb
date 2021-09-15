@@ -14,26 +14,26 @@ module ThemeCheck
       visit_object(@default, @other, [])
     end
 
-    def add_as_offenses(check, key_prefix: [], node: nil, template: nil)
+    def add_as_offenses(check, key_prefix: [], node: nil, theme_file: nil)
       if extra_keys.any?
         add_keys_offense(check, "Extra translation keys", extra_keys,
-          key_prefix: key_prefix, node: node, template: template)
+          key_prefix: key_prefix, node: node, theme_file: theme_file)
       end
 
       if missing_keys.any?
         add_keys_offense(check, "Missing translation keys", missing_keys,
-          key_prefix: key_prefix, node: node, template: template)
+          key_prefix: key_prefix, node: node, theme_file: theme_file)
       end
     end
 
     private
 
-    def add_keys_offense(check, cause, keys, key_prefix:, node: nil, template: nil)
+    def add_keys_offense(check, cause, keys, key_prefix:, node: nil, theme_file: nil)
       message = "#{cause}: #{format_keys(key_prefix, keys)}"
       if node
         check.add_offense(message, node: node)
       else
-        check.add_offense(message, template: template)
+        check.add_offense(message, theme_file: theme_file)
       end
     end
 

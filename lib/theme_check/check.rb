@@ -91,8 +91,8 @@ module ThemeCheck
       @offenses ||= []
     end
 
-    def add_offense(message, node: nil, template: node&.template, markup: nil, line_number: nil, node_markup_offset: 0, &block)
-      offenses << Offense.new(check: self, message: message, template: template, node: node, markup: markup, line_number: line_number, node_markup_offset: node_markup_offset, correction: block)
+    def add_offense(message, node: nil, theme_file: node&.theme_file, markup: nil, line_number: nil, node_markup_offset: 0, &block)
+      offenses << Offense.new(check: self, message: message, theme_file: theme_file, node: node, markup: markup, line_number: line_number, node_markup_offset: node_markup_offset, correction: block)
     end
 
     def severity

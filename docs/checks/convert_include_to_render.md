@@ -2,7 +2,7 @@
 
 The `include` tag is [deprecated][deprecated]. This tag exists to enforce the use of the `render` tag instead of `include`.
 
-The `include` tag works similarly to the `render` tag, but it lets the code inside of the snippet to access and overwrite the variables within its parent template. The `include` tag has been deprecated because the way that it handles variables reduces performance and makes theme code harder to both read and maintain.
+The `include` tag works similarly to the `render` tag, but it lets the code inside of the snippet to access and overwrite the variables within its parent theme file. The `include` tag has been deprecated because the way that it handles variables reduces performance and makes theme code harder to both read and maintain.
 
 ## Check Details
 

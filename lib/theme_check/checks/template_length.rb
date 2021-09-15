@@ -29,9 +29,9 @@ module ThemeCheck
     end
 
     def after_document(node)
-      lines = node.template.source.count("\n") - @excluded_lines
+      lines = node.theme_file.source.count("\n") - @excluded_lines
       if lines > @max_length
-        add_offense("Template has too many lines [#{lines}/#{@max_length}]", template: node.template)
+        add_offense("Template has too many lines [#{lines}/#{@max_length}]", theme_file: node.theme_file)
       end
     end
 

@@ -15,8 +15,8 @@ module ThemeCheck
     end
 
     def test_eol_are_always_new_lines_internally
-      @theme.liquid.each do |template|
-        assert_equal("hello\nworld", template.source)
+      @theme.liquid.each do |liquid_file|
+        assert_equal("hello\nworld", liquid_file.source)
       end
       @theme.json.each do |json_file|
         assert_equal("{\n  \"a\": \"b\"\n}", json_file.source)
@@ -31,17 +31,17 @@ module ThemeCheck
         ["windows", "\r\n"],
         ["linux", "\n"],
       ].each do |(platform, eol)|
-        template = @theme["liquid/#{platform}"]
-        assert_equal("hello#{eol}world", @theme.storage.read(template.relative_path.to_s))
-        template.rewriter.replace(
+        liquid_file = @theme["liquid/#{platform}"]
+        assert_equal("hello#{eol}world", @theme.storage.read(liquid_file.relative_path.to_s))
+        liquid_file.rewriter.replace(
           node(
             "hello\nworld".index('w'),
             "hello\nworld".index('d') + 1
           ),
           "friend"
         )
-        template.write
-        assert_equal("hello#{eol}friend", @theme.storage.read(template.relative_path.to_s))
+        liquid_file.write
+        assert_equal("hello#{eol}friend", @theme.storage.read(liquid_file.relative_path.to_s))
       end
     end
 

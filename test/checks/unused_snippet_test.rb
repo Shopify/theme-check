@@ -16,7 +16,7 @@ class UnusedSnippetTest < Minitest::Test
       END
     )
     assert_offenses(<<~END, offenses)
-      This template is not used at snippets/unused.liquid
+      This snippet is not used at snippets/unused.liquid
     END
   end
 

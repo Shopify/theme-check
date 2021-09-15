@@ -5,8 +5,8 @@ module ThemeCheck
     category :html
     doc docs_url(__FILE__)
 
-    def on_parse_error(exception, template)
-      add_offense("HTML in this template can not be parsed: #{exception.message}", template: template)
+    def on_parse_error(exception, theme_file)
+      add_offense("HTML in this template can not be parsed: #{exception.message}", theme_file: theme_file)
     end
   end
 end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ThemeCheck
-  class Template < ThemeFile
+  class LiquidFile < ThemeFile
     def write
       content = rewriter.to_s
       if source != content
@@ -28,7 +28,7 @@ module ThemeCheck
     end
 
     def rewriter
-      @rewriter ||= TemplateRewriter.new(@relative_path, source)
+      @rewriter ||= ThemeFileRewriter.new(@relative_path, source)
     end
 
     def source_excerpt(line)

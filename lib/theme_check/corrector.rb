@@ -2,25 +2,25 @@
 
 module ThemeCheck
   class Corrector
-    def initialize(template:)
-      @template = template
+    def initialize(theme_file:)
+      @theme_file = theme_file
     end
 
     def insert_after(node, content)
-      @template.rewriter.insert_after(node, content)
+      @theme_file.rewriter.insert_after(node, content)
     end
 
     def insert_before(node, content)
-      @template.rewriter.insert_before(node, content)
+      @theme_file.rewriter.insert_before(node, content)
     end
 
     def replace(node, content)
-      @template.rewriter.replace(node, content)
+      @theme_file.rewriter.replace(node, content)
       node.markup = content
     end
 
     def wrap(node, insert_before, insert_after)
-      @template.rewriter.wrap(node, insert_before, insert_after)
+      @theme_file.rewriter.wrap(node, insert_before, insert_after)
     end
 
     def create(theme, relative_path, content)

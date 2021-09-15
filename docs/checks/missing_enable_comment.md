@@ -1,6 +1,6 @@
 # Prevent missing theme-check-enable comments (`MissingEnableComment`)
 
-When `theme-check-disable` is used in the middle of a template, the corresponding `theme-check-enable` comment should also be included.
+When `theme-check-disable` is used in the middle of a theme file, the corresponding `theme-check-enable` comment should also be included.
 
 ## Check Details
 

@@ -19,22 +19,22 @@ module ThemeCheck
         new_single_file_offenses = {}
         analyzed_files = analyzed_files.map { |path| Pathname.new(path) } if analyzed_files
 
-        offenses.group_by(&:template).each do |template, template_offenses|
-          next unless template
+        offenses.group_by(&:theme_file).each do |theme_file, template_offenses|
+          next unless theme_file
           reported_offenses = template_offenses
-          previous_offenses = @single_files_offenses[template.path]
-          if analyzed_files.nil? || analyzed_files.include?(template.path)
+          previous_offenses = @single_files_offenses[theme_file.path]
+          if analyzed_files.nil? || analyzed_files.include?(theme_file.path)
             # We re-analyzed the file, so we know the template_offenses are update to date.
             reported_single_file_offenses = reported_offenses.select(&:single_file?)
             if reported_single_file_offenses.any?
-              new_single_file_offenses[template.path] = reported_single_file_offenses
+              new_single_file_offenses[theme_file.path] = reported_single_file_offenses
             end
           elsif previous_offenses
             # Merge in the previous ones, if some
             reported_offenses |= previous_offenses
           end
-          yield template.path, reported_offenses
-          reported_files << template.path
+          yield theme_file.path, reported_offenses
+          reported_files << theme_file.path
         end
 
         @single_files_offenses.each do |path, _|
@@ -51,7 +51,7 @@ module ThemeCheck
           reported_files << path
         end
 
-        # Publish diagnostics with empty array if all issues on a previously reported template
+        # Publish diagnostics with empty array if all issues on a previously reported theme_file
         # have been fixed.
         (@previously_reported_files - reported_files).each do |path|
           yield path, []

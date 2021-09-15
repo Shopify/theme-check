@@ -16,13 +16,13 @@ module ThemeCheck
     severity :suggestion # :error or :style
 
     def on_document(node)
-      # Called with the root node of all templates
-      node.value    # is the original Liquid object for this node. See Liquid source code for details.
-      node.template # is the template being analyzed, See lib/theme_check/template.rb.
-      node.parent   # is the parent node.
-      node.children # are the children nodes.
+      # Called with the root node of all liquid_file
+      node.value      # is the original Liquid object for this node. See Liquid source code for details.
+      node.theme_file # is the liquid_file being analyzed, See lib/theme_check/liquid_file.rb.
+      node.parent     # is the parent node.
+      node.children   # are the children nodes.
       # See lib/theme_check/node.rb for more helper methods
-      theme # Gives you access to all the templates in the theme. See lib/theme_check/theme.rb.
+      theme # Gives you access to all the theme files in the theme. See lib/theme_check/theme.rb.
     end
 
     def on_node(node)
@@ -38,8 +38,8 @@ module ThemeCheck
       
       # If you find an issue, add an offense:
       add_offense("Describe the problem...", node: node)
-      # Or, if the offense is related to the whole template:
-      add_offense("Describe the problem...", template: node.template)
+      # Or, if the offense is related to the whole theme file:
+      add_offense("Describe the problem...", theme_file: node.theme_file)
     end
 
     def on_assign(node)
@@ -50,7 +50,7 @@ module ThemeCheck
       # Called for every `String` (including inside if conditions).
       if node.parent.block?
         # If parent is a block, `node.value` is a String written directly to the output when
-        # the template is rendered.
+        # the theme file is rendered.
       end
     end
 
@@ -59,7 +59,7 @@ module ThemeCheck
     end
 
     def on_error(exception)
-      # Called each time a Liquid exception is raised while parsing the template
+      # Called each time a Liquid exception is raised while parsing the theme file
     end
 
     def on_end

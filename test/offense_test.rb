@@ -27,7 +27,7 @@ class OffenseTest < Minitest::Test
 
   def test_source_excerpt
     node = stub(
-      template: @theme["templates/index"],
+      theme_file: @theme["templates/index"],
       line_number: 2,
       markup: "1 + 2",
     )
@@ -40,7 +40,7 @@ class OffenseTest < Minitest::Test
 
   def test_truncated_source_excerpt
     node = stub(
-      template: @theme["templates/long"],
+      theme_file: @theme["templates/long"],
       line_number: 1,
       markup: "include 'icon-error'",
     )
@@ -53,7 +53,7 @@ class OffenseTest < Minitest::Test
 
   def test_correct
     node = stub(
-      template: @theme["templates/index"],
+      theme_file: @theme["templates/index"],
       line_number: 2,
       start_index: @theme["templates/index"].source.index('1'),
       end_index: @theme["templates/index"].source.index('2 ') + 2,
@@ -62,13 +62,13 @@ class OffenseTest < Minitest::Test
     offense = ThemeCheck::Offense.new(check: Bogus.new, node: node, correction: proc { |c| c.insert_after(node, "abc") })
     offense.correct
 
-    node.template.write
-    assert_equal("{{ 1 + 2 abc}}", node.template.source_excerpt(2))
+    node.theme_file.write
+    assert_equal("{{ 1 + 2 abc}}", node.theme_file.source_excerpt(2))
   end
 
   def test_location
     node = stub(
-      template: @theme["templates/index"],
+      theme_file: @theme["templates/index"],
       line_number: 2,
       markup: "1 + 2",
     )
@@ -81,7 +81,7 @@ class OffenseTest < Minitest::Test
 
   def test_multiline_markup_location
     node = stub(
-      template: @theme["templates/multiline"],
+      theme_file: @theme["templates/multiline"],
       line_number: 1,
       markup: "render 'product-card',\n  product: product,\n  show: true",
     )
@@ -95,7 +95,7 @@ class OffenseTest < Minitest::Test
   def test_multiline_markup_location_with_trailing_new_line
     markup = "render 'product-card',\n  product: product,\n  show: true\n\n\n"
     node = stub(
-      template: make_theme("stub.liquid" => "{% #{markup}%}")["stub"],
+      theme_file: make_theme("stub.liquid" => "{% #{markup}%}")["stub"],
       line_number: 1,
       markup: markup
     )
@@ -109,7 +109,7 @@ class OffenseTest < Minitest::Test
   def test_multiline_markup_location_with_multiple_new_lines_back_to_back
     markup = "render 'product-card',\n\n\n  product: product"
     node = stub(
-      template: make_theme("stub.liquid" => "{% #{markup}%}")["stub"],
+      theme_file: make_theme("stub.liquid" => "{% #{markup}%}")["stub"],
       line_number: 1,
       markup: markup
     )
@@ -122,7 +122,7 @@ class OffenseTest < Minitest::Test
 
   def test_location_without_markup
     node = stub(
-      template: @theme["templates/index"],
+      theme_file: @theme["templates/index"],
       line_number: 1,
       markup: nil,
     )

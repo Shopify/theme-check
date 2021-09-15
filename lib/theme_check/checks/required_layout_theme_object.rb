@@ -14,7 +14,7 @@ module ThemeCheck
     end
 
     def on_document(node)
-      @layout_theme_node = node if node.template.name == LAYOUT_FILENAME
+      @layout_theme_node = node if node.theme_file.name == LAYOUT_FILENAME
     end
 
     def on_variable(node)
@@ -25,7 +25,7 @@ module ThemeCheck
     end
 
     def after_document(node)
-      return unless node.template.name == LAYOUT_FILENAME
+      return unless node.theme_file.name == LAYOUT_FILENAME
 
       add_missing_object_offense("content_for_layout") unless @content_for_layout_found
       add_missing_object_offense("content_for_header") unless @content_for_header_found

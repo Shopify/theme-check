@@ -23,7 +23,7 @@ module ThemeCheck
 
       @files.each do |file|
         diff = LocaleDiff.new(@theme.default_locale_json.content, file.content)
-        diff.add_as_offenses(self, template: file)
+        diff.add_as_offenses(self, theme_file: file)
       end
     end
   end
