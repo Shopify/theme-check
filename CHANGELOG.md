@@ -1,4 +1,9 @@
 
+v1.6.1 / 2021-09-15
+===================
+
+  * Fix `Undefined method `-' for nil:NilClass` in Node when tag was missing surrounding spaces ([#454](https://github.com/shopify/theme-check/issues/454), [#452](https://github.com/shopify/theme-check/issues/452))
+
 v1.6.0 / 2021-09-14
 ===================
 
