@@ -50,6 +50,7 @@ module ThemeCheck
       template = node.respond_to?(:template) ? node.template.relative_path : "?"
       markup = node.respond_to?(:markup) ? node.markup : ""
       node_class = node.respond_to?(:value) ? node.value.class : "?"
+      line_number = node.respond_to?(:line_number) ? node.line_number : "?"
 
       ThemeCheck.bug(<<~EOS)
         Exception while running `#{check.code_name}##{method}`:
@@ -64,6 +65,7 @@ module ThemeCheck
         ```
         #{markup}
         ```
+        Line number: #{line_number}
         Check options: `#{check.options.pretty_inspect}`
       EOS
     end

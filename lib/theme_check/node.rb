@@ -209,7 +209,7 @@ module ThemeCheck
     # This breaks any kind of position logic we have since that string
     # does not exist in the template.
     def tag_markup
-      return @value.raw if @value.instance_variable_get('@markup').empty?
+      return @value.tag_name if @value.instance_variable_get('@markup').empty?
       return @tag_markup if @tag_markup
 
       l = 1
