@@ -1,4 +1,10 @@
 
+v1.6.2 / 2021-09-16
+===================
+
+  * SpaceInsideBraces fixup for tags without arguments ([#458](https://github.com/shopify/theme-check/issues/458))
+  * Fix UnusedAssign bug when variable used in for loop range by bumping Liquid to 5.1 ([#456](https://github.com/shopify/theme-check/issues/456))
+
 v1.6.1 / 2021-09-15
 ===================
 
