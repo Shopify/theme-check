@@ -14,6 +14,8 @@ class SpaceInsideBracesTest < Minitest::Test
         {{ x-}}
         {{x }}
         {{-x }}
+        {%comment%}
+        {% endcomment %}
       END
     )
     assert_offenses(<<~END, offenses)
@@ -25,7 +27,23 @@ class SpaceInsideBracesTest < Minitest::Test
       Space missing before '-}}' at templates/index.liquid:6
       Space missing after '{{' at templates/index.liquid:7
       Space missing after '{{-' at templates/index.liquid:8
+      Space missing before '%}' at templates/index.liquid:9
     END
+  end
+
+  def test_dont_report_when_no_missing_space
+    offenses = analyze_theme(
+      ThemeCheck::SpaceInsideBraces.new,
+      "templates/index.liquid" => <<~END,
+        {% comment %}
+        {% endcomment %}
+        {%
+          comment
+        %}
+        {% endcomment %}
+      END
+    )
+    assert_offenses('', offenses)
   end
 
   def test_reports_extra_space

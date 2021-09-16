@@ -15,20 +15,23 @@ module ThemeCheck
             'foo'
           %}
           {% comment   %}hi{% endcomment %}
+          {%
+            style
+          %}
+          {% endstyle %}
+          {% style%}{% endstyle %}
+          {% if
+          true%}{% endif %}
         </ul>
       END
-      node = find(root) { |n| n.type_name == :if }
-      assert_equal("if true ", node.markup)
-      node = find(root) { |n| n.type_name == :assign }
-      assert_equal("assign x = 1", node.markup)
-      node = find(root) { |n| n.type_name == :echo }
-      assert_equal("echo x", node.markup)
-      node = find(root) { |n| n.type_name == :render }
-      assert_equal("render\n    'foo'\n  ", node.markup)
-      # Note, the following also doesn't return content as expected.
-      # We're getting "comment " back
-      # node = find(root) { |n| n.type_name == :comment }
-      # assert_equal("comment   ", node.markup)
+      assert_can_find_node_with_markup(root, "if true ")
+      assert_can_find_node_with_markup(root, "assign x = 1")
+      assert_can_find_node_with_markup(root, "echo x")
+      assert_can_find_node_with_markup(root, "render\n    'foo'\n  ")
+      assert_can_find_node_with_markup(root, "comment   ")
+      assert_can_find_node_with_markup(root, "style\n  ")
+      assert_can_find_node_with_markup(root, "style")
+      assert_can_find_node_with_markup(root, "if\n  true")
     end
 
     def test_inside_liquid_tag?
@@ -192,6 +195,13 @@ module ThemeCheck
       node.children
         .map { |n| find(n, &block) }
         .find { |n| !n.nil? }
+    end
+
+    def assert_can_find_node_with_markup(root, markup)
+      assert(
+        find(root) { |n| n.markup == markup },
+        "Expected to find node with markup == `#{markup}`"
+      )
     end
   end
 end
