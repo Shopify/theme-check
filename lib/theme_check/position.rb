@@ -104,7 +104,7 @@ module ThemeCheck
     end
 
     def can_find_needle?
-      !!contents.index(@needle)
+      !!contents.index(@needle, start_offset)
     end
 
     def entire_line_needle

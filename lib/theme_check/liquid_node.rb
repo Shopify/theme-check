@@ -132,7 +132,7 @@ module ThemeCheck
       # backtrack on all the whitespace until we land on something. If
       # that something is {% or %-, then we can safely assume that
       # we're inside a full tag and not a liquid tag.
-      @inside_liquid_tag ||= if tag? && line_number && source
+      @inside_liquid_tag ||= if tag? && start_index && source
         i = 1
         i += 1 while source[start_index - i] =~ WHITESPACE && i < start_index
         first_two_backtracked_characters = source[(start_index - i - 1)..(start_index - i)]
@@ -144,7 +144,7 @@ module ThemeCheck
 
     # Is this node inside a tag or variable that starts by removing whitespace. i.e. {%- or {{-
     def whitespace_trimmed_start?
-      @whitespace_trimmed_start ||= if line_number && source && !inside_liquid_tag?
+      @whitespace_trimmed_start ||= if start_index && source && !inside_liquid_tag?
         i = 1
         i += 1 while source[start_index - i] =~ WHITESPACE && i < start_index
         source[start_index - i] == "-"
@@ -155,7 +155,7 @@ module ThemeCheck
 
     # Is this node inside a tag or variable ends starts by removing whitespace. i.e. -%} or -}}
     def whitespace_trimmed_end?
-      @whitespace_trimmed_end ||= if line_number && source && !inside_liquid_tag?
+      @whitespace_trimmed_end ||= if end_index && source && !inside_liquid_tag?
         i = 0
         i += 1 while source[end_index + i] =~ WHITESPACE && i < source.size
         source[end_index + i] == "-"
@@ -209,7 +209,6 @@ module ThemeCheck
     # This breaks any kind of position logic we have since that string
     # does not exist in the theme_file.
     def tag_markup
-      return @value.tag_name if @value.instance_variable_get('@markup').empty?
       return @tag_markup if @tag_markup
 
       l = 1
@@ -217,7 +216,49 @@ module ThemeCheck
       scanner.scan_until(/\n/) while l < @value.line_number && (l += 1)
       start = scanner.charpos
 
+      tag_name = @value.tag_name
       tag_markup = @value.instance_variable_get('@markup')
+
+      # This is tricky, if the tag_markup is empty, then the tag could
+      # either start on a previous line, or the tag could start on the
+      # same line.
+      #
+      # Consider this:
+      # 1 {%
+      # 2 comment
+      # 3 %}{% endcomment %}{%comment%}
+      #
+      # Both comments would markup == "" AND line_number == 3
+      #
+      # There's no way to determine which one is the correct one, but
+      # we'll try our best to at least give you one.
+      #
+      # To screw with you even more, the name of the tag could be
+      # outside of a tag on the same line :) But I won't do anything
+      # about that (yet?).
+      #
+      # {% comment
+      # %}comment{% endcomment %}
+      if tag_markup.empty?
+        eol = source.index("\n", start) || source.size
+
+        # OK here I'm trying one of two things. Either tag_start is on
+        # the same line OR tag_start is on a previous line. The line
+        # number would be at the end of the whitespace after tag_name.
+        unless (tag_start = source.index(tag_name, start)) && tag_start < eol
+          tag_start = start
+          tag_start -= 1 while source[tag_start - 1] =~ WHITESPACE
+          tag_start -= @value.tag_name.size
+
+          # keep track of the error in line_number
+          @line_number_offset = source[tag_start...start].count("\n")
+        end
+        tag_end = tag_start + tag_name.size
+        tag_end += 1 while source[tag_end] =~ WHITESPACE
+
+        # return the real raw content
+        @tag_markup = source[tag_start...tag_end]
+        return @tag_markup
 
       # See https://github.com/Shopify/theme-check/pull/423/files#r701936559 for a detailed explanation
       # of why we're doing the check below.
@@ -227,7 +268,7 @@ module ThemeCheck
       # markup could be present on the same line outside of a Tag. e.g.
       #
       # uhoh {% if uhoh %}
-      if (match = /#{@value.tag_name} +#{Regexp.escape(tag_markup)}/.match(source, start))
+      elsif (match = /#{tag_name} +#{Regexp.escape(tag_markup)}/.match(source, start))
         return @tag_markup = match[0]
       end
 
@@ -238,7 +279,7 @@ module ThemeCheck
       # go back until you find the tag_name
       tag_start = markup_start
       tag_start -= 1 while source[tag_start - 1] =~ WHITESPACE
-      tag_start -= @value.tag_name.size
+      tag_start -= tag_name.size
 
       # keep track of the error in line_number
       @line_number_offset = source[tag_start...markup_start].count("\n")
