@@ -16,7 +16,8 @@ module ThemeCheck
         in_stream: STDIN,
         out_stream: STDOUT,
         err_stream: STDERR,
-        should_raise_errors: false
+        should_raise_errors: false,
+        number_of_threads: 2
       )
         validate!([in_stream, out_stream, err_stream])
 
@@ -37,33 +38,90 @@ module ThemeCheck
         @out.sync = true # do not buffer
         @err.sync = true # do not buffer
 
+        # The queue holds the JSON RPC messages
+        @queue = Queue.new
+
+        # The JSON RPC thread pushes messages onto the queue
+        @json_rpc_thread = nil
+
+        # The handler threads read messages from the queue
+        @number_of_threads = number_of_threads
+        @handlers = []
+
+        # The messenger permits requests to be made from the handler
+        # to the language client and for those messages to be resolved in place.
+        @messenger = Messenger.new
+
+        # The error queue holds blocks the main thread. When filled, we exit the program.
+        @error = SizedQueue.new(1)
+
         @should_raise_errors = should_raise_errors
       end
 
       def listen
-        loop do
-          process_request
+        start_handler_threads
+        start_json_rpc_thread
+        status_code_from_error(@error.pop)
+      rescue SignalException
+        0
+      ensure
+        cleanup
+      end
 
-        # support ctrl+c and stuff
-        rescue SignalException, DoneStreaming
-          cleanup
-          return 0
-
-        rescue Exception => e # rubocop:disable Lint/RescueException
-          raise e if should_raise_errors
-          log(e)
-          log(e.backtrace)
-          return 1
+      def start_json_rpc_thread
+        @json_rpc_thread = Thread.new do
+          loop do
+            message = read_json_rpc_message
+            if message['method'] == 'initialize'
+              handle_message(message)
+            else
+              @queue << message
+            end
+          rescue Exception => e # rubocop:disable Lint/RescueException
+            break @error << e
+          end
         end
       end
 
-      def send_response(response)
-        response_body = JSON.dump(response)
-        log(JSON.pretty_generate(response)) if $DEBUG
+      def start_handler_threads
+        @number_of_threads.times do
+          @handlers << Thread.new do
+            loop do
+              message = @queue.pop
+              break if @queue.closed? && @queue.empty?
+              handle_message(message)
+            rescue Exception => e # rubocop:disable Lint/RescueException
+              break @error << e
+            end
+          end
+        end
+      end
 
-        @out.write("Content-Length: #{response_body.bytesize}\r\n")
+      def status_code_from_error(e)
+        raise e
+
+      # support ctrl+c and stuff
+      rescue SignalException, DoneStreaming
+        0
+
+      rescue Exception => e # rubocop:disable Lint/RescueException
+        raise e if should_raise_errors
+        log(e)
+        log(e.backtrace)
+        2
+      end
+
+      def request(&block)
+        @messenger.request(&block)
+      end
+
+      def send_message(message)
+        message_body = JSON.dump(message)
+        log(JSON.pretty_generate(message)) if $DEBUG
+
+        @out.write("Content-Length: #{message_body.bytesize}\r\n")
         @out.write("\r\n")
-        @out.write(response_body)
+        @out.write(message_body)
         @out.flush
       end
 
@@ -91,17 +149,23 @@ module ThemeCheck
         "one of the following: #{supported_io_classes.join(', ')}"
       end
 
-      def process_request
-        request_body = read_new_content
-        request_json = JSON.parse(request_body)
-        log(JSON.pretty_generate(request_json)) if $DEBUG
+      def read_json_rpc_message
+        message_body = read_new_content
+        message_json = JSON.parse(message_body)
+        log(JSON.pretty_generate(message_json)) if $DEBUG
+        message_json
+      end
 
-        id = request_json['id']
-        method_name = request_json['method']
-        params = request_json['params']
-        method_name = "on_#{to_snake_case(method_name)}"
+      def handle_message(message)
+        id = message['id']
+        method_name = message['method']
+        method_name &&= "on_#{to_snake_case(method_name)}"
+        params = message['params']
+        result = message['result']
 
-        if @handler.respond_to?(method_name)
+        if message.key?('result')
+          @messenger.respond(id, result)
+        elsif @handler.respond_to?(method_name)
           @handler.send(method_name, id, params)
         end
       end
@@ -128,26 +192,27 @@ module ThemeCheck
         length = initial_line.match(/Content-Length: (\d+)/)[1].to_i
         content = ''
         while content.length < length + 2
-          begin
-            # Why + 2? Because \r\n
-            content += @in.read(length + 2)
-          rescue => e
-            log(e)
-            log(e.backtrace)
-            # We have almost certainly been disconnected from the server
-            cleanup
-            raise DoneStreaming
-          end
+          # Why + 2? Because \r\n
+          content += @in.read(length + 2)
+          raise DoneStreaming if @in.closed?
         end
 
         content
       end
 
       def cleanup
+        # Stop listenting to RPC calls
+        @in.close unless @in.closed?
+        # Wait for rpc loop to close
+        @json_rpc_thread&.join if @json_rpc_thread&.alive?
+        # Close the queue
+        @queue.close unless @queue.closed?
+        # Give 10 seconds for the handlers to wrap up what they were
+        # doing/emptying the queue. 👀 unit tests.
+        @handlers.each { |thread| thread.join(10) if thread.alive? }
+      ensure
         @err.close
         @out.close
-      rescue
-        # I did my best
       end
     end
   end

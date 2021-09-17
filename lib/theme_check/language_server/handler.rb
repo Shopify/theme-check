@@ -24,10 +24,17 @@ module ThemeCheck
       def initialize(server)
         @server = server
         @diagnostics_tracker = DiagnosticsTracker.new
+        @diagnostics_lock = Mutex.new
+        @supports_progress = false
+      end
+
+      def supports_progress_notifications?
+        @supports_progress
       end
 
       def on_initialize(id, params)
         @root_path = root_path_from_params(params)
+        @supports_progress = params.dig('capabilities', 'window', 'workDoneProgress')
 
         # Tell the client we don't support anything if there's no rootPath
         return send_response(id, { capabilities: {} }) if @root_path.nil?
@@ -128,6 +135,8 @@ module ThemeCheck
       end
 
       def analyze_and_send_offenses(absolute_path)
+        return unless @diagnostics_lock.try_lock
+        token = send_create_work_done_progress_request
         config = config_for_path(absolute_path)
         storage = ThemeCheck::FileSystemStorage.new(
           config.root,
@@ -137,13 +146,17 @@ module ThemeCheck
         analyzer = ThemeCheck::Analyzer.new(theme, config.enabled_checks)
 
         if @diagnostics_tracker.first_run?
-          # Analyze the full theme on first run
+          send_work_done_progress_begin(token, "Full theme check")
           log("Checking #{config.root}")
           offenses = nil
           time = Benchmark.measure do
-            offenses = analyzer.analyze_theme
+            offenses = analyzer.analyze_theme do |path, i, total|
+              send_work_done_progress_report(token, "#{i}/#{total} #{path}", (i.to_f / total * 100.0).to_i)
+            end
           end
-          log("Found #{offenses.size} offenses in #{format("%0.2f", time.real)}s")
+          end_message = "Found #{offenses.size} offenses in #{format("%0.2f", time.real)}s"
+          log(end_message)
+          send_work_done_progress_end(token, end_message)
           send_diagnostics(offenses)
         else
           # Analyze selected files
@@ -152,14 +165,20 @@ module ThemeCheck
           # Skip if not a theme file
           if file
             log("Checking #{relative_path}")
+            send_work_done_progress_begin(token, "Partial theme check")
             offenses = nil
             time = Benchmark.measure do
-              offenses = analyzer.analyze_files([file])
+              offenses = analyzer.analyze_files([file]) do |path, i, total|
+                send_work_done_progress_report(token, "#{i}/#{total} #{path}", (i.to_f / total * 100.0).to_i)
+              end
             end
-            log("Found #{offenses.size} new offenses in #{format("%0.2f", time.real)}s")
+            end_message = "Found #{offenses.size} new offenses in #{format("%0.2f", time.real)}s"
+            send_work_done_progress_end(token, end_message)
+            log(end_message)
             send_diagnostics(offenses, [absolute_path])
           end
         end
+        @diagnostics_lock.unlock
       end
 
       def completions(relative_path, line, col)
@@ -228,9 +247,57 @@ module ThemeCheck
         }
       end
 
+      def send_create_work_done_progress_request
+        return unless supports_progress_notifications?
+        token = nil
+        @server.request do |id|
+          token = id # we'll reuse the RQID as token
+          send_message({
+            id: id,
+            method: "window/workDoneProgress/create",
+            params: {
+              token: id,
+            },
+          })
+        end
+        token
+      end
+
+      def send_work_done_progress_begin(token, title)
+        return unless supports_progress_notifications?
+        send_progress(token, {
+          kind: 'begin',
+          title: title,
+          cancellable: false,
+          percentage: 0,
+        })
+      end
+
+      def send_work_done_progress_report(token, message, percentage)
+        return unless supports_progress_notifications?
+        send_progress(token, {
+          kind: 'report',
+          message: message,
+          cancellable: false,
+          percentage: percentage,
+        })
+      end
+
+      def send_work_done_progress_end(token, message)
+        return unless supports_progress_notifications?
+        send_progress(token, {
+          kind: 'end',
+          message: message,
+        })
+      end
+
+      def send_progress(token, value)
+        send_notification("$/progress", token: token, value: value)
+      end
+
       def send_message(message)
         message[:jsonrpc] = '2.0'
-        @server.send_response(message)
+        @server.send_message(message)
       end
 
       def send_response(id, result = nil, error = nil)
@@ -238,6 +305,15 @@ module ThemeCheck
         message[:result] = result if result
         message[:error] = error if error
         send_message(message)
+      end
+
+      def send_request(method, params = nil)
+        @server.request do |id|
+          message = { id: id }
+          message[:method] = method
+          message[:params] = params if params
+          send_message(message)
+        end
       end
 
       def send_notification(method, params)

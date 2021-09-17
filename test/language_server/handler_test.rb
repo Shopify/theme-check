@@ -74,7 +74,7 @@ module ThemeCheck
         @responses = []
       end
 
-      def send_response(hash)
+      def send_message(hash)
         @responses << hash
       end
 
