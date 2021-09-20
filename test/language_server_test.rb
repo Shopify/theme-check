@@ -14,7 +14,8 @@ class LanguageServerTest < Minitest::Test
       in_stream: @in,
       out_stream: @out,
       err_stream: @err,
-      should_raise_errors: true
+      should_raise_errors: true,
+      number_of_threads: 1
     )
   end
 
@@ -53,6 +54,7 @@ class LanguageServerTest < Minitest::Test
 
   # Stringify keys
   CAPABILITIES = JSON.parse(JSON.generate(ThemeCheck::LanguageServer::Handler::CAPABILITIES))
+  SERVER_INFO = JSON.parse(JSON.generate(ThemeCheck::LanguageServer::Handler::SERVER_INFO))
 
   def test_sends_offenses_on_open
     storage = make_file_system_storage("layout/theme.liquid" => "")
@@ -80,9 +82,6 @@ class LanguageServerTest < Minitest::Test
           "version" => 1,
         },
       },
-    }, {
-      "jsonrpc" => "2.0",
-      "method" => "exit",
     })
 
     assert_responses({
@@ -90,6 +89,7 @@ class LanguageServerTest < Minitest::Test
       "id" => "123",
       "result" => {
         "capabilities" => CAPABILITIES,
+        "serverInfo" => SERVER_INFO,
       },
     }, {
       "jsonrpc" => "2.0",
@@ -142,9 +142,6 @@ class LanguageServerTest < Minitest::Test
           "version" => 1,
         },
       },
-    }, {
-      "jsonrpc" => "2.0",
-      "method" => "exit",
     })
 
     assert_responses({
@@ -152,6 +149,7 @@ class LanguageServerTest < Minitest::Test
       "id" => "123",
       "result" => {
         "capabilities" => CAPABILITIES,
+        "serverInfo" => SERVER_INFO,
       },
     }, {
       "jsonrpc" => "2.0",
@@ -204,9 +202,6 @@ class LanguageServerTest < Minitest::Test
           "version" => 1,
         },
       },
-    }, {
-      "jsonrpc" => "2.0",
-      "method" => "exit",
     })
 
     assert_includes(@err.string, "Checking #{storage.path('src')}")
@@ -245,9 +240,6 @@ class LanguageServerTest < Minitest::Test
           "uri" => file_uri(storage.path('layout/theme.liquid')),
         },
       },
-    }, {
-      "jsonrpc" => "2.0",
-      "method" => "exit",
     })
 
     assert_responses_include({
@@ -306,9 +298,6 @@ class LanguageServerTest < Minitest::Test
           "uri" => file_uri(storage.path('src/theme/layout/theme.liquid')),
         },
       },
-    }, {
-      "jsonrpc" => "2.0",
-      "method" => "exit",
     })
 
     assert_responses_include({
@@ -367,9 +356,6 @@ class LanguageServerTest < Minitest::Test
           "version" => 1,
         },
       },
-    }, {
-      "jsonrpc" => "2.0",
-      "method" => "exit",
     })
 
     assert_responses({
@@ -377,6 +363,7 @@ class LanguageServerTest < Minitest::Test
       "id" => "123",
       "result" => {
         "capabilities" => CAPABILITIES,
+        "serverInfo" => SERVER_INFO,
       },
     }, {
       # After first save, one offense
@@ -474,9 +461,6 @@ class LanguageServerTest < Minitest::Test
           "uri" => file_uri(storage.path('path with spaces/layout/theme.liquid')),
         },
       },
-    }, {
-      "jsonrpc" => "2.0",
-      "method" => "exit",
     })
 
     assert_responses_include({
@@ -501,6 +485,10 @@ class LanguageServerTest < Minitest::Test
   private
 
   def send_messages(*messages)
+    messages << {
+      "jsonrpc" => "2.0",
+      "method" => "exit",
+    }
     messages.each do |message|
       default = {
         jsonrpc: "2.0",
@@ -525,23 +513,6 @@ class LanguageServerTest < Minitest::Test
     actual_responses
   end
 
-  def assert_responses(*expected_responses)
-    actual_responses = responses
-    expected_responses.each do |response|
-      actual_response = actual_responses.shift
-      assert_equal(response, actual_response, <<~ERR)
-        Expected response:
-
-        #{JSON.pretty_generate(response)}
-
-        Actual response:
-
-        #{JSON.pretty_generate(actual_response)}
-
-      ERR
-    end
-  end
-
   def assert_responses_include(*expected_responses)
     actual_responses = responses
     expected_responses.each do |response|
@@ -560,4 +531,5 @@ class LanguageServerTest < Minitest::Test
       )
     end
   end
+  alias_method :assert_responses, :assert_responses_include
 end

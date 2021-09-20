@@ -31,6 +31,7 @@ module ThemeCheck
           id: 1,
           result: {
             capabilities: Handler::CAPABILITIES,
+            serverInfo: Handler::SERVER_INFO,
           },
         })
       end
@@ -42,6 +43,7 @@ module ThemeCheck
           id: 1,
           result: {
             capabilities: Handler::CAPABILITIES,
+            serverInfo: Handler::SERVER_INFO,
           },
         })
       end
@@ -74,7 +76,7 @@ module ThemeCheck
         @responses = []
       end
 
-      def send_response(hash)
+      def send_message(hash)
         @responses << hash
       end
 
