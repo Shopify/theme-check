@@ -31,6 +31,7 @@ module ThemeCheck
           id: 1,
           result: {
             capabilities: Handler::CAPABILITIES,
+            serverInfo: Handler::SERVER_INFO,
           },
         })
       end
@@ -42,6 +43,7 @@ module ThemeCheck
           id: 1,
           result: {
             capabilities: Handler::CAPABILITIES,
+            serverInfo: Handler::SERVER_INFO,
           },
         })
       end

@@ -7,6 +7,11 @@ module ThemeCheck
     class Handler
       include URIHelper
 
+      SERVER_INFO = {
+        name: $PROGRAM_NAME,
+        version: ThemeCheck::VERSION,
+      }
+
       CAPABILITIES = {
         completionProvider: {
           triggerCharacters: ['.', '{{ ', '{% '],
@@ -44,6 +49,7 @@ module ThemeCheck
         # https://microsoft.github.io/language-server-protocol/specifications/specification-current/#responseMessage
         send_response(id, {
           capabilities: CAPABILITIES,
+          serverInfo: SERVER_INFO,
         })
       end
 

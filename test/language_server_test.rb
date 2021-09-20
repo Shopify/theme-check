@@ -54,6 +54,7 @@ class LanguageServerTest < Minitest::Test
 
   # Stringify keys
   CAPABILITIES = JSON.parse(JSON.generate(ThemeCheck::LanguageServer::Handler::CAPABILITIES))
+  SERVER_INFO = JSON.parse(JSON.generate(ThemeCheck::LanguageServer::Handler::SERVER_INFO))
 
   def test_sends_offenses_on_open
     storage = make_file_system_storage("layout/theme.liquid" => "")
@@ -88,6 +89,7 @@ class LanguageServerTest < Minitest::Test
       "id" => "123",
       "result" => {
         "capabilities" => CAPABILITIES,
+        "serverInfo" => SERVER_INFO,
       },
     }, {
       "jsonrpc" => "2.0",
@@ -147,6 +149,7 @@ class LanguageServerTest < Minitest::Test
       "id" => "123",
       "result" => {
         "capabilities" => CAPABILITIES,
+        "serverInfo" => SERVER_INFO,
       },
     }, {
       "jsonrpc" => "2.0",
@@ -360,6 +363,7 @@ class LanguageServerTest < Minitest::Test
       "id" => "123",
       "result" => {
         "capabilities" => CAPABILITIES,
+        "serverInfo" => SERVER_INFO,
       },
     }, {
       # After first save, one offense
