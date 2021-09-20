@@ -1,4 +1,13 @@
 
+v1.7.0 / 2021-09-20
+===================
+
+### Features
+
+  * Handle LSP messages concurrently in the Language Server ([#459](https://github.com/shopify/theme-check/issues/459))
+    * Adds progress reporting while checking (:eyes: VS Code status bar)
+    * Makes completions work while checking (more noticeable on Windows since ruby is 3x slower on Windows)
+
 v1.6.2 / 2021-09-16
 ===================
 
