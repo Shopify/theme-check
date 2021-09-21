@@ -1,17 +1,5 @@
 # frozen_string_literal: true
 module ThemeCheck
-  module SystemTranslations
-    extend self
-
-    def translations
-      @translations ||= YAML.load(File.read("#{__dir__}/../../../data/shopify_translation_keys.yml")).to_set
-    end
-
-    def include?(key)
-      translations.include?(key)
-    end
-  end
-
   class TranslationKeyExists < LiquidCheck
     severity :error
     category :translation
@@ -24,7 +12,7 @@ module ThemeCheck
       return unless (key_node = node.children.first)
       return unless key_node.value.is_a?(String)
 
-      unless key_exists?(key_node.value) || SystemTranslations.include?(key_node.value)
+      unless key_exists?(key_node.value) || ShopifyLiquid::SystemTranslations.include?(key_node.value)
         add_offense(
           "'#{key_node.value}' does not have a matching entry in '#{@theme.default_locale_json.relative_path}'",
           node: node,

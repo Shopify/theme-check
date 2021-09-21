@@ -148,4 +148,30 @@ class MatchingTranslationsTest < Minitest::Test
 
     assert_offenses("", offenses)
   end
+
+  def test_ignore_shopify_provided
+    offenses = analyze_theme(
+      ThemeCheck::MatchingTranslations.new,
+      "locales/en.default.json" => JSON.dump(
+        hello: "Hello",
+        shopify: {
+          checkout: {
+            general: {
+              page_title: 'Checkout',
+            },
+          },
+        },
+      ),
+      "locales/fr.json" => JSON.dump(
+        hello: "Bonjour",
+        shopify: {
+          sentence: {
+            words_connector: "hello world",
+          },
+        },
+      ),
+    )
+
+    assert_offenses("", offenses)
+  end
 end
