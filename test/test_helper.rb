@@ -202,5 +202,41 @@ module Minitest
         # Ignore, too noisy
       end
     end
+
+    class MockMessenger < ThemeCheck::LanguageServer::Messenger
+      attr_accessor :logs, :sent_messages
+      attr_writer :supports_work_done_progress
+
+      def initialize
+        @logs = []
+        @sent_messages = []
+        @supports_work_done_progress = false
+        @queue = Queue.new
+      end
+
+      def read_message
+        @queue.pop
+      ensure
+        raise ThemeCheck::LanguageServer::DoneStreaming if @queue.closed?
+      end
+
+      def send_message(message_body)
+        @sent_messages << JSON.parse(message_body, symbolize_names: true)
+      end
+
+      def log(s)
+        logs << s
+      end
+
+      def close_input
+        @queue.close
+      end
+
+      def close_output; end
+
+      def send_mock_message(message)
+        @queue << message
+      end
+    end
   end
 end

@@ -8,14 +8,15 @@ module ThemeCheck
       include URIHelper
 
       def setup
-        @server = MockServer.new
-        @handler = Handler.new(@server)
+        @mock_messenger = MockMessenger.new
+        @bridge = Bridge.new(@mock_messenger)
+        @handler = Handler.new(@bridge)
         @storage = make_file_system_storage("layout/theme.liquid" => "<html>hello world</html>")
       end
 
       def test_handle_initialize_no_path
         initialize!(1, nil, nil)
-        assert_includes(@server.responses, {
+        assert_includes(@mock_messenger.sent_messages, {
           jsonrpc: "2.0",
           id: 1,
           result: {
@@ -26,7 +27,7 @@ module ThemeCheck
 
       def test_handle_initialize_with_root_uri
         initialize!(1, @storage.root)
-        assert_includes(@server.responses, {
+        assert_includes(@mock_messenger.sent_messages, {
           jsonrpc: "2.0",
           id: 1,
           result: {
@@ -38,7 +39,7 @@ module ThemeCheck
 
       def test_handle_initialize_with_root_path
         initialize!(1, nil, @storage.root)
-        assert_includes(@server.responses, {
+        assert_includes(@mock_messenger.sent_messages, {
           jsonrpc: "2.0",
           id: 1,
           result: {
@@ -65,23 +66,6 @@ module ThemeCheck
           "rootUri" => root_uri_path.nil? ? nil : file_uri(root_uri_path),
           "rootPath" => root_path,
         })
-      end
-    end
-
-    class MockServer
-      attr_accessor :strings, :responses
-
-      def initialize
-        @strings = []
-        @responses = []
-      end
-
-      def send_message(hash)
-        @responses << hash
-      end
-
-      def log(s)
-        strings << s
       end
     end
   end

@@ -11,6 +11,10 @@ module ThemeCheck
       @files = {}
     end
 
+    def relative_path(absolute_path)
+      Pathname.new(absolute_path).relative_path_from(@root).to_s
+    end
+
     def path(relative_path)
       @root.join(relative_path)
     end
