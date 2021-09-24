@@ -29,5 +29,11 @@ module ThemeCheck
       refute(asset.gzipped_size)
       refute(asset.content)
     end
+
+    def test_handles_eaddr_not_avail_errors
+      asset = RemoteAssetFile.from_src("https://localhost:0/packs/embed.js")
+      assert(asset.gzipped_size == 0)
+      assert(asset.content.empty?)
+    end
   end
 end
