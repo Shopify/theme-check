@@ -22,6 +22,7 @@ module ThemeCheck
     Errno::EAGAIN,
     Errno::EHOSTUNREACH,
     Errno::ENETUNREACH,
+    Errno::EADDRNOTAVAIL,
   ]
 
   NET_HTTP_EXCEPTIONS = [
