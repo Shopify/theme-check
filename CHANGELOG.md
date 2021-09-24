@@ -1,4 +1,9 @@
 
+v1.7.2 / 2021-09-24
+===================
+
+  * Fixup a multithreading problem with our IO Messenger (regression from 1.7.1) ([#468](https://github.com/shopify/theme-check/issues/468))
+
 v1.7.1 / 2021-09-24
 ===================
 
