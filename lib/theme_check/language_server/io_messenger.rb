@@ -25,6 +25,9 @@ module ThemeCheck
 
         @out.sync = true # do not buffer
         @err.sync = true # do not buffer
+
+        # Lock for writing, otherwise messages might be interspersed.
+        @writer = Mutex.new
       end
 
       def read_message
@@ -40,10 +43,12 @@ module ThemeCheck
       end
 
       def send_message(message_body)
-        @out.write("Content-Length: #{message_body.bytesize}\r\n")
-        @out.write("\r\n")
-        @out.write(message_body)
-        @out.flush
+        @writer.synchronize do
+          @out.write("Content-Length: #{message_body.bytesize}\r\n")
+          @out.write("\r\n")
+          @out.write(message_body)
+          @out.flush
+        end
       end
 
       def log(message)
