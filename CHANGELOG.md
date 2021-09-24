@@ -1,4 +1,11 @@
 
+v1.7.1 / 2021-09-24
+===================
+
+  * Handle Errno::EADDRNOTAVAIL in RemoteAsset ([#465](https://github.com/shopify/theme-check/issues/465))
+  * Complete end tags ([#277](https://github.com/shopify/theme-check/issues/277))
+  * Do not flag shopify translations as missing or extra ([#407](https://github.com/shopify/theme-check/issues/407))
+
 v1.7.0 / 2021-09-20
 ===================
 
