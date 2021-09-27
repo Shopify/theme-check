@@ -40,6 +40,8 @@ module ThemeCheck
           content += chunk
         end
         content.lstrip!
+      rescue IOError
+        raise DoneStreaming
       end
 
       def send_message(message_body)

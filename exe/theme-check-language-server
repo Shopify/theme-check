@@ -3,9 +3,5 @@
 
 require 'theme_check'
 
-if ENV["THEME_CHECK_DEBUG"] == "true"
-  $DEBUG = true
-end
-
 status_code = ThemeCheck::LanguageServer.start
 exit! status_code

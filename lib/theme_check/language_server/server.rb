@@ -37,7 +37,7 @@ module ThemeCheck
         @handlers = []
 
         # The error queue holds blocks the main thread. When filled, we exit the program.
-        @error = SizedQueue.new(1)
+        @error = SizedQueue.new(number_of_threads)
 
         @should_raise_errors = should_raise_errors
       end
@@ -94,8 +94,7 @@ module ThemeCheck
 
       rescue Exception => e # rubocop:disable Lint/RescueException
         raise e if should_raise_errors
-        @bridge.log(e)
-        @bridge.log(e.backtrace)
+        @bridge.log("#{e.class}: #{e.message}\n#{e.backtrace.join("\n")}")
         2
       end
 
@@ -110,6 +109,15 @@ module ThemeCheck
         if @handler.respond_to?(method_name)
           @handler.send(method_name, id, params)
         end
+
+      rescue DoneStreaming => e
+        raise e
+      rescue StandardError => e
+        is_request = id
+        raise e unless is_request
+        # Errors obtained in request handlers should be sent
+        # back as internal errors instead of closing the program.
+        @bridge.send_internal_error(id, e)
       end
 
       def handle_response(message)
@@ -135,7 +143,16 @@ module ThemeCheck
 
         # Hijack the status_code if an error occurred while cleaning up.
         # 👀 unit tests.
-        return status_code_from_error(@error.pop) unless @error.empty?
+        until @error.empty?
+          code = status_code_from_error(@error.pop)
+          # Promote the status_code to ERROR if one of the threads
+          # resulted in an error, otherwise leave the status_code as
+          # is. That's because one thread could end successfully in a
+          # DoneStreaming error while the other failed with an
+          # internal error. If we had an internal error, we should
+          # return with a status_code that fits.
+          status_code = code if code > status_code
+        end
         status_code
       ensure
         @messenger.close_output

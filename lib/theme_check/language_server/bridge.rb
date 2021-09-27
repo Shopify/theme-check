@@ -38,14 +38,14 @@ module ThemeCheck
       def read_message
         message_body = @messenger.read_message
         message_json = JSON.parse(message_body)
-        @messenger.log(JSON.pretty_generate(message_json)) if $DEBUG
+        @messenger.log(JSON.pretty_generate(message_json)) if ThemeCheck.debug?
         message_json
       end
 
       def send_message(message_hash)
         message_hash[:jsonrpc] = '2.0'
         message_body = JSON.dump(message_hash)
-        @messenger.log(JSON.pretty_generate(message_hash)) if $DEBUG
+        @messenger.log(JSON.pretty_generate(message_hash)) if ThemeCheck.debug?
         @messenger.send_message(message_body)
       end
 
@@ -68,9 +68,23 @@ module ThemeCheck
       # https://microsoft.github.io/language-server-protocol/specifications/specification-current/#responseMessage
       def send_response(id, result = nil, error = nil)
         message = { id: id }
-        message[:result] = result if result
-        message[:error] = error if error
+        if error
+          message[:error] = error
+        else
+          message[:result] = result
+        end
         send_message(message)
+      end
+
+      # https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#responseError
+      def send_internal_error(id, e)
+        send_response(id, nil, {
+          code: ErrorCodes::INTERNAL_ERROR,
+          message: <<~EOS,
+            #{e.class}: #{e.message}
+              #{e.backtrace.join("\n  ")}
+          EOS
+        })
       end
 
       # https://microsoft.github.io/language-server-protocol/specifications/specification-current/#notificationMessage

@@ -47,10 +47,13 @@ module ThemeCheck
         })
       end
 
+      def on_shutdown(id, _params)
+        @bridge.send_response(id, nil)
+      end
+
       def on_exit(_id, _params)
         close!
       end
-      alias_method :on_shutdown, :on_exit
 
       def on_text_document_did_change(_id, params)
         relative_path = relative_path_from_text_document_uri(params)
