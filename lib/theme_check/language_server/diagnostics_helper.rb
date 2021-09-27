@@ -40,11 +40,11 @@ module ThemeCheck
         def range(offense)
           {
             start: {
-              line: offense.start_line,
+              line: offense.start_row,
               character: offense.start_column,
             },
             end: {
-              line: offense.end_line,
+              line: offense.end_row,
               character: offense.end_column,
             },
           }

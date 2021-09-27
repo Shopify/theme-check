@@ -85,7 +85,7 @@ module ThemeCheck
       @position.start_index
     end
 
-    def start_line
+    def start_row
       @position.start_row
     end
 
@@ -97,7 +97,7 @@ module ThemeCheck
       @position.end_index
     end
 
-    def end_line
+    def end_row
       @position.end_row
     end
 
@@ -211,9 +211,9 @@ module ThemeCheck
         check: check.code_name,
         path: theme_file&.relative_path,
         severity: check.severity_value,
-        start_line: start_line,
+        start_row: start_row,
         start_column: start_column,
-        end_line: end_line,
+        end_row: end_row,
         end_column: end_column,
         message: message,
       }

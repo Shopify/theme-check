@@ -73,8 +73,8 @@ class OffenseTest < Minitest::Test
       markup: "1 + 2",
     )
     offense = ThemeCheck::Offense.new(check: Bogus.new, node: node)
-    assert_equal(1, offense.start_line)
-    assert_equal(1, offense.end_line)
+    assert_equal(1, offense.start_row)
+    assert_equal(1, offense.end_row)
     assert_equal(5, offense.start_column)
     assert_equal(10, offense.end_column)
   end
@@ -86,9 +86,9 @@ class OffenseTest < Minitest::Test
       markup: "render 'product-card',\n  product: product,\n  show: true",
     )
     offense = ThemeCheck::Offense.new(check: Bogus.new, node: node)
-    assert_equal(0, offense.start_line)
+    assert_equal(0, offense.start_row)
     assert_equal(3, offense.start_column)
-    assert_equal(2, offense.end_line)
+    assert_equal(2, offense.end_row)
     assert_equal(12, offense.end_column)
   end
 
@@ -100,9 +100,9 @@ class OffenseTest < Minitest::Test
       markup: markup
     )
     offense = ThemeCheck::Offense.new(check: Bogus.new, node: node)
-    assert_equal(0, offense.start_line)
+    assert_equal(0, offense.start_row)
     assert_equal(3, offense.start_column)
-    assert_equal(5, offense.end_line)
+    assert_equal(5, offense.end_row)
     assert_equal(0, offense.end_column)
   end
 
@@ -114,9 +114,9 @@ class OffenseTest < Minitest::Test
       markup: markup
     )
     offense = ThemeCheck::Offense.new(check: Bogus.new, node: node)
-    assert_equal(0, offense.start_line)
+    assert_equal(0, offense.start_row)
     assert_equal(3, offense.start_column)
-    assert_equal(3, offense.end_line)
+    assert_equal(3, offense.end_row)
     assert_equal(18, offense.end_column)
   end
 
@@ -127,8 +127,8 @@ class OffenseTest < Minitest::Test
       markup: nil,
     )
     offense = ThemeCheck::Offense.new(check: Bogus.new, node: node)
-    assert_equal(0, offense.start_line)
-    assert_equal(0, offense.end_line)
+    assert_equal(0, offense.start_row)
+    assert_equal(0, offense.end_row)
     assert_equal(0, offense.start_column)
     assert_equal(3, offense.end_column)
   end

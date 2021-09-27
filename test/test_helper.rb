@@ -90,9 +90,9 @@ module Minitest
     def assert_offenses(output, offenses)
       # Making sure nothing blows up in the language_server
       offenses.each do |offense|
-        assert(offense.start_line)
+        assert(offense.start_row)
         assert(offense.start_column)
-        assert(offense.end_line)
+        assert(offense.end_row)
         assert(offense.end_column)
       end
 
@@ -107,9 +107,9 @@ module Minitest
     def assert_offenses_with_range(output, offenses)
       # Making sure nothing blows up in the language_server
       offenses.each do |offense|
-        assert(offense.start_line)
+        assert(offense.start_row)
         assert(offense.start_column)
-        assert(offense.end_line)
+        assert(offense.end_row)
         assert(offense.end_column)
       end
 

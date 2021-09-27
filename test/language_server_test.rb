@@ -22,8 +22,8 @@ class LanguageServerTest < Minitest::Test
     :theme_file,
     :start_column,
     :end_column,
-    :start_line,
-    :end_line,
+    :start_row,
+    :end_row,
     :doc,
     :whole_theme?,
   ) do
