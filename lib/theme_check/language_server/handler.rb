@@ -77,14 +77,14 @@ module ThemeCheck
 
       def on_text_document_document_link(id, params)
         relative_path = relative_path_from_text_document_uri(params)
-        @bridge.send_response(id, document_links(relative_path))
+        @bridge.send_response(id, @document_link_engine.document_links(relative_path))
       end
 
       def on_text_document_completion(id, params)
         relative_path = relative_path_from_text_document_uri(params)
         line = params.dig('position', 'line')
         col = params.dig('position', 'character')
-        @bridge.send_response(id, completions(relative_path, line, col))
+        @bridge.send_response(id, @completion_engine.completions(relative_path, line, col))
       end
 
       private
@@ -142,14 +142,6 @@ module ThemeCheck
           absolute_path,
           config_for_path(absolute_path)
         )
-      end
-
-      def completions(relative_path, line, col)
-        @completion_engine.completions(relative_path, line, col)
-      end
-
-      def document_links(relative_path)
-        @document_link_engine.document_links(relative_path)
       end
 
       def log(message)
