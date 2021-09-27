@@ -139,9 +139,9 @@ module ThemeCheck
       !!correction
     end
 
-    def correct
+    def correct(corrector = nil)
       if correctable?
-        corrector = Corrector.new(theme_file: theme_file)
+        corrector ||= Corrector.new(theme_file: theme_file)
         correction.call(corrector)
       end
     rescue => e
