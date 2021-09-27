@@ -110,6 +110,15 @@ module ThemeCheck
         if @handler.respond_to?(method_name)
           @handler.send(method_name, id, params)
         end
+
+      rescue DoneStreaming => e
+        raise e
+      rescue StandardError => e
+        is_request = id
+        raise e unless is_request
+        # Errors obtained in request handlers should be sent
+        # back as internal errors instead of closing the program.
+        @bridge.send_internal_error(id, e)
       end
 
       def handle_response(message)
