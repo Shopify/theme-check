@@ -37,5 +37,9 @@ module ThemeCheck
       FULL = 1
       INCREMENTAL = 2
     end
+
+    module ErrorCodes
+      INTERNAL_ERROR = -32603
+    end
   end
 end

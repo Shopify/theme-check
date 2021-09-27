@@ -76,6 +76,17 @@ module ThemeCheck
         send_message(message)
       end
 
+      # https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#responseError
+      def send_internal_error(id, e)
+        send_response(id, nil, {
+          code: ErrorCodes::INTERNAL_ERROR,
+          message: <<~EOS,
+            #{e.class}: #{e.message}
+              #{e.backtrace.join("\n  ")}
+          EOS
+        })
+      end
+
       # https://microsoft.github.io/language-server-protocol/specifications/specification-current/#notificationMessage
       def send_notification(method, params)
         message = { method: method }
