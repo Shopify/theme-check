@@ -68,8 +68,11 @@ module ThemeCheck
       # https://microsoft.github.io/language-server-protocol/specifications/specification-current/#responseMessage
       def send_response(id, result = nil, error = nil)
         message = { id: id }
-        message[:result] = result if result
-        message[:error] = error if error
+        if error
+          message[:error] = error
+        else
+          message[:result] = result
+        end
         send_message(message)
       end
 
