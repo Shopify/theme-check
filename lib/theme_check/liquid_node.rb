@@ -70,8 +70,24 @@ module ThemeCheck
       position.start_index
     end
 
+    def start_row
+      position.start_row
+    end
+
+    def start_column
+      position.start_column
+    end
+
     def end_index
       position.end_index
+    end
+
+    def end_row
+      position.end_row
+    end
+
+    def end_column
+      position.end_column
     end
 
     def start_token_index

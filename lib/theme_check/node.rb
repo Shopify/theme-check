@@ -30,7 +30,23 @@ module ThemeCheck
       raise NotImplementedError
     end
 
+    def start_row
+      raise NotImplementedError
+    end
+
+    def start_column
+      raise NotImplementedError
+    end
+
     def end_index
+      raise NotImplementedError
+    end
+
+    def end_row
+      raise NotImplementedError
+    end
+
+    def end_column
       raise NotImplementedError
     end
   end
