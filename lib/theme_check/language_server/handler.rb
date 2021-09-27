@@ -38,9 +38,10 @@ module ThemeCheck
 
         @bridge.supports_work_done_progress = params.dig('capabilities', 'window', 'workDoneProgress') || false
         @storage = in_memory_storage(@root_path)
+        @diagnostics_tracker = DiagnosticsTracker.new
         @completion_engine = CompletionEngine.new(@storage)
         @document_link_engine = DocumentLinkEngine.new(@storage)
-        @diagnostics_engine = DiagnosticsEngine.new(@bridge)
+        @diagnostics_engine = DiagnosticsEngine.new(@bridge, @diagnostics_tracker)
         @bridge.send_response(id, {
           capabilities: CAPABILITIES,
           serverInfo: SERVER_INFO,

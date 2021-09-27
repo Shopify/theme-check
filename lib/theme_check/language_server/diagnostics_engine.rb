@@ -6,9 +6,9 @@ module ThemeCheck
       include URIHelper
       include DiagnosticsHelper
 
-      def initialize(bridge)
+      def initialize(bridge, diagnostics_tracker = DiagnosticsTracker.new)
         @diagnostics_lock = Mutex.new
-        @diagnostics_tracker = DiagnosticsTracker.new
+        @diagnostics_tracker = diagnostics_tracker
         @bridge = bridge
         @token = 0
       end
