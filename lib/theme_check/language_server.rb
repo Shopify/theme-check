@@ -9,6 +9,7 @@ require_relative "language_server/uri_helper"
 require_relative "language_server/server"
 require_relative "language_server/tokens"
 require_relative "language_server/variable_lookup_finder"
+require_relative "language_server/diagnostics_helper"
 require_relative "language_server/diagnostics_tracker"
 require_relative "language_server/diagnostics_engine"
 
