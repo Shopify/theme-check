@@ -51,6 +51,10 @@ Encoding.default_external = Encoding::UTF_8
 Encoding.default_internal = Encoding::UTF_8
 
 module ThemeCheck
+  def self.debug?
+    ENV["THEME_CHECK_DEBUG"] == "true"
+  end
+
   def self.with_liquid_c_disabled
     if defined?(Liquid::C)
       was_enabled = Liquid::C.enabled

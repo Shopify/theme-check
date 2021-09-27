@@ -38,14 +38,14 @@ module ThemeCheck
       def read_message
         message_body = @messenger.read_message
         message_json = JSON.parse(message_body)
-        @messenger.log(JSON.pretty_generate(message_json)) if $DEBUG
+        @messenger.log(JSON.pretty_generate(message_json)) if ThemeCheck.debug?
         message_json
       end
 
       def send_message(message_hash)
         message_hash[:jsonrpc] = '2.0'
         message_body = JSON.dump(message_hash)
-        @messenger.log(JSON.pretty_generate(message_hash)) if $DEBUG
+        @messenger.log(JSON.pretty_generate(message_hash)) if ThemeCheck.debug?
         @messenger.send_message(message_body)
       end
 
