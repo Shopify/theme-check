@@ -35,4 +35,12 @@ module ThemeCheck
       Server.new(messenger: IOMessenger.new).listen
     end
   end
+
+  # Augment Offense with helper to create diagnostics.
+  # We don't need that in core.
+  class Offense
+    def to_diagnostic
+      @diagnostic ||= LanguageServer::DiagnosticsHelper.offense_to_diagnostic(self)
+    end
+  end
 end
