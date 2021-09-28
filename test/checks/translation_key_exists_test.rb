@@ -39,6 +39,25 @@ class TranslationKeyExistsTest < Minitest::Test
     assert_offenses("", offenses)
   end
 
+  def test_ignores_key_included_in_schema
+    offenses = analyze_theme(
+      ThemeCheck::TranslationKeyExists.new,
+      "sections/product.liquid" => <<~END,
+        {{"submit" | t}}
+        {% schema %}
+          {
+            "locales": {
+              "en": {
+                "submit": "Subscribe"
+              }
+            }
+          }
+        {% endschema %}
+      END
+    )
+    assert_offenses("", offenses)
+  end
+
   def test_reports_unknown_key
     offenses = analyze_theme(
       ThemeCheck::TranslationKeyExists.new,
