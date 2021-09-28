@@ -81,6 +81,10 @@ module ThemeCheck
       end
     end
 
+    def range
+      @range ||= (start_index...end_index) # end_index is excluded
+    end
+
     def start_index
       @position.start_index
     end
