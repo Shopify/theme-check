@@ -18,6 +18,11 @@ module ThemeCheck
       @relative_pathname ||= Pathname.new(@relative_path)
     end
 
+    def version
+      return unless @storage.respond_to?('version')
+      @storage.version(@relative_path)
+    end
+
     def name
       relative_path.sub_ext('').to_s
     end

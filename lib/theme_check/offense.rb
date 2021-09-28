@@ -121,6 +121,10 @@ module ThemeCheck
       StringHelpers.demodulize(check.class.name)
     end
 
+    def version
+      theme_file&.version
+    end
+
     def doc
       check.doc
     end

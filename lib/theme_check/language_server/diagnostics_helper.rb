@@ -4,6 +4,8 @@ module ThemeCheck
   module LanguageServer
     module DiagnosticsHelper
       class << self
+        include URIHelper
+
         def offense_to_diagnostic(offense)
           diagnostic = {
             code: offense.code_name,
@@ -11,8 +13,9 @@ module ThemeCheck
             range: range(offense),
             severity: severity(offense),
             source: "theme-check",
+            data: data(offense),
           }
-          diagnostic["codeDescription"] = code_description(offense) unless offense.doc.nil?
+          diagnostic[:codeDescription] = code_description(offense) unless offense.doc.nil?
           diagnostic
         end
 
@@ -47,6 +50,15 @@ module ThemeCheck
               line: offense.end_row,
               character: offense.end_column,
             },
+          }
+        end
+
+        def data(offense)
+          path = offense&.theme_file&.path
+          {
+            path: path,
+            uri: path && file_uri(path),
+            version: offense&.version,
           }
         end
       end

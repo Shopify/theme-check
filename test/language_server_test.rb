@@ -5,9 +5,10 @@ require "test_helper"
 class LanguageServerTest < Minitest::Test
   include ThemeCheck::LanguageServer::URIHelper
 
+  DiagnosticsHelper = ThemeCheck::LanguageServer::DiagnosticsHelper
+
   def setup
     @messenger = MockMessenger.new
-
     @server = ThemeCheck::LanguageServer::Server.new(
       messenger: @messenger,
       should_raise_errors: true,
@@ -26,6 +27,7 @@ class LanguageServerTest < Minitest::Test
     :end_row,
     :doc,
     :whole_theme?,
+    :version,
   ) do
     def single_file?
       !whole_theme?
@@ -43,6 +45,7 @@ class LanguageServerTest < Minitest::Test
         9,
         "https://path.to/docs.md",
         true,
+        0,
       )
     end
   end
@@ -54,9 +57,8 @@ class LanguageServerTest < Minitest::Test
 
   def test_sends_offenses_on_open
     storage = make_file_system_storage("layout/theme.liquid" => "")
-    ThemeCheck::Analyzer.any_instance.stubs(:offenses).returns([
-      OffenseMock.build(storage.path("layout/theme.liquid")),
-    ])
+    offense = OffenseMock.build(storage.path("layout/theme.liquid"))
+    ThemeCheck::Analyzer.any_instance.stubs(:offenses).returns([offense])
 
     send_messages({
       jsonrpc: "2.0",
@@ -93,35 +95,15 @@ class LanguageServerTest < Minitest::Test
       method: "textDocument/publishDiagnostics",
       params: {
         uri: file_uri(storage.path('layout/theme.liquid')),
-        diagnostics: [{
-          range: {
-            start: {
-              line: 9,
-              character: 5,
-            },
-            end: {
-              line: 9,
-              character: 14,
-            },
-          },
-          severity: 3,
-          code: "LiquidTag",
-          codeDescription: {
-            href: "https://path.to/docs.md",
-          },
-          source: "theme-check",
-          message: "Wrong",
-        }],
+        diagnostics: [DiagnosticsHelper.offense_to_diagnostic(offense)],
       },
     })
   end
 
   def test_sends_offenses_on_text_document_did_save
     storage = make_file_system_storage("layout/theme.liquid" => "")
-
-    ThemeCheck::Analyzer.any_instance.expects(:offenses).returns([
-      OffenseMock.build(storage.path("layout/theme.liquid")),
-    ])
+    offense = OffenseMock.build(storage.path("layout/theme.liquid"))
+    ThemeCheck::Analyzer.any_instance.expects(:offenses).returns([offense])
 
     send_messages({
       jsonrpc: "2.0",
@@ -153,25 +135,7 @@ class LanguageServerTest < Minitest::Test
       method: "textDocument/publishDiagnostics",
       params: {
         uri: file_uri(storage.path('layout/theme.liquid')),
-        diagnostics: [{
-          range: {
-            start: {
-              line: 9,
-              character: 5,
-            },
-            end: {
-              line: 9,
-              character: 14,
-            },
-          },
-          severity: 3,
-          code: "LiquidTag",
-          codeDescription: {
-            href: "https://path.to/docs.md",
-          },
-          source: "theme-check",
-          message: "Wrong",
-        }],
+        diagnostics: [DiagnosticsHelper.offense_to_diagnostic(offense)],
       },
     })
   end
@@ -416,7 +380,10 @@ class LanguageServerTest < Minitest::Test
     actual_responses = @messenger.sent_messages
     expected_responses.each do |response|
       assert(
-        actual_responses.find { |actual| actual == response },
+        actual_responses.find do |actual|
+          # Avoid conversion problems. We only care about the JSON.
+          JSON.parse(JSON.generate(actual)) == JSON.parse(JSON.generate(response))
+        end,
         <<~ERR,
           Expected to find the following object:
 
