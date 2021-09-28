@@ -28,6 +28,12 @@ Dir[__dir__ + "/language_server/document_link_providers/*.rb"].each do |file|
   require file
 end
 
+require_relative "language_server/execute_command_provider"
+require_relative "language_server/execute_command_engine"
+Dir[__dir__ + "/language_server/execute_command_providers/*.rb"].each do |file|
+  require file
+end
+
 require_relative "language_server/handler"
 
 module ThemeCheck
