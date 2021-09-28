@@ -163,6 +163,22 @@ module ThemeCheck
         )
       end
 
+      def test_single_file_offenses_returns_offenses_for_an_absolute_path
+        build_diagnostics(
+          offenses: [
+            WholeThemeOffense.new("MissingTemplate", "template/index.liquid"),
+            SingleFileOffense.new("UnusedAssign", "template/index.liquid"),
+            SingleFileOffense.new("SyntaxError", "template/index.liquid"),
+          ],
+        )
+        expected = [
+          SingleFileOffense.new("UnusedAssign", "template/index.liquid"),
+          SingleFileOffense.new("SyntaxError", "template/index.liquid"),
+        ]
+        assert_equal(expected, @tracker.single_file_offenses(Pathname.new("template/index.liquid")))
+        assert_equal(expected, @tracker.single_file_offenses("template/index.liquid"))
+      end
+
       private
 
       def build_diagnostics(offenses:, analyzed_files: nil)

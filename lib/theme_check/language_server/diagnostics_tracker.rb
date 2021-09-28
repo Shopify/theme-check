@@ -6,13 +6,14 @@ module ThemeCheck
     class DiagnosticsTracker
       def initialize
         @previously_reported_files = Set.new
-        @single_files_offenses = {}
+        @single_file_offenses = {} # { [Pathname(absolute)] => Offense[] }
         @mutex = Mutex.new
         @first_run = true
       end
 
-      def offenses(absolute_path)
-        @mutex.synchronize { @single_files_offenses[absolute_path] || [] }
+      def single_file_offenses(absolute_path)
+        absolute_path = Pathname.new(absolute_path) if absolute_path.is_a?(String)
+        @mutex.synchronize { @single_file_offenses[absolute_path] || [] }
       end
 
       def first_run?
@@ -28,7 +29,7 @@ module ThemeCheck
           offenses.group_by(&:theme_file).each do |theme_file, template_offenses|
             next unless theme_file
             reported_offenses = template_offenses
-            previous_offenses = @single_files_offenses[theme_file.path]
+            previous_offenses = @single_file_offenses[theme_file.path]
             if analyzed_files.nil? || analyzed_files.include?(theme_file.path)
               # We re-analyzed the file, so we know the template_offenses are update to date.
               reported_single_file_offenses = reported_offenses.select(&:single_file?)
@@ -43,7 +44,7 @@ module ThemeCheck
             reported_files << theme_file.path
           end
 
-          @single_files_offenses.each do |path, _|
+          @single_file_offenses.each do |path, _|
             # Already reported above, skip
             next if reported_files.include?(path)
 
@@ -64,7 +65,7 @@ module ThemeCheck
           end
 
           @previously_reported_files = reported_files
-          @single_files_offenses.merge!(new_single_file_offenses)
+          @single_file_offenses.merge!(new_single_file_offenses)
           @first_run = false
         end
       end
