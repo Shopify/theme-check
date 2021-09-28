@@ -17,6 +17,11 @@ module ThemeCheck
           triggerCharacters: ['.', '{{ ', '{% '],
           context: true,
         },
+        codeActionProvider: {
+          codeActionKinds: CodeActionProvider.all.map(&:kind),
+          resolveProvider: false,
+          workDoneProgress: false,
+        },
         documentLinkProvider: true,
         executeCommandProvider: {
           workDoneProgress: false,
@@ -47,6 +52,7 @@ module ThemeCheck
         @document_link_engine = DocumentLinkEngine.new(@storage)
         @diagnostics_engine = DiagnosticsEngine.new(@storage, @bridge, @diagnostics_tracker)
         @execute_command_engine = ExecuteCommandEngine.new(@bridge, @diagnostics_tracker)
+        @code_action_engine = CodeActionEngine.new(@storage, @diagnostics_tracker)
         @bridge.send_response(id, {
           capabilities: CAPABILITIES,
           serverInfo: SERVER_INFO,
@@ -96,6 +102,17 @@ module ThemeCheck
         line = params.dig('position', 'line')
         col = params.dig('position', 'character')
         @bridge.send_response(id, @completion_engine.completions(relative_path, line, col))
+      end
+
+      def on_text_document_code_action(id, params)
+        absolute_path = text_document_uri(params)
+        start_position = range_element(params, 'start')
+        end_position = range_element(params, 'end')
+        @bridge.send_response(id, @code_action_engine.code_actions(
+          absolute_path,
+          start_position,
+          end_position
+        ))
       end
 
       def on_workspace_execute_command(id, params)
@@ -164,6 +181,13 @@ module ThemeCheck
           absolute_path,
           config_for_path(absolute_path)
         )
+      end
+
+      def range_element(params, start_or_end)
+        [
+          params.dig('range', start_or_end, 'line'),
+          params.dig('range', start_or_end, 'character'),
+        ]
       end
 
       def log(message)
