@@ -6,6 +6,8 @@
 # as a big hash already, leave it like that and save yourself some IO.
 module ThemeCheck
   class InMemoryStorage < Storage
+    attr_reader :root
+
     def initialize(files = {}, root = "/dev/null")
       @files = files
       @root = Pathname.new(root)
