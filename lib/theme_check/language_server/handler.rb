@@ -56,20 +56,24 @@ module ThemeCheck
         close!
       end
 
+      def on_text_document_did_open(_id, params)
+        relative_path = relative_path_from_text_document_uri(params)
+        @storage.write(relative_path, text_document_text(params))
+        @storage.set_version(relative_path, text_document_version(params))
+        analyze_and_send_offenses(text_document_uri(params)) if @diagnostics_engine.first_run?
+      end
+
       def on_text_document_did_change(_id, params)
         relative_path = relative_path_from_text_document_uri(params)
         @storage.write(relative_path, content_changes_text(params))
+        @storage.set_version(relative_path, text_document_version(params))
       end
 
       def on_text_document_did_close(_id, params)
         relative_path = relative_path_from_text_document_uri(params)
-        @storage.write(relative_path, "")
-      end
-
-      def on_text_document_did_open(_id, params)
-        relative_path = relative_path_from_text_document_uri(params)
-        @storage.write(relative_path, text_document_text(params))
-        analyze_and_send_offenses(text_document_uri(params)) if @diagnostics_engine.first_run?
+        file_system_content = ""
+        @storage.write(relative_path, file_system_content)
+        @storage.set_version(relative_path, nil)
       end
 
       def on_text_document_did_save(_id, params)
@@ -104,7 +108,7 @@ module ThemeCheck
           .map { |fn| [fn, ""] }
           .to_h
 
-        InMemoryStorage.new(files, config.root)
+        VersionedInMemoryStorage.new(files, config.root)
       end
 
       def text_document_uri(params)
@@ -127,6 +131,10 @@ module ThemeCheck
 
       def text_document_text(params)
         params.dig('textDocument', 'text')
+      end
+
+      def text_document_version(params)
+        params.dig('textDocument', 'version')
       end
 
       def content_changes_text(params)
