@@ -12,6 +12,7 @@ require_relative "language_server/variable_lookup_finder"
 require_relative "language_server/diagnostics_helper"
 require_relative "language_server/diagnostics_tracker"
 require_relative "language_server/diagnostics_engine"
+require_relative "language_server/versioned_in_memory_storage"
 
 require_relative "language_server/completion_helper"
 require_relative "language_server/completion_provider"

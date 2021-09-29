@@ -24,7 +24,6 @@ require_relative "theme_check/regex_helpers"
 require_relative "theme_check/json_helpers"
 require_relative "theme_check/position_helper"
 require_relative "theme_check/position"
-require_relative "theme_check/language_server"
 require_relative "theme_check/checks"
 require_relative "theme_check/config"
 require_relative "theme_check/node"
@@ -43,6 +42,7 @@ require_relative "theme_check/theme"
 require_relative "theme_check/corrector"
 require_relative "theme_check/liquid_visitor"
 require_relative "theme_check/html_visitor"
+require_relative "theme_check/language_server"
 
 Dir[__dir__ + "/theme_check/checks/*.rb"].each { |file| require file }
 
