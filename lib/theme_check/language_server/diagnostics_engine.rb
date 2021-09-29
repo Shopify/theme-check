@@ -6,9 +6,12 @@ module ThemeCheck
       include URIHelper
       include DiagnosticsHelper
 
-      def initialize(bridge, diagnostics_tracker = DiagnosticsTracker.new)
+      attr_reader :storage
+
+      def initialize(storage, bridge, diagnostics_tracker = DiagnosticsTracker.new)
         @diagnostics_lock = Mutex.new
         @diagnostics_tracker = diagnostics_tracker
+        @storage = storage
         @bridge = bridge
         @token = 0
       end
@@ -21,16 +24,12 @@ module ThemeCheck
         return unless @diagnostics_lock.try_lock
         @token += 1
         @bridge.send_create_work_done_progress_request(@token)
-        storage = ThemeCheck::FileSystemStorage.new(
-          config.root,
-          ignored_patterns: config.ignored_patterns
-        )
         theme = ThemeCheck::Theme.new(storage)
         analyzer = ThemeCheck::Analyzer.new(theme, config.enabled_checks)
 
         if @diagnostics_tracker.first_run?
           @bridge.send_work_done_progress_begin(@token, "Full theme check")
-          @bridge.log("Checking #{config.root}")
+          @bridge.log("Checking #{storage.root}")
           offenses = nil
           time = Benchmark.measure do
             offenses = analyzer.analyze_theme do |path, i, total|

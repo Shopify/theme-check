@@ -74,6 +74,7 @@ class LanguageServerTest < Minitest::Test
       method: "textDocument/didOpen",
       params: {
         textDocument: {
+          text: storage.read('layout/theme.liquid'),
           uri: file_uri(storage.path('layout/theme.liquid')),
           version: 1,
         },
@@ -194,13 +195,14 @@ class LanguageServerTest < Minitest::Test
       method: "textDocument/didOpen",
       params: {
         textDocument: {
+          text: storage.read('src/layout/theme.liquid'),
           uri: file_uri(storage.path("src/layout/theme.liquid")),
           version: 1,
         },
       },
     })
 
-    assert_includes(@messenger.logs.join("\n"), "Checking #{storage.path('src')}")
+    assert_includes(@messenger.logs.join("\n"), "Checking #{storage.root}")
   end
 
   def test_document_link_response
@@ -263,6 +265,7 @@ class LanguageServerTest < Minitest::Test
     LIQUID
 
     storage = make_file_system_storage(
+      "src/theme/layout/theme.liquid" => "",
       ".theme-check.yml" => <<~CONFIG,
         root: src/theme
       CONFIG

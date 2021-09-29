@@ -53,6 +53,7 @@ module ThemeCheck
         initialize!(1, nil, @storage.root)
         @handler.on_text_document_did_open(nil, {
           "textDocument" => {
+            "text" => @storage.read('layout/theme.liquid'),
             "uri" => file_uri(@storage.path('layout/theme.liquid')),
             "version" => 1,
           },

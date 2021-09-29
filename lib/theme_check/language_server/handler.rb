@@ -41,7 +41,7 @@ module ThemeCheck
         @diagnostics_tracker = DiagnosticsTracker.new
         @completion_engine = CompletionEngine.new(@storage)
         @document_link_engine = DocumentLinkEngine.new(@storage)
-        @diagnostics_engine = DiagnosticsEngine.new(@bridge, @diagnostics_tracker)
+        @diagnostics_engine = DiagnosticsEngine.new(@storage, @bridge, @diagnostics_tracker)
         @bridge.send_response(id, {
           capabilities: CAPABILITIES,
           serverInfo: SERVER_INFO,
@@ -71,7 +71,8 @@ module ThemeCheck
 
       def on_text_document_did_close(_id, params)
         relative_path = relative_path_from_text_document_uri(params)
-        file_system_content = ""
+        file_system_content = Pathname.new(text_document_uri(params)).read(mode: 'rb', encoding: 'UTF-8')
+        # On close, the file system becomes the source of truth
         @storage.write(relative_path, file_system_content)
         @storage.set_version(relative_path, nil)
       end
@@ -103,9 +104,9 @@ module ThemeCheck
           ignored_patterns: config.ignored_patterns
         )
 
-        # Turn that into a hash of empty buffers
+        # Turn that into a hash of buffers
         files = fs.files
-          .map { |fn| [fn, ""] }
+          .map { |fn| [fn, fs.read(fn)] }
           .to_h
 
         VersionedInMemoryStorage.new(files, config.root)

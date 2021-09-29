@@ -9,7 +9,6 @@ module ThemeCheck
       def setup
         @messenger = MockMessenger.new
         @bridge = Bridge.new(@messenger)
-        @engine = DiagnosticsEngine.new(@bridge)
         @storage = make_file_system_storage(
           "layout/theme.liquid" => "{% if unclosed %}",
           "snippets/a.liquid" => "{% if unclosed %}",
@@ -19,6 +18,7 @@ module ThemeCheck
               enabled: true
           YML
         )
+        @engine = DiagnosticsEngine.new(@storage, @bridge)
       end
 
       def test_analyze_and_send_offenses_full_on_first_run_partial_second_run
