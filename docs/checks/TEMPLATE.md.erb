@@ -1,47 +1,52 @@
 # Check Title (`<%= class_name %>`)
 
-A brief paragraph explaining why the check exists.
+_Version THEME_CHECK_VERSION+_
 
-## Check Details
+A short description of what the check does.
 
-This check is aimed at eliminating ...
+A brief paragraph explaining why the check exists (what best practice is it enforcing, and why is it important?).
 
-:-1: Examples of **incorrect** code for this check:
+## Examples
+
+The following examples contain code snippets that either fail or pass this check.
+
+### &#x2717; Fail
 
 ```liquid
 ```
 
-:+1: Examples of **correct** code for this check:
+### &#x2713; Pass
 
 ```liquid
 ```
 
-## Check Options
+## Options
 
-The default configuration for this check is the following:
+The following example contains the default configuration for this check:
 
 ```yaml
 <%= class_name %>:
-  enabled: true
-  some_option: 10
+  enabled: false
+  severity: suggestion
+  other_option: 10_000
 ```
 
-### `some_option`
+| Parameter | Description |
+| --- | --- |
+| enabled | Whether the check is enabled. |
+| severity | The [severity](https://shopify.developers/themes/tools/theme-check/configuration#check-severity) of the check. |
+| other_option | A description of the option. |
 
-The `some_option` option (Default: `10`) determines ...
+## Disabling this check
 
-## When Not To Use It
+[ This check is safe to disable. You might want to disable this check if ... | Disabling this check isn't recommended because ... ].
 
-If you don't want to ..., then it's safe to disable this rule.
-
-## Version
-
-This check has been introduced in Theme Check THEME_CHECK_VERSION.
+[ This check is disabled by default when <condition>. ]
 
 ## Resources
 
-- [Rule Source][codesource]
-- [Documentation Source][docsource]
+- [Rule source][codesource]
+- [Documentation source][docsource]
 
 [codesource]: /<%= code_source %>
 [docsource]: /<%= doc_source %>
