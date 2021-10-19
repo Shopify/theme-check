@@ -27,14 +27,19 @@ module ThemeCheck
     def after_document(node)
       return unless node.theme_file.name == LAYOUT_FILENAME
 
-      add_missing_object_offense("content_for_layout") unless @content_for_layout_found
-      add_missing_object_offense("content_for_header") unless @content_for_header_found
+      add_missing_object_offense("content_for_layout", "</body>") unless @content_for_layout_found
+      add_missing_object_offense("content_for_header", "</head>") unless @content_for_header_found
     end
 
     private
 
-    def add_missing_object_offense(name)
-      add_offense("#{LAYOUT_FILENAME} must include {{#{name}}}", node: @layout_theme_node)
+    def add_missing_object_offense(name, tag)
+      add_offense("#{LAYOUT_FILENAME} must include {{#{name}}}", node: @layout_theme_node) do
+        if @layout_theme_node.source.index(tag)
+          @layout_theme_node.source.insert(@layout_theme_node.source.index(tag), "  {{ #{name} }}\n  ")
+          @layout_theme_node.markup = @layout_theme_node.source
+        end
+      end
     end
   end
 end
