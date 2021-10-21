@@ -116,6 +116,7 @@ module ThemeCheck
     def write_corrections
       if @auto_correct
         @theme.liquid.each(&:write)
+        # @theme.html.each(&:write)
         @theme.json.each(&:write)
       end
     end

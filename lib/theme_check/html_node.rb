@@ -149,6 +149,10 @@ module ThemeCheck
       @content ||= replace_placeholders(@value.content)
     end
 
+    def source
+      theme_file&.source
+    end
+
     def name
       if @value.name == "#document-fragment"
         "document"
