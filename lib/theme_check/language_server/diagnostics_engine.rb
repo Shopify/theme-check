@@ -4,7 +4,6 @@ module ThemeCheck
   module LanguageServer
     class DiagnosticsEngine
       include URIHelper
-      include DiagnosticsHelper
 
       attr_reader :storage
 
@@ -64,16 +63,16 @@ module ThemeCheck
       private
 
       def send_diagnostics(offenses, analyzed_files = nil)
-        @diagnostics_tracker.build_diagnostics(offenses, analyzed_files: analyzed_files) do |path, diagnostic_offenses|
-          send_diagnostic(path, diagnostic_offenses)
+        @diagnostics_tracker.build_diagnostics(offenses, analyzed_files: analyzed_files).each do |path, diagnostics|
+          send_diagnostic(path, diagnostics)
         end
       end
 
-      def send_diagnostic(path, offenses)
+      def send_diagnostic(path, diagnostics)
         # https://microsoft.github.io/language-server-protocol/specifications/specification-current/#notificationMessage
         @bridge.send_notification('textDocument/publishDiagnostics', {
           uri: file_uri(path),
-          diagnostics: offenses.map { |offense| DiagnosticsHelper.offense_to_diagnostic(offense) },
+          diagnostics: diagnostics.map(&:to_h),
         })
       end
     end

@@ -9,9 +9,8 @@ module ThemeCheck
       # thing, we'll make sure that the methods we call exist and
       # depend on their unit test to do their job correctly.
       def test_dependencies_have_expected_methods
-        assert(DiagnosticsTracker.method_defined?("single_file_offenses"))
+        assert(DiagnosticsTracker.method_defined?("diagnostics"))
         assert(Offense.method_defined?("message"))
-        assert(Offense.method_defined?("to_diagnostic"))
         assert(Offense.method_defined?("correctable?"))
         assert(Offense.method_defined?("range"))
       end

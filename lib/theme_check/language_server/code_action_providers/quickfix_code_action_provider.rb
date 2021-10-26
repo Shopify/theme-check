@@ -8,7 +8,8 @@ module ThemeCheck
       kind "quickfix"
 
       def code_actions(absolute_path, range)
-        diagnostics_tracker.single_file_offenses(absolute_path)
+        diagnostics_tracker.diagnostics(absolute_path)
+          .map(&:offense)
           .filter { |offense| offense.correctable? && offense_in_range?(offense, range) }
           .map { |offense| offense_to_code_action(offense) }
       end
@@ -17,14 +18,15 @@ module ThemeCheck
 
       # @param offense [ThemeCheck::Offense]
       def offense_to_code_action(offense)
+        diagnostic = Diagnostic.new(offense).to_h
         {
           title: "Correct #{offense.message}",
           kind: kind,
-          diagnostics: [offense.to_diagnostic],
+          diagnostics: [diagnostic],
           command: {
             title: 'quickfix',
             command: LanguageServer::CorrectionExecuteCommandProvider.command,
-            arguments: [offense.to_diagnostic],
+            arguments: [diagnostic],
           },
         }
       end

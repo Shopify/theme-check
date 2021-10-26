@@ -5,7 +5,7 @@ require "test_helper"
 class LanguageServerTest < Minitest::Test
   include ThemeCheck::LanguageServer::URIHelper
 
-  DiagnosticsHelper = ThemeCheck::LanguageServer::DiagnosticsHelper
+  Diagnostic = ThemeCheck::LanguageServer::Diagnostic
 
   def setup
     @messenger = MockMessenger.new
@@ -95,7 +95,7 @@ class LanguageServerTest < Minitest::Test
       method: "textDocument/publishDiagnostics",
       params: {
         uri: file_uri(storage.path('layout/theme.liquid')),
-        diagnostics: [DiagnosticsHelper.offense_to_diagnostic(offense)],
+        diagnostics: [Diagnostic.new(offense).to_h],
       },
     })
   end
@@ -135,7 +135,7 @@ class LanguageServerTest < Minitest::Test
       method: "textDocument/publishDiagnostics",
       params: {
         uri: file_uri(storage.path('layout/theme.liquid')),
-        diagnostics: [DiagnosticsHelper.offense_to_diagnostic(offense)],
+        diagnostics: [Diagnostic.new(offense).to_h],
       },
     })
   end

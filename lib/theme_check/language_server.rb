@@ -9,7 +9,7 @@ require_relative "language_server/uri_helper"
 require_relative "language_server/server"
 require_relative "language_server/tokens"
 require_relative "language_server/variable_lookup_finder"
-require_relative "language_server/diagnostics_helper"
+require_relative "language_server/diagnostic"
 require_relative "language_server/diagnostics_tracker"
 require_relative "language_server/diagnostics_engine"
 require_relative "language_server/text_edit_corrector"
@@ -47,14 +47,6 @@ module ThemeCheck
   module LanguageServer
     def self.start
       Server.new(messenger: IOMessenger.new).listen
-    end
-  end
-
-  # Augment Offense with helper to create diagnostics.
-  # We don't need that in core.
-  class Offense
-    def to_diagnostic
-      @diagnostic ||= LanguageServer::DiagnosticsHelper.offense_to_diagnostic(self)
     end
   end
 end

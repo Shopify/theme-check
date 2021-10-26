@@ -163,35 +163,42 @@ module ThemeCheck
         )
       end
 
-      def test_single_file_offenses_returns_offenses_for_an_absolute_path
+      def test_diagnostics_returns_offenses_for_an_absolute_path
         build_diagnostics(
           offenses: [
             WholeThemeOffense.new("MissingTemplate", "template/index.liquid"),
             SingleFileOffense.new("UnusedAssign", "template/index.liquid"),
             SingleFileOffense.new("SyntaxError", "template/index.liquid"),
+            SingleFileOffense.new("SyntaxError", "template/collection.liquid"),
           ],
         )
         expected = [
+          WholeThemeOffense.new("MissingTemplate", "template/index.liquid"),
           SingleFileOffense.new("UnusedAssign", "template/index.liquid"),
           SingleFileOffense.new("SyntaxError", "template/index.liquid"),
         ]
-        assert_equal(expected, @tracker.single_file_offenses(Pathname.new("template/index.liquid")))
-        assert_equal(expected, @tracker.single_file_offenses("template/index.liquid"))
+        assert_equal(expected, @tracker.diagnostics(Pathname.new("template/index.liquid")).map(&:offense))
+        assert_equal(expected, @tracker.diagnostics("template/index.liquid").map(&:offense))
       end
 
       private
 
       def build_diagnostics(offenses:, analyzed_files: nil)
         actual_diagnostics = {}
-        @tracker.build_diagnostics(offenses, analyzed_files: analyzed_files) do |path, diagnostic_offenses|
-          actual_diagnostics[path] = diagnostic_offenses
+        @tracker.build_diagnostics(offenses, analyzed_files: analyzed_files).each do |path, diagnostics|
+          actual_diagnostics[path] = diagnostics
         end
         actual_diagnostics
       end
 
       def assert_diagnostics(offenses:, analyzed_files:, diagnostics:)
         actual_diagnostics = build_diagnostics(offenses: offenses, analyzed_files: analyzed_files)
-        assert_equal(diagnostics, actual_diagnostics.transform_keys(&:to_s))
+        assert_equal(
+          diagnostics,
+          actual_diagnostics
+            .transform_keys(&:to_s)
+            .transform_values { |path_diagnostics| path_diagnostics.map(&:offense) }
+        )
       end
     end
   end
