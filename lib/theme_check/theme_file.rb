@@ -3,10 +3,13 @@ require "pathname"
 
 module ThemeCheck
   class ThemeFile
+    attr_reader :version
+
     def initialize(relative_path, storage)
       @relative_path = relative_path
       @storage = storage
       @source = nil
+      @version = nil
       @eol = "\n"
     end
 
@@ -16,11 +19,6 @@ module ThemeCheck
 
     def relative_path
       @relative_pathname ||= Pathname.new(@relative_path)
-    end
-
-    def version
-      return unless @storage.respond_to?('version')
-      @storage.version(@relative_path)
     end
 
     def name
@@ -42,6 +40,7 @@ module ThemeCheck
     def source
       return @source if @source
       @source = @storage.read(@relative_path)
+      @version = @storage.version(@relative_path, @source) if @storage.respond_to?('version')
       @eol = @source.include?("\r\n") ? "\r\n" : "\n"
       @source = @source.gsub("\r\n", "\n")
     end

@@ -69,23 +69,20 @@ module ThemeCheck
 
       def on_text_document_did_open(_id, params)
         relative_path = relative_path_from_text_document_uri(params)
-        @storage.write(relative_path, text_document_text(params))
-        @storage.set_version(relative_path, text_document_version(params))
+        @storage.write(relative_path, text_document_text(params), text_document_version(params))
         analyze_and_send_offenses(text_document_uri(params)) if @diagnostics_engine.first_run?
       end
 
       def on_text_document_did_change(_id, params)
         relative_path = relative_path_from_text_document_uri(params)
-        @storage.write(relative_path, content_changes_text(params))
-        @storage.set_version(relative_path, text_document_version(params))
+        @storage.write(relative_path, content_changes_text(params), text_document_version(params))
       end
 
       def on_text_document_did_close(_id, params)
         relative_path = relative_path_from_text_document_uri(params)
         file_system_content = Pathname.new(text_document_uri(params)).read(mode: 'rb', encoding: 'UTF-8')
         # On close, the file system becomes the source of truth
-        @storage.write(relative_path, file_system_content)
-        @storage.set_version(relative_path, nil)
+        @storage.write(relative_path, file_system_content, nil)
       end
 
       def on_text_document_did_save(_id, params)
