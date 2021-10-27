@@ -44,6 +44,10 @@ module ThemeCheck
         offense.single_file?
       end
 
+      def correctable?
+        offense.correctable?
+      end
+
       def code
         offense.code_name
       end

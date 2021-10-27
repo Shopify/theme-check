@@ -10,8 +10,9 @@ module ThemeCheck
       # depend on their unit test to do their job correctly.
       def test_dependencies_have_expected_methods
         assert(DiagnosticsTracker.method_defined?("diagnostics"))
-        assert(Offense.method_defined?("message"))
-        assert(Offense.method_defined?("correctable?"))
+        assert(Diagnostic.method_defined?("message"))
+        assert(Diagnostic.method_defined?("correctable?"))
+        assert(Diagnostic.method_defined?("offense"))
         assert(Offense.method_defined?("range"))
       end
     end
