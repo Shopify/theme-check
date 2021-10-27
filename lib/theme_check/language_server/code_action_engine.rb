@@ -7,7 +7,7 @@ module ThemeCheck
 
       def initialize(storage, diagnostics_tracker)
         @storage = storage
-        @providers = CodeActionProvider.all.map { |c| c.new(diagnostics_tracker) }
+        @providers = CodeActionProvider.all.map { |c| c.new(storage, diagnostics_tracker) }
       end
 
       def code_actions(absolute_path, start_position, end_position)

@@ -89,10 +89,12 @@ module ThemeCheck
       end
 
       def data
-        path = offense&.theme_file&.path
+        absolute_path = offense&.theme_file&.path
+        relative_path = offense&.theme_file&.relative_path
         {
-          path: path.to_s,
-          uri: path && file_uri(path),
+          absolute_path: absolute_path.to_s,
+          relative_path: relative_path.to_s,
+          uri: absolute_path && file_uri(absolute_path),
           version: offense&.version,
         }
       end

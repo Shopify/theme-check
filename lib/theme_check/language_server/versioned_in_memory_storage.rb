@@ -58,12 +58,19 @@ module ThemeCheck
     end
 
     def version(relative_path, content)
-      @versions[relative_path]
+      @versions[relative_path.to_s]
         &.find { |version| version.id == content.object_id }
         &.version
     end
 
+    def latest_version(relative_path)
+      @versions[relative_path.to_s]
+        &.last
+        &.version
+    end
+
     def set_version(relative_path, content, version)
+      relative_path = relative_path.to_s unless relative_path.is_a?(String)
       @versions[relative_path] ||= []
       @versions[relative_path] << Version.new(content.object_id, version)
 
