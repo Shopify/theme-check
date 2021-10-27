@@ -10,9 +10,11 @@ module ThemeCheck
       def code_actions(absolute_path, range)
         diagnostics_tracker.diagnostics(absolute_path)
           .filter { |diagnostic| diagnostic.correctable? && offense_in_range?(diagnostic.offense, range) }
-          # We cannot quickfix if the buffer was modified. This means
-          # our diagnostics and InMemoryStorage are out of sync.
-          .reject { |diagnostic| diagnostic.data[:version] != storage.latest_version(diagnostic.data[:relative_path]) }
+          .reject do |diagnostic|
+            # We cannot quickfix if the buffer was modified. This means
+            # our diagnostics and InMemoryStorage are out of sync.
+            diagnostic.data[:version] != storage.latest_version(diagnostic.data[:relative_path])
+          end
           .map { |diagnostic| diagnostic_to_code_action(diagnostic) }
       end
 

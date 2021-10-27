@@ -106,7 +106,8 @@ module ThemeCheck
             },
             data: {
               uri: file_uri(@storage.path(path)),
-              path: @storage.path(path).to_s,
+              absolute_path: @storage.path(path).to_s,
+              relative_path: path.to_s,
               version: nil,
             },
           },

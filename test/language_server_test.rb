@@ -38,7 +38,7 @@ class LanguageServerTest < Minitest::Test
         'LiquidTag',
         :style,
         'Wrong',
-        TemplateMock.new(path),
+        TemplateMock.new(path, path),
         5,
         14,
         9,
@@ -49,7 +49,7 @@ class LanguageServerTest < Minitest::Test
       )
     end
   end
-  TemplateMock = Struct.new(:path)
+  TemplateMock = Struct.new(:path, :relative_path)
 
   # Stringify keys
   CAPABILITIES = ThemeCheck::LanguageServer::Handler::CAPABILITIES
