@@ -12,6 +12,16 @@ module ThemeCheck
         @diagnostic = nil
       end
 
+      def ==(other)
+        if other.is_a?(Hash)
+          to_h == other
+        elsif other.is_a?(Diagnostic)
+          to_h == other.to_h
+        else
+          raise ArgumentError
+        end
+      end
+
       def to_h
         return @diagnostic unless @diagnostic.nil?
         @diagnostic = {
@@ -25,7 +35,10 @@ module ThemeCheck
         @diagnostic[:codeDescription] = code_description unless offense.doc.nil?
         @diagnostic
       end
-      alias_method :to_hash, :to_h
+
+      def to_s
+        to_h.to_s
+      end
 
       def single_file?
         offense.single_file?
@@ -74,7 +87,7 @@ module ThemeCheck
       def data
         path = offense&.theme_file&.path
         {
-          path: path,
+          path: path.to_s,
           uri: path && file_uri(path),
           version: offense&.version,
         }
