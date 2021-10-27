@@ -3,7 +3,7 @@ require "test_helper"
 
 module ThemeCheck
   module LanguageServer
-    class QuickfixCodeActionProviderTest < Minitest::Test
+    class SourceFixAllCodeActionProviderTest < Minitest::Test
       # This class is really hard to test since it depends on a lot.
       # However, it doesn't do a lot. So instead of testing the whole
       # thing, we'll make sure that the methods we call exist and
@@ -12,9 +12,7 @@ module ThemeCheck
         assert(DiagnosticsTracker.method_defined?("diagnostics"))
         assert(Diagnostic.method_defined?("message"))
         assert(Diagnostic.method_defined?("correctable?"))
-        assert(Diagnostic.method_defined?("offense"))
         assert(Diagnostic.method_defined?("to_h"))
-        assert(Offense.method_defined?("range"))
       end
     end
   end
