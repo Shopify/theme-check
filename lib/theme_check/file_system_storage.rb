@@ -36,9 +36,9 @@ module ThemeCheck
     end
 
     def mkdir(relative_path)
-      reset_memoizers unless file_exists?(relative_path)
-
-      file(relative_path).mkpath unless file(relative_path).directory?
+      return if file_exists?(relative_path)
+      reset_memoizers
+      file(relative_path).mkpath
     end
 
     def files
