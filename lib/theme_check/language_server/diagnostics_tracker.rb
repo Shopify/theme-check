@@ -30,6 +30,10 @@ module ThemeCheck
         @mutex.synchronize { @latest_diagnostics[absolute_path] || [] }
       end
 
+      def delete(absolute_path, diagnostic)
+        @diagnostics[absolute_path].delete(diagnostic)
+      end
+
       def build_diagnostics(offenses, analyzed_files: nil)
         @mutex.synchronize do
           full_check = analyzed_files.nil?
