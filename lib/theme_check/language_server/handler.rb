@@ -45,7 +45,7 @@ module ThemeCheck
         # Tell the client we don't support anything if there's no rootPath
         return @bridge.send_response(id, { capabilities: {} }) if @root_path.nil?
 
-        @bridge.supports_work_done_progress = params.dig('capabilities', 'window', 'workDoneProgress') || false
+        @bridge.supports_work_done_progress = params.dig(:capabilities, :window, :workDoneProgress) || false
         @storage = in_memory_storage(@root_path)
         @diagnostics_tracker = DiagnosticsTracker.new
         @completion_engine = CompletionEngine.new(@storage)
@@ -96,15 +96,15 @@ module ThemeCheck
 
       def on_text_document_completion(id, params)
         relative_path = relative_path_from_text_document_uri(params)
-        line = params.dig('position', 'line')
-        col = params.dig('position', 'character')
+        line = params.dig(:position, :line)
+        col = params.dig(:position, :character)
         @bridge.send_response(id, @completion_engine.completions(relative_path, line, col))
       end
 
       def on_text_document_code_action(id, params)
         absolute_path = text_document_uri(params)
-        start_position = range_element(params, 'start')
-        end_position = range_element(params, 'end')
+        start_position = range_element(params, :start)
+        end_position = range_element(params, :end)
         @bridge.send_response(id, @code_action_engine.code_actions(
           absolute_path,
           start_position,
@@ -114,8 +114,8 @@ module ThemeCheck
 
       def on_workspace_execute_command(id, params)
         @bridge.send_response(id, @execute_command_engine.execute(
-          params['command'],
-          params['arguments'],
+          params[:command],
+          params[:arguments],
         ))
       end
 
@@ -139,7 +139,7 @@ module ThemeCheck
       end
 
       def text_document_uri(params)
-        file_path(params.dig('textDocument', 'uri'))
+        file_path(params.dig(:textDocument, :uri))
       end
 
       def relative_path_from_text_document_uri(params)
@@ -147,8 +147,8 @@ module ThemeCheck
       end
 
       def root_path_from_params(params)
-        root_uri = params["rootUri"]
-        root_path = params["rootPath"]
+        root_uri = params[:rootUri]
+        root_path = params[:rootPath]
         if root_uri
           file_path(root_uri)
         elsif root_path
@@ -157,15 +157,15 @@ module ThemeCheck
       end
 
       def text_document_text(params)
-        params.dig('textDocument', 'text')
+        params.dig(:textDocument, :text)
       end
 
       def text_document_version(params)
-        params.dig('textDocument', 'version')
+        params.dig(:textDocument, :version)
       end
 
       def content_changes_text(params)
-        params.dig('contentChanges', 0, 'text')
+        params.dig(:contentChanges, 0, :text)
       end
 
       def config_for_path(path)
@@ -182,8 +182,8 @@ module ThemeCheck
 
       def range_element(params, start_or_end)
         [
-          params.dig('range', start_or_end, 'line'),
-          params.dig('range', start_or_end, 'character'),
+          params.dig(:range, start_or_end, :line),
+          params.dig(:range, start_or_end, :character),
         ]
       end
 

@@ -57,12 +57,12 @@ module ThemeCheck
         })
       end
 
-      def test_read_message_as_json
+      def test_read_message_as_json_with_symbols_for_keys
         expected = {
-          "jsonrpc" => "2.0",
-          "method" => "textDocument/didOpen",
-          "params" => {
-            "x" => 1,
+          jsonrpc: "2.0",
+          method: "textDocument/didOpen",
+          params: {
+            x: 1,
           },
         }
 

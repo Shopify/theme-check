@@ -37,7 +37,7 @@ module ThemeCheck
 
       def read_message
         message_body = @messenger.read_message
-        message_json = JSON.parse(message_body)
+        message_json = JSON.parse(message_body, symbolize_names: true)
         @messenger.log(JSON.pretty_generate(message_json)) if ThemeCheck.debug?
         message_json
       end

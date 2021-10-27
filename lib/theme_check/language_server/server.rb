@@ -55,9 +55,9 @@ module ThemeCheck
         @json_rpc_thread = Thread.new do
           loop do
             message = @bridge.read_message
-            if message['method'] == 'initialize'
+            if message[:method] == 'initialize'
               handle_message(message)
-            elsif message.key?('result')
+            elsif message.key?(:result)
               # Responses are handled on the main thread to prevent
               # a potential deadlock caused by all handlers waiting
               # for a responses.
@@ -101,10 +101,10 @@ module ThemeCheck
       private
 
       def handle_message(message)
-        id = message['id']
-        method_name = message['method']
+        id = message[:id]
+        method_name = message[:method]
         method_name &&= "on_#{to_snake_case(method_name)}"
-        params = message['params']
+        params = message[:params]
 
         if @handler.respond_to?(method_name)
           @handler.send(method_name, id, params)
@@ -121,8 +121,8 @@ module ThemeCheck
       end
 
       def handle_response(message)
-        id = message['id']
-        result = message['result']
+        id = message[:id]
+        result = message[:result]
         @bridge.receive_response(id, result)
       end
 
