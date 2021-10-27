@@ -4,10 +4,6 @@ require "logger"
 module ThemeCheck
   module LanguageServer
     class DiagnosticsTracker
-      # The LSP expects an empty array of diagnostics when we want to
-      # clear previous ones.
-      CLEAR = []
-
       # This class exists to facilitate LanguageServer diagnostics tracking.
       #
       # Motivations:
@@ -31,7 +27,8 @@ module ThemeCheck
       end
 
       def delete(absolute_path, diagnostic)
-        @diagnostics[absolute_path].delete(diagnostic)
+        absolute_path = Pathname.new(absolute_path) if absolute_path.is_a?(String)
+        @mutex.synchronize { @latest_diagnostics[absolute_path]&.delete(diagnostic) }
       end
 
       def build_diagnostics(offenses, analyzed_files: nil)

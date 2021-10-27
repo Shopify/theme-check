@@ -10,28 +10,47 @@ module ThemeCheck
       #
       # @param diagnostic_hashes [Array] - of diagnostics
       def execute(diagnostic_hashes)
+        # compile all the document changes
         document_changes = diagnostic_hashes
           .group_by { |d| to_text_document(d) }
-          .map do |text_document, diagnostic_hashes_for_uri|
+          .map do |text_document, diagnostic_hashes_for_document|
             {
               textDocument: text_document,
-              edits: diagnostic_hashes_for_uri.flat_map do |diagnostic_hash|
+              edits: diagnostic_hashes_for_document.flat_map do |diagnostic_hash|
                 to_text_edit(diagnostic_hash)
               end,
             }
           end
+
+        # attempt to apply the document changes
         result = bridge.send_request('workspace/applyEdit', {
           label: 'Theme Check correction',
           edit: {
             documentChanges: document_changes,
           },
         })
-        return unless result['applied']
+
+        return unless result[:applied]
 
         # Clean up fixed diagnostics from the list.
-        diagnostic_hashes.each do |diagnostic|
-          diagnostics_tracker.delete(diagnostic.dig(:data, :path), diagnostic)
+        diagnostic_hashes.each do |diagnostic_hash|
+          absolute_path = diagnostic_hash.dig(:data, :path)
+          diagnostic = diagnostics_tracker
+            .diagnostics(absolute_path)
+            .find { |d| d == diagnostic_hash }
+          diagnostics_tracker
+            .delete(absolute_path, diagnostic)
         end
+
+        # Send updated diagnostics to client
+        diagnostic_hashes
+          .group_by { |d| d.dig(:data) }
+          .map do |data, _|
+            bridge.send_notification('textDocument/publishDiagnostics', {
+              uri: data[:uri],
+              diagnostics: diagnostics_tracker.diagnostics(data[:path]).map(&:to_h),
+            })
+          end
       end
 
       private
