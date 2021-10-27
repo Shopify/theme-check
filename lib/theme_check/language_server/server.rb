@@ -117,6 +117,7 @@ module ThemeCheck
         raise e unless is_request
         # Errors obtained in request handlers should be sent
         # back as internal errors instead of closing the program.
+        @bridge.log("#{e.class}: #{e.message}\n#{e.backtrace.join("\n")}")
         @bridge.send_internal_error(id, e)
       end
 
