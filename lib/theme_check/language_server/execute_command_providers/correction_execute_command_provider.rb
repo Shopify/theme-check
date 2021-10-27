@@ -63,12 +63,12 @@ module ThemeCheck
       end
 
       def to_text_edit(diagnostic_hash)
-        corrector = TextEditCorrector.new
         offense = diagnostics_tracker
           .diagnostics(diagnostic_hash.dig(:data, :path))
           .find { |d| d == diagnostic_hash }
           &.offense
         return [] if offense.nil?
+        corrector = TextEditCorrector.new
         offense.correct(corrector)
         corrector.edits
       end
