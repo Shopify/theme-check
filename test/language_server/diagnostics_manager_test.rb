@@ -3,7 +3,7 @@ require "test_helper"
 
 module ThemeCheck
   module LanguageServer
-    class DiagnosticsTrackerTest < Minitest::Test
+    class DiagnosticsManagerTest < Minitest::Test
       Offense = Struct.new(
         :code_name,
         :theme_file,
@@ -32,7 +32,7 @@ module ThemeCheck
       end
 
       def setup
-        @tracker = DiagnosticsTracker.new
+        @tracker = DiagnosticsManager.new
       end
 
       def test_reports_all_on_first_run

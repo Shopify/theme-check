@@ -6,7 +6,7 @@ module ThemeCheck
       kind "source.fixAll"
 
       def code_actions(absolute_path, _)
-        diagnostics = diagnostics_tracker
+        diagnostics = diagnostics_manager
           .diagnostics(absolute_path)
           .filter(&:correctable?)
           .map(&:to_h)

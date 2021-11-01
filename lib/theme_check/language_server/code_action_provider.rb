@@ -19,11 +19,11 @@ module ThemeCheck
       end
 
       attr_reader :storage
-      attr_reader :diagnostics_tracker
+      attr_reader :diagnostics_manager
 
-      def initialize(storage, diagnostics_tracker)
+      def initialize(storage, diagnostics_manager)
         @storage = storage
-        @diagnostics_tracker = diagnostics_tracker
+        @diagnostics_manager = diagnostics_manager
       end
 
       def kind

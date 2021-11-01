@@ -47,12 +47,12 @@ module ThemeCheck
 
         @bridge.supports_work_done_progress = params.dig(:capabilities, :window, :workDoneProgress) || false
         @storage = in_memory_storage(@root_path)
-        @diagnostics_tracker = DiagnosticsTracker.new
+        @diagnostics_manager = DiagnosticsManager.new
         @completion_engine = CompletionEngine.new(@storage)
         @document_link_engine = DocumentLinkEngine.new(@storage)
-        @diagnostics_engine = DiagnosticsEngine.new(@storage, @bridge, @diagnostics_tracker)
-        @execute_command_engine = ExecuteCommandEngine.new(@bridge, @diagnostics_tracker)
-        @code_action_engine = CodeActionEngine.new(@storage, @diagnostics_tracker)
+        @diagnostics_engine = DiagnosticsEngine.new(@storage, @bridge, @diagnostics_manager)
+        @execute_command_engine = ExecuteCommandEngine.new(@bridge, @diagnostics_manager)
+        @code_action_engine = CodeActionEngine.new(@storage, @diagnostics_manager)
         @bridge.send_response(id, {
           capabilities: CAPABILITIES,
           serverInfo: SERVER_INFO,

@@ -35,10 +35,10 @@ module ThemeCheck
         # Clean up fixed diagnostics from the list.
         diagnostic_hashes.each do |diagnostic_hash|
           absolute_path = diagnostic_hash.dig(:data, :absolute_path)
-          diagnostic = diagnostics_tracker
+          diagnostic = diagnostics_manager
             .diagnostics(absolute_path)
             .find { |d| d == diagnostic_hash }
-          diagnostics_tracker
+          diagnostics_manager
             .delete(absolute_path, diagnostic)
         end
 
@@ -48,7 +48,7 @@ module ThemeCheck
           .map do |data, _|
             bridge.send_notification('textDocument/publishDiagnostics', {
               uri: data[:uri],
-              diagnostics: diagnostics_tracker.diagnostics(data[:absolute_path]).map(&:to_h),
+              diagnostics: diagnostics_manager.diagnostics(data[:absolute_path]).map(&:to_h),
             })
           end
       end
@@ -63,7 +63,7 @@ module ThemeCheck
       end
 
       def to_text_edit(diagnostic_hash)
-        offense = diagnostics_tracker
+        offense = diagnostics_manager
           .diagnostics(diagnostic_hash.dig(:data, :absolute_path))
           .find { |d| d == diagnostic_hash }
           &.offense

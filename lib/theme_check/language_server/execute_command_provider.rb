@@ -18,11 +18,11 @@ module ThemeCheck
         end
       end
 
-      attr_reader :bridge, :diagnostics_tracker
+      attr_reader :bridge, :diagnostics_manager
 
-      def initialize(bridge, diagnostics_tracker)
+      def initialize(bridge, diagnostics_manager)
         @bridge = bridge
-        @diagnostics_tracker = diagnostics_tracker
+        @diagnostics_manager = diagnostics_manager
       end
 
       def execute(arguments)

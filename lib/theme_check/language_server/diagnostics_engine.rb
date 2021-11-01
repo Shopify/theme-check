@@ -7,16 +7,16 @@ module ThemeCheck
 
       attr_reader :storage
 
-      def initialize(storage, bridge, diagnostics_tracker = DiagnosticsTracker.new)
+      def initialize(storage, bridge, diagnostics_manager = DiagnosticsManager.new)
         @diagnostics_lock = Mutex.new
-        @diagnostics_tracker = diagnostics_tracker
+        @diagnostics_manager = diagnostics_manager
         @storage = storage
         @bridge = bridge
         @token = 0
       end
 
       def first_run?
-        @diagnostics_tracker.first_run?
+        @diagnostics_manager.first_run?
       end
 
       def analyze_and_send_offenses(absolute_path, config)
@@ -26,7 +26,7 @@ module ThemeCheck
         theme = ThemeCheck::Theme.new(storage)
         analyzer = ThemeCheck::Analyzer.new(theme, config.enabled_checks)
 
-        if @diagnostics_tracker.first_run?
+        if @diagnostics_manager.first_run?
           @bridge.send_work_done_progress_begin(@token, "Full theme check")
           @bridge.log("Checking #{storage.root}")
           offenses = nil
@@ -63,7 +63,7 @@ module ThemeCheck
       private
 
       def send_diagnostics(offenses, analyzed_files = nil)
-        @diagnostics_tracker.build_diagnostics(offenses, analyzed_files: analyzed_files).each do |path, diagnostics|
+        @diagnostics_manager.build_diagnostics(offenses, analyzed_files: analyzed_files).each do |path, diagnostics|
           send_diagnostic(path, diagnostics)
         end
       end

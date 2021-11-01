@@ -5,9 +5,9 @@ module ThemeCheck
     class CodeActionEngine
       include PositionHelper
 
-      def initialize(storage, diagnostics_tracker)
+      def initialize(storage, diagnostics_manager)
         @storage = storage
-        @providers = CodeActionProvider.all.map { |c| c.new(storage, diagnostics_tracker) }
+        @providers = CodeActionProvider.all.map { |c| c.new(storage, diagnostics_manager) }
       end
 
       def code_actions(absolute_path, start_position, end_position)

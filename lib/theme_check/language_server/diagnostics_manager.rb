@@ -3,7 +3,7 @@ require "logger"
 
 module ThemeCheck
   module LanguageServer
-    class DiagnosticsTracker
+    class DiagnosticsManager
       # This class exists to facilitate LanguageServer diagnostics tracking.
       #
       # Motivations:
