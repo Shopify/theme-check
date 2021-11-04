@@ -25,7 +25,7 @@ module ThemeCheck
     def on_end
       missing_snippets.each do |theme_file|
         add_offense("This snippet is not used", theme_file: theme_file) do |corrector|
-          corrector.remove_file(@theme, theme_file.relative_path.to_s)
+          corrector.remove_file(@theme.storage, theme_file.relative_path.to_s)
         end
       end
     end

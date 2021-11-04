@@ -32,24 +32,19 @@ module ThemeCheck
       @theme_file.rewriter.wrap(node, insert_before, insert_after)
     end
 
-    def create(theme, relative_path, content)
-      theme.storage.write(relative_path, content)
+    def create(storage, relative_path, content)
+      storage.write(relative_path, content)
     end
 
-    def create_default_locale_json(theme)
-      create(theme, "locales/#{theme.default_locale}.default.json", {})
-      theme.default_locale_json = JsonFile.new("locales/#{theme.default_locale}.default.json", theme.storage)
+    def remove_file(storage, relative_path)
+      storage.remove(relative_path)
     end
 
-    def remove_file(theme, relative_path)
-      theme.storage.remove(relative_path)
+    def mkdir(storage, relative_path)
+      storage.mkdir(relative_path)
     end
 
-    def mkdir(theme, relative_path)
-      theme.storage.mkdir(relative_path)
-    end
-
-    def add_default_translation_key(file, key, value)
+    def add_translation(file, key_path, value)
       hash = file.content
       add_key(hash, key, value)
       file.update_contents(hash)
@@ -63,9 +58,13 @@ module ThemeCheck
     end
 
     def add_key(hash, key, value)
-      key.reduce(hash) do |pointer, token|
-        return pointer[token] = value if token == key.last
-        pointer[token] = {} unless pointer.key?(token)
+      key_path = key_path.split('.') if key_path.is_a?(String)
+      key_path.each_with_index.reduce(hash) do |pointer, (token, index)|
+        if index == key_path.size - 1
+          pointer[token] = value
+        elsif !pointer.key?(token)
+          pointer[token] = {}
+        end
         pointer[token]
       end
     end

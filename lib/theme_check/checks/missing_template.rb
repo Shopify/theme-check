@@ -35,7 +35,7 @@ module ThemeCheck
       path = "#{name}.liquid"
       unless ignore?(path) || theme[name]
         add_offense("'#{path}' is not found", node: node) do |corrector|
-          corrector.create(@theme, "#{name}.liquid", "")
+          corrector.create(@theme.storage, "#{name}.liquid", "")
         end
       end
     end

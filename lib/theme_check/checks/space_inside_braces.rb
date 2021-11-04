@@ -12,6 +12,7 @@ module ThemeCheck
 
     def on_node(node)
       return unless node.markup
+      return if node.literal?
       return if :assign == node.type_name
 
       outside_of_strings(node.markup) do |chunk, chunk_start|
@@ -77,6 +78,7 @@ module ThemeCheck
 
     def on_variable(node)
       return if @ignore || node.markup.empty?
+      return unless node.variable?
       if node.markup[0] != " "
         add_offense(
           "Space missing after '#{node.start_token}'",

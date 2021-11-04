@@ -45,6 +45,8 @@ module ThemeCheck
     def markup
       if tag?
         tag_markup
+      elsif literal?
+        value.to_s
       elsif @value.instance_variable_defined?(:@markup)
         @value.instance_variable_get(:@markup)
       end

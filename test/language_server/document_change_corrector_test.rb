@@ -1,0 +1,221 @@
+# frozen_string_literal: true
+require "test_helper"
+
+module ThemeCheck
+  module LanguageServer
+    class DocumentChangeCorrectorTest < Minitest::Test
+      include URIHelper
+
+      def setup
+        @node = find(root_node("{{x}}"), &:variable?)
+        @corrector = DocumentChangeCorrector.new
+      end
+
+      def test_could_pass_for_a_corrector
+        document_change_corrector_methods = DocumentChangeCorrector.new.methods
+        corrector_methods = Corrector.new(theme_file: nil).methods
+        difference = corrector_methods - document_change_corrector_methods
+        assert_empty(difference, <<~EXPECTED)
+          Expected the following methods to be implemented in DocumentChangeCorrector:
+
+          #{pretty_print(difference)}
+
+          If this test is failing because you are adding a new method to Corrector,
+          it should be possible to do the same thing in the Language Server.
+
+          For more details on how we correct diagnostics in the language server, see our docs file on the subject:
+
+          docs/language_server/how_to_correct_code_with_code_actions_and_execute_command.md
+        EXPECTED
+      end
+
+      def test_insert_before
+        @corrector.insert_before(@node, ' ')
+        assert_equal(2, @node.start_column)
+        assert_equal(
+          [
+            {
+              textDocument: {
+                uri: file_uri(@node.theme_file.path),
+                version: nil,
+              },
+              edits: [{
+                range: range(0, 2, 0, 2),
+                newText: ' ',
+              }],
+            },
+          ],
+          @corrector.document_changes
+        )
+      end
+
+      def test_insert_after
+        @corrector.insert_after(@node, ' ')
+        assert_equal(3, @node.end_column)
+        assert_equal(
+          [
+            {
+              textDocument: {
+                uri: file_uri(@node.theme_file.path),
+                version: nil,
+              },
+              edits: [{
+                range: range(0, 3, 0, 3),
+                newText: ' ',
+              }],
+            },
+          ],
+          @corrector.document_changes
+        )
+      end
+
+      def test_replace
+        @corrector.replace(@node, 'y')
+        assert_equal(3, @node.end_column)
+        assert_equal(
+          [
+            {
+              textDocument: {
+                uri: file_uri(@node.theme_file.path),
+                version: nil,
+              },
+              edits: [{
+                range: range(0, 2, 0, 3),
+                newText: 'y',
+              }],
+            },
+          ],
+          @corrector.document_changes
+        )
+      end
+
+      def test_wrap
+        @corrector.wrap(@node, '<', '>')
+        assert_equal(3, @node.end_column)
+        assert_equal(
+          [
+            {
+              textDocument: {
+                uri: file_uri(@node.theme_file.path),
+                version: nil,
+              },
+              edits: [{
+                range: range(0, 2, 0, 3),
+                newText: '<x>',
+              }],
+            },
+          ],
+          @corrector.document_changes
+        )
+      end
+
+      def test_create
+        @corrector.create(@node.theme_file.storage, 'test.liquid', 'hello world')
+        assert_equal(
+          [
+            {
+              kind: 'create',
+              uri: file_uri(@node.theme_file.storage.path('test.liquid')),
+            },
+            {
+              textDocument: {
+                uri: file_uri(@node.theme_file.storage.path('test.liquid')),
+                version: nil,
+              },
+              edits: [
+                {
+                  range: range(0, 0, 0, 0),
+                  newText: 'hello world',
+                },
+              ],
+            },
+          ],
+          @corrector.document_changes
+        )
+      end
+
+      def test_remove
+        @corrector.remove(@node.theme_file.storage, 'test.liquid')
+        assert_equal(
+          [
+            {
+              kind: 'delete',
+              uri: file_uri(@node.theme_file.storage.path('test.liquid')),
+            },
+          ],
+          @corrector.document_changes
+        )
+      end
+
+      def test_mkdir
+        @corrector.mkdir(@node.theme_file.storage, 'test.liquid')
+        assert_equal(
+          [
+            {
+              kind: 'create',
+              uri: file_uri(@node.theme_file.storage.path('test.liquid').join('tmp')),
+            },
+            {
+              kind: 'delete',
+              uri: file_uri(@node.theme_file.storage.path('test.liquid').join('tmp')),
+            },
+          ],
+          @corrector.document_changes
+        )
+      end
+
+      def test_add_translation
+        storage = make_storage("foo.json" => '{ "a": "b" }')
+        file = JsonFile.new('foo.json', storage)
+        @corrector.add_translation(file, "hello", "world")
+        assert_equal(
+          [
+            {
+              kind: 'create',
+              uri: file_uri(storage.path('foo.json')),
+              options: {
+                overwrite: true,
+              },
+            },
+            {
+              textDocument: {
+                uri: file_uri(storage.path('foo.json')),
+                version: nil,
+              },
+              edits: [{
+                range: {
+                  start: { line: 0, character: 0 },
+                  end: { line: 0, character: 0 },
+                },
+                newText: JSON.pretty_generate({ a: "b", hello: "world" }),
+              }],
+            },
+          ],
+          @corrector.document_changes
+        )
+      end
+
+      private
+
+      def root_node(code)
+        theme_file = parse_liquid(code)
+        LiquidNode.new(theme_file.root, nil, theme_file)
+      end
+
+      def find(node, &block)
+        return node if block.call(node)
+        return nil if node.children.nil? || node.children.empty?
+        node.children
+          .map { |n| find(n, &block) }
+          .find { |n| !n.nil? }
+      end
+
+      def range(start_row, start_column, end_row, end_column)
+        {
+          start: { line: start_row, character: start_column },
+          end: { line: end_row, character: end_column },
+        }
+      end
+    end
+  end
+end

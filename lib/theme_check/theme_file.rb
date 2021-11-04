@@ -3,7 +3,7 @@ require "pathname"
 
 module ThemeCheck
   class ThemeFile
-    attr_reader :version
+    attr_reader :version, :storage
 
     def initialize(relative_path, storage)
       @relative_path = relative_path

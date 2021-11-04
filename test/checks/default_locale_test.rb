@@ -33,6 +33,6 @@ class DefaultLocaleTest < Minitest::Test
 
     missing_files = ["locales/en.default.json"]
     assert(missing_files.all? { |file| theme.storage.files.include?(file) })
-    assert(theme.default_locale_json)
+    assert(theme.storage.read("locales/#{theme.default_locale}.default.json"))
   end
 end

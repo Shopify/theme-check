@@ -17,17 +17,17 @@ module ThemeCheck
           "#<#{code_name} theme_file=\"#{theme_file.path}\" #{whole_theme? ? 'whole_theme' : 'single_file'}>"
         end
       end
-      LiquidFile = Struct.new(:relative_path)
+      LiquidFile = Struct.new(:relative_path, :absolute_path)
 
       class WholeThemeOffense < Offense
         def initialize(code_name, path)
-          super(code_name, LiquidFile.new(Pathname.new(path)), true)
+          super(code_name, LiquidFile.new(Pathname.new(path), Pathname.new(path)), true)
         end
       end
 
       class SingleFileOffense < Offense
         def initialize(code_name, path)
-          super(code_name, LiquidFile.new(Pathname.new(path)), false)
+          super(code_name, LiquidFile.new(Pathname.new(path), Pathname.new(path)), false)
         end
       end
 
@@ -204,6 +204,14 @@ module ThemeCheck
                 },
                 edits: [
                   { range: range(0, 2, 0, 2), newText: ' ' },
+                ],
+              },
+              {
+                textDocument: {
+                  uri: diagnostic_hashes[1].dig(:data, :uri),
+                  version: diagnostic_hashes[1].dig(:data, :version),
+                },
+                edits: [
                   { range: range(0, 3, 0, 3), newText: ' ' },
                 ],
               },
@@ -270,12 +278,6 @@ module ThemeCheck
           actual.transform_keys(&:to_s),
         )
       end
-
-      # TODO
-      def test_handle_create_file_document_changes; end
-
-      # TODO
-      def test_handle_delete_file_document_changes; end
 
       private
 

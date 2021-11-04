@@ -47,6 +47,8 @@ We define providers:
 - One `ExecuteCommandProvider`:
   1. [`CorrectionExecuteCommandProvider`](/lib/theme_check/language_server/execute_command_providers/correction_execute_command_provider.rb) - This one takes a list of diagnostics as arguments, turns them into a [WorkspaceEdit](#workspace-edit) and tries to apply them with the server->client `workspace/applyEdit` request.
 
+We define a [`DocumentChangeCorrector`](/lib/theme_check/language_server/document_change_corrector.rb) (an LSP analog to our [`Corrector`](/lib/theme_check/corrector.rb) class). This class turns corrector calls into document changes supported by the LSP. For more details, see the [LSP reference on resource changes][lspresourcechange].
+
 ## Definitions
 
 ### Code Actions
@@ -145,8 +147,16 @@ Think edit file, create file, delete file but as data.
   ```ts
   interface WorkspaceEdit {
     changes?: { uri: TextEdit[] ];
-    documentChanges: TextDocumentEdit[];
+    documentChanges: (TextDocumentEdit | CreateFile | RenameFile | DeleteFile|)[];
     changeAnnotations?: { [id: string]: ChangeAnnotation }
+  }
+
+  // see https://microsoft.github.io/language-server-protocol/specifications/specification-current/#resourceChanges
+  interface CreateFile {
+    kind: 'create';
+    uri: DocumentUri;
+    options?: CreateFileOptions;
+    annotationId?: ChangeAnnotationIdentifier;
   }
 
   interface TextEdit {
@@ -184,3 +194,4 @@ They appear in the Problems tab and in the gutter of the editor.
 [lspexecutecommand]: https://microsoft.github.io/language-server-protocol/specification#workspace_executeCommand
 [lspworkspaceedit]: https://microsoft.github.io/language-server-protocol/specification#workspaceEdit
 [lspdiagnostic]: https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#diagnostic
+[lspresourcechange]: https://microsoft.github.io/language-server-protocol/specifications/specification-current/#resourceChanges

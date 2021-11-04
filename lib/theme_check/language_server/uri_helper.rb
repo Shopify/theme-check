@@ -15,6 +15,7 @@ module ThemeCheck
       #
       # Exists because of https://github.com/Shopify/theme-check/issues/360
       def file_uri(absolute_path)
+        return if absolute_path.nil?
         "file://" + absolute_path
           .to_s
           .split('/')

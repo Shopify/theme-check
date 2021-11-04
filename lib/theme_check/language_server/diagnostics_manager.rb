@@ -74,15 +74,7 @@ module ThemeCheck
 
         document_changes = diagnostics
           .select(&:correctable?)
-          .group_by { |d| to_text_document(d) }
-          .map do |text_document, text_document_diagnostics|
-            {
-              textDocument: text_document,
-              edits: text_document_diagnostics.flat_map do |diagnostic|
-                to_text_edit(diagnostic)
-              end,
-            }
-          end
+          .flat_map { |d| to_document_changes(d) }
 
         {
           documentChanges: document_changes,
@@ -127,18 +119,11 @@ module ThemeCheck
           .find { |d| d == diagnostic_hash }
       end
 
-      def to_text_document(diagnostic)
-        {
-          uri: diagnostic.uri,
-          version: diagnostic.file_version,
-        }
-      end
-
-      def to_text_edit(diagnostic)
+      def to_document_changes(diagnostic)
         offense = diagnostic.offense
-        corrector = TextEditCorrector.new
+        corrector = DocumentChangeCorrector.new
         offense.correct(corrector)
-        corrector.edits
+        corrector.document_changes
       end
 
       def paths(diagnostics)

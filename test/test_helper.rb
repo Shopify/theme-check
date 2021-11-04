@@ -66,6 +66,16 @@ module Minitest
       DESC
     end
 
+    def assert_equal(expected, actual, msg = nil)
+      super(expected, actual, msg || <<~DESC)
+        --- expected
+        +++ actual
+
+        -#{pretty_print(expected).gsub("\n", "\n-")}
+        +#{pretty_print(actual).gsub("\n", "\n+")}
+      DESC
+    end
+
     def pretty_print(hash)
       io = StringIO.new
       PP.pp(hash, io)

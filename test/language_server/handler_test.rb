@@ -64,7 +64,7 @@ module ThemeCheck
 
       def initialize!(id, root_uri_path, root_path = nil)
         @handler.on_initialize(id, {
-          rootUri: root_uri_path.nil? ? nil : file_uri(root_uri_path),
+          rootUri: file_uri(root_uri_path),
           rootPath: root_path,
         })
       end
