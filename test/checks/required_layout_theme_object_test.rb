@@ -45,6 +45,91 @@ class RequiredLayoutThemeObjectTest < Minitest::Test
     )
   end
 
+  def test_creates_missing_content_for_layout
+    expected_sources = {
+      "layout/theme.liquid" => <<~END,
+        <!DOCTYPE html>
+        <html>
+          <head>
+            {{ content_for_header }}
+          </head>
+          <body>
+            {{ content_for_layout }}
+          </body>
+        </html>
+      END
+    }
+    sources = fix_theme(
+      ThemeCheck::RequiredLayoutThemeObject.new,
+      "layout/theme.liquid" => <<~END,
+        <!DOCTYPE html>
+        <html>
+          <head>
+            {{ content_for_header }}
+          </head>
+          <body>
+          </body>
+        </html>
+      END
+    )
+    sources.each do |path, source|
+      assert_equal(expected_sources[path], source)
+    end
+  end
+
+  def test_creates_missing_content_for_header
+    expected_sources = {
+      "layout/theme.liquid" => <<~END,
+        <!DOCTYPE html>
+        <html>
+          <head>
+            {{ content_for_header }}
+          </head>
+          <body>
+            {{ content_for_layout }}
+          </body>
+        </html>
+      END
+    }
+    sources = fix_theme(
+      ThemeCheck::RequiredLayoutThemeObject.new,
+      "layout/theme.liquid" => <<~END,
+        <!DOCTYPE html>
+        <html>
+          <head>
+          </head>
+          <body>
+            {{ content_for_layout }}
+          </body>
+        </html>
+      END
+    )
+    sources.each do |path, source|
+      assert_equal(expected_sources[path], source)
+    end
+  end
+
+  def test_no_head_or_body_tag
+    expected_sources = {
+      "layout/theme.liquid" => <<~END,
+        <!DOCTYPE html>
+        <html>
+        </html>
+      END
+    }
+    sources = fix_theme(
+      ThemeCheck::RequiredLayoutThemeObject.new,
+      "layout/theme.liquid" => <<~END,
+        <!DOCTYPE html>
+        <html>
+        </html>
+      END
+    )
+    sources.each do |path, source|
+      assert_equal(expected_sources[path], source)
+    end
+  end
+
   private
 
   def analyze_layout_theme(content)
