@@ -66,7 +66,6 @@ module ThemeCheck
 
       def initialize(tag_name, markup, options)
         super
-
         if (matches = markup.match(SYNTAX))
           @liquid_variable_name = matches[:liquid_variable_name]
           @page_size = parse_expression(matches[:page_size])

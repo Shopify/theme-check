@@ -101,4 +101,57 @@ class CorrectorTest < Minitest::Test
       </p>
     UPDATED_SOURCE
   end
+
+  def test_replaces_schema_body
+    contents = <<~END
+      {% schema %}
+        {
+          "name": {
+            "en": "Hello",
+            "fr": "Bonjour"
+          },
+          "settings": [
+            {
+              "id": "product",
+              "label": {
+                "en": "Product"
+              }
+            }
+          ]
+        }
+      {% endschema %}
+    END
+    theme = make_theme("templates/index.liquid" => contents)
+    theme_file = theme["templates/index"]
+    node = stub(
+      theme_file: theme_file,
+      block_body_start_index: 12,
+      block_body_end_index: 205,
+      :markup= => ()
+    )
+    corrector = ThemeCheck::Corrector.new(theme_file: theme_file)
+    schema =  { "name" => { "en" => "Hello", "fr" => "Bonjour" }, "settings" => [{ "id" => "product", "label" => { "en" => "Product", "fr" => "TODO" } }] }
+    corrector.replace_block_body(node, "\n  #{JSON.pretty_generate(schema, array_nl: "\n  ", object_nl: "\n  ")}\n")
+    theme_file.write
+
+    assert_equal(<<~UPDATED_SOURCE, theme_file.source)
+      {% schema %}
+        {
+          "name": {
+            "en": "Hello",
+            "fr": "Bonjour"
+          },
+          "settings": [
+            {
+              "id": "product",
+              "label": {
+                "en": "Product",
+                "fr": "TODO"
+              }
+            }
+          ]
+        }
+      {% endschema %}
+    UPDATED_SOURCE
+  end
 end

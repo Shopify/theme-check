@@ -7,7 +7,6 @@ module ThemeCheck
 
     def on_schema(node)
       schema = JSON.parse(node.value.nodelist.join)
-
       # Get all locales used in the schema
       used_locales = Set.new([theme.default_locale])
       visit_object(schema) do |_, locales|
@@ -19,11 +18,17 @@ module ThemeCheck
       visit_object(schema) do |key, locales|
         missing = used_locales - locales
         if missing.any?
-          add_offense("#{key} missing translations for #{missing.join(', ')}", node: node)
+          add_offense("#{key} missing translations for #{missing.join(', ')}", node: node) do |corrector|
+            key = key.split(".")
+            missing.each do |language|
+              corrector.schema_corrector(schema, key + [language], "TODO")
+            end
+            corrector.replace_block_body(node, schema)
+          end
         end
       end
 
-      check_locales(schema["locales"], node: node)
+      check_locales(schema, node: node)
 
     rescue JSON::ParserError
       # Ignored, handled in ValidSchema.
@@ -31,14 +36,16 @@ module ThemeCheck
 
     private
 
-    def check_locales(locales, node:)
+    def check_locales(schema, node:)
+      locales = schema["locales"]
       return unless locales.is_a?(Hash)
 
       default_locale = locales[theme.default_locale]
+
       if default_locale
         locales.each_pair do |name, content|
           diff = LocaleDiff.new(default_locale, content)
-          diff.add_as_offenses(self, key_prefix: ["locales", name], node: node)
+          diff.add_as_offenses(self, key_prefix: ["locales", name], node: node, schema: schema)
         end
       else
         add_offense("Missing default locale in key: locales", node: node)
