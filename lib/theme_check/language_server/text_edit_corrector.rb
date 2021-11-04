@@ -12,16 +12,16 @@ module ThemeCheck
       # @param node [Node]
       def insert_after(node, content)
         @edits << {
-          range: range(node),
-          newText: node.markup + content,
+          range: { start: end_position(node), end: end_position(node) },
+          newText: content,
         }
       end
 
       # @param node [Node]
       def insert_before(node, content)
         @edits << {
-          range: range(node),
-          newText: content + node.markup,
+          range: { start: start_position(node), end: start_position(node) },
+          newText: content,
         }
       end
 
@@ -44,14 +44,8 @@ module ThemeCheck
       # @param node [ThemeCheck::Node]
       def range(node)
         {
-          start: {
-            line: node.start_row,
-            character: node.start_column,
-          },
-          end: {
-            line: node.end_row,
-            character: node.end_column,
-          },
+          start: start_position(node),
+          end: end_position(node),
         }
       end
 

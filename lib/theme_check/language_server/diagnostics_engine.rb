@@ -54,7 +54,7 @@ module ThemeCheck
             end_message = "Found #{offenses.size} new offenses in #{format("%0.2f", time.real)}s"
             @bridge.send_work_done_progress_end(@token, end_message)
             @bridge.log(end_message)
-            send_diagnostics(offenses, [absolute_path])
+            send_diagnostics(offenses, [relative_path])
           end
         end
         @diagnostics_lock.unlock
@@ -63,15 +63,15 @@ module ThemeCheck
       private
 
       def send_diagnostics(offenses, analyzed_files = nil)
-        @diagnostics_manager.build_diagnostics(offenses, analyzed_files: analyzed_files).each do |path, diagnostics|
-          send_diagnostic(path, diagnostics)
+        @diagnostics_manager.build_diagnostics(offenses, analyzed_files: analyzed_files).each do |relative_path, diagnostics|
+          send_diagnostic(relative_path, diagnostics)
         end
       end
 
-      def send_diagnostic(path, diagnostics)
+      def send_diagnostic(relative_path, diagnostics)
         # https://microsoft.github.io/language-server-protocol/specifications/specification-current/#notificationMessage
         @bridge.send_notification('textDocument/publishDiagnostics', {
-          uri: file_uri(path),
+          uri: file_uri(storage.path(relative_path)),
           diagnostics: diagnostics.map(&:to_h),
         })
       end

@@ -7,8 +7,8 @@ module ThemeCheck
 
       kind "quickfix"
 
-      def code_actions(absolute_path, range)
-        diagnostics_manager.diagnostics(absolute_path)
+      def code_actions(relative_path, range)
+        diagnostics_manager.diagnostics(relative_path)
           .filter { |diagnostic| diagnostic.correctable? && offense_in_range?(diagnostic.offense, range) }
           .reject do |diagnostic|
             # We cannot quickfix if the buffer was modified. This means

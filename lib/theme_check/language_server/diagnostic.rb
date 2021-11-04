@@ -88,14 +88,28 @@ module ThemeCheck
         }
       end
 
+      def absolute_path
+        @absolute_path ||= offense&.theme_file&.path
+      end
+
+      def relative_path
+        @relative_path ||= offense&.theme_file&.relative_path
+      end
+
+      def uri
+        @uri ||= absolute_path && file_uri(absolute_path)
+      end
+
+      def file_version
+        @version ||= offense&.version
+      end
+
       def data
-        absolute_path = offense&.theme_file&.path
-        relative_path = offense&.theme_file&.relative_path
         {
           absolute_path: absolute_path.to_s,
           relative_path: relative_path.to_s,
-          uri: absolute_path && file_uri(absolute_path),
-          version: offense&.version,
+          uri: uri,
+          version: file_version,
         }
       end
     end

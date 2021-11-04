@@ -5,9 +5,9 @@ module ThemeCheck
     class SourceFixAllCodeActionProvider < CodeActionProvider
       kind "source.fixAll"
 
-      def code_actions(absolute_path, _)
+      def code_actions(relative_path, _)
         diagnostics = diagnostics_manager
-          .diagnostics(absolute_path)
+          .diagnostics(relative_path)
           .filter(&:correctable?)
           .map(&:to_h)
         diagnostics_to_code_action(diagnostics)

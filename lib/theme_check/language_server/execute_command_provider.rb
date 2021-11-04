@@ -18,9 +18,10 @@ module ThemeCheck
         end
       end
 
-      attr_reader :bridge, :diagnostics_manager
+      attr_reader :storage, :bridge, :diagnostics_manager
 
-      def initialize(bridge, diagnostics_manager)
+      def initialize(storage, bridge, diagnostics_manager)
+        @storage = storage
         @bridge = bridge
         @diagnostics_manager = diagnostics_manager
       end

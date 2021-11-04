@@ -3,6 +3,8 @@
 module ThemeCheck
   module LanguageServer
     class CorrectionExecuteCommandProvider < ExecuteCommandProvider
+      include URIHelper
+
       command "correction"
 
       # The arguments passed to this method are the ones forwarded
@@ -10,67 +12,27 @@ module ThemeCheck
       #
       # @param diagnostic_hashes [Array] - of diagnostics
       def execute(diagnostic_hashes)
-        # compile all the document changes
-        document_changes = diagnostic_hashes
-          .group_by { |d| to_text_document(d) }
-          .map do |text_document, diagnostic_hashes_for_document|
-            {
-              textDocument: text_document,
-              edits: diagnostic_hashes_for_document.flat_map do |diagnostic_hash|
-                to_text_edit(diagnostic_hash)
-              end,
-            }
-          end
-
         # attempt to apply the document changes
+        workspace_edit = diagnostics_manager.workspace_edit(diagnostic_hashes)
         result = bridge.send_request('workspace/applyEdit', {
           label: 'Theme Check correction',
-          edit: {
-            documentChanges: document_changes,
-          },
+          edit: workspace_edit,
         })
 
+        # Bail if unable to apply changes
         return unless result[:applied]
 
-        # Clean up fixed diagnostics from the list.
-        diagnostic_hashes.each do |diagnostic_hash|
-          absolute_path = diagnostic_hash.dig(:data, :absolute_path)
-          diagnostic = diagnostics_manager
-            .diagnostics(absolute_path)
-            .find { |d| d == diagnostic_hash }
-          diagnostics_manager
-            .delete(absolute_path, diagnostic)
-        end
+        # Clean up internal representation of fixed diagnostics
+        diagnostics_update = diagnostics_manager.delete_applied(diagnostic_hashes)
 
         # Send updated diagnostics to client
-        diagnostic_hashes
-          .group_by { |d| d.dig(:data) }
-          .map do |data, _|
+        diagnostics_update
+          .map do |relative_path, diagnostics|
             bridge.send_notification('textDocument/publishDiagnostics', {
-              uri: data[:uri],
-              diagnostics: diagnostics_manager.diagnostics(data[:absolute_path]).map(&:to_h),
+              uri: file_uri(storage.path(relative_path)),
+              diagnostics: diagnostics.map(&:to_h),
             })
           end
-      end
-
-      private
-
-      def to_text_document(diagnostic_hash)
-        {
-          uri: diagnostic_hash.dig(:data, :uri),
-          version: diagnostic_hash.dig(:data, :version),
-        }
-      end
-
-      def to_text_edit(diagnostic_hash)
-        offense = diagnostics_manager
-          .diagnostics(diagnostic_hash.dig(:data, :absolute_path))
-          .find { |d| d == diagnostic_hash }
-          &.offense
-        return [] if offense.nil?
-        corrector = TextEditCorrector.new
-        offense.correct(corrector)
-        corrector.edits
       end
     end
   end

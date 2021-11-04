@@ -17,7 +17,7 @@ module ThemeCheck
           "#<#{code_name} theme_file=\"#{theme_file.path}\" #{whole_theme? ? 'whole_theme' : 'single_file'}>"
         end
       end
-      LiquidFile = Struct.new(:path)
+      LiquidFile = Struct.new(:relative_path)
 
       class WholeThemeOffense < Offense
         def initialize(code_name, path)
@@ -32,7 +32,7 @@ module ThemeCheck
       end
 
       def setup
-        @tracker = DiagnosticsManager.new
+        @diagnostics_manager = DiagnosticsManager.new
       end
 
       def test_reports_all_on_first_run
@@ -177,15 +177,118 @@ module ThemeCheck
           SingleFileOffense.new("UnusedAssign", "template/index.liquid"),
           SingleFileOffense.new("SyntaxError", "template/index.liquid"),
         ]
-        assert_equal(expected, @tracker.diagnostics(Pathname.new("template/index.liquid")).map(&:offense))
-        assert_equal(expected, @tracker.diagnostics("template/index.liquid").map(&:offense))
+        assert_equal(expected, @diagnostics_manager.diagnostics(Pathname.new("template/index.liquid")).map(&:offense))
+        assert_equal(expected, @diagnostics_manager.diagnostics("template/index.liquid").map(&:offense))
       end
+
+      def test_workspace_edit
+        # setup, pretend we ran diagnostics on a theme
+        diagnostics_manager = diagnose_theme(
+          SpaceInsideBraces.new,
+          "index.liquid" => <<~LIQUID
+            {{x}}
+            01234
+          LIQUID
+        )
+        diagnostic_hashes = diagnostics_manager.diagnostics("index.liquid").map(&:to_h)
+
+        # pretend the user wants to correct all of them, what does the workspace_edit look like?
+        workspace_edit = diagnostics_manager.workspace_edit(diagnostic_hashes)
+        assert_equal(
+          {
+            documentChanges: [
+              {
+                textDocument: {
+                  uri: diagnostic_hashes[0].dig(:data, :uri),
+                  version: diagnostic_hashes[0].dig(:data, :version),
+                },
+                edits: [
+                  { range: range(0, 2, 0, 2), newText: ' ' },
+                  { range: range(0, 3, 0, 3), newText: ' ' },
+                ],
+              },
+            ],
+          },
+          workspace_edit,
+        )
+      end
+
+      def test_delete_applied_deletes_fixable_diagnostics
+        diagnostics_manager = diagnose_theme(
+          SpaceInsideBraces.new,
+          TemplateLength.new(max_length: 0),
+          "index.liquid" => <<~LIQUID
+            {{x}}
+            01234
+          LIQUID
+        )
+        diagnostics = diagnostics_manager.diagnostics("index.liquid")
+        refute(diagnostics.all? { |diagnostic| diagnostic.code == "SpaceInsideBraces" })
+
+        diagnostics_manager.delete_applied(diagnostics.map(&:to_h))
+
+        remaining_diagnostics = diagnostics_manager.diagnostics("index.liquid")
+        assert(
+          remaining_diagnostics.all? { |diagnostic| diagnostic.code == "TemplateLength" },
+          "TemplateLength is unfixable, therefore it should remain in the collection of diagnostics",
+        )
+      end
+
+      def test_delete_applied_returns_updated_diagnostics
+        diagnostics_manager = diagnose_theme(
+          SpaceInsideBraces.new,
+          TemplateLength.new(max_length: 0),
+          "index.liquid" => <<~LIQUID
+            {{x}}
+            01234
+          LIQUID
+        )
+        diagnostics = diagnostics_manager.diagnostics("index.liquid")
+        actual = diagnostics_manager.delete_applied(diagnostics.map(&:to_h))
+        assert_equal(
+          {
+            "index.liquid" => diagnostics.select { |d| d.code == "TemplateLength" },
+          },
+          actual.transform_keys(&:to_s),
+        )
+      end
+
+      def test_delete_applied_returns_empty_diagnostics_if_all_were_cleared
+        diagnostics_manager = diagnose_theme(
+          SpaceInsideBraces.new,
+          "index.liquid" => <<~LIQUID
+            {{x}}
+            01234
+          LIQUID
+        )
+        diagnostics = diagnostics_manager.diagnostics("index.liquid")
+        actual = diagnostics_manager.delete_applied(diagnostics.map(&:to_h))
+        assert_equal(
+          {
+            "index.liquid" => [],
+          },
+          actual.transform_keys(&:to_s),
+        )
+      end
+
+      # TODO
+      def test_handle_create_file_document_changes; end
+
+      # TODO
+      def test_handle_delete_file_document_changes; end
 
       private
 
+      def diagnose_theme(*check_classes, templates)
+        diagnostics_manager = DiagnosticsManager.new
+        offenses = analyze_theme(*check_classes, templates)
+        diagnostics_manager.build_diagnostics(offenses)
+        diagnostics_manager
+      end
+
       def build_diagnostics(offenses:, analyzed_files: nil)
         actual_diagnostics = {}
-        @tracker.build_diagnostics(offenses, analyzed_files: analyzed_files).each do |path, diagnostics|
+        @diagnostics_manager.build_diagnostics(offenses, analyzed_files: analyzed_files).each do |path, diagnostics|
           actual_diagnostics[path] = diagnostics
         end
         actual_diagnostics
@@ -199,6 +302,13 @@ module ThemeCheck
             .transform_keys(&:to_s)
             .transform_values { |path_diagnostics| path_diagnostics.map(&:offense) }
         )
+      end
+
+      def range(start_row, start_col, end_row, end_col)
+        {
+          start: { line: start_row, character: start_col },
+          end: { line: end_row, character: end_col },
+        }
       end
     end
   end

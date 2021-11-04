@@ -3,10 +3,10 @@
 module ThemeCheck
   module LanguageServer
     class ExecuteCommandEngine
-      def initialize(bridge, diagnostics_manager)
+      def initialize(storage, bridge, diagnostics_manager)
         @providers = {}
         ExecuteCommandProvider.all
-          .map { |c| c.new(bridge, diagnostics_manager) }
+          .map { |c| c.new(storage, bridge, diagnostics_manager) }
           .each { |p| @providers[p.command] = p }
       end
 
