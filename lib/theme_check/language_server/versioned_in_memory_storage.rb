@@ -6,7 +6,7 @@ module ThemeCheck
 
     attr_reader :versions
 
-    def initialize(files, root)
+    def initialize(files, root = "/dev/null")
       super(files, root)
       @versions = {}
       @mutex = Mutex.new

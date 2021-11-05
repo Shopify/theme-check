@@ -97,6 +97,25 @@ module Minitest
       analyzer.offenses
     end
 
+    def diagnose_theme(*check_classes, templates)
+      storage = ThemeCheck::VersionedInMemoryStorage.new(templates)
+      templates.each do |path, value|
+        # set initial version of the files to 1
+        storage.write(path, value, 1)
+      end
+
+      theme = ThemeCheck::Theme.new(storage)
+      analyzer = ThemeCheck::Analyzer.new(theme, check_classes)
+      analyzer.analyze_theme
+      offenses = analyzer.offenses
+      diagnostics_manager = ThemeCheck::LanguageServer::DiagnosticsManager.new
+      diagnostics_manager.build_diagnostics(offenses)
+      {
+        diagnostics_manager: diagnostics_manager,
+        storage: storage,
+      }
+    end
+
     def make_theme(files = {})
       storage = make_storage(files)
       ThemeCheck::Theme.new(storage)

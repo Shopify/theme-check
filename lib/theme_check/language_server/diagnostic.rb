@@ -88,6 +88,14 @@ module ThemeCheck
         }
       end
 
+      def start_index
+        offense.start_index
+      end
+
+      def end_index
+        offense.end_index
+      end
+
       def absolute_path
         @absolute_path ||= offense&.theme_file&.path
       end

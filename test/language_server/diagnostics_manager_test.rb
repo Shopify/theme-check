@@ -282,7 +282,7 @@ module ThemeCheck
       private
 
       def diagnose_theme(*check_classes, templates)
-        diagnostics_manager = DiagnosticsManager.new
+        diagnostics_manager = ThemeCheck::LanguageServer::DiagnosticsManager.new
         offenses = analyze_theme(*check_classes, templates)
         diagnostics_manager.build_diagnostics(offenses)
         diagnostics_manager

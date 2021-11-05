@@ -9,6 +9,11 @@ module ThemeCheck
         diagnostics = diagnostics_manager
           .diagnostics(relative_path)
           .filter(&:correctable?)
+          .reject do |diagnostic|
+            # We cannot quickfix if the buffer was modified. This means
+            # our diagnostics and InMemoryStorage are out of sync.
+            diagnostic.file_version != storage.latest_version(diagnostic.relative_path)
+          end
           .map(&:to_h)
         diagnostics_to_code_action(diagnostics)
       end
@@ -19,11 +24,11 @@ module ThemeCheck
         return [] if diagnostics.empty?
         [
           {
-            title: "Fix all correctable checks",
+            title: "Fix all correctable checks in file.",
             kind: kind,
             diagnostics: diagnostics,
             command: {
-              title: 'fixAll',
+              title: 'fixAll.file',
               command: LanguageServer::CorrectionExecuteCommandProvider.command,
               arguments: diagnostics,
             },

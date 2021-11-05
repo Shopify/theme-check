@@ -13,7 +13,7 @@ module ThemeCheck
           .reject do |diagnostic|
             # We cannot quickfix if the buffer was modified. This means
             # our diagnostics and InMemoryStorage are out of sync.
-            diagnostic.data[:version] != storage.latest_version(diagnostic.data[:relative_path])
+            diagnostic.file_version != storage.latest_version(diagnostic.relative_path)
           end
           .map { |diagnostic| diagnostic_to_code_action(diagnostic) }
       end
@@ -28,7 +28,7 @@ module ThemeCheck
           diagnostics: [diagnostic.to_h],
           command: {
             title: 'quickfix',
-            command: LanguageServer::CorrectionExecuteCommandProvider.command,
+            command: CorrectionExecuteCommandProvider.command,
             arguments: [diagnostic.to_h],
           },
         }

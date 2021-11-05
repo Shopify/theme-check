@@ -4,17 +4,44 @@ require "test_helper"
 module ThemeCheck
   module LanguageServer
     class QuickfixCodeActionProviderTest < Minitest::Test
-      # This class is really hard to test since it depends on a lot.
-      # However, it doesn't do a lot. So instead of testing the whole
-      # thing, we'll make sure that the methods we call exist and
-      # depend on their unit test to do their job correctly.
-      def test_dependencies_have_expected_methods
-        assert(DiagnosticsManager.method_defined?("diagnostics"))
-        assert(Diagnostic.method_defined?("message"))
-        assert(Diagnostic.method_defined?("correctable?"))
-        assert(Diagnostic.method_defined?("offense"))
-        assert(Diagnostic.method_defined?("to_h"))
-        assert(Offense.method_defined?("range"))
+      def setup
+        instances = diagnose_theme(
+          ThemeCheck::SpaceInsideBraces.new,
+          ThemeCheck::TemplateLength.new(max_length: 0),
+          "index.liquid" => <<~LIQUID,
+            {{xx}}
+            muffin
+          LIQUID
+          "other.liquid" => <<~LIQUID,
+            cookies
+          LIQUID
+        )
+        @storage = instances[:storage]
+        @diagnostics_manager = instances[:diagnostics_manager]
+        @provider = QuickfixCodeActionProvider.new(@storage, @diagnostics_manager)
+      end
+
+      def test_returns_relevant_code_actions_if_cursor_covers_diagnostic
+        expected_diagnostic = @diagnostics_manager
+          .diagnostics("index.liquid")
+          .find { |d| d.code == "SpaceInsideBraces" && d.start_index == 2 }
+        code_actions = @provider.code_actions("index.liquid", (0..2))
+        code_action = code_actions[0]
+        assert_equal(1, code_actions.size)
+        assert_equal('quickfix', code_action.dig(:kind))
+        assert_equal([expected_diagnostic.to_h], code_action.dig(:diagnostics))
+        assert_equal('quickfix', code_action.dig(:command, :title))
+        assert_equal(CorrectionExecuteCommandProvider.command, code_action.dig(:command, :command))
+        assert_equal([expected_diagnostic.to_h], code_action.dig(:command, :arguments))
+      end
+
+      def test_returns_empty_array_if_versions_dont_match
+        @storage.write('index.liquid', '{{ look ma I fixed it }}', 1000)
+        assert_equal([], @provider.code_actions("index.liquid", (0..2)))
+      end
+
+      def test_returns_empty_array_if_range_does_not_cover_a_correctable_diagnostic
+        assert_equal([], @provider.code_actions("index.liquid", (0..0)))
       end
     end
   end
