@@ -10,6 +10,7 @@ module ThemeCheck
       @first_statement = nil
       @consecutive_statements = 0
       @min_consecutive_statements = min_consecutive_statements
+      @consecutive_nodes = []
     end
 
     def on_tag(node)
@@ -35,14 +36,30 @@ module ThemeCheck
     def increment_consecutive_statements(node)
       @first_statement ||= node
       @consecutive_statements += 1
+      @consecutive_nodes << node
     end
 
     def reset_consecutive_statements
-      if @consecutive_statements >= @min_consecutive_statements
-        add_offense("Use {% liquid ... %} to write multiple tags", node: @first_statement)
+      if (@consecutive_statements >= @min_consecutive_statements) && @first_statement
+        add_offense("Use {% liquid ... %} to write multiple tags", node: @first_statement) do |corrector|
+          next if @first_statement.nil?
+          lines = @first_statement.source.split("\n").collect(&:rstrip)
+          # remove tags to be replaced by liquid tag
+          @first_statement.source.sub!("\n#{lines[@consecutive_nodes[1].line_number - 1, @consecutive_nodes[-1].line_number].join("\n")}", "")
+          # construct liquid tag with consecutive nodes (remove opening/closing tags + add liquid to opening tag)
+          consecutive = " #{lines[@first_statement.line_number - 1, @consecutive_nodes[-1].line_number + 1].join("\n ")}\n".gsub(/({%| %})/, "")
+          corrector.replace(@first_statement, "liquid\n#{consecutive}")
+          reset_values
+        end
+      else
+        reset_values
       end
+    end
+
+    def reset_values
       @first_statement = nil
       @consecutive_statements = 0
+      @consecutive_nodes = []
     end
   end
 end
