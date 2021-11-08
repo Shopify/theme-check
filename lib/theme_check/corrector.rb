@@ -2,6 +2,18 @@
 
 module ThemeCheck
   class Corrector
+    def self.pretty_json(hash, level = 1)
+      indent = "  " * level
+      <<~JSON
+
+        #{indent}#{JSON.pretty_generate(
+          hash,
+          array_nl: "\n#{indent}",
+          object_nl: "\n#{indent}",
+        )}
+      JSON
+    end
+
     def initialize(theme_file:)
       @theme_file = theme_file
     end
@@ -24,8 +36,11 @@ module ThemeCheck
     end
 
     def replace_block_body(node, content)
-      content = "\n  #{JSON.pretty_generate(content, array_nl: "\n  ", object_nl: "\n  ")}\n" if content.is_a?(Hash)
-      @theme_file.rewriter.replace_body(node, content)
+      @theme_file.rewriter.replace_block_body(node, content)
+    end
+
+    def replace_block_json(node, json)
+      replace_block_body(node, Corrector.pretty_json(json))
     end
 
     def wrap(node, insert_before, insert_after)
@@ -44,46 +59,10 @@ module ThemeCheck
       storage.mkdir(relative_path)
     end
 
-    def add_translation(file, key_path, value)
-      hash = file.content
-      add_key(hash, key, value)
-      file.update_contents(hash)
-    end
-
-    def remove_key(hash, key)
-      key.reduce(hash) do |pointer, token|
-        return pointer.delete(token) if token == key.last
-        pointer[token]
-      end
-    end
-
-    def add_key(hash, key, value)
-      key_path = key_path.split('.') if key_path.is_a?(String)
-      key_path.each_with_index.reduce(hash) do |pointer, (token, index)|
-        if index == key_path.size - 1
-          pointer[token] = value
-        elsif !pointer.key?(token)
-          pointer[token] = {}
-        end
-        pointer[token]
-      end
-    end
-
-    def schema_corrector(schema, key, value)
-      return unless schema.is_a?(Hash)
-      key.reduce(schema) do |pointer, token|
-        case pointer
-        when Array
-          pointer.each do |item|
-            schema_corrector(item, key.drop(1), value)
-          end
-
-        when Hash
-          return pointer[token] = value if token == key.last
-          pointer[token] = {} unless pointer.key?(token) || pointer.key?("id")
-          pointer[token].nil? && pointer["id"] == token ? pointer : pointer[token]
-        end
-      end
+    def add_translation(json_file, path, value)
+      hash = json_file.content
+      HashHelper.set(hash, path, value)
+      json_file.update_contents(hash)
     end
   end
 end

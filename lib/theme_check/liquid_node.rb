@@ -102,24 +102,6 @@ module ThemeCheck
       position.end_index + end_token.length
     end
 
-    def render_start_tag
-      "#{start_token} #{@value.raw}#{end_token}"
-    end
-
-    def render_end_tag
-      "#{start_token} #{@value.block_delimiter} #{end_token}"
-    end
-
-    def block_body_start_index
-      return unless block_tag?
-      block_regex.begin(:body)
-    end
-
-    def block_body_end_index
-      return unless block_tag?
-      block_regex.end(:body)
-    end
-
     # Literals are hard-coded values in the liquid file.
     def literal?
       @value.is_a?(String) || @value.is_a?(Integer)
@@ -168,6 +150,37 @@ module ThemeCheck
 
     def source
       theme_file&.source
+    end
+
+    def block_body
+      return unless block_tag?
+      @block_body ||= source[block_body_start_index...block_body_end_index]
+    end
+
+    def block_body_start_index
+      return unless block_tag?
+      @block_body_start_index ||= source.match(/-?#{Liquid::TagEnd}/omi, end_index).end(0)
+    end
+
+    def block_body_end_index
+      return unless block_tag?
+      @block_body_end_index ||= source.index(/#{Liquid::TagStart}-?\s*#{@value.block_delimiter}/im, block_body_start_index)
+    end
+
+    def block_body_start_row
+      block_body_position&.start_row
+    end
+
+    def block_body_start_column
+      block_body_position&.start_column
+    end
+
+    def block_body_end_row
+      block_body_position&.end_row
+    end
+
+    def block_body_end_column
+      block_body_position&.end_column
     end
 
     WHITESPACE = /\s/
@@ -230,16 +243,20 @@ module ThemeCheck
 
     private
 
-    def block_regex
-      return unless block_tag?
-      /(?<start_token>#{render_start_tag})(?<body>.*)(?<end_token>#{render_end_tag})/m.match(source)
-    end
-
     def position
       @position ||= Position.new(
         markup,
         theme_file&.source,
         line_number_1_indexed: line_number
+      )
+    end
+
+    def block_body_position
+      return unless block_tag?
+      @block_body_position ||= StrictPosition.new(
+        block_body,
+        source,
+        block_body_start_index,
       )
     end
 

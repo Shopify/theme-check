@@ -21,9 +21,9 @@ module ThemeCheck
           add_offense("#{key} missing translations for #{missing.join(', ')}", node: node) do |corrector|
             key = key.split(".")
             missing.each do |language|
-              corrector.schema_corrector(schema, key + [language], "TODO")
+              HashHelper.schema_corrector(schema, key + [language], "TODO")
             end
-            corrector.replace_block_body(node, schema)
+            corrector.replace_block_json(node, schema)
           end
         end
       end

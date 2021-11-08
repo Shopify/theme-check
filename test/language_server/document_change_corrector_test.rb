@@ -89,6 +89,28 @@ module ThemeCheck
         )
       end
 
+      def test_replace_block_body
+        node = find(root_node(<<~LIQUID)) { |n| n.type_name == :schema }
+          {% schema %}Hello Muffin{% endschema %}
+          012345678901234567890123456789
+        LIQUID
+        corrector = DocumentChangeCorrector.new
+        corrector.replace_block_body(node, "Hello cookies!")
+        assert_equal(
+          [{
+            textDocument: {
+              uri: file_uri(node.theme_file.path),
+              version: nil,
+            },
+            edits: [{
+              range: range(0, 12, 0, 24),
+              newText: 'Hello cookies!',
+            }],
+          }],
+          corrector.document_changes,
+        )
+      end
+
       def test_wrap
         @corrector.wrap(@node, '<', '>')
         assert_equal(3, @node.end_column)

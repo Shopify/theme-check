@@ -1,0 +1,76 @@
+# frozen_string_literal: true
+require "test_helper"
+
+module ThemeCheck
+  class HashHelperTest < Minitest::Test
+    def test_set
+      assert_equal({ "a" => { "b" => 1 } }, HashHelper.set({}, 'a.b', 1))
+      assert_equal({ "a" => { "b" => 1 } }, HashHelper.set({}, ['a', 'b'], 1))
+      assert_equal({ "a" => { "b" => 1 } }, HashHelper.set({ "a" => { "b" => 0 } }, 'a.b', 1))
+    end
+
+    def test_delete
+      hash = { "a" => { "b" => 111, "c" => 222 } }
+      assert_equal(111, HashHelper.delete(hash, 'a.b'))
+      assert_equal(222, HashHelper.delete(hash, ['a', 'c']))
+      assert_nil(HashHelper.delete(hash, 'a.b'))
+      assert_equal({ "a" => {} }, hash)
+    end
+
+    def test_schema_corrector_recursively_adds_keys_through_arrays
+      schema = {
+        "array" => [
+          {},
+          {},
+          {},
+        ],
+      }
+      assert_equal(
+        {
+          "array" => [
+            { "a" => 1 },
+            { "a" => 1 },
+            { "a" => 1 },
+          ],
+        },
+        HashHelper.schema_corrector(schema, "array.a", 1),
+      )
+    end
+
+    def test_schema_corrector_deeply_adds_keys
+      schema = {
+        "deep" => {
+          "object" => {},
+        },
+      }
+      assert_equal(
+        {
+          "deep" => {
+            "object" => {
+              "a" => 1,
+            },
+          },
+        },
+        HashHelper.schema_corrector(schema, ["deep", "object", "a"], 1),
+      )
+    end
+
+    def test_schema_corrector_deeply_adds_keys_in_array_by_id
+      schema = {
+        "deep" => [
+          { "id" => "hi" },
+          { "id" => "oh" },
+        ],
+      }
+      assert_equal(
+        {
+          "deep" => [
+            { "id" => "hi", "ho" => "ho" },
+            { "id" => "oh" },
+          ],
+        },
+        HashHelper.schema_corrector(schema, "deep.hi.ho", "ho")
+      )
+    end
+  end
+end

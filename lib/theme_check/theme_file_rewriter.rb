@@ -38,7 +38,7 @@ module ThemeCheck
       )
     end
 
-    def replace_body(node, content)
+    def replace_block_body(node, content)
       @rewriter.replace(
         range(node.block_body_start_index, node.block_body_end_index),
         content

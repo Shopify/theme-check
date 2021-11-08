@@ -39,6 +39,26 @@ module ThemeCheck
         }
       end
 
+      def replace_block_body(node, content)
+        edits(node) << {
+          range: {
+            start: {
+              line: node.block_body_start_row,
+              character: node.block_body_start_column,
+            },
+            end: {
+              line: node.block_body_end_row,
+              character: node.block_body_end_column,
+            },
+          },
+          newText: content,
+        }
+      end
+
+      def replace_block_json(node, content)
+        replace_block_body(node, Corrector.pretty_json(content))
+      end
+
       def wrap(node, insert_before, insert_after)
         edits(node) << {
           range: range(node),
@@ -88,21 +108,16 @@ module ThemeCheck
         remove(storage, path)
       end
 
-      # @param file [JsonFile]
-      # @param key_path [Array]
-      def add_translation(file, key_path, value)
+      def add_translation(file, path, value)
         hash = file.content
-        key_path = key_path.split('.') if key_path.is_a?(String)
-        key_path.each_with_index.reduce(hash) do |pointer, (token, index)|
-          if index == key_path.size - 1
-            pointer[token] = value
-          elsif !pointer.key?(token)
-            pointer[token] = {}
-          end
-          pointer[token]
-        end
+        HashHelper.set(hash, path, value)
         # simpler to just overwrite it.
-        create(file.storage, file.relative_path, JSON.pretty_generate(hash), overwrite: true)
+        create(
+          file.storage,
+          file.relative_path,
+          JSON.pretty_generate(hash),
+          overwrite: true
+        )
       end
 
       private
