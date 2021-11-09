@@ -204,14 +204,6 @@ module ThemeCheck
                 },
                 edits: [
                   { range: range(0, 2, 0, 2), newText: ' ' },
-                ],
-              },
-              {
-                textDocument: {
-                  uri: diagnostic_hashes[1].dig(:data, :uri),
-                  version: diagnostic_hashes[1].dig(:data, :version),
-                },
-                edits: [
                   { range: range(0, 3, 0, 3), newText: ' ' },
                 ],
               },

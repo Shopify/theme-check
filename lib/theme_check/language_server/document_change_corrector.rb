@@ -6,6 +6,7 @@ module ThemeCheck
       include URIHelper
 
       def initialize
+        @json_edits = {}
         @text_document_edits = {}
         @create_files = []
         @rename_files = []
@@ -13,6 +14,7 @@ module ThemeCheck
       end
 
       def document_changes
+        apply_json_edits
         @create_files + @rename_files + @text_document_edits.values + @delete_files
       end
 
@@ -55,8 +57,15 @@ module ThemeCheck
         }
       end
 
-      def replace_block_json(node, content)
-        replace_block_body(node, Corrector.pretty_json(content))
+      def replace_block_json(node, json)
+        # Kind of brittle alert: We're assuming that modifications are
+        # made directly on the same json hash (e.g. schema). As such,
+        # if this assumption is true, then it follows that the
+        # "correct" JSON is the _last_ one that we defined.
+        #
+        # We're going to append those changes to the text edit when
+        # we're done.
+        @json_edits[node] = json
       end
 
       def wrap(node, insert_before, insert_after)
@@ -121,6 +130,12 @@ module ThemeCheck
       end
 
       private
+
+      def apply_json_edits
+        @json_edits.each do |node, json|
+          replace_block_body(node, Corrector.pretty_json(json))
+        end
+      end
 
       # @param node [Node]
       def text_document_edit(node)

@@ -217,6 +217,37 @@ module ThemeCheck
         )
       end
 
+      def test_replace_json_body
+        node = find(root_node(<<~LIQUID)) { |n| n.type_name == :schema }
+          {% schema %}
+            {}
+          {% endschema %}
+        LIQUID
+        corrector = DocumentChangeCorrector.new
+
+        # Simulate doing multiple corrector calls on the _same_ node.
+        json = JSON.parse(node.block_body)
+        HashHelper.set(json, 'a.b', 1)
+        corrector.replace_block_json(node, json)
+        HashHelper.set(json, 'a.c', 2)
+        corrector.replace_block_json(node, json)
+
+        # We expect only ONE change for all those replace_block_json calls
+        assert_equal(
+          [{
+            textDocument: {
+              uri: file_uri(node.theme_file.path),
+              version: nil,
+            },
+            edits: [{
+              range: range(0, 12, 2, 0),
+              newText: Corrector.pretty_json(json, 1),
+            }],
+          }],
+          corrector.document_changes,
+        )
+      end
+
       private
 
       def root_node(code)

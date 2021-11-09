@@ -71,26 +71,22 @@ module ThemeCheck
 
       def workspace_edit(diagnostics)
         diagnostics = sanitize(diagnostics)
-
-        document_changes = diagnostics
           .select(&:correctable?)
-          .flat_map { |d| to_document_changes(d) }
 
         {
-          documentChanges: document_changes,
+          documentChanges: document_changes(diagnostics),
         }
       end
 
       def delete_applied(diagnostics)
         diagnostics = sanitize(diagnostics)
+          .select(&:correctable?)
 
         previous_paths = paths(@latest_diagnostics)
 
-        diagnostics
-          .select(&:correctable?)
-          .each do |diagnostic|
-            delete(diagnostic.relative_path, diagnostic)
-          end
+        diagnostics.each do |diagnostic|
+          delete(diagnostic.relative_path, diagnostic)
+        end
 
         current_paths = paths(@latest_diagnostics)
 
@@ -119,10 +115,12 @@ module ThemeCheck
           .find { |d| d == diagnostic_hash }
       end
 
-      def to_document_changes(diagnostic)
-        offense = diagnostic.offense
+      def document_changes(diagnostics)
         corrector = DocumentChangeCorrector.new
-        offense.correct(corrector)
+        diagnostics.each do |diagnostic|
+          offense = diagnostic.offense
+          offense.correct(corrector)
+        end
         corrector.document_changes
       end
 
