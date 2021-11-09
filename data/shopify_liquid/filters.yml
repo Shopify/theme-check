@@ -81,6 +81,7 @@ UrlFilter:
 - product_img_url
 - collection_img_url
 - article_img_url
+- preload_tag
 JsonFilter:
 - json
 ColorFilter:
