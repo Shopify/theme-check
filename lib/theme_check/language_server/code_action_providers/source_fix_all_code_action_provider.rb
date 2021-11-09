@@ -24,7 +24,7 @@ module ThemeCheck
         return [] if diagnostics.empty?
         [
           {
-            title: "Fix all correctable checks in file.",
+            title: "Fix all Theme Check auto-fixable problems",
             kind: kind,
             diagnostics: diagnostics,
             command: {

@@ -28,7 +28,7 @@ module ThemeCheck
           .map(&:to_h)
         expected = [
           {
-            title: 'Fix all correctable checks in file.',
+            title: 'Fix all Theme Check auto-fixable problems',
             kind: 'source.fixAll',
             diagnostics: expected_diagnostics,
             command: {
