@@ -1,4 +1,20 @@
 
+v1.8.0 / 2021-11-09
+===================
+
+## Features
+
+**New corrections for the following checks:**
+
+  * `MissingRequiredTemplateFiles` ([#462](https://github.com/shopify/theme-check/issues/462))
+  * `RequiredLayoutThemeObject` ([#484](https://github.com/shopify/theme-check/issues/484))
+  * `UnusedAssign` ([#380](https://github.com/shopify/theme-check/issues/380))
+
+## Fixes
+
+  * Add support for `preload_tag` filter
+  * Minor Language Server improvements (close logs) ([#472](https://github.com/shopify/theme-check/issues/472))
+
 v1.7.2 / 2021-09-24
 ===================
 
