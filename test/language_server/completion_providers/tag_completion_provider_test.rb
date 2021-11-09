@@ -26,7 +26,7 @@ module ThemeCheck
         assert_can_complete_with(@provider, "{% comm", "comment")
       end
 
-      def test_complete_end_blocks
+      def test_complete_block_ends
         assert_can_complete_with(@provider, "{% end", "endcomment")
         assert_can_complete_with(@provider, "{% endcomm", "endcomment")
       end

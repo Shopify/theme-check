@@ -41,23 +41,34 @@ module ThemeCheck
         }
       end
 
-      def replace_block_body(node, content)
+      # @param node [LiquidNode]
+      def remove(node)
+        edits(node) << {
+          range: {
+            start: { line: node.outer_markup_start_row, character: node.outer_markup_start_column },
+            end: { line: node.outer_markup_end_row, character: node.outer_markup_end_column },
+          },
+          newText: '',
+        }
+      end
+
+      def replace_inner_markup(node, content)
         edits(node) << {
           range: {
             start: {
-              line: node.block_body_start_row,
-              character: node.block_body_start_column,
+              line: node.inner_markup_start_row,
+              character: node.inner_markup_start_column,
             },
             end: {
-              line: node.block_body_end_row,
-              character: node.block_body_end_column,
+              line: node.inner_markup_end_row,
+              character: node.inner_markup_end_column,
             },
           },
           newText: content,
         }
       end
 
-      def replace_block_json(node, json)
+      def replace_inner_json(node, json)
         # Kind of brittle alert: We're assuming that modifications are
         # made directly on the same json hash (e.g. schema). As such,
         # if this assumption is true, then it follows that the
@@ -65,6 +76,15 @@ module ThemeCheck
         #
         # We're going to append those changes to the text edit when
         # we're done.
+        #
+        # We're doing this because no language client will accept
+        # text modifications that occur on the same range. So we need
+        # to dedup our JSON edits for the client to accept our change.
+        #
+        # What we're doing here is overwriting the json edit for a
+        # node to the latest one that is called. If all the edits
+        # occur on the same hash, this final hash will have all the
+        # edits in it.
         @json_edits[node] = json
       end
 
@@ -75,9 +95,9 @@ module ThemeCheck
         }
       end
 
-      def create(storage, relative_path, contents = nil, overwrite: false)
+      def create_file(storage, relative_path, contents = nil, overwrite: false)
         uri = file_uri(storage.path(relative_path))
-        @create_files << create_file(uri, overwrite)
+        @create_files << create_file_change(uri, overwrite)
         return if contents.nil?
         text_document = { uri: uri, version: nil }
         @text_document_edits[text_document] = {
@@ -92,19 +112,9 @@ module ThemeCheck
         }
       end
 
-      def create_file(uri, overwrite = false)
-        result = {}
-        result[:kind] = 'create'
-        result[:uri] = uri
-        result[:options] = { overwrite: overwrite } if overwrite
-        result
-      end
-
-      def remove(storage, relative_path)
-        @delete_files << {
-          kind: 'delete',
-          uri: file_uri(storage.path(relative_path)),
-        }
+      def remove_file(storage, relative_path)
+        uri = file_uri(storage.path(relative_path))
+        @delete_files << delete_file_change(uri)
       end
 
       def mkdir(storage, relative_path)
@@ -113,15 +123,15 @@ module ThemeCheck
         # do is create a file and then delete it.
         #
         # It does the job :upside_down_smile:.
-        create(storage, path)
-        remove(storage, path)
+        create_file(storage, path)
+        remove_file(storage, path)
       end
 
       def add_translation(file, path, value)
         hash = file.content
         HashHelper.set(hash, path, value)
         # simpler to just overwrite it.
-        create(
+        create_file(
           file.storage,
           file.relative_path,
           JSON.pretty_generate(hash),
@@ -133,7 +143,7 @@ module ThemeCheck
 
       def apply_json_edits
         @json_edits.each do |node, json|
-          replace_block_body(node, Corrector.pretty_json(json))
+          replace_inner_markup(node, Corrector.pretty_json(json))
         end
       end
 
@@ -143,6 +153,21 @@ module ThemeCheck
         @text_document_edits[text_document] ||= {
           textDocument: text_document,
           edits: [],
+        }
+      end
+
+      def create_file_change(uri, overwrite = false)
+        change = {}
+        change[:kind] = 'create'
+        change[:uri] = uri
+        change[:options] = { overwrite: overwrite } if overwrite
+        change
+      end
+
+      def delete_file_change(uri)
+        {
+          kind: 'delete',
+          uri: uri,
         }
       end
 

@@ -35,19 +35,19 @@ module ThemeCheck
       node.markup = content
     end
 
-    def replace_block_body(node, content)
-      @theme_file.rewriter.replace_block_body(node, content)
+    def replace_inner_markup(node, content)
+      @theme_file.rewriter.replace_inner_markup(node, content)
     end
 
-    def replace_block_json(node, json)
-      replace_block_body(node, Corrector.pretty_json(json))
+    def replace_inner_json(node, json)
+      replace_inner_markup(node, Corrector.pretty_json(json))
     end
 
     def wrap(node, insert_before, insert_after)
       @theme_file.rewriter.wrap(node, insert_before, insert_after)
     end
 
-    def create(storage, relative_path, content)
+    def create_file(storage, relative_path, content)
       storage.write(relative_path, content)
     end
 

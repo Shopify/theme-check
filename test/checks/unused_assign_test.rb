@@ -95,7 +95,8 @@ class UnusedAssignTest < Minitest::Test
       "templates/index.liquid" => <<~END,
         {% liquid
           assign x = 1
-          assign y = 2\n  \n%}
+          assign y = 2
+        %}
         {{ x }}
         {{ y }}
       END

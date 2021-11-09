@@ -32,6 +32,7 @@ module ThemeCheck
               uri: file_uri(storage.path(relative_path)),
               diagnostics: diagnostics.map(&:to_h),
             })
+            storage.path(relative_path)
           end
       end
     end

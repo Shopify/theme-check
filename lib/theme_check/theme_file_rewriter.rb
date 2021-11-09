@@ -27,7 +27,7 @@ module ThemeCheck
 
     def remove(node)
       @rewriter.remove(
-        range(node.start_token_index, node.end_token_index)
+        range(node.outer_markup_start_index, node.outer_markup_end_index)
       )
     end
 
@@ -38,9 +38,9 @@ module ThemeCheck
       )
     end
 
-    def replace_block_body(node, content)
+    def replace_inner_markup(node, content)
       @rewriter.replace(
-        range(node.block_body_start_index, node.block_body_end_index),
+        range(node.inner_markup_start_index, node.inner_markup_end_index),
         content
       )
     end

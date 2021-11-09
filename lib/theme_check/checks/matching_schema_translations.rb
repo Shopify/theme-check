@@ -23,7 +23,7 @@ module ThemeCheck
             missing.each do |language|
               HashHelper.schema_corrector(schema, key + [language], "TODO")
             end
-            corrector.replace_block_json(node, schema)
+            corrector.replace_inner_json(node, schema)
           end
         end
       end

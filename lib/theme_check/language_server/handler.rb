@@ -76,6 +76,7 @@ module ThemeCheck
       def on_text_document_did_change(_id, params)
         relative_path = relative_path_from_text_document_uri(params)
         @storage.write(relative_path, content_changes_text(params), text_document_version(params))
+        analyze_and_send_offenses(text_document_uri(params))
       end
 
       def on_text_document_did_close(_id, params)

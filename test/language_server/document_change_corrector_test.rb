@@ -7,7 +7,7 @@ module ThemeCheck
       include URIHelper
 
       def setup
-        @node = find(root_node("{{x}}"), &:variable?)
+        @node = find(root_node("{{x}} "), &:variable?)
         @corrector = DocumentChangeCorrector.new
       end
 
@@ -89,13 +89,33 @@ module ThemeCheck
         )
       end
 
-      def test_replace_block_body
+      def test_remove
+        @corrector.remove(@node)
+        assert_equal(3, @node.end_column)
+        assert_equal(
+          [
+            {
+              textDocument: {
+                uri: file_uri(@node.theme_file.path),
+                version: nil,
+              },
+              edits: [{
+                range: range(0, 0, 0, 5),
+                newText: '',
+              }],
+            },
+          ],
+          @corrector.document_changes
+        )
+      end
+
+      def test_replace_inner_markup
         node = find(root_node(<<~LIQUID)) { |n| n.type_name == :schema }
           {% schema %}Hello Muffin{% endschema %}
           012345678901234567890123456789
         LIQUID
         corrector = DocumentChangeCorrector.new
-        corrector.replace_block_body(node, "Hello cookies!")
+        corrector.replace_inner_markup(node, "Hello cookies!")
         assert_equal(
           [{
             textDocument: {
@@ -131,8 +151,8 @@ module ThemeCheck
         )
       end
 
-      def test_create
-        @corrector.create(@node.theme_file.storage, 'test.liquid', 'hello world')
+      def test_create_file
+        @corrector.create_file(@node.theme_file.storage, 'test.liquid', 'hello world')
         assert_equal(
           [
             {
@@ -156,8 +176,8 @@ module ThemeCheck
         )
       end
 
-      def test_remove
-        @corrector.remove(@node.theme_file.storage, 'test.liquid')
+      def test_remove_file
+        @corrector.remove_file(@node.theme_file.storage, 'test.liquid')
         assert_equal(
           [
             {
@@ -226,13 +246,13 @@ module ThemeCheck
         corrector = DocumentChangeCorrector.new
 
         # Simulate doing multiple corrector calls on the _same_ node.
-        json = JSON.parse(node.block_body)
+        json = JSON.parse(node.inner_markup)
         HashHelper.set(json, 'a.b', 1)
-        corrector.replace_block_json(node, json)
+        corrector.replace_inner_json(node, json)
         HashHelper.set(json, 'a.c', 2)
-        corrector.replace_block_json(node, json)
+        corrector.replace_inner_json(node, json)
 
-        # We expect only ONE change for all those replace_block_json calls
+        # We expect only ONE change for all those replace_inner_json calls
         assert_equal(
           [{
             textDocument: {
