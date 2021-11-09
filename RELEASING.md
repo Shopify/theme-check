@@ -24,6 +24,19 @@
 
 6. On [Shipit](https://shipit.shopify.io/shopify/theme-check/rubygems), deploy your commit.
 
+7. [Create a GitHub release](https://github.com/Shopify/theme-check/releases/new) for the change.
+
+   ```
+   VERSION=v1.X.Y
+   git fetch origin
+   git fetch origin --tags
+   git reset origin $VERSION
+   gh release create -t $VERSION
+   ```
+
+   (It's a good idea to copy parts of the CHANGELOG in there)
+
+
 ## Homebrew Release Process
 
 1. Release `theme-check` on RubyGems by following the steps in the previous section.
