@@ -26,9 +26,13 @@ class DefaultLocaleTest < Minitest::Test
         </p>
       END
     )
+
     analyzer = ThemeCheck::Analyzer.new(theme, [ThemeCheck::DefaultLocale.new], true)
     analyzer.analyze_theme
     analyzer.correct_offenses
+
+    missing_files = ["locales/en.default.json"]
+    assert(missing_files.all? { |file| theme.storage.files.include?(file) })
     assert(theme.default_locale_json)
   end
 end
