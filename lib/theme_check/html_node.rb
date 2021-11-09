@@ -102,11 +102,11 @@ module ThemeCheck
     end
 
     def start_index
-      position.start_index
+      raise NotImplementedError
     end
 
     def end_index
-      position.end_index
+      raise NotImplementedError
     end
 
     def start_row
