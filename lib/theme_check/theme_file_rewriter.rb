@@ -38,6 +38,13 @@ module ThemeCheck
       )
     end
 
+    def replace_body(node, content)
+      @rewriter.replace(
+        range(node.block_body_start_index, node.block_body_end_index),
+        content
+      )
+    end
+
     def wrap(node, insert_before, insert_after)
       @rewriter.wrap(
         range(node.start_index, node.end_index),
