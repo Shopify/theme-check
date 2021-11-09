@@ -74,6 +74,16 @@ module ThemeCheck
       position.end_index
     end
 
+    def start_token_index
+      return position.start_index if inside_liquid_tag?
+      position.start_index - (start_token.length + 1)
+    end
+
+    def end_token_index
+      return position.end_index if inside_liquid_tag?
+      position.end_index + end_token.length
+    end
+
     def render_start_tag
       "#{start_token} #{@value.raw}#{end_token}"
     end

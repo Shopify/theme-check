@@ -14,6 +14,10 @@ module ThemeCheck
       @theme_file.rewriter.insert_before(node, content)
     end
 
+    def remove(node)
+      @theme_file.rewriter.remove(node)
+    end
+
     def replace(node, content)
       @theme_file.rewriter.replace(node, content)
       node.markup = content
@@ -37,7 +41,7 @@ module ThemeCheck
       theme.default_locale_json.update_contents({})
     end
 
-    def remove(theme, relative_path)
+    def remove_file(theme, relative_path)
       theme.storage.remove(relative_path)
     end
 
