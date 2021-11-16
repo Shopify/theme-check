@@ -3,7 +3,7 @@ require "test_helper"
 
 class CliTest < Minitest::Test
   def test_help
-    out = capture(:stdout) do
+    out, _err = capture_io do
       ThemeCheck::Cli.parse_and_run!(%w(--help))
     end
 
@@ -11,7 +11,7 @@ class CliTest < Minitest::Test
   end
 
   def test_check
-    out = capture(:stdout) do
+    out, _err = capture_io do
       assert_raises(ThemeCheck::Cli::Abort) do
         ThemeCheck::Cli.parse_and_run!([__dir__ + "/theme"])
       end
@@ -35,7 +35,7 @@ class CliTest < Minitest::Test
       YAML
     )
 
-    out = capture(:stdout) do
+    out, _err = capture_io do
       ThemeCheck::Cli.parse_and_run!([storage.root.to_s, '--output', 'json'])
     end
 
@@ -90,7 +90,7 @@ class CliTest < Minitest::Test
   end
 
   def test_print
-    out = capture(:stdout) do
+    out, _err = capture_io do
       ThemeCheck::Cli.parse_and_run!([__dir__ + "/theme", '--print'])
     end
 
@@ -108,7 +108,7 @@ class CliTest < Minitest::Test
       YAML
     )
 
-    out = capture(:stdout) do
+    out, _err = capture_io do
       ThemeCheck::Cli.parse_and_run!([__dir__ + "/theme", "-C", storage.path(".theme-check.yml").to_s, '--print'])
     end
 
@@ -119,7 +119,7 @@ class CliTest < Minitest::Test
   end
 
   def test_check_with_category
-    out = capture(:stdout) do
+    out, _err = capture_io do
       assert_raises(ThemeCheck::Cli::Abort) do
         ThemeCheck::Cli.parse_and_run!([__dir__ + "/theme", "-c", "translation", "--fail-level", "style"])
       end
@@ -128,7 +128,7 @@ class CliTest < Minitest::Test
   end
 
   def test_check_with_exclude_category
-    out = capture(:stdout) do
+    out, _err = capture_io do
       assert_raises(ThemeCheck::Cli::Abort) do
         ThemeCheck::Cli.parse_and_run!([__dir__ + "/theme", "-x", "liquid", "--fail-level", "style"])
       end
@@ -138,14 +138,14 @@ class CliTest < Minitest::Test
 
   def test_check_no_templates
     assert_raises(ThemeCheck::Cli::Abort, /^No templates found./) do
-      silence_stream(STDOUT) do
+      capture_io do
         ThemeCheck::Cli.parse_and_run!([__dir__])
       end
     end
   end
 
   def test_list
-    out = capture(:stdout) do
+    out, _err = capture_io do
       ThemeCheck::Cli.parse_and_run!(%w(--list))
     end
     assert_includes(out, "LiquidTag:")
@@ -157,7 +157,7 @@ class CliTest < Minitest::Test
         {{ content_for_header }}
       LIQUID
     )
-    out = capture(:stdout) do
+    out, _err = capture_io do
       ThemeCheck::Cli.parse_and_run!([storage.root.to_s, "-a"])
     end
     assert_includes(out, "corrected")
@@ -220,7 +220,7 @@ class CliTest < Minitest::Test
 
   def test_init
     storage = make_file_system_storage
-    out = capture(:stdout) do
+    out, _err = capture_io do
       ThemeCheck::Cli.parse_and_run!([storage.root, "--init"])
     end
     assert_includes(out, "Writing new .theme-check.yml")
@@ -233,20 +233,30 @@ class CliTest < Minitest::Test
       END
     )
     assert_raises(ThemeCheck::Cli::Abort, /^.theme-check.yml already exists/) do
-      ThemeCheck::Cli.parse_and_run!([storage.root, "--init"])
+      capture_io do
+        ThemeCheck::Cli.parse_and_run!([storage.root, "--init"])
+      end
     end
   end
 
   private
 
+  def capture_io(&block)
+    err = nil
+    out = capture(:stdout) do
+      err = capture(:stderr) do
+        block.call
+      end
+    end
+    [out, err]
+  end
+
   def assert_exit_code(exit_code, severity, files = {})
     storage = make_file_system_storage(files)
 
     err = assert_raises(SystemExit) do
-      silence_stream(STDOUT) do
-        silence_stream(STDERR) do
-          ThemeCheck::Cli.parse_and_run([storage.root, "--fail-level", severity, "-C", storage.path(".theme-check.yml").to_s])
-        end
+      capture_io do
+        ThemeCheck::Cli.parse_and_run([storage.root, "--fail-level", severity, "-C", storage.path(".theme-check.yml").to_s])
       end
     end
 
