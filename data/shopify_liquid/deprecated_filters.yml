@@ -4,6 +4,8 @@ Liquid::ColorFilter:
     - color_to_rgb
     - color_modify
 Liquid::UrlFilter:
+  img_tag:
+    - image_tag
   collection_img_url:
     - img_url
   product_img_url:

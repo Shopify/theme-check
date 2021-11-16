@@ -67,6 +67,7 @@ UrlFilter:
 - stylesheet_tag
 - script_tag
 - img_tag
+- image_tag
 - shopify_asset_url
 - payment_type_img_url
 - payment_type_svg_tag
