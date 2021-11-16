@@ -85,5 +85,22 @@ module ThemeCheck
         Asset should be served by the Shopify CDN for better performance. at templates/index.liquid:2
       END
     end
+
+    def test_offense_location_makes_sense
+      liquid = <<~LIQUID
+        {%
+          if
+          true
+        %}
+          <script
+            src="https://widget.reviews.co.uk/product/dist.js"
+            defer
+          ></script>
+        {% endif %}
+      LIQUID
+      offenses = analyze_theme(RemoteAsset.new, "templates/index.liquid" => liquid)
+      assert_equal(4, offenses[0].start_line)
+      assert_equal(2, offenses[0].start_column)
+    end
   end
 end

@@ -4,7 +4,6 @@ require "forwardable"
 
 module ThemeCheck
   class HtmlVisitor
-    include RegexHelpers
     attr_reader :checks
 
     def initialize(checks)
@@ -12,42 +11,12 @@ module ThemeCheck
     end
 
     def visit_liquid_file(liquid_file)
-      doc, placeholder_values = parse(liquid_file)
-      visit(HtmlNode.new(doc, liquid_file, placeholder_values))
+      visit(HtmlNode.parse(liquid_file))
     rescue ArgumentError => e
       call_checks(:on_parse_error, e, liquid_file)
     end
 
     private
-
-    def parse(liquid_file)
-      placeholder_values = []
-      parseable_source = +liquid_file.source.clone
-
-      # Replace all non-empty liquid tags with ≬{i}######≬ to prevent the HTML
-      # parser from freaking out. We transparently replace those placeholders in
-      # HtmlNode.
-      #
-      # We're using base36 to prevent index bleeding on 36^3 tags.
-      # `{{x}}` -> `≬#{i}≬` would properly be transformed for 46656 tags in a single file.
-      # Should be enough.
-      #
-      # The base10 alternative would have overflowed at 1000 (`{{x}}` -> `≬1000≬`) which seemed more likely.
-      #
-      # Didn't go with base64 because of the `=` character that would have messed with HTML parsing.
-      matches(parseable_source, LIQUID_TAG_OR_VARIABLE).each do |m|
-        value = m[0]
-        next unless value.size > 4 # skip empty tags/variables {%%} and {{}}
-        placeholder_values.push(value)
-        key = (placeholder_values.size - 1).to_s(36)
-        parseable_source[m.begin(0)...m.end(0)] = "≬#{key.ljust(m.end(0) - m.begin(0) - 2, '#')}≬"
-      end
-
-      [
-        Nokogiri::HTML5.fragment(parseable_source, max_tree_depth: 400, max_attributes: 400),
-        placeholder_values,
-      ]
-    end
 
     def visit(node)
       call_checks(:on_element, node) if node.element?
