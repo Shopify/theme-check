@@ -47,7 +47,7 @@ module ThemeCheck
           # remove tags to be replaced by liquid tag
           @first_statement.source.sub!("\n#{lines[@consecutive_nodes[1].line_number - 1, @consecutive_nodes[-1].line_number].join("\n")}", "")
           # construct liquid tag with consecutive nodes (remove opening/closing tags + add liquid to opening tag)
-          consecutive = " #{lines[@first_statement.line_number - 1, @consecutive_nodes[-1].line_number + 1].join("\n ")}\n".gsub(/({%| %})/, "")
+          consecutive = " #{lines[@first_statement.line_number - 1, @consecutive_nodes[-1].line_number + 1].join("\n ")}\n".gsub(Regexp.union(/{%/, / %}/, /-/, / -%}/), "")
           corrector.replace(@first_statement, "liquid\n#{consecutive}")
           reset_values
         end

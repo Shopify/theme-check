@@ -69,11 +69,11 @@ class LiquidTagTest < Minitest::Test
       ThemeCheck::LiquidTag.new(min_consecutive_statements: 4),
       "templates/index.liquid" => <<~END,
         {% if collection.image.size != 0 %}
-        {%   assign collection_image = collection.image %}
+          {% assign collection_image = collection.image %}
         {% elsif collection.products.first.size != 0 and collection.products.first.media != empty %}
-        {%   assign collection_image = collection.products.first.featured_media.preview_image %}
+          {% assign collection_image = collection.products.first.featured_media.preview_image %}
         {% else %}
-        {%   assign collection_image = nil %}
+          {% assign collection_image = nil %}
         {% endif %}
       END
     )
@@ -147,6 +147,35 @@ class LiquidTagTest < Minitest::Test
         {% assign x = 1 %}
         {% assign y = 2 %}
         {% assign z = 3 %}
+      END
+    )
+
+    sources.each do |path, source|
+      assert_equal(expected_sources[path], source)
+    end
+  end
+
+  def test_corrects_with_whitespace_trimmed
+    expected_sources = {
+      "templates/index.liquid" => <<~END,
+        {%- liquid
+          if image.width > 800
+            assign x = 1
+            assign y = 2
+            assign z = 3
+          endif
+        -%}
+      END
+    }
+
+    sources = fix_theme(
+      ThemeCheck::LiquidTag.new(min_consecutive_statements: 4),
+      "templates/index.liquid" => <<~END,
+        {%- if image.width > 800 -%}
+          {%- assign x = 1 %}
+          {%- assign y = 2 %}
+          {%- assign z = 3 %}
+        {%- endif -%}
       END
     )
 
