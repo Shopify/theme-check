@@ -45,7 +45,8 @@ module ThemeCheck
         # Tell the client we don't support anything if there's no rootPath
         return @bridge.send_response(id, { capabilities: {} }) if @root_path.nil?
 
-        @bridge.supports_work_done_progress = params.dig(:capabilities, :window, :workDoneProgress) || false
+        @client_capabilities = ClientCapabilities.new(params.dig(:capabilities) || {})
+        @bridge.supports_work_done_progress = @client_capabilities.supports_work_done_progress?
         @storage = in_memory_storage(@root_path)
         @diagnostics_manager = DiagnosticsManager.new
         @completion_engine = CompletionEngine.new(@storage)
@@ -106,10 +107,12 @@ module ThemeCheck
         absolute_path = text_document_uri(params)
         start_position = range_element(params, :start)
         end_position = range_element(params, :end)
+        only_code_action_kinds = params.dig(:context, :only) || []
         @bridge.send_response(id, @code_action_engine.code_actions(
           absolute_path,
           start_position,
-          end_position
+          end_position,
+          only_code_action_kinds,
         ))
       end
 
