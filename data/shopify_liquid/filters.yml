@@ -63,11 +63,11 @@ I18nFilter:
 - sentence
 - time_tag
 UrlFilter:
-- image_url
 - stylesheet_tag
 - script_tag
 - img_tag
 - image_tag
+- image_url
 - shopify_asset_url
 - payment_type_img_url
 - payment_type_svg_tag
