@@ -37,6 +37,7 @@ module ThemeCheck
             title: "Fix this #{diagnostic.code} problem: #{diagnostic.message}",
             kind: kind,
             diagnostics: [diagnostic.to_h],
+            isPreferred: true,
             command: {
               title: 'quickfix',
               command: CorrectionExecuteCommandProvider.command,
