@@ -14,7 +14,7 @@ module ThemeCheck
         assert_can_complete(@provider, "{{ 'foo.js' | ")
         assert_can_complete(@provider, "{{ 'foo.js' | asset")
         assert_can_complete(@provider, "{{ 'foo.js' | asset_url | ")
-        assert_can_complete(@provider, "{{ 'foo.js' | asset_url | img")
+        assert_can_complete(@provider, "{{ 'foo.js' | asset_url | image")
 
         refute_can_complete(@provider, "{{ 'foo.js' ")
         refute_can_complete(@provider, "{% if foo")
@@ -23,7 +23,7 @@ module ThemeCheck
       def test_completions
         assert_can_complete_with(@provider, "{{ 'foo.js' | ", "asset_url")
         assert_can_complete_with(@provider, "{{ 'foo.js' | asset", "asset_url")
-        assert_can_complete_with(@provider, "{{ 'foo.js' | asset_url | img", "img_url")
+        assert_can_complete_with(@provider, "{{ 'foo.js' | asset_url | image", "image_url")
       end
 
       def test_does_not_complete_deprecated_filters
