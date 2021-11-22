@@ -15,6 +15,15 @@ module ThemeCheck
       @consecutive_nodes = {}
     end
 
+    def on_node(node)
+      if node.type_name == :if
+        puts node.children.length
+        node.children.each do |n|
+          puts n.type_name
+        end
+      end
+    end
+
     def on_tag(node)
       if node.inside_liquid_tag?
         reset_values
@@ -25,10 +34,6 @@ module ThemeCheck
       #if 
     end
 
-    def on_else_condition(node)
-      # How to delete else & endif?
-      # increment_consecutive_statements(node)
-    end
 
     def on_string(node)
       # Only reset the counter on outputted strings, and ignore empty line-breaks
