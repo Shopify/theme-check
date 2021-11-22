@@ -4,6 +4,8 @@ module ThemeCheck
   class Position
     include PositionHelper
 
+    attr_accessor :needle
+
     def initialize(
       needle_arg,
       contents_arg,
@@ -68,25 +70,6 @@ module ThemeCheck
       @content_line_count ||= contents.count("\n")
     end
 
-    private
-
-    def compute_start_offset
-      return start_line_offset if @node_markup.nil?
-      node_markup_start = contents.index(@node_markup, start_line_offset)
-      return start_line_offset if node_markup_start.nil?
-      node_markup_start + @node_markup_offset
-    end
-
-    def contents
-      return '' unless @contents.is_a?(String) && !@contents.empty?
-      @contents
-    end
-
-    def line_number
-      return 0 if @line_number_1_indexed.nil?
-      bounded(0, @line_number_1_indexed - 1, content_line_count)
-    end
-
     def needle
       if has_content_and_line_number_but_no_needle?
         entire_line_needle
@@ -98,6 +81,25 @@ module ThemeCheck
         @needle
       end
     end
+
+    def contents
+      return '' unless @contents.is_a?(String) && !@contents.empty?
+      @contents
+    end
+
+    def compute_start_offset
+      return start_line_offset if @node_markup.nil?
+      node_markup_start = contents.index(@node_markup, start_line_offset)
+      return start_line_offset if node_markup_start.nil?
+      node_markup_start + @node_markup_offset
+    end
+
+    def line_number
+      return 0 if @line_number_1_indexed.nil?
+      bounded(0, @line_number_1_indexed - 1, content_line_count)
+    end
+
+    
 
     def has_content_and_line_number_but_no_needle?
       @needle.nil? && !contents.empty? && @line_number_1_indexed.is_a?(Integer)
@@ -120,6 +122,9 @@ module ThemeCheck
     attr_reader :needle, :contents
 
     def initialize(needle, contents, start_index)
+      # unless start_index.is_a?(Integer)
+      #   binding.pry
+      # end
       raise ArgumentError, 'Bad start_index' unless start_index.is_a?(Integer)
       raise ArgumentError, 'Bad contents' unless contents.is_a?(String)
       raise ArgumentError, 'Bad needle' unless needle.is_a?(String) || !contents.index(needle, start_index)
