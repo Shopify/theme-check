@@ -32,6 +32,10 @@ module ThemeCheck
     def replace_inner_json(node, json)
       replace_inner_markup(node, pretty_json(json))
     end
+    
+    def remove_node(node)
+      @theme_file.rewriter.remove_node(node)
+    end
 
     def wrap(node, insert_before, insert_after)
       @theme_file.rewriter.wrap(node, insert_before, insert_after)

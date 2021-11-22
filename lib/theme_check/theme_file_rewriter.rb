@@ -44,7 +44,10 @@ module ThemeCheck
           character_range&.end || node.end_index,
         ),
         content
-      )
+    end
+
+    def remove_node(node)
+      @rewriter.remove(range(node.outer_markup_position.start_index, node.outer_markup_position.end_index + 1))
     end
 
     def replace_inner_markup(node, content)
