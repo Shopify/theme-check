@@ -4,6 +4,7 @@ module ThemeCheck
   module LanguageServer
     class DocumentChangeCorrector
       include URIHelper
+      include JsonHelpers
 
       def initialize
         @json_edits = {}
@@ -143,7 +144,7 @@ module ThemeCheck
 
       def apply_json_edits
         @json_edits.each do |node, json|
-          replace_inner_markup(node, Corrector.pretty_json(json))
+          replace_inner_markup(node, pretty_json(json))
         end
       end
 

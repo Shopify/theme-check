@@ -5,6 +5,7 @@ module ThemeCheck
   module LanguageServer
     class DocumentChangeCorrectorTest < Minitest::Test
       include URIHelper
+      include JsonHelpers
 
       def setup
         @node = find(root_node("{{x}} "), &:variable?)
@@ -261,7 +262,7 @@ module ThemeCheck
             },
             edits: [{
               range: range(0, 12, 2, 0),
-              newText: Corrector.pretty_json(json, 1),
+              newText: pretty_json(json, 1),
             }],
           }],
           corrector.document_changes,

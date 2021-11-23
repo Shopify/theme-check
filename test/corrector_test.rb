@@ -2,51 +2,6 @@
 require "test_helper"
 
 module ThemeCheck
-  class CorrectorClassTest < Minitest::Test
-    def test_pretty_json
-      test_obj = {
-        "a" => {
-          "b" => "c",
-        },
-        "d" => [
-          "e",
-          "f",
-          "g",
-        ],
-        "h" => {
-          "i" => "j",
-          "k" => [
-            "l",
-            "m",
-            "n",
-          ],
-        },
-      }
-
-      assert_equal(<<~JSON, Corrector.pretty_json(test_obj, 0))
-
-        {
-          "a": {
-            "b": "c"
-          },
-          "d": [
-            "e",
-            "f",
-            "g"
-          ],
-          "h": {
-            "i": "j",
-            "k": [
-              "l",
-              "m",
-              "n"
-            ]
-          }
-        }
-      JSON
-    end
-  end
-
   class CorrectorTest < Minitest::Test
     def setup
       @contents = <<~END

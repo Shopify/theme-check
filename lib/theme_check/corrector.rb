@@ -2,17 +2,7 @@
 
 module ThemeCheck
   class Corrector
-    def self.pretty_json(hash, level = 1)
-      indent = "  " * level
-      <<~JSON
-
-        #{indent}#{JSON.pretty_generate(
-          hash,
-          array_nl: "\n#{indent}",
-          object_nl: "\n#{indent}",
-        )}
-      JSON
-    end
+    include JsonHelpers
 
     def initialize(theme_file:)
       @theme_file = theme_file
@@ -40,7 +30,7 @@ module ThemeCheck
     end
 
     def replace_inner_json(node, json)
-      replace_inner_markup(node, Corrector.pretty_json(json))
+      replace_inner_markup(node, pretty_json(json))
     end
 
     def wrap(node, insert_before, insert_after)
