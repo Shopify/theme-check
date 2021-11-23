@@ -6,6 +6,8 @@
 # as a big hash already, leave it like that and save yourself some IO.
 module ThemeCheck
   class InMemoryStorage < Storage
+    attr_reader :root
+
     def initialize(files = {}, root = "/dev/null")
       @files = files
       @root = Pathname.new(root)
@@ -29,6 +31,7 @@ module ThemeCheck
 
     def mkdir(relative_path)
       @files[relative_path] = nil
+      reset_memoizers
     end
 
     def files
@@ -45,6 +48,12 @@ module ThemeCheck
 
     def relative_path(absolute_path)
       Pathname.new(absolute_path).relative_path_from(@root).to_s
+    end
+
+    private
+
+    def reset_memoizers
+      @directories = nil
     end
   end
 end

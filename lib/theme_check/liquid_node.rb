@@ -45,9 +45,36 @@ module ThemeCheck
     def markup
       if tag?
         tag_markup
+      elsif literal?
+        value.to_s
       elsif @value.instance_variable_defined?(:@markup)
         @value.instance_variable_get(:@markup)
       end
+    end
+
+    def outer_markup
+      if literal?
+        markup
+      elsif variable_lookup?
+        ''
+      elsif variable?
+        start_token + markup + end_token
+      elsif tag? && block?
+        start_index = block_start_start_index
+        end_index = block_start_end_index
+        end_index += inner_markup.size
+        end_index = find_block_delimiter(end_index)&.end(0)
+        source[start_index...end_index]
+      elsif tag?
+        source[block_start_start_index...block_start_end_index]
+      else
+        inner_markup
+      end
+    end
+
+    def inner_markup
+      return '' unless block?
+      @inner_markup ||= source[block_start_end_index...block_end_start_index]
     end
 
     def markup=(markup)
@@ -70,36 +97,24 @@ module ThemeCheck
       position.start_index
     end
 
+    def start_row
+      position.start_row
+    end
+
+    def start_column
+      position.start_column
+    end
+
     def end_index
       position.end_index
     end
 
-    def start_token_index
-      return position.start_index if inside_liquid_tag?
-      position.start_index - (start_token.length + 1)
+    def end_row
+      position.end_row
     end
 
-    def end_token_index
-      return position.end_index if inside_liquid_tag?
-      position.end_index + end_token.length
-    end
-
-    def render_start_tag
-      "#{start_token} #{@value.raw}#{end_token}"
-    end
-
-    def render_end_tag
-      "#{start_token} #{@value.block_delimiter} #{end_token}"
-    end
-
-    def block_body_start_index
-      return unless block_tag?
-      block_regex.begin(:body)
-    end
-
-    def block_body_end_index
-      return unless block_tag?
-      block_regex.end(:body)
+    def end_column
+      position.end_column
     end
 
     # Literals are hard-coded values in the liquid file.
@@ -114,6 +129,10 @@ module ThemeCheck
 
     def variable?
       @value.is_a?(Liquid::Variable)
+    end
+
+    def variable_lookup?
+      @value.is_a?(Liquid::VariableLookup)
     end
 
     # A {% comment %} block node?
@@ -150,6 +169,78 @@ module ThemeCheck
 
     def source
       theme_file&.source
+    end
+
+    def block_start_start_index
+      @block_start_start_index ||= if inside_liquid_tag?
+        backtrack_on_whitespace(source, start_index, /[ \t]/)
+      elsif tag?
+        backtrack_on_whitespace(source, start_index) - start_token.length
+      else
+        position.start_index - start_token.length
+      end
+    end
+
+    def block_start_end_index
+      @block_start_end_index ||= position.end_index + end_token.size
+    end
+
+    def block_end_start_index
+      return block_start_end_index unless tag? && block?
+      @block_end_start_index ||= block_end_match&.begin(0) || block_start_end_index
+    end
+
+    def block_end_end_index
+      return block_end_start_index unless tag? && block?
+      @block_end_end_index ||= block_end_match&.end(0) || block_start_end_index
+    end
+
+    def outer_markup_start_index
+      outer_markup_position.start_index
+    end
+
+    def outer_markup_end_index
+      outer_markup_position.end_index
+    end
+
+    def outer_markup_start_row
+      outer_markup_position.start_row
+    end
+
+    def outer_markup_start_column
+      outer_markup_position.start_column
+    end
+
+    def outer_markup_end_row
+      outer_markup_position.end_row
+    end
+
+    def outer_markup_end_column
+      outer_markup_position.end_column
+    end
+
+    def inner_markup_start_index
+      inner_markup_position.start_index
+    end
+
+    def inner_markup_end_index
+      inner_markup_position.end_index
+    end
+
+    def inner_markup_start_row
+      inner_markup_position.start_row
+    end
+
+    def inner_markup_start_column
+      inner_markup_position.start_column
+    end
+
+    def inner_markup_end_row
+      inner_markup_position.end_row
+    end
+
+    def inner_markup_end_column
+      inner_markup_position.end_column
     end
 
     WHITESPACE = /\s/
@@ -202,26 +293,46 @@ module ThemeCheck
     end
 
     def end_token
-      return "" if inside_liquid_tag?
-      output = ""
-      output += "-" if whitespace_trimmed_end?
-      output += "}}" if variable?
-      output += "%}" if tag?
-      output
+      if inside_liquid_tag? && source[end_index] == "\n"
+        "\n"
+      elsif inside_liquid_tag?
+        ""
+      elsif variable? && whitespace_trimmed_end?
+        "-}}"
+      elsif variable?
+        "}}"
+      elsif tag? && whitespace_trimmed_end?
+        "-%}"
+      elsif tag?
+        "%}"
+      else
+        ""
+      end
     end
 
     private
-
-    def block_regex
-      return unless block_tag?
-      /(?<start_token>#{render_start_tag})(?<body>.*)(?<end_token>#{render_end_tag})/m.match(source)
-    end
 
     def position
       @position ||= Position.new(
         markup,
         theme_file&.source,
         line_number_1_indexed: line_number
+      )
+    end
+
+    def outer_markup_position
+      @outer_markup_position ||= StrictPosition.new(
+        outer_markup,
+        source,
+        block_start_start_index,
+      )
+    end
+
+    def inner_markup_position
+      @inner_markup_position ||= StrictPosition.new(
+        inner_markup,
+        source,
+        block_start_end_index,
       )
     end
 
@@ -319,6 +430,73 @@ module ThemeCheck
 
       # return the real raw content
       @tag_markup = source[tag_start...markup_end]
+    end
+
+    # Returns the index of the leftmost consecutive whitespace
+    # starting from start going backwards.
+    #
+    # e.g. backtrack_on_whitespace("01  45", 4) would return 2.
+    # e.g. backtrack_on_whitespace("{%   render %}", 5) would return 2.
+    def backtrack_on_whitespace(string, start, whitespace = WHITESPACE)
+      i = start
+      i -= 1 while string[i - 1] =~ whitespace && i > 0
+      i
+    end
+
+    def find_block_delimiter(start_index)
+      return nil unless tag? && block?
+
+      tag_start, tag_end = if inside_liquid_tag?
+        [
+          /^\s*#{@value.tag_name}\s*/,
+          /^\s*end#{@value.tag_name}\s*/,
+        ]
+      else
+        [
+          /#{Liquid::TagStart}-?\s*#{@value.tag_name}/mi,
+          /#{Liquid::TagStart}-?\s*end#{@value.tag_name}\s*-?#{Liquid::TagEnd}/mi,
+        ]
+      end
+
+      # This little algorithm below find the _correct_ block delimiter
+      # (endif, endcase, endcomment) for the current tag. What do I
+      # mean by correct? It means the one you'd expect. Making sure
+      # that we don't do the naive regex find. Since you can have
+      # nested ifs, fors, etc.
+      #
+      # It works by having a stack, pushing onto the stack when we
+      # open a tag of our type_name. And popping when we find a
+      # closing tag of our type_name.
+      #
+      # When the stack is empty, we return the end tag match.
+      index = start_index
+      stack = []
+      stack.push("open")
+      loop do
+        tag_start_match = tag_start.match(source, index)
+        tag_end_match = tag_end.match(source, index)
+
+        return nil unless tag_end_match
+
+        # We have found a tag_start and it appeared _before_ the
+        # tag_end that we found, thus we push it onto the stack.
+        if tag_start_match && tag_start_match.end(0) < tag_end_match.end(0)
+          stack.push("open")
+        end
+
+        # We have found a tag_end, therefore we pop
+        stack.pop
+
+        # Nothing left on the stack, we're done.
+        break tag_end_match if stack.empty?
+
+        # We keep looking from the end of the end tag we just found.
+        index = tag_end_match.end(0)
+      end
+    end
+
+    def block_end_match
+      @block_end_match ||= find_block_delimiter(block_start_end_index)
     end
   end
 end

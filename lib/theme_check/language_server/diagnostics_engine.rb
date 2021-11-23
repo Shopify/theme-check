@@ -5,31 +5,30 @@ module ThemeCheck
     class DiagnosticsEngine
       include URIHelper
 
-      def initialize(bridge)
+      attr_reader :storage
+
+      def initialize(storage, bridge, diagnostics_manager = DiagnosticsManager.new)
         @diagnostics_lock = Mutex.new
-        @diagnostics_tracker = DiagnosticsTracker.new
+        @diagnostics_manager = diagnostics_manager
+        @storage = storage
         @bridge = bridge
         @token = 0
       end
 
       def first_run?
-        @diagnostics_tracker.first_run?
+        @diagnostics_manager.first_run?
       end
 
       def analyze_and_send_offenses(absolute_path, config)
         return unless @diagnostics_lock.try_lock
         @token += 1
         @bridge.send_create_work_done_progress_request(@token)
-        storage = ThemeCheck::FileSystemStorage.new(
-          config.root,
-          ignored_patterns: config.ignored_patterns
-        )
         theme = ThemeCheck::Theme.new(storage)
         analyzer = ThemeCheck::Analyzer.new(theme, config.enabled_checks)
 
-        if @diagnostics_tracker.first_run?
+        if @diagnostics_manager.first_run?
           @bridge.send_work_done_progress_begin(@token, "Full theme check")
-          @bridge.log("Checking #{config.root}")
+          @bridge.log("Checking #{storage.root}")
           offenses = nil
           time = Benchmark.measure do
             offenses = analyzer.analyze_theme do |path, i, total|
@@ -55,7 +54,7 @@ module ThemeCheck
             end_message = "Found #{offenses.size} new offenses in #{format("%0.2f", time.real)}s"
             @bridge.send_work_done_progress_end(@token, end_message)
             @bridge.log(end_message)
-            send_diagnostics(offenses, [absolute_path])
+            send_diagnostics(offenses, [relative_path])
           end
         end
         @diagnostics_lock.unlock
@@ -64,61 +63,17 @@ module ThemeCheck
       private
 
       def send_diagnostics(offenses, analyzed_files = nil)
-        @diagnostics_tracker.build_diagnostics(offenses, analyzed_files: analyzed_files) do |path, diagnostic_offenses|
-          send_diagnostic(path, diagnostic_offenses)
+        @diagnostics_manager.build_diagnostics(offenses, analyzed_files: analyzed_files).each do |relative_path, diagnostics|
+          send_diagnostic(relative_path, diagnostics)
         end
       end
 
-      def send_diagnostic(path, offenses)
+      def send_diagnostic(relative_path, diagnostics)
         # https://microsoft.github.io/language-server-protocol/specifications/specification-current/#notificationMessage
         @bridge.send_notification('textDocument/publishDiagnostics', {
-          uri: file_uri(path),
-          diagnostics: offenses.map { |offense| offense_to_diagnostic(offense) },
+          uri: file_uri(storage.path(relative_path)),
+          diagnostics: diagnostics.map(&:to_h),
         })
-      end
-
-      def offense_to_diagnostic(offense)
-        diagnostic = {
-          code: offense.code_name,
-          message: offense.message,
-          range: range(offense),
-          severity: severity(offense),
-          source: "theme-check",
-        }
-        diagnostic["codeDescription"] = code_description(offense) unless offense.doc.nil?
-        diagnostic
-      end
-
-      def code_description(offense)
-        {
-          href: offense.doc,
-        }
-      end
-
-      def severity(offense)
-        case offense.severity
-        when :error
-          1
-        when :suggestion
-          2
-        when :style
-          3
-        else
-          4
-        end
-      end
-
-      def range(offense)
-        {
-          start: {
-            line: offense.start_line,
-            character: offense.start_column,
-          },
-          end: {
-            line: offense.end_line,
-            character: offense.end_column,
-          },
-        }
       end
     end
   end

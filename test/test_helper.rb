@@ -6,6 +6,9 @@ require "minitest/focus"
 require "mocha/minitest"
 require "pry-byebug"
 require "tmpdir"
+require "pp"
+
+Minitest::Test.make_my_diffs_pretty!
 
 module Minitest
   class Test
@@ -38,6 +41,12 @@ module Minitest
       stream_io.reopen(origin_stream)
     end
 
+    def pretty_print(hash)
+      io = StringIO.new
+      PP.pp(hash, io)
+      io.string
+    end
+
     def parse_liquid(code)
       storage = make_storage("file.liquid" => code)
       ThemeCheck::LiquidFile.new("file.liquid", storage)
@@ -51,6 +60,25 @@ module Minitest
       analyzer = ThemeCheck::Analyzer.new(make_theme(templates), check_classes)
       analyzer.analyze_theme
       analyzer.offenses
+    end
+
+    def diagnose_theme(*check_classes, templates)
+      storage = ThemeCheck::VersionedInMemoryStorage.new(templates)
+      templates.each do |path, value|
+        # set initial version of the files to 1
+        storage.write(path, value, 1)
+      end
+
+      theme = ThemeCheck::Theme.new(storage)
+      analyzer = ThemeCheck::Analyzer.new(theme, check_classes)
+      analyzer.analyze_theme
+      offenses = analyzer.offenses
+      diagnostics_manager = ThemeCheck::LanguageServer::DiagnosticsManager.new
+      diagnostics_manager.build_diagnostics(offenses)
+      {
+        diagnostics_manager: diagnostics_manager,
+        storage: storage,
+      }
     end
 
     def make_theme(files = {})
@@ -90,9 +118,9 @@ module Minitest
     def assert_offenses(output, offenses)
       # Making sure nothing blows up in the language_server
       offenses.each do |offense|
-        assert(offense.start_line)
+        assert(offense.start_row)
         assert(offense.start_column)
-        assert(offense.end_line)
+        assert(offense.end_row)
         assert(offense.end_column)
       end
 
@@ -107,9 +135,9 @@ module Minitest
     def assert_offenses_with_range(output, offenses)
       # Making sure nothing blows up in the language_server
       offenses.each do |offense|
-        assert(offense.start_line)
+        assert(offense.start_row)
         assert(offense.start_column)
-        assert(offense.end_line)
+        assert(offense.end_row)
         assert(offense.end_column)
       end
 

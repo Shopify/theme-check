@@ -52,9 +52,10 @@ module ThemeCheck
       def test_handle_document_did_open
         initialize!(1, nil, @storage.root)
         @handler.on_text_document_did_open(nil, {
-          "textDocument" => {
-            "uri" => file_uri(@storage.path('layout/theme.liquid')),
-            "version" => 1,
+          textDocument: {
+            text: @storage.read('layout/theme.liquid'),
+            uri: file_uri(@storage.path('layout/theme.liquid')),
+            version: 1,
           },
         })
       end
@@ -63,8 +64,8 @@ module ThemeCheck
 
       def initialize!(id, root_uri_path, root_path = nil)
         @handler.on_initialize(id, {
-          "rootUri" => root_uri_path.nil? ? nil : file_uri(root_uri_path),
-          "rootPath" => root_path,
+          rootUri: file_uri(root_uri_path),
+          rootPath: root_path,
         })
       end
     end

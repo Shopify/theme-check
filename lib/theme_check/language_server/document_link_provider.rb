@@ -37,12 +37,12 @@ module ThemeCheck
 
       def document_links(buffer)
         matches(buffer, partial_regexp).map do |match|
-          start_line, start_character = from_index_to_row_column(
+          start_row, start_column = from_index_to_row_column(
             buffer,
             match.begin(:partial),
           )
 
-          end_line, end_character = from_index_to_row_column(
+          end_row, end_column = from_index_to_row_column(
             buffer,
             match.end(:partial)
           )
@@ -51,12 +51,12 @@ module ThemeCheck
             target: file_link(match[:partial]),
             range: {
               start: {
-                line: start_line,
-                character: start_character,
+                line: start_row,
+                character: start_column,
               },
               end: {
-                line: end_line,
-                character: end_character,
+                line: end_row,
+                character: end_column,
               },
             },
           }

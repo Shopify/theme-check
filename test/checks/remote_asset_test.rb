@@ -99,7 +99,7 @@ module ThemeCheck
         {% endif %}
       LIQUID
       offenses = analyze_theme(RemoteAsset.new, "templates/index.liquid" => liquid)
-      assert_equal(4, offenses[0].start_line)
+      assert_equal(4, offenses[0].start_row)
       assert_equal(2, offenses[0].start_column)
     end
   end

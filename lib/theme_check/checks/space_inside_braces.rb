@@ -12,6 +12,7 @@ module ThemeCheck
 
     def on_node(node)
       return unless node.markup
+      return if node.literal?
       return if :assign == node.type_name
 
       outside_of_strings(node.markup) do |chunk, chunk_start|

@@ -9,7 +9,6 @@ module ThemeCheck
       def setup
         @messenger = MockMessenger.new
         @bridge = Bridge.new(@messenger)
-        @engine = DiagnosticsEngine.new(@bridge)
         @storage = make_file_system_storage(
           "layout/theme.liquid" => "{% if unclosed %}",
           "snippets/a.liquid" => "{% if unclosed %}",
@@ -19,6 +18,7 @@ module ThemeCheck
               enabled: true
           YML
         )
+        @engine = DiagnosticsEngine.new(@storage, @bridge)
       end
 
       def test_analyze_and_send_offenses_full_on_first_run_partial_second_run
@@ -74,7 +74,7 @@ module ThemeCheck
           method: "textDocument/publishDiagnostics",
           params: {
             uri: file_uri(@storage.path(path)),
-            diagnostics: expected_diagnostics,
+            diagnostics: expected_diagnostics(path),
           },
         }
       end
@@ -90,7 +90,7 @@ module ThemeCheck
         }
       end
 
-      def expected_diagnostics
+      def expected_diagnostics(path)
         [
           {
             code: "SyntaxError",
@@ -103,6 +103,12 @@ module ThemeCheck
             source: "theme-check",
             codeDescription: {
               href: "https://github.com/Shopify/theme-check/blob/main/docs/checks/syntax_error.md",
+            },
+            data: {
+              uri: file_uri(@storage.path(path)),
+              absolute_path: @storage.path(path).to_s,
+              relative_path: path.to_s,
+              version: nil,
             },
           },
         ]

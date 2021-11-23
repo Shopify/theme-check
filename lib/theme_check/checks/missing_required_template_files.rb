@@ -25,15 +25,15 @@ module ThemeCheck
     def on_end
       (REQUIRED_LIQUID_FILES - theme.liquid.map(&:name)).each do |file|
         add_offense("'#{file}.liquid' is missing") do |corrector|
-          corrector.create(@theme, "#{file}.liquid", "")
+          corrector.create_file(@theme.storage, "#{file}.liquid", "")
         end
       end
       (REQUIRED_TEMPLATE_FILES - (theme.liquid + theme.json).map(&:name)).each do |file|
         add_offense("'#{file}.liquid' or '#{file}.json' is missing") do |corrector|
           if REQUIRED_LIQUID_TEMPLATE_FILES.include?(file)
-            corrector.create(@theme, "#{file}.liquid", "")
+            corrector.create_file(@theme.storage, "#{file}.liquid", "")
           else
-            corrector.create(@theme, "#{file}.json", "")
+            corrector.create_file(@theme.storage, "#{file}.json", "")
           end
         end
       end

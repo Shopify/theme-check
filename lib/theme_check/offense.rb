@@ -81,11 +81,21 @@ module ThemeCheck
       end
     end
 
+    def in_range?(other_range)
+      # Zero length ranges are OK and considered the same as size 1 ranges
+      other_range = other_range.first...(other_range.first + 1) if other_range.size == 0 # rubocop:disable Style/ZeroLengthPredicate
+      range.cover?(other_range) || other_range.cover?(range)
+    end
+
+    def range
+      @range ||= (start_index...end_index) # end_index is excluded
+    end
+
     def start_index
       @position.start_index
     end
 
-    def start_line
+    def start_row
       @position.start_row
     end
 
@@ -97,7 +107,7 @@ module ThemeCheck
       @position.end_index
     end
 
-    def end_line
+    def end_row
       @position.end_row
     end
 
@@ -121,6 +131,10 @@ module ThemeCheck
       StringHelpers.demodulize(check.class.name)
     end
 
+    def version
+      theme_file&.version
+    end
+
     def doc
       check.doc
     end
@@ -139,9 +153,9 @@ module ThemeCheck
       !!correction
     end
 
-    def correct
+    def correct(corrector = nil)
       if correctable?
-        corrector = Corrector.new(theme_file: theme_file)
+        corrector ||= Corrector.new(theme_file: theme_file)
         correction.call(corrector)
       end
     rescue => e
@@ -211,9 +225,9 @@ module ThemeCheck
         check: check.code_name,
         path: theme_file&.relative_path,
         severity: check.severity_value,
-        start_line: start_line,
+        start_row: start_row,
         start_column: start_column,
-        end_line: end_line,
+        end_row: end_row,
         end_column: end_column,
         message: message,
       }

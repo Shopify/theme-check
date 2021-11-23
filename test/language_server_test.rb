@@ -5,9 +5,10 @@ require "test_helper"
 class LanguageServerTest < Minitest::Test
   include ThemeCheck::LanguageServer::URIHelper
 
+  Diagnostic = ThemeCheck::LanguageServer::Diagnostic
+
   def setup
     @messenger = MockMessenger.new
-
     @server = ThemeCheck::LanguageServer::Server.new(
       messenger: @messenger,
       should_raise_errors: true,
@@ -22,10 +23,11 @@ class LanguageServerTest < Minitest::Test
     :theme_file,
     :start_column,
     :end_column,
-    :start_line,
-    :end_line,
+    :start_row,
+    :end_row,
     :doc,
     :whole_theme?,
+    :version,
   ) do
     def single_file?
       !whole_theme?
@@ -36,17 +38,18 @@ class LanguageServerTest < Minitest::Test
         'LiquidTag',
         :style,
         'Wrong',
-        TemplateMock.new(path),
+        TemplateMock.new(path, path),
         5,
         14,
         9,
         9,
         "https://path.to/docs.md",
         true,
+        0,
       )
     end
   end
-  TemplateMock = Struct.new(:path)
+  TemplateMock = Struct.new(:path, :relative_path)
 
   # Stringify keys
   CAPABILITIES = ThemeCheck::LanguageServer::Handler::CAPABILITIES
@@ -54,9 +57,8 @@ class LanguageServerTest < Minitest::Test
 
   def test_sends_offenses_on_open
     storage = make_file_system_storage("layout/theme.liquid" => "")
-    ThemeCheck::Analyzer.any_instance.stubs(:offenses).returns([
-      OffenseMock.build(storage.path("layout/theme.liquid")),
-    ])
+    offense = OffenseMock.build(storage.path("layout/theme.liquid"))
+    ThemeCheck::Analyzer.any_instance.stubs(:offenses).returns([offense])
 
     send_messages({
       jsonrpc: "2.0",
@@ -74,6 +76,7 @@ class LanguageServerTest < Minitest::Test
       method: "textDocument/didOpen",
       params: {
         textDocument: {
+          text: storage.read('layout/theme.liquid'),
           uri: file_uri(storage.path('layout/theme.liquid')),
           version: 1,
         },
@@ -92,35 +95,15 @@ class LanguageServerTest < Minitest::Test
       method: "textDocument/publishDiagnostics",
       params: {
         uri: file_uri(storage.path('layout/theme.liquid')),
-        diagnostics: [{
-          range: {
-            start: {
-              line: 9,
-              character: 5,
-            },
-            end: {
-              line: 9,
-              character: 14,
-            },
-          },
-          severity: 3,
-          code: "LiquidTag",
-          codeDescription: {
-            href: "https://path.to/docs.md",
-          },
-          source: "theme-check",
-          message: "Wrong",
-        }],
+        diagnostics: [Diagnostic.new(offense).to_h],
       },
     })
   end
 
   def test_sends_offenses_on_text_document_did_save
     storage = make_file_system_storage("layout/theme.liquid" => "")
-
-    ThemeCheck::Analyzer.any_instance.expects(:offenses).returns([
-      OffenseMock.build(storage.path("layout/theme.liquid")),
-    ])
+    offense = OffenseMock.build(storage.path("layout/theme.liquid"))
+    ThemeCheck::Analyzer.any_instance.expects(:offenses).returns([offense])
 
     send_messages({
       jsonrpc: "2.0",
@@ -152,25 +135,7 @@ class LanguageServerTest < Minitest::Test
       method: "textDocument/publishDiagnostics",
       params: {
         uri: file_uri(storage.path('layout/theme.liquid')),
-        diagnostics: [{
-          range: {
-            start: {
-              line: 9,
-              character: 5,
-            },
-            end: {
-              line: 9,
-              character: 14,
-            },
-          },
-          severity: 3,
-          code: "LiquidTag",
-          codeDescription: {
-            href: "https://path.to/docs.md",
-          },
-          source: "theme-check",
-          message: "Wrong",
-        }],
+        diagnostics: [Diagnostic.new(offense).to_h],
       },
     })
   end
@@ -194,13 +159,14 @@ class LanguageServerTest < Minitest::Test
       method: "textDocument/didOpen",
       params: {
         textDocument: {
+          text: storage.read('src/layout/theme.liquid'),
           uri: file_uri(storage.path("src/layout/theme.liquid")),
           version: 1,
         },
       },
     })
 
-    assert_includes(@messenger.logs.join("\n"), "Checking #{storage.path('src')}")
+    assert_includes(@messenger.logs.join("\n"), "Checking #{storage.root}")
   end
 
   def test_document_link_response
@@ -263,6 +229,7 @@ class LanguageServerTest < Minitest::Test
     LIQUID
 
     storage = make_file_system_storage(
+      "src/theme/layout/theme.liquid" => "",
       ".theme-check.yml" => <<~CONFIG,
         root: src/theme
       CONFIG
@@ -413,7 +380,10 @@ class LanguageServerTest < Minitest::Test
     actual_responses = @messenger.sent_messages
     expected_responses.each do |response|
       assert(
-        actual_responses.find { |actual| actual == response },
+        actual_responses.find do |actual|
+          # Avoid conversion problems. We only care about the JSON.
+          JSON.parse(JSON.generate(actual)) == JSON.parse(JSON.generate(response))
+        end,
         <<~ERR,
           Expected to find the following object:
 
