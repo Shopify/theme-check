@@ -17,10 +17,7 @@ module ThemeCheck
 
     def on_node(node)
       if node.type_name == :if
-        puts node.children.length
-        node.children.each do |n|
-          puts n.type_name
-        end
+        puts node.outer_markup
       end
     end
 
@@ -47,9 +44,23 @@ module ThemeCheck
       @first_nodes.each do |node|
         add_offense("Use {% liquid ... %} to write multiple tags", node: node) do |corrector|
           lines = node.source.split("\n").collect(&:rstrip)
-          @consecutive_nodes[node.line_number][1..-1].each { |n|  corrector.remove_node(n) }
-          consecutive = " #{lines[node.line_number - 1, @consecutive_nodes[node.line_number][-1].line_number].join("\n ")}\n".gsub(/{%-| -%}|{%| %}/, "")
-          corrector.replace(node, "liquid\n#{consecutive}")
+          end_line = @consecutive_nodes[node.line_number][-1].line_number
+          # TODO: test cases, other nodes with {% end__ %}
+          end_line += 1 if lines[end_line] == "#{node.start_token} endif #{node.end_token}"
+          consecutive = " #{lines[node.line_number - 1, end_line].join("\n ")}\n".gsub(/{%-| -%}|{%| %}/, "")
+          # binding.pry
+          
+          if @consecutive_nodes[node.line_number][0].type_name == :if
+            corrector.insert_before_node(node, "#{node.start_token} liquid\n#{consecutive}#{node.end_token}")
+            @consecutive_nodes[node.line_number].each { |n| 
+              corrector.remove_node(n)
+            }
+          else
+            corrector.replace(node, "liquid\n#{consecutive}")
+            @consecutive_nodes[node.line_number][1..-1].each { |n| 
+              corrector.remove_node(n)
+            }
+          end 
         end
       end
       @first_nodes = []

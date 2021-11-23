@@ -34,6 +34,7 @@ module ThemeCheck
     end
     
     def remove_node(node)
+      puts "HERE"
       @theme_file.rewriter.remove_node(node)
     end
 

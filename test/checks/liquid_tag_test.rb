@@ -210,6 +210,59 @@ class LiquidTagTest < Minitest::Test
     end
   end
 
+  def test_corrects_multiple_ifs
+    expected_sources = {
+      "templates/index.liquid" => <<~END,
+        {% liquid
+          if x == 1
+            assign y = 2
+          else
+            assign z = 2
+          endif
+          assign x = 1
+        %}
+        <p>Not</p>
+        <p>a</p>
+        <p>Liquid</p>
+        <p>Tag</p>
+        {% liquid
+          if x == 1
+            assign y = 2
+          else
+            assign z = 2
+          endif
+          assign x = 1
+        %}
+      END
+    }
+
+    sources = fix_theme(
+      ThemeCheck::LiquidTag.new(min_consecutive_statements: 4),
+      "templates/index.liquid" => <<~END,
+        {% if x == 1 %}
+          {% assign y = 2 %}
+        {% else %}
+          {% assign z = 2 %}
+        {% endif %}
+        {% assign x = 1 %}
+        <p>Not</p>
+        <p>a</p>
+        <p>Liquid</p>
+        <p>Tag</p>
+        {% if x == 1 %}
+          {% assign y = 2 %}
+        {% else %}
+          {% assign z = 2 %}
+        {% endif %}
+        {% assign x = 1 %}
+      END
+    )
+
+    sources.each do |path, source|
+      assert_equal(expected_sources[path], source)
+    end
+  end
+
 
   def test_corrects_with_whitespace_trimmed
     expected_sources = {
