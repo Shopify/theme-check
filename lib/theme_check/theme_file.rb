@@ -39,8 +39,11 @@ module ThemeCheck
     # source file.
     def source
       return @source if @source
-      @source = @storage.read(@relative_path)
-      @version = @storage.version(@relative_path, @source) if @storage.respond_to?('version')
+      if @storage.versioned?
+        @source, @version = @storage.read_version(@relative_path)
+      else
+        @source = @storage.read(@relative_path)
+      end
       @eol = @source.include?("\r\n") ? "\r\n" : "\n"
       @source = @source.gsub("\r\n", "\n")
     end

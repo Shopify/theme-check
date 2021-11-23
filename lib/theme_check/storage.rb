@@ -21,5 +21,9 @@ module ThemeCheck
     def directories
       raise NotImplementedError
     end
+
+    def versioned?
+      false
+    end
   end
 end

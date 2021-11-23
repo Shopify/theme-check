@@ -14,7 +14,7 @@ module ThemeCheck
           .reject do |diagnostic|
             # We cannot quickfix if the buffer was modified. This means
             # our diagnostics and InMemoryStorage are out of sync.
-            diagnostic.file_version != storage.latest_version(diagnostic.relative_path)
+            diagnostic.file_version != storage.version(diagnostic.relative_path)
           end
 
         diagnostics_under_cursor = correctable_diagnostics
