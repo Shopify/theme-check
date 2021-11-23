@@ -8,6 +8,8 @@ require "pry-byebug"
 require "tmpdir"
 require "pp"
 
+Minitest::Test.make_my_diffs_pretty!
+
 module Minitest
   class Test
     # Ported from active_support/testing/stream
@@ -37,43 +39,6 @@ module Minitest
       captured_stream.close
       captured_stream.unlink
       stream_io.reopen(origin_stream)
-    end
-
-    # Improve assert_includes default error message a little bit.
-    # Otherwise it's really hard to figure out why an object isn't in
-    # a collection when the objects are huge.
-    def assert_includes(collection, obj, msg = nil)
-      super(collection, obj, msg || <<~DESC)
-        Expected the following collection:
-
-        #{pretty_print(collection)}
-
-        To include the following obj:
-
-        #{pretty_print(obj)}
-      DESC
-    end
-
-    def refute_includes(collection, obj, msg = nil)
-      super(collection, obj, msg || <<~DESC)
-        Expected the following collection:
-
-        #{pretty_print(collection)}
-
-        To not include the following obj:
-
-        #{pretty_print(obj)}
-      DESC
-    end
-
-    def assert_equal(expected, actual, msg = nil)
-      super(expected, actual, msg || <<~DESC)
-        --- expected
-        +++ actual
-
-        -#{pretty_print(expected).gsub("\n", "\n-")}
-        +#{pretty_print(actual).gsub("\n", "\n+")}
-      DESC
     end
 
     def pretty_print(hash)
