@@ -78,7 +78,6 @@ module ThemeCheck
 
     def on_variable(node)
       return if @ignore || node.markup.empty?
-      return unless node.variable?
       if node.markup[0] != " "
         add_offense(
           "Space missing after '#{node.start_token}'",
