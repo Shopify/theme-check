@@ -4,8 +4,6 @@ module ThemeCheck
   class Position
     include PositionHelper
 
-    attr_accessor :needle
-
     def initialize(
       needle_arg,
       contents_arg,
@@ -98,8 +96,6 @@ module ThemeCheck
       return 0 if @line_number_1_indexed.nil?
       bounded(0, @line_number_1_indexed - 1, content_line_count)
     end
-
-    
 
     def has_content_and_line_number_but_no_needle?
       @needle.nil? && !contents.empty? && @line_number_1_indexed.is_a?(Integer)
