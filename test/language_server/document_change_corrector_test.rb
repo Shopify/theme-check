@@ -50,6 +50,26 @@ module ThemeCheck
         )
       end
 
+      def test_insert_before_character_range
+        @corrector.insert_before(@node, ' ', 1...5)
+        assert_equal(2, @node.start_column)
+        assert_equal(
+          [
+            {
+              textDocument: {
+                uri: file_uri(@node.theme_file.path),
+                version: nil,
+              },
+              edits: [{
+                range: range(0, 1, 0, 1),
+                newText: ' ',
+              }],
+            },
+          ],
+          @corrector.document_changes
+        )
+      end
+
       def test_insert_after
         @corrector.insert_after(@node, ' ')
         assert_equal(3, @node.end_column)
@@ -70,6 +90,26 @@ module ThemeCheck
         )
       end
 
+      def test_insert_after_character_range
+        @corrector.insert_after(@node, ' ', 0...5)
+        assert_equal(3, @node.end_column)
+        assert_equal(
+          [
+            {
+              textDocument: {
+                uri: file_uri(@node.theme_file.path),
+                version: nil,
+              },
+              edits: [{
+                range: range(0, 5, 0, 5),
+                newText: ' ',
+              }],
+            },
+          ],
+          @corrector.document_changes
+        )
+      end
+
       def test_replace
         @corrector.replace(@node, 'y')
         assert_equal(3, @node.end_column)
@@ -82,6 +122,26 @@ module ThemeCheck
               },
               edits: [{
                 range: range(0, 2, 0, 3),
+                newText: 'y',
+              }],
+            },
+          ],
+          @corrector.document_changes
+        )
+      end
+
+      def test_replace_character_range
+        @corrector.replace(@node, 'y', 0...5)
+        assert_equal(3, @node.end_column)
+        assert_equal(
+          [
+            {
+              textDocument: {
+                uri: file_uri(@node.theme_file.path),
+                version: nil,
+              },
+              edits: [{
+                range: range(0, 0, 0, 5),
                 newText: 'y',
               }],
             },

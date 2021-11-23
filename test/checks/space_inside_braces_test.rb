@@ -14,8 +14,7 @@ class SpaceInsideBracesTest < Minitest::Test
         {{ x-}}
         {{x }}
         {{-x }}
-        {%comment%}
-        {% endcomment %}
+        {%comment%}{%-endcomment-%}
       END
     )
     assert_offenses(<<~END, offenses)
@@ -27,7 +26,10 @@ class SpaceInsideBracesTest < Minitest::Test
       Space missing before '-}}' at templates/index.liquid:6
       Space missing after '{{' at templates/index.liquid:7
       Space missing after '{{-' at templates/index.liquid:8
+      Space missing after '{%' at templates/index.liquid:9
+      Space missing after '{%-' at templates/index.liquid:9
       Space missing before '%}' at templates/index.liquid:9
+      Space missing before '-%}' at templates/index.liquid:9
     END
   end
 
@@ -41,6 +43,22 @@ class SpaceInsideBracesTest < Minitest::Test
           comment
         %}
         {% endcomment %}
+        {%
+          assign x = 'hi'
+          | upcase
+        %}
+        {{
+          color
+          | color_to_hsl
+          | remove: "hsl("
+          | remove: ")"
+        }}
+        {{
+          color |
+          color_to_hsl |
+          remove: "hsl(" |
+          remove: ")"
+        }}
       END
     )
     assert_offenses('', offenses)
@@ -52,19 +70,23 @@ class SpaceInsideBracesTest < Minitest::Test
       "templates/index.liquid" => <<~END,
         {{  x }}
         {{-  x }}
-        {% assign x = 1  %}
-        {% assign x = 1  -%}
+        {%  assign x = 1 %}
+        {%-  assign x = 1 -%}
         {{ x  }}
         {{ x  -}}
+        {% assign x = 1  %}
+        {% assign x = 1  -%}
       END
     )
     assert_offenses(<<~END, offenses)
       Too many spaces after '{{' at templates/index.liquid:1
       Too many spaces after '{{-' at templates/index.liquid:2
-      Too many spaces before '%}' at templates/index.liquid:3
-      Too many spaces before '-%}' at templates/index.liquid:4
+      Too many spaces after '{%' at templates/index.liquid:3
+      Too many spaces after '{%-' at templates/index.liquid:4
       Too many spaces before '}}' at templates/index.liquid:5
       Too many spaces before '-}}' at templates/index.liquid:6
+      Too many spaces before '%}' at templates/index.liquid:7
+      Too many spaces before '-%}' at templates/index.liquid:8
     END
   end
 
@@ -90,6 +112,8 @@ class SpaceInsideBracesTest < Minitest::Test
         {{ url |  asset_url | img_tag }}
         {% assign my_upcase_string = "Hello world"  | upcase %}
         {% assign my_upcase_string = "Hello world" |  upcase %}
+        {% echo "Hello world"  | upcase %}
+        {% echo "Hello world" |  upcase %}
       END
     )
     assert_offenses(<<~END, offenses)
@@ -97,6 +121,8 @@ class SpaceInsideBracesTest < Minitest::Test
       Too many spaces after '|' at templates/index.liquid:2
       Too many spaces before '|' at templates/index.liquid:3
       Too many spaces after '|' at templates/index.liquid:4
+      Too many spaces before '|' at templates/index.liquid:5
+      Too many spaces after '|' at templates/index.liquid:6
     END
   end
 
