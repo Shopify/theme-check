@@ -13,9 +13,8 @@ module ThemeCheck
       end
 
       def ==(other)
-        if other.is_a?(Hash)
-          to_h == other
-        elsif other.is_a?(Diagnostic)
+        case other
+        when Hash, Diagnostic
           to_h == other.to_h
         else
           raise ArgumentError
