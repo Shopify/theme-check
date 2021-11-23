@@ -472,6 +472,16 @@ module ThemeCheck
           assign y = 1
         %}
       LIQUID
+      assert_can_find_node_with_outer_markup("  assign y = 1 ", <<~LIQUID)
+        {% liquid
+          assign x = 1
+          assign y = 1 %}
+      LIQUID
+      assert_can_find_node_with_outer_markup("  assign y = 1", <<~LIQUID)
+        {% liquid
+          assign x = 1
+          assign y = 1-%}
+      LIQUID
       assert_can_find_node_with_outer_markup(<<~LIQUID.rstrip)
         {% if true %}
           sayhi

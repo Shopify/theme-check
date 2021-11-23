@@ -293,12 +293,21 @@ module ThemeCheck
     end
 
     def end_token
-      return "\n" if inside_liquid_tag?
-      output = ""
-      output += "-" if whitespace_trimmed_end?
-      output += "}}" if variable?
-      output += "%}" if tag?
-      output
+      if inside_liquid_tag? && source[end_index] == "\n"
+        "\n"
+      elsif inside_liquid_tag?
+        ""
+      elsif variable? && whitespace_trimmed_end?
+        "-}}"
+      elsif variable?
+        "}}"
+      elsif tag? && whitespace_trimmed_end?
+        "-%}"
+      elsif tag?
+        "%}"
+      else
+        ""
+      end
     end
 
     private
