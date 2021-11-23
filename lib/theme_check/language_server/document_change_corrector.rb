@@ -129,7 +129,7 @@ module ThemeCheck
 
       def add_translation(file, path, value)
         hash = file.content
-        HashHelper.set(hash, path, value)
+        SchemaHelper.set(hash, path, value)
         # simpler to just overwrite it.
         create_file(
           file.storage,

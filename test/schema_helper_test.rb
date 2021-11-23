@@ -2,18 +2,18 @@
 require "test_helper"
 
 module ThemeCheck
-  class HashHelperTest < Minitest::Test
+  class SchemaHelperTest < Minitest::Test
     def test_set
-      assert_equal({ "a" => { "b" => 1 } }, HashHelper.set({}, 'a.b', 1))
-      assert_equal({ "a" => { "b" => 1 } }, HashHelper.set({}, ['a', 'b'], 1))
-      assert_equal({ "a" => { "b" => 1 } }, HashHelper.set({ "a" => { "b" => 0 } }, 'a.b', 1))
+      assert_equal({ "a" => { "b" => 1 } }, SchemaHelper.set({}, 'a.b', 1))
+      assert_equal({ "a" => { "b" => 1 } }, SchemaHelper.set({}, ['a', 'b'], 1))
+      assert_equal({ "a" => { "b" => 1 } }, SchemaHelper.set({ "a" => { "b" => 0 } }, 'a.b', 1))
     end
 
     def test_delete
       hash = { "a" => { "b" => 111, "c" => 222 } }
-      assert_equal(111, HashHelper.delete(hash, 'a.b'))
-      assert_equal(222, HashHelper.delete(hash, ['a', 'c']))
-      assert_nil(HashHelper.delete(hash, 'a.b'))
+      assert_equal(111, SchemaHelper.delete(hash, 'a.b'))
+      assert_equal(222, SchemaHelper.delete(hash, ['a', 'c']))
+      assert_nil(SchemaHelper.delete(hash, 'a.b'))
       assert_equal({ "a" => {} }, hash)
     end
 
@@ -33,7 +33,7 @@ module ThemeCheck
             { "a" => 1 },
           ],
         },
-        HashHelper.schema_corrector(schema, "array.a", 1),
+        SchemaHelper.schema_corrector(schema, "array.a", 1),
       )
     end
 
@@ -51,7 +51,7 @@ module ThemeCheck
             },
           },
         },
-        HashHelper.schema_corrector(schema, ["deep", "object", "a"], 1),
+        SchemaHelper.schema_corrector(schema, ["deep", "object", "a"], 1),
       )
     end
 
@@ -69,7 +69,7 @@ module ThemeCheck
             { "id" => "oh" },
           ],
         },
-        HashHelper.schema_corrector(schema, "deep.hi.ho", "ho")
+        SchemaHelper.schema_corrector(schema, "deep.hi.ho", "ho")
       )
     end
   end

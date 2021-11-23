@@ -61,7 +61,7 @@ module ThemeCheck
 
     def add_translation(json_file, path, value)
       hash = json_file.content
-      HashHelper.set(hash, path, value)
+      SchemaHelper.set(hash, path, value)
       json_file.update_contents(hash)
     end
   end

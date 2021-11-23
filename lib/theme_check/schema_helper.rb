@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ThemeCheck
-  class HashHelper
+  class SchemaHelper
     # Deeply sets a value in a hash. Accepts both arrays and strings for path.
     def self.set(hash, path, value)
       path = path.split('.') if path.is_a?(String)
@@ -46,7 +46,7 @@ module ThemeCheck
     #       { "id" => "oh" },
     #     ],
     #   },
-    #   HashHelper.schema_corrector(schema, "deep.hi.ho", "ho")
+    #   SchemaHelper.schema_corrector(schema, "deep.hi.ho", "ho")
     # )
     def self.schema_corrector(schema, path, value)
       return schema unless schema.is_a?(Hash)

@@ -33,7 +33,7 @@ module ThemeCheck
       if node
         check.add_offense(message, node: node) do |corrector|
           extra_keys.each do |k|
-            HashHelper.delete(schema, key_prefix + k)
+            SchemaHelper.delete(schema, key_prefix + k)
           end
           corrector.replace_inner_json(node, schema)
         end
@@ -47,7 +47,7 @@ module ThemeCheck
       if node
         check.add_offense(message, node: node) do |corrector|
           missing_keys.each do |k|
-            HashHelper.set(schema, key_prefix + k, "TODO")
+            SchemaHelper.set(schema, key_prefix + k, "TODO")
           end
           corrector.replace_inner_json(node, schema)
         end

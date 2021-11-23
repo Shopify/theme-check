@@ -247,9 +247,9 @@ module ThemeCheck
 
         # Simulate doing multiple corrector calls on the _same_ node.
         json = JSON.parse(node.inner_markup)
-        HashHelper.set(json, 'a.b', 1)
+        SchemaHelper.set(json, 'a.b', 1)
         corrector.replace_inner_json(node, json)
-        HashHelper.set(json, 'a.c', 2)
+        SchemaHelper.set(json, 'a.c', 2)
         corrector.replace_inner_json(node, json)
 
         # We expect only ONE change for all those replace_inner_json calls
