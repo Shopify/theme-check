@@ -52,6 +52,7 @@ module ThemeCheck
       end
     end
 
+    # The original source code of the node. Does contain wrapping braces.
     def outer_markup
       if literal?
         markup
@@ -131,6 +132,10 @@ module ThemeCheck
       @value.is_a?(Liquid::Variable)
     end
 
+    def assigned_or_echoed_variable?
+      variable? && start_token == ""
+    end
+
     def variable_lookup?
       @value.is_a?(Liquid::VariableLookup)
     end
@@ -171,6 +176,10 @@ module ThemeCheck
       theme_file&.source
     end
 
+    def block_start_markup
+      source[block_start_start_index...block_start_end_index]
+    end
+
     def block_start_start_index
       @block_start_start_index ||= if inside_liquid_tag?
         backtrack_on_whitespace(source, start_index, /[ \t]/)
@@ -183,6 +192,10 @@ module ThemeCheck
 
     def block_start_end_index
       @block_start_end_index ||= position.end_index + end_token.size
+    end
+
+    def block_end_markup
+      source[block_end_start_index...block_end_end_index]
     end
 
     def block_end_start_index
@@ -284,12 +297,19 @@ module ThemeCheck
     end
 
     def start_token
-      return "" if inside_liquid_tag?
-      output = ""
-      output += "{{" if variable?
-      output += "{%" if tag?
-      output += "-" if whitespace_trimmed_start?
-      output
+      if inside_liquid_tag?
+        ""
+      elsif variable? && source[start_index - 3..start_index - 1] == "{{-"
+        "{{-"
+      elsif variable? && source[start_index - 2..start_index - 1] == "{{"
+        "{{"
+      elsif tag? && whitespace_trimmed_start?
+        "{%-"
+      elsif tag?
+        "{%"
+      else
+        ""
+      end
     end
 
     def end_token
@@ -297,15 +317,15 @@ module ThemeCheck
         "\n"
       elsif inside_liquid_tag?
         ""
-      elsif variable? && whitespace_trimmed_end?
+      elsif variable? && source[end_index...end_index + 3] == "-}}"
         "-}}"
-      elsif variable?
+      elsif variable? && source[end_index...end_index + 2] == "}}"
         "}}"
       elsif tag? && whitespace_trimmed_end?
         "-%}"
       elsif tag?
         "%}"
-      else
+      else # this could happen because we're in an assign statement (variable)
         ""
       end
     end

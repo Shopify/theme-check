@@ -11,16 +11,22 @@ module ThemeCheck
       )
     end
 
-    def insert_before(node, content)
+    def insert_before(node, content, character_range = nil)
       @rewriter.insert_before(
-        range(node.start_index, node.end_index),
+        range(
+          character_range&.begin || node.start_index,
+          character_range&.end || node.end_index,
+        ),
         content
       )
     end
 
-    def insert_after(node, content)
+    def insert_after(node, content, character_range = nil)
       @rewriter.insert_after(
-        range(node.start_index, node.end_index),
+        range(
+          character_range&.begin || node.start_index,
+          character_range&.end || node.end_index,
+        ),
         content
       )
     end
@@ -31,9 +37,12 @@ module ThemeCheck
       )
     end
 
-    def replace(node, content)
+    def replace(node, content, character_range = nil)
       @rewriter.replace(
-        range(node.start_index, node.end_index),
+        range(
+          character_range&.begin || node.start_index,
+          character_range&.end || node.end_index,
+        ),
         content
       )
     end

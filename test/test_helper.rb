@@ -125,10 +125,10 @@ module Minitest
       end
 
       assert_equal(
-        output.chomp,
+        output.split("\n"),
         offenses
           .sort_by { |o| [o.location, o.message].join(' ') }
-          .join("\n")
+          .map(&:to_s)
       )
     end
 

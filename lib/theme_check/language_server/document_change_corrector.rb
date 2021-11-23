@@ -20,24 +20,33 @@ module ThemeCheck
       end
 
       # @param node [Node]
-      def insert_before(node, content)
+      def insert_before(node, content, character_range = nil)
+        position = character_range_position(node, character_range) if character_range
         edits(node) << {
-          range: { start: start_position(node), end: start_position(node) },
+          range: {
+            start: start_location(position || node),
+            end: start_location(position || node),
+          },
           newText: content,
         }
       end
 
       # @param node [Node]
-      def insert_after(node, content)
+      def insert_after(node, content, character_range = nil)
+        position = character_range_position(node, character_range) if character_range
         edits(node) << {
-          range: { start: end_position(node), end: end_position(node) },
+          range: {
+            start: end_location(position || node),
+            end: end_location(position || node),
+          },
           newText: content,
         }
       end
 
-      def replace(node, content)
+      def replace(node, content, character_range = nil)
+        position = character_range_position(node, character_range) if character_range
         edits(node) << {
-          range: range(node),
+          range: range(position || node),
           newText: content,
         }
       end
@@ -187,22 +196,32 @@ module ThemeCheck
         node.theme_file&.path
       end
 
+      def character_range_position(node, character_range)
+        return unless character_range
+        source = node.theme_file.source
+        StrictPosition.new(
+          source[character_range],
+          source,
+          character_range.begin,
+        )
+      end
+
       # @param node [ThemeCheck::Node]
       def range(node)
         {
-          start: start_position(node),
-          end: end_position(node),
+          start: start_location(node),
+          end: end_location(node),
         }
       end
 
-      def start_position(node)
+      def start_location(node)
         {
           line: node.start_row,
           character: node.start_column,
         }
       end
 
-      def end_position(node)
+      def end_location(node)
         {
           line: node.end_row,
           character: node.end_column,

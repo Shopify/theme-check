@@ -8,20 +8,20 @@ module ThemeCheck
       @theme_file = theme_file
     end
 
-    def insert_after(node, content)
-      @theme_file.rewriter.insert_after(node, content)
+    def insert_after(node, content, character_range = nil)
+      @theme_file.rewriter.insert_after(node, content, character_range)
     end
 
-    def insert_before(node, content)
-      @theme_file.rewriter.insert_before(node, content)
+    def insert_before(node, content, character_range = nil)
+      @theme_file.rewriter.insert_before(node, content, character_range)
     end
 
     def remove(node)
       @theme_file.rewriter.remove(node)
     end
 
-    def replace(node, content)
-      @theme_file.rewriter.replace(node, content)
+    def replace(node, content, character_range = nil)
+      @theme_file.rewriter.replace(node, content, character_range)
       node.markup = content
     end
 

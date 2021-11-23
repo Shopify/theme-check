@@ -39,31 +39,17 @@ module ThemeCheck
       end
 
       @node = node
-      @theme_file = nil
-      if node
-        @theme_file = node.theme_file
-      elsif theme_file
-        @theme_file = theme_file
-      end
-
-      @markup = if markup
-        markup
-      else
-        node&.markup
-      end
+      @theme_file = node&.theme_file || theme_file
+      @markup = markup || node&.markup
 
       raise ArgumentError, "Offense markup cannot be an empty string" if @markup.is_a?(String) && @markup.empty?
 
-      @line_number = if line_number
-        line_number
-      elsif @node
-        @node.line_number
-      end
+      @line_number = line_number || @node&.line_number
 
       @position = Position.new(
         @markup,
         @theme_file&.source,
-        line_number_1_indexed: @line_number,
+        line_number_1_indexed: line_number,
         node_markup_offset: node_markup_offset,
         node_markup: node&.markup
       )

@@ -7,7 +7,7 @@ module ThemeCheck
       root = root_node(<<~END)
         <ul class="{% if true %}list{% endif %}>
           <li>{% liquid
-            assign x = 1
+            assign x = product | foo
             echo x
           %}</li>
           {%
@@ -22,16 +22,23 @@ module ThemeCheck
           {% style%}{% endstyle %}
           {% if
           true%}{% endif %}
+          {{ 'x' }}
+          {{
+            'x'
+          }}
         </ul>
       END
       assert_can_find_node_with_markup(root, "if true ")
-      assert_can_find_node_with_markup(root, "assign x = 1")
+      assert_can_find_node_with_markup(root, "assign x = product | foo")
+      assert_can_find_node_with_markup(root, "product | foo") # the Variable in the assign
       assert_can_find_node_with_markup(root, "echo x")
       assert_can_find_node_with_markup(root, "render\n    'foo'\n  ")
       assert_can_find_node_with_markup(root, "comment   ")
       assert_can_find_node_with_markup(root, "style\n  ")
       assert_can_find_node_with_markup(root, "style")
       assert_can_find_node_with_markup(root, "if\n  true")
+      assert_can_find_node_with_markup(root, " 'x' ")
+      assert_can_find_node_with_markup(root, "\n    'x'\n  ")
     end
 
     def test_inside_liquid_tag?
@@ -463,6 +470,7 @@ module ThemeCheck
     def test_outer_markup
       assert_can_find_node_with_outer_markup("literal\n")
       assert_can_find_node_with_outer_markup('{{x}}')
+      assert_can_find_node_with_outer_markup('{{-x-}}')
       assert_can_find_node_with_outer_markup('{{ x }}')
       assert_can_find_node_with_outer_markup('{%  assign x = 1 %}')
       assert_can_find_node_with_outer_markup('{%assign x = 1%}')
