@@ -3,8 +3,6 @@
 module ThemeCheck
   module LanguageServer
     class QuickfixCodeActionProvider < CodeActionProvider
-      include CodeActionHelper
-
       kind "quickfix"
 
       def code_actions(relative_path, range)
@@ -18,7 +16,7 @@ module ThemeCheck
           end
 
         diagnostics_under_cursor = correctable_diagnostics
-          .filter { |diagnostic| offense_in_range?(diagnostic.offense, range) }
+          .filter { |diagnostic| diagnostic.offense.in_range?(range) }
 
         return [] if diagnostics_under_cursor.empty?
 

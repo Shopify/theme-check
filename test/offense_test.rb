@@ -137,4 +137,42 @@ class OffenseTest < Minitest::Test
     assert_equal(ThemeCheck::Offense.new(check: Bogus.new, line_number: 2), ThemeCheck::Offense.new(check: Bogus.new, line_number: 2))
     refute_equal(ThemeCheck::Offense.new(check: Bogus.new, line_number: 1), ThemeCheck::Offense.new(check: Bogus.new, line_number: 2))
   end
+
+  def test_offense_in_range
+    theme_file = stub(source: "supp world! how are you doing today?")
+    offense = ThemeCheck::Offense.new(
+      check: Bogus.new,
+      markup: "world",
+      theme_file: theme_file,
+      line_number: 1
+    )
+
+    # Showing the assumption
+    assert_equal(offense.range, 5...10)
+
+    # True when highlighting inside the error
+    assert(offense.in_range?(5..5))
+    assert(offense.in_range?(6...8))
+
+    # True when highlighting the error itself
+    assert(offense.in_range?(5...10))
+
+    # True when highlighting around the error
+    assert(offense.in_range?(1...15))
+    assert(offense.in_range?(1...10))
+    assert(offense.in_range?(5...15))
+
+    # True for zero length range inside the range
+    assert(offense.in_range?(5...5))
+    assert(offense.in_range?(6...6))
+
+    # False for no overlap
+    refute(offense.in_range?(1...5))
+
+    # False for partial overlap
+    refute(offense.in_range?(1...7))
+
+    # False for zero length range outside the range
+    refute(offense.in_range?(10...10))
+  end
 end

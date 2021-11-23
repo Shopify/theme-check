@@ -35,7 +35,6 @@ Dir[__dir__ + "/language_server/execute_command_providers/*.rb"].each do |file|
   require file
 end
 
-require_relative "language_server/code_action_helper"
 require_relative "language_server/code_action_provider"
 require_relative "language_server/code_action_engine"
 Dir[__dir__ + "/language_server/code_action_providers/*.rb"].each do |file|

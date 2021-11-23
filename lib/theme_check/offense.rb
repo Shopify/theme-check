@@ -81,6 +81,12 @@ module ThemeCheck
       end
     end
 
+    def in_range?(other_range)
+      # Zero length ranges are OK and considered the same as size 1 ranges
+      other_range = other_range.first...(other_range.first + 1) if other_range.size == 0 # rubocop:disable Style/ZeroLengthPredicate
+      range.cover?(other_range) || other_range.cover?(range)
+    end
+
     def range
       @range ||= (start_index...end_index) # end_index is excluded
     end
