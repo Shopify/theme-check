@@ -19,7 +19,9 @@ module ThemeCheck
 
         @providers
           .filter do |provider|
-            only_kinds.empty? || only_kinds.include?(provider.kind)
+            only_kinds.empty? ||
+            only_kinds.include?(provider.kind) ||
+            only_kinds.include?(provider.base_kind)
           end
           .flat_map do |provider|
             provider.code_actions(relative_path, range)

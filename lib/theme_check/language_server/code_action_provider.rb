@@ -30,6 +30,10 @@ module ThemeCheck
         self.class.kind
       end
 
+      def base_kind
+        kind.split('.')[0]
+      end
+
       def code_actions(relative_path, range)
         raise NotImplementedError
       end
