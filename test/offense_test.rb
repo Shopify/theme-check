@@ -175,4 +175,22 @@ class OffenseTest < Minitest::Test
     # False for zero length range outside the range
     refute(offense.in_range?(10...10))
   end
+
+  def test_offense_in_range_zero_length_offense
+    theme_file = stub(source: '{ "json_file_without_line_numbers": "ok" }')
+    offense = ThemeCheck::Offense.new(
+      check: Bogus.new,
+      theme_file: theme_file,
+    )
+
+    # Showing the assumption
+    assert_equal(offense.range, 0..0)
+
+    # True when highlighting over the error
+    assert(offense.in_range?(0..0))
+    assert(offense.in_range?(0...0))
+
+    # False for no overlap
+    refute(offense.in_range?(1...5))
+  end
 end

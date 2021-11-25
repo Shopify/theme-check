@@ -9,12 +9,13 @@ class ThemeTest < Minitest::Test
       "templates/index.liquid" => "",
       "snippets/product.liquid" => "",
       "sections/article-template/template.liquid" => "",
-      "locales/en.default.json" => "",
+      "locales/fr.default.json" => "",
+      "locales/en.json" => "",
     )
   end
 
   def test_all
-    assert_equal(6, @theme.all.size)
+    assert_equal(7, @theme.all.size)
   end
 
   def test_assets
@@ -28,7 +29,7 @@ class ThemeTest < Minitest::Test
   end
 
   def test_json
-    assert_equal(1, @theme.json.size)
+    assert_equal(2, @theme.json.size)
     assert(@theme.json.all? { |a| a.instance_of?(ThemeCheck::JsonFile) })
   end
 
@@ -51,11 +52,11 @@ class ThemeTest < Minitest::Test
   end
 
   def test_default_locale_json
-    assert_equal(@theme["locales/en.default"], @theme.default_locale_json)
+    assert_equal(@theme["locales/fr.default"], @theme.default_locale_json)
   end
 
   def test_default_locale
-    assert_equal("en", @theme.default_locale)
+    assert_equal("fr", @theme.default_locale)
   end
 
   def test_ignore
