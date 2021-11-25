@@ -180,3 +180,13 @@ DeprecateLazysizes:
   enabled: true
   severity: error
 ```
+
+## Language Server Configurations
+
+- `themeCheck.checkOnOpen` (default: `true`) makes it so theme check runs on file open.
+- `themeCheck.checkOnChange` (default: `true`) makes it so theme check runs on file change.
+- `themeCheck.checkOnSave` (default: `true`) makes it so theme check runs on file save.
+
+⚠️ **Note:** Quickfixes only work on a freshly checked file. If any of those configurations are turned off, you will need to rerun theme-check in order to apply quickfixes.
+
+In VS Code, these can be set directly in your `settings.json`.
