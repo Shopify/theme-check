@@ -46,6 +46,7 @@ module ThemeCheck
         return @bridge.send_response(id, { capabilities: {} }) if @root_path.nil?
 
         @client_capabilities = ClientCapabilities.new(params.dig(:capabilities) || {})
+        @configuration = Configuration.new(@bridge, @client_capabilities)
         @bridge.supports_work_done_progress = @client_capabilities.supports_work_done_progress?
         @storage = in_memory_storage(@root_path)
         @diagnostics_manager = DiagnosticsManager.new
@@ -60,6 +61,11 @@ module ThemeCheck
         })
       end
 
+      def on_initialized(_id, _params)
+        @configuration.fetch
+        @configuration.register_did_change_capability
+      end
+
       def on_shutdown(id, _params)
         @bridge.send_response(id, nil)
       end
@@ -71,13 +77,13 @@ module ThemeCheck
       def on_text_document_did_open(_id, params)
         relative_path = relative_path_from_text_document_uri(params)
         @storage.write(relative_path, text_document_text(params), text_document_version(params))
-        analyze_and_send_offenses(text_document_uri(params))
+        analyze_and_send_offenses(text_document_uri(params)) if @configuration.check_on_open?
       end
 
       def on_text_document_did_change(_id, params)
         relative_path = relative_path_from_text_document_uri(params)
         @storage.write(relative_path, content_changes_text(params), text_document_version(params))
-        analyze_and_send_offenses(text_document_uri(params))
+        analyze_and_send_offenses(text_document_uri(params)) if @configuration.check_on_change?
       end
 
       def on_text_document_did_close(_id, params)
@@ -88,7 +94,7 @@ module ThemeCheck
       end
 
       def on_text_document_did_save(_id, params)
-        analyze_and_send_offenses(text_document_uri(params))
+        analyze_and_send_offenses(text_document_uri(params)) if @configuration.check_on_save?
       end
 
       def on_text_document_document_link(id, params)
@@ -121,6 +127,10 @@ module ThemeCheck
           params[:command],
           params[:arguments],
         ))
+      end
+
+      def on_workspace_did_change_configuration(_id, _params)
+        @configuration.fetch(force: true)
       end
 
       private
