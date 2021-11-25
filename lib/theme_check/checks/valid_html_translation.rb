@@ -19,7 +19,7 @@ module ThemeCheck
 
     def html_key?(keys)
       pluralized_key = keys[-2] if keys.length > 1
-      keys[-1].end_with?('_html') || pluralized_key.end_with?('_html')
+      keys[-1].end_with?('_html') || pluralized_key&.end_with?('_html')
     end
 
     def parse_and_add_offense(key, value)
