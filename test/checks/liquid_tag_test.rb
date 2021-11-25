@@ -342,4 +342,63 @@ class LiquidTagTest < Minitest::Test
       assert_equal(expected_sources[path], source)
     end
   end
+
+  def test_corrects_single_line
+    expected_sources = {
+      "templates/index.liquid" => <<~END,
+        {% liquid
+          assign a = 1
+          assign b = 2
+          assign c = 3
+          assign x = 1
+          assign y = 2
+          assign z = 3
+        %}
+      END
+    }
+
+    sources = fix_theme(
+      ThemeCheck::LiquidTag.new(min_consecutive_statements: 4),
+      "templates/index.liquid" => <<~END,
+        {% assign a = 1 %}
+        {% assign b = 2 %}{% assign c = 3 %}
+        {% assign x = 1 %}{% assign y = 2 %}{% assign z = 3 %}
+      END
+    )
+
+    sources.each do |path, source|
+      assert_equal(expected_sources[path], source)
+    end
+  end
+
+  def test_doesnt_correct_if_with_anything_other_than_tags
+    expected_sources = {
+      "templates/index.liquid" => <<~END,
+        {% if collection.image.size != 0 %}
+          <div>hello</div>
+        {% elsif collection.products.first.size != 0 and collection.products.first.media != empty %}
+          <div>goodbye</div>
+        {% else %}
+          <div>hello</div>
+        {% endif %}
+      END
+    }
+
+    sources = fix_theme(
+      ThemeCheck::LiquidTag.new(min_consecutive_statements: 4),
+      "templates/index.liquid" => <<~END,
+        {% if collection.image.size != 0 %}
+          <div>hello</div>
+        {% elsif collection.products.first.size != 0 and collection.products.first.media != empty %}
+          <div>goodbye</div>
+        {% else %}
+          <div>hello</div>
+        {% endif %}
+      END
+    )
+
+    sources.each do |path, source|
+      assert_equal(expected_sources[path], source)
+    end
+  end
 end
