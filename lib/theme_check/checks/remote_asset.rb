@@ -22,6 +22,7 @@ module ThemeCheck
       return if resource_url =~ ABSOLUTE_PATH
       return if resource_url =~ RELATIVE_PATH
       return if url_hosted_by_shopify?(resource_url)
+      return if url_is_setting_variable?(resource_url)
 
       # Ignore non-stylesheet link tags
       rel = node.attributes["rel"]
@@ -38,6 +39,10 @@ module ThemeCheck
     def url_hosted_by_shopify?(url)
       url.start_with?(Liquid::VariableStart) &&
         AssetUrlFilters::ASSET_URL_FILTERS.any? { |filter| url.include?(filter) }
+    end
+
+    def url_is_setting_variable?(url)
+      url.start_with?(Liquid::VariableStart) && url =~ /settings\./
     end
   end
 end
