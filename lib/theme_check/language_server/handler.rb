@@ -53,7 +53,9 @@ module ThemeCheck
         @completion_engine = CompletionEngine.new(@storage)
         @document_link_engine = DocumentLinkEngine.new(@storage)
         @diagnostics_engine = DiagnosticsEngine.new(@storage, @bridge, @diagnostics_manager)
-        @execute_command_engine = ExecuteCommandEngine.new(@storage, @bridge, @diagnostics_manager)
+        @execute_command_engine = ExecuteCommandEngine.new
+        @execute_command_engine << CorrectionExecuteCommandProvider.new(@storage, @bridge, @diagnostics_manager)
+        @execute_command_engine << RunChecksExecuteCommandProvider.new(@diagnostics_engine, @root_path, config_for_path(@root_path))
         @code_action_engine = CodeActionEngine.new(@storage, @diagnostics_manager)
         @bridge.send_response(id, {
           capabilities: CAPABILITIES,

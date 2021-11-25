@@ -19,14 +19,14 @@ module ThemeCheck
         @diagnostics_manager.first_run?
       end
 
-      def analyze_and_send_offenses(absolute_path, config)
+      def analyze_and_send_offenses(absolute_path, config, force: false)
         return unless @diagnostics_lock.try_lock
         @token += 1
         @bridge.send_create_work_done_progress_request(@token)
         theme = ThemeCheck::Theme.new(storage)
         analyzer = ThemeCheck::Analyzer.new(theme, config.enabled_checks)
 
-        if @diagnostics_manager.first_run?
+        if @diagnostics_manager.first_run? || force
           @bridge.send_work_done_progress_begin(@token, "Full theme check")
           @bridge.log("Checking #{storage.root}")
           offenses = nil

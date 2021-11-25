@@ -18,14 +18,6 @@ module ThemeCheck
         end
       end
 
-      attr_reader :storage, :bridge, :diagnostics_manager
-
-      def initialize(storage, bridge, diagnostics_manager)
-        @storage = storage
-        @bridge = bridge
-        @diagnostics_manager = diagnostics_manager
-      end
-
       def execute(arguments)
         raise NotImplementedError
       end
