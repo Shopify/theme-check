@@ -18,7 +18,7 @@ module ThemeCheck
     end
 
     def on_schema(node)
-      schema = JSON.parse(node.value.nodelist.join)
+      schema = node.inner_json
 
       if (javascript = schema["javascript"])
         size = asset_size(javascript)

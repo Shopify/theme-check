@@ -6,7 +6,7 @@ module ThemeCheck
     doc docs_url(__FILE__)
 
     def on_schema(node)
-      JSON.parse(node.value.nodelist.join)
+      node.inner_json
     rescue JSON::ParserError => e
       add_offense(format_json_parse_error(e), node: node)
     end

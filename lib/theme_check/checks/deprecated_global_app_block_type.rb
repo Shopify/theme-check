@@ -9,7 +9,7 @@ module ThemeCheck
     VALID_GLOBAL_APP_BLOCK_TYPE = "@app"
 
     def on_schema(node)
-      schema = JSON.parse(node.value.nodelist.join)
+      schema = node.inner_json
 
       if block_types_from(schema).include?(INVALID_GLOBAL_APP_BLOCK_TYPE)
         add_offense(
