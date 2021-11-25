@@ -10,7 +10,7 @@ module ThemeCheck
       @min_consecutive_statements = min_consecutive_statements
     end
 
-    def on_document(node)
+    def on_document(_node)
       @first_nodes = []
       @consecutive_nodes = {}
       @first_statement = nil
@@ -38,7 +38,6 @@ module ThemeCheck
       @first_nodes.each do |node|
         add_offense("Use {% liquid ... %} to write multiple tags", node: node) do |corrector|
           consecutive = node.source[@consecutive_nodes[node.line_number][0].outer_markup_start_index, @consecutive_nodes[node.line_number][-1].outer_markup_end_index]
-          
           next_tag = /(?<tag_open>({%-|{%))(?<contents>(.|\n)*?)(?<tag_close>(%}|-%}))/m.match(node.source, @consecutive_nodes[node.line_number][-1].outer_markup_end_index)
           unless next_tag.nil?
             consecutive += "\n  #{next_tag[:contents].strip}" if next_tag[:contents].strip.start_with?("end")
