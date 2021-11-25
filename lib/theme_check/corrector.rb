@@ -16,8 +16,8 @@ module ThemeCheck
       @theme_file.rewriter.insert_before(node, content, character_range)
     end
 
-    def remove(node)
-      @theme_file.rewriter.remove(node)
+    def remove(node, character_range = nil)
+      @theme_file.rewriter.remove(node, character_range)
     end
 
     def replace(node, content, character_range = nil)
@@ -31,10 +31,6 @@ module ThemeCheck
 
     def replace_inner_json(node, json)
       replace_inner_markup(node, pretty_json(json))
-    end
-    
-    def remove_node(node)
-      @theme_file.rewriter.remove_node(node)
     end
 
     def wrap(node, insert_before, insert_after)

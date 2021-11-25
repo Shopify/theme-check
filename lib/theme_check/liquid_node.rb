@@ -84,10 +84,6 @@ module ThemeCheck
       end
     end
 
-    def variable_lookup?
-      @value.is_a?(Liquid::VariableLookup)
-    end
-
     # Most nodes have a line number, but it's not guaranteed.
     def line_number
       if tag? && @value.respond_to?(:line_number)
@@ -210,6 +206,10 @@ module ThemeCheck
     def block_end_end_index
       return block_end_start_index unless tag? && block?
       @block_end_end_index ||= block_end_match&.end(0) || block_start_end_index
+    end
+
+    def block_tag_end_index
+      find_block_delimiter(block_start_end_index + inner_markup.size)&.end(0)
     end
 
     def outer_markup_start_index
@@ -358,58 +358,6 @@ module ThemeCheck
         source,
         block_start_end_index,
       )
-    end
-
-    def find_block_delimiter(start_index)
-      return nil unless tag? && block?
-
-      tag_start, tag_end = if inside_liquid_tag?
-        [
-          /^\s*#{@value.tag_name}\s*/,
-          /^\s*end#{@value.tag_name}\s*/,
-        ]
-      else
-        [
-          /#{Liquid::TagStart}-?\s*#{@value.tag_name}/mi,
-          /#{Liquid::TagStart}-?\s*end#{@value.tag_name}\s*-?#{Liquid::TagEnd}/mi,
-        ]
-      end
-
-      # This little algorithm below find the _correct_ block delimiter
-      # (endif, endcase, endcomment) for the current tag. What do I
-      # mean by correct? It means the one you'd expect. Making sure
-      # that we don't do the naive regex find. Since you can have
-      # nested ifs, fors, etc.
-      #
-      # It works by having a stack, pushing onto the stack when we
-      # open a tag of our type_name. And popping when we find a
-      # closing tag of our type_name.
-      #
-      # When the stack is empty, we return the end tag match.
-      index = start_index
-      stack = []
-      stack.push("open")
-      loop do
-        tag_start_match = tag_start.match(source, index)
-        tag_end_match = tag_end.match(source, index)
-
-        return nil unless tag_end_match
-
-        # We have found a tag_start and it appeared _before_ the
-        # tag_end that we found, thus we push it onto the stack.
-        if tag_start_match && tag_start_match.end(0) < tag_end_match.end(0)
-          stack.push("open")
-        end
-
-        # We have found a tag_end, therefore we pop
-        stack.pop
-
-        # Nothing left on the stack, we're done.
-        break tag_end_match if stack.empty?
-
-        # We keep looking from the end of the end tag we just found.
-        index = tag_end_match.end(0)
-      end
     end
 
     # Here we're hacking around a glorious bug in Liquid that makes it so the

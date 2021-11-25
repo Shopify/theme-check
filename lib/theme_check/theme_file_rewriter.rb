@@ -31,9 +31,12 @@ module ThemeCheck
       )
     end
 
-    def remove(node)
+    def remove(node, character_range = nil)
       @rewriter.remove(
-        range(node.outer_markup_start_index, node.outer_markup_end_index)
+        range(
+          character_range&.begin || node.outer_markup_start_index,
+          character_range&.end || node.outer_markup_end_index
+        )
       )
     end
 
@@ -44,10 +47,7 @@ module ThemeCheck
           character_range&.end || node.end_index,
         ),
         content
-    end
-
-    def remove_node(node)
-      @rewriter.remove(range(node.outer_markup_position.start_index, node.outer_markup_position.end_index + 1))
+      )
     end
 
     def replace_inner_markup(node, content)
