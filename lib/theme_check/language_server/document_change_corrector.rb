@@ -8,6 +8,7 @@ module ThemeCheck
 
       def initialize
         @json_edits = {}
+        @json_file_edits = {}
         @text_document_edits = {}
         @create_files = []
         @rename_files = []
@@ -16,6 +17,7 @@ module ThemeCheck
 
       def document_changes
         apply_json_edits
+        apply_json_file_edits
         @create_files + @rename_files + @text_document_edits.values + @delete_files
       end
 
@@ -138,15 +140,17 @@ module ThemeCheck
       end
 
       def add_translation(file, path, value)
+        raise ArgumentError unless file.is_a?(JsonFile)
         hash = file.content
         SchemaHelper.set(hash, path, value)
-        # simpler to just overwrite it.
-        create_file(
-          file.storage,
-          file.relative_path,
-          JSON.pretty_generate(hash),
-          overwrite: true
-        )
+        @json_file_edits[file] = hash
+      end
+
+      def remove_translation(file, path)
+        raise ArgumentError unless file.is_a?(JsonFile)
+        hash = file.content
+        SchemaHelper.delete(hash, path)
+        @json_file_edits[file] = hash
       end
 
       private
@@ -155,6 +159,27 @@ module ThemeCheck
         @json_edits.each do |node, json|
           replace_inner_markup(node, pretty_json(json))
         end
+      end
+
+      def apply_json_file_edits
+        @json_file_edits.each do |file, hash|
+          replace_entire_file(file, JSON.pretty_generate(hash))
+        end
+      end
+
+      def replace_entire_file(file, contents)
+        text_document = to_text_document(file)
+        position = ThemeCheck::StrictPosition.new(file.source, file.source, 0)
+        @text_document_edits[text_document] = {
+          textDocument: text_document,
+          edits: [{
+            range: {
+              start: { line: 0, character: 0 },
+              end: { line: position.end_row, character: position.end_column },
+            },
+            newText: contents,
+          }],
+        }
       end
 
       # @param node [Node]
@@ -185,11 +210,21 @@ module ThemeCheck
         text_document_edit(node)[:edits]
       end
 
-      def to_text_document(node)
-        {
-          uri: file_uri(node.theme_file&.path),
-          version: node.theme_file&.version,
-        }
+      def to_text_document(thing)
+        case thing
+        when Node
+          {
+            uri: file_uri(thing.theme_file&.path),
+            version: thing.theme_file&.version,
+          }
+        when ThemeFile
+          {
+            uri: file_uri(thing.path),
+            version: thing.version,
+          }
+        else
+          raise ArgumentError
+        end
       end
 
       def absolute_path(node)

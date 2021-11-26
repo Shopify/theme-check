@@ -28,6 +28,16 @@ module ThemeCheck
 
           docs/language_server/how_to_correct_code_with_code_actions_and_execute_command.md
         EXPECTED
+
+        difference = document_change_corrector_methods - corrector_methods - [:file_path, :file_uri, :document_changes]
+        assert_empty(difference, <<~EXPECTED)
+          Expected the following methods to be implemented in Corrector:
+
+          #{pretty_print(difference)}
+
+          If this test is failing because you are adding a new method to DocumentChangeCorrector,
+          it should be possible to do the same thing outside the language server.
+        EXPECTED
       end
 
       def test_insert_before
@@ -267,19 +277,14 @@ module ThemeCheck
         )
       end
 
-      def test_add_translation
-        storage = make_storage("foo.json" => '{ "a": "b" }')
+      def test_add_remove_translation
+        contents = '{ "a": "b" }'
+        storage = make_storage("foo.json" => contents)
         file = JsonFile.new('foo.json', storage)
         @corrector.add_translation(file, "hello", "world")
+        @corrector.remove_translation(file, "a")
         assert_equal(
           [
-            {
-              kind: 'create',
-              uri: file_uri(storage.path('foo.json')),
-              options: {
-                overwrite: true,
-              },
-            },
             {
               textDocument: {
                 uri: file_uri(storage.path('foo.json')),
@@ -288,9 +293,9 @@ module ThemeCheck
               edits: [{
                 range: {
                   start: { line: 0, character: 0 },
-                  end: { line: 0, character: 0 },
+                  end: { line: 0, character: contents.size - 1 },
                 },
-                newText: JSON.pretty_generate({ a: "b", hello: "world" }),
+                newText: JSON.pretty_generate({ hello: "world" }),
               }],
             },
           ],

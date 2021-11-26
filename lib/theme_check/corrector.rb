@@ -54,5 +54,11 @@ module ThemeCheck
       SchemaHelper.set(hash, path, value)
       json_file.update_contents(hash)
     end
+
+    def remove_translation(json_file, path)
+      hash = json_file.content
+      SchemaHelper.delete(hash, path)
+      json_file.update_contents(hash)
+    end
   end
 end

@@ -3,7 +3,7 @@ require "pathname"
 
 module ThemeCheck
   class Theme
-    DEFAULT_LOCALE_REGEXP = %r{^locales/(.*)\.default$}
+    DEFAULT_LOCALE_REGEXP = %r{locales/(.*)\.default$}
     LIQUID_REGEX = /\.liquid$/i
     JSON_REGEX = /\.json$/i
 

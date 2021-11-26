@@ -37,6 +37,12 @@ module ThemeCheck
           end
           corrector.replace_inner_json(node, schema)
         end
+      elsif theme_file.is_a?(JsonFile)
+        check.add_offense(message, theme_file: theme_file) do |corrector|
+          extra_keys.each do |k|
+            corrector.remove_translation(theme_file, key_prefix + k)
+          end
+        end
       else
         check.add_offense(message, theme_file: theme_file)
       end
@@ -50,6 +56,12 @@ module ThemeCheck
             SchemaHelper.set(schema, key_prefix + k, "TODO")
           end
           corrector.replace_inner_json(node, schema)
+        end
+      elsif theme_file.is_a?(JsonFile)
+        check.add_offense(message, theme_file: theme_file) do |corrector|
+          missing_keys.each do |k|
+            corrector.add_translation(theme_file, key_prefix + k, "TODO")
+          end
         end
       else
         check.add_offense(message, theme_file: theme_file)
