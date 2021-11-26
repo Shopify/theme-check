@@ -53,10 +53,10 @@ module ThemeCheck
 
           if @consecutive_nodes[node.line_number][0].block? && node.inner_markup.lines.map(&:strip)[1..-1].all? { |l| l.start_with?("{%") && l.end_with?("%}") }
             corrector.insert_before(node, "#{node.start_token} liquid\n#{consecutive}#{node.end_token}", (node.outer_markup_start_index)...(node.outer_markup_end_index))
-            @consecutive_nodes[node.line_number].each { |n| corrector.remove(n, (n.block_start_start_index)...(n.block_tag_end_index)) }
+            @consecutive_nodes[node.line_number].each { |n| corrector.remove(n, n.outer_markup_range) }
           else
             corrector.replace(node, "liquid\n#{consecutive}")
-            @consecutive_nodes[node.line_number][1..-1].each { |n| corrector.remove(n, (n.outer_markup_start_index)...(n.outer_markup_end_index + 1)) }
+            @consecutive_nodes[node.line_number][1..-1].each { |n| corrector.remove(n, n.outer_markup_range) }
           end
         end
       end

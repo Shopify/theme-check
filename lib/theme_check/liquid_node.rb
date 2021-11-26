@@ -73,6 +73,21 @@ module ThemeCheck
       end
     end
 
+    def outer_markup_range
+      return if variable_lookup?
+      if tag? && block?
+        start_index = block_start_start_index
+        end_index = find_block_delimiter(block_start_end_index + inner_markup.size)&.end(0)
+      elsif tag?
+        start_index = block_start_start_index
+        end_index = block_start_end_index + 1
+      else
+        start_index = outer_markup_start_index
+        end_index = outer_markup_end_index + 1
+      end
+      (start_index)...(end_index)
+    end
+
     def inner_markup
       return '' unless block?
       @inner_markup ||= source[block_start_end_index...block_end_start_index]
@@ -209,7 +224,7 @@ module ThemeCheck
     end
 
     def block_tag_end_index
-      find_block_delimiter(block_start_end_index + inner_markup.size)&.end(0)
+      find_block_delimiter(block_start_end_index + inner_markup.size)&.end(0) + 1
     end
 
     def outer_markup_start_index
