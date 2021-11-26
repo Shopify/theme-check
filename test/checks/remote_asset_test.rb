@@ -27,6 +27,7 @@ module ThemeCheck
           <source src="data:image/png;base64,...">
           <source src="{{ image.src | img_url }}">
           <source src="{{ image | img_url }}">
+          <source src="{{ section.settings.video_url }}">
 
           <!-- weird edge cases from the wild -->
           <img alt="logo" src="" data-src="{{ url | asset_url | img_tag }}" width="100" height="100" />
