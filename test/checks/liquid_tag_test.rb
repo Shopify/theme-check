@@ -23,6 +23,8 @@ class LiquidTagTest < Minitest::Test
     offenses = analyze_theme(
       ThemeCheck::LiquidTag.new(min_consecutive_statements: 4),
       "templates/index.liquid" => <<~END,
+        {% assign x = 1 %}
+        Hello
         {% if x == 1 %}
           {% assign y = 2 %}
         {% else %}
