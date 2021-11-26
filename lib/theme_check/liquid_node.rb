@@ -85,7 +85,7 @@ module ThemeCheck
         start_index = outer_markup_start_index
         end_index = outer_markup_end_index + 1
       end
-      (start_index)...(end_index)
+      start_index...end_index
     end
 
     def inner_markup
@@ -221,10 +221,6 @@ module ThemeCheck
     def block_end_end_index
       return block_end_start_index unless tag? && block?
       @block_end_end_index ||= block_end_match&.end(0) || block_start_end_index
-    end
-
-    def block_tag_end_index
-      find_block_delimiter(block_start_end_index + inner_markup.size)&.end(0) + 1
     end
 
     def outer_markup_start_index
