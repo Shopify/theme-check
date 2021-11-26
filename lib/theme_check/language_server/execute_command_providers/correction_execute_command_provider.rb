@@ -7,6 +7,14 @@ module ThemeCheck
 
       command "correction"
 
+      attr_reader :storage, :bridge, :diagnostics_manager
+
+      def initialize(storage, bridge, diagnostics_manager)
+        @storage = storage
+        @bridge = bridge
+        @diagnostics_manager = diagnostics_manager
+      end
+
       # The arguments passed to this method are the ones forwarded
       # from the selected CodeAction by the client.
       #

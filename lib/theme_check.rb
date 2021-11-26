@@ -56,6 +56,10 @@ module ThemeCheck
     ENV["THEME_CHECK_DEBUG"] == "true"
   end
 
+  def self.debug_log_file
+    ENV["THEME_CHECK_DEBUG_LOG_FILE"]
+  end
+
   def self.with_liquid_c_disabled
     if defined?(Liquid::C)
       was_enabled = Liquid::C.enabled

@@ -3,10 +3,18 @@
 module ThemeCheck
   module LanguageServer
     class IOMessenger < Messenger
+      def self.err_stream
+        if ThemeCheck.debug_log_file
+          File.open(ThemeCheck.debug_log_file, "w")
+        else
+          STDERR
+        end
+      end
+
       def initialize(
         in_stream: STDIN,
         out_stream: STDOUT,
-        err_stream: STDERR
+        err_stream: IOMessenger.err_stream
       )
         validate!([in_stream, out_stream, err_stream])
 

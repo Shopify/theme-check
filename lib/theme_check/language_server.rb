@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 require_relative "language_server/protocol"
 require_relative "language_server/constants"
+require_relative "language_server/configuration"
 require_relative "language_server/channel"
 require_relative "language_server/messenger"
 require_relative "language_server/io_messenger"
