@@ -49,7 +49,7 @@ module ThemeCheck
       @position = Position.new(
         @markup,
         @theme_file&.source,
-        line_number_1_indexed: line_number,
+        line_number_1_indexed: @line_number,
         node_markup_offset: node_markup_offset,
         node_markup: node&.markup
       )

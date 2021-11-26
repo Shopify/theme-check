@@ -130,7 +130,7 @@ class OffenseTest < Minitest::Test
     assert_equal(0, offense.start_row)
     assert_equal(0, offense.end_row)
     assert_equal(0, offense.start_column)
-    assert_equal(0, offense.end_column)
+    assert_equal(3, offense.end_column)
   end
 
   def test_equal

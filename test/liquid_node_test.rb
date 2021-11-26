@@ -533,6 +533,20 @@ module ThemeCheck
       OUTER_MARKUP
     end
 
+    def test_outer_markup_repeated_comments
+      liquid = <<~LIQUID
+        {% comment %}theme-check-disable foo{% endcomment %}
+        {% comment %}theme-check-disable bar{% endcomment %}
+        {%comment%}
+        {%endcomment%}
+      LIQUID
+      assert_can_find_node_with_outer_markup('{% comment %}theme-check-disable foo{% endcomment %}', liquid)
+      assert_can_find_node_with_outer_markup(<<~COMMENT.rstrip, liquid)
+        {%comment%}
+        {%endcomment%}
+      COMMENT
+    end
+
     def test_inner_markup
       assert_node_inner_markup_equals('', '{{x}}')
       assert_node_inner_markup_equals('', '{{ x }}')

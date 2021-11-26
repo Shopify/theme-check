@@ -412,6 +412,14 @@ class SpaceInsideBracesTest < Minitest::Test
         liquid: '{%- if x!= "x" -%}{%- endif -%}',
         expected: "Space missing before '!=' at templates/index.liquid:8:10",
       },
+      {
+        liquid: <<~LIQUID,
+          {% comment %}theme-check-disable foo{% endcomment %}
+          {%comment %}
+          {% endcomment %}
+        LIQUID
+        expected: "Space missing after '{%' at templates/index.liquid:55:56",
+      },
     ].each do |test_desc|
       offenses = analyze_theme(
         ThemeCheck::SpaceInsideBraces.new,
