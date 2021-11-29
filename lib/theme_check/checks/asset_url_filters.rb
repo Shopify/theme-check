@@ -8,6 +8,7 @@ module ThemeCheck
     HTML_FILTERS = [
       'stylesheet_tag',
       'script_tag',
+      'image_tag',
       'img_tag',
     ]
     ASSET_URL_FILTERS = [
@@ -16,6 +17,7 @@ module ThemeCheck
       'file_img_url',
       'file_url',
       'global_asset_url',
+      'image_url',
       'img_url',
       'payment_type_img_url',
       'shopify_asset_url',
