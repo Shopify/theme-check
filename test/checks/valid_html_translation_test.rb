@@ -9,7 +9,8 @@ class ValidHTMLTranslationTest < Minitest::Test
         hello_html: "<h1>Hello, world</h1>",
         image_html: "<img src='spongebob.png'>",
         line_break_html: "<br>",
-        self_closing_svg_html: "<svg />"
+        self_closing_svg_html: "<svg />",
+        foo: "bar",
       ),
     )
     assert_offenses("", offenses)
