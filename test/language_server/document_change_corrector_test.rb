@@ -312,7 +312,7 @@ module ThemeCheck
         corrector = DocumentChangeCorrector.new
 
         # Simulate doing multiple corrector calls on the _same_ node.
-        json = JSON.parse(node.inner_markup)
+        json = node.inner_json
         SchemaHelper.set(json, 'a.b', 1)
         corrector.replace_inner_json(node, json)
         SchemaHelper.set(json, 'a.c', 2)

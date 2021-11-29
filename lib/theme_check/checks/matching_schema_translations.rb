@@ -6,7 +6,7 @@ module ThemeCheck
     doc docs_url(__FILE__)
 
     def on_schema(node)
-      schema = JSON.parse(node.value.nodelist.join)
+      schema = node.inner_json
       # Get all locales used in the schema
       used_locales = Set.new([theme.default_locale])
       visit_object(schema) do |_, locales|

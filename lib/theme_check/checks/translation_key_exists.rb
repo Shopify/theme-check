@@ -22,7 +22,7 @@ module ThemeCheck
     end
 
     def on_schema(node)
-      if (schema_locales = JSON.parse(node.value.nodelist.join).dig("locales", @theme.default_locale))
+      if (schema_locales = node.inner_json.dig("locales", @theme.default_locale))
         @schema_locales = schema_locales
       end
     end

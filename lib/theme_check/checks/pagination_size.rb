@@ -27,7 +27,7 @@ module ThemeCheck
     end
 
     def on_schema(node)
-      schema = JSON.parse(node.value.nodelist.join)
+      schema = node.inner_json
 
       if (settings = schema["settings"])
         @schema_settings = settings

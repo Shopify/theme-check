@@ -78,6 +78,11 @@ module ThemeCheck
       @inner_markup ||= source[block_start_end_index...block_end_start_index]
     end
 
+    def inner_json
+      return nil unless schema?
+      @inner_json ||= JSON.parse(inner_markup)
+    end
+
     def markup=(markup)
       if @value.instance_variable_defined?(:@markup)
         @value.instance_variable_set(:@markup, markup)
@@ -164,6 +169,10 @@ module ThemeCheck
     # A block of type of node?
     def block?
       block_tag? || block_body? || document?
+    end
+
+    def schema?
+      @value.is_a?(ThemeCheck::Tags::Schema)
     end
 
     # The `:under_score_name` of this type of node. Used to dispatch to the `on_<type_name>`
