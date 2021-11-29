@@ -170,6 +170,26 @@ module ThemeCheck
         )
       end
 
+      def test_remove_character_range
+        @corrector.remove(@node, 0...5)
+        assert_equal(3, @node.end_column)
+        assert_equal(
+          [
+            {
+              textDocument: {
+                uri: file_uri(@node.theme_file.path),
+                version: nil,
+              },
+              edits: [{
+                range: range(0, 0, 0, 5),
+                newText: '',
+              }],
+            },
+          ],
+          @corrector.document_changes
+        )
+      end
+
       def test_replace_inner_markup
         node = find(root_node(<<~LIQUID)) { |n| n.type_name == :schema }
           {% schema %}Hello Muffin{% endschema %}

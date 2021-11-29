@@ -52,11 +52,12 @@ module ThemeCheck
       end
 
       # @param node [LiquidNode]
-      def remove(node)
+      def remove(node, character_range = nil)
+        position = character_range_position(node, character_range) if character_range
         edits(node) << {
           range: {
-            start: { line: node.outer_markup_start_row, character: node.outer_markup_start_column },
-            end: { line: node.outer_markup_end_row, character: node.outer_markup_end_column },
+            start: start_location(position) || outer_start_location(node),
+            end: end_location(position) || outer_end_location(node),
           },
           newText: '',
         }
@@ -215,6 +216,7 @@ module ThemeCheck
       end
 
       def start_location(node)
+        return nil if node.nil?
         {
           line: node.start_row,
           character: node.start_column,
@@ -222,9 +224,24 @@ module ThemeCheck
       end
 
       def end_location(node)
+        return nil if node.nil?
         {
           line: node.end_row,
           character: node.end_column,
+        }
+      end
+
+      def outer_start_location(node)
+        {
+          line: node.outer_markup_start_row,
+          character: node.outer_markup_start_column,
+        }
+      end
+
+      def outer_end_location(node)
+        {
+          line: node.outer_markup_end_row,
+          character: node.outer_markup_end_column,
         }
       end
     end
