@@ -85,7 +85,7 @@ module ThemeCheck
         start_index = outer_markup_start_index
         end_index = outer_markup_end_index + 1
       end
-      start_index...end_index
+      start_index..end_index
     end
 
     def inner_markup

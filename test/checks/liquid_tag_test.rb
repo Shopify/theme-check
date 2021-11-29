@@ -345,6 +345,33 @@ class LiquidTagTest < Minitest::Test
     end
   end
 
+  def test_whitespace_trimmed_middle
+    expected_sources = {
+      "templates/index.liquid" => <<~END,
+        {% liquid
+          assign x = 1
+          assign y = 2
+          assign z = 3
+          assign m = 1
+        %}
+      END
+    }
+
+    sources = fix_theme(
+      ThemeCheck::LiquidTag.new(min_consecutive_statements: 4),
+      "templates/index.liquid" => <<~END,
+        {% assign x = 1 %}
+        {%- assign y = 2 -%}
+        {%- assign z = 3 -%}
+        {% assign m = 1 %}
+      END
+    )
+
+    sources.each do |path, source|
+      assert_equal(expected_sources[path], source)
+    end
+  end
+
   def test_corrects_single_line
     expected_sources = {
       "templates/index.liquid" => <<~END,
@@ -396,6 +423,95 @@ class LiquidTagTest < Minitest::Test
         {% else %}
           <div>hello</div>
         {% endif %}
+      END
+    )
+
+    sources.each do |path, source|
+      assert_equal(expected_sources[path], source)
+    end
+  end
+
+  def test_doesnt_correct_if_with_variables
+    expected_sources = {
+      "templates/index.liquid" => <<~END,
+        {% if collection.image.size != 0 %}
+          Hello {{ name }}
+        {% elsif collection.products.first.size != 0 and collection.products.first.media != empty %}
+          Goodbye {{ name }}
+        {% else %}
+          Welcome {{ name }}
+        {% endif %}
+      END
+    }
+
+    sources = fix_theme(
+      ThemeCheck::LiquidTag.new(min_consecutive_statements: 4),
+      "templates/index.liquid" => <<~END,
+        {% if collection.image.size != 0 %}
+          Hello {{ name }}
+        {% elsif collection.products.first.size != 0 and collection.products.first.media != empty %}
+          Goodbye {{ name }}
+        {% else %}
+          Welcome {{ name }}
+        {% endif %}
+      END
+    )
+
+    sources.each do |path, source|
+      assert_equal(expected_sources[path], source)
+    end
+  end
+
+  def test_new_line_inside_tag
+    expected_sources = {
+      "templates/index.liquid" => <<~END,
+        {% liquid
+          assign a = 1
+          assign b = 2
+          assign c = 3
+          assign x = 1
+        %}
+      END
+    }
+
+    sources = fix_theme(
+      ThemeCheck::LiquidTag.new(min_consecutive_statements: 4),
+      "templates/index.liquid" => <<~END,
+        {% assign a = 1
+        %}
+        {%
+          assign b = 2
+        %}
+        {%
+          assign c = 3 %}
+        {% assign x = 1 %}
+      END
+    )
+
+    sources.each do |path, source|
+      assert_equal(expected_sources[path], source)
+    end
+  end
+
+  def test_spacing_in_tags
+    expected_sources = {
+      "templates/index.liquid" => <<~END,
+        {% liquid
+          assign a = 1
+          assign b = 2
+          assign c = 3
+          assign x = 1
+        %}
+      END
+    }
+
+    sources = fix_theme(
+      ThemeCheck::LiquidTag.new(min_consecutive_statements: 4),
+      "templates/index.liquid" => <<~END,
+        {% assign a = 1     %}
+        {%      assign b = 2%}
+        {%assign c = 3%}
+        {%   assign x = 1   %}
       END
     )
 

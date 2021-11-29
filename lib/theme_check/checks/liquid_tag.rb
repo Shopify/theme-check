@@ -43,14 +43,11 @@ module ThemeCheck
             consecutive += "\n  #{next_tag[:contents].strip}" if next_tag[:contents].strip.start_with?("end")
           end
 
-          if consecutive.lines.count < @consecutive_nodes[node.line_number].length
-            consecutive.gsub!(/\n/, "")
-            consecutive.gsub!(/ -%}| %}/, "\n")
-          end
+          consecutive.gsub!(/\n/, "")
+          consecutive.gsub!(/(\s?|\n)+(?=(-%}|%}))(-%}|%})/, "\n")
+          consecutive.gsub!(/({%-|{%)(\s?|\n)+(?=\w)/, "  ")
 
-          consecutive.gsub!(/{%-|{%/, " ").gsub!(/ -%}| %}/, "")
           consecutive << "\n" if consecutive[-1] != "\n"
-
           if @consecutive_nodes[node.line_number][0].block? && node.inner_markup.lines.map(&:strip)[1..-1].all? { |l| l.start_with?("{%") && l.end_with?("%}") }
             corrector.insert_before(node, "#{node.start_token} liquid\n#{consecutive}#{node.end_token}", (node.outer_markup_start_index)...(node.outer_markup_end_index))
             @consecutive_nodes[node.line_number].each { |n| corrector.remove(n, n.outer_markup_range) }
