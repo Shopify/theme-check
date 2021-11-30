@@ -327,7 +327,7 @@ module ThemeCheck
             },
             edits: [{
               range: range(0, 12, 2, 0),
-              newText: pretty_json(json, 1),
+              newText: pretty_json(json, start_level: 1),
             }],
           }],
           corrector.document_changes,

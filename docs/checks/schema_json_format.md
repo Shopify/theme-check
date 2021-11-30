@@ -29,18 +29,18 @@ The following examples contain code snippets that either fail or pass this check
 
 ```liquid
 {% schema %}
-  {
-    "locales": {
-      "en": {
-        "title": "Welcome",
-        "missing": "Product"
-      },
-      "fr": {
-        "title": "Bienvenue",
-        "missing": "TODO"
-      }
+{
+  "locales": {
+    "en": {
+      "title": "Welcome",
+      "missing": "Product"
+    },
+    "fr": {
+      "title": "Bienvenue",
+      "missing": "TODO"
     }
   }
+}
 {% endschema %}
 ```
 
@@ -52,12 +52,16 @@ The following example contains the default configuration for this check:
 SchemaJsonFormat:
   enabled: true
   severity: style
+  start_level: 0
+  indent: '  '
 ```
 
 | Parameter | Description |
 | --- | --- |
 | enabled | Whether the check is enabled. |
 | severity | The [severity](https://shopify.developers/themes/tools/theme-check/configuration#check-severity) of the check. |
+| start_level | The indentation level. If you prefer an indented schema, set this to 1. |
+| indent | The character(s) used for indentation levels. |
 
 ## Disabling this check
 
