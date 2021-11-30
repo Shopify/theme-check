@@ -47,8 +47,11 @@ class DeprecatedFilterTest < Minitest::Test
         {% assign url =
           product.featured_image | img_url: '200x'
         %}
+        {{ product.featured_image | img_url: 'master' }}
+        {{ product.featured_image | img_url: '4000x', scale: 2 }}
 
         // not supported:
+        {{ product.featured_image | img_url: 'small' }}
         {{ product.featured_image | img_url: variable }}
         {{ product.featured_image | img_url: '200x', scale: variable }}
       END
@@ -73,8 +76,11 @@ class DeprecatedFilterTest < Minitest::Test
         {% assign url =
           product.featured_image | image_url: width: 200
         %}
+        {{ product.featured_image | image_url }}
+        {{ product.featured_image | image_url: width: 5760 }}
 
         // not supported:
+        {{ product.featured_image | img_url: 'small' }}
         {{ product.featured_image | img_url: variable }}
         {{ product.featured_image | img_url: '200x', scale: variable }}
       LIQUID

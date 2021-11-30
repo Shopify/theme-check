@@ -5,6 +5,10 @@ module ThemeCheck
     category :liquid
     severity :suggestion
 
+    # The image_url filter does not accept width or height values
+    # greater than this numbr.
+    MAX_SIZE = 5760
+
     def on_variable(node)
       used_filters = node.value.filters.map { |name, *_rest| name }
       used_filters.each do |filter|
@@ -35,13 +39,10 @@ module ThemeCheck
       scale = img_url_filter_props&.delete("scale")
 
       # Can't correct those.
-      if size_spec.is_a?(Liquid::VariableLookup) || scale.is_a?(Liquid::VariableLookup)
-        return add_default_offense(
-          node,
-          'img_url',
-          ['image_url']
-        )
-      end
+      return add_default_offense(node, 'img_url', ['image_url']) unless
+       (size_spec.nil? || size_spec.is_a?(String)) &&
+       (scale.nil? || scale.is_a?(Numeric)) &&
+       size_spec != 'small'
 
       node_source = node.markup
       node_start_index = node.start_index
@@ -50,12 +51,12 @@ module ThemeCheck
         (node_start_index + match.begin(0))...(node_start_index + match.end(0))
 
       scale = (scale || 1).to_i
-      width, height = size_spec&.split('x') || [100, 100]
-      width = width.to_i * scale
-      height = height.to_i * scale
+      width, height = (size_spec&.split('x') || [100, 100])
+        .map { |v| v.to_i * scale }
+
       image_url_filter_params = [
-        width > 0 ? "width: #{width}" : nil,
-        height > 0 ? "height: #{height}" : nil,
+        width && width > 0 ? "width: #{[width, MAX_SIZE].min}" : nil,
+        height && height > 0 ? "height: #{[height, MAX_SIZE].min}" : nil,
       ]
       image_url_filter_params += (img_url_filter_props || {})
         .map do |k, v|
@@ -72,8 +73,8 @@ module ThemeCheck
 
       trailing_whitespace = match[0].match(/\s*\Z/)[0]
 
-      image_url_filter = "image_url: "
-      image_url_filter += image_url_filter_params
+      image_url_filter = "image_url"
+      image_url_filter += ": " + image_url_filter_params unless image_url_filter_params.empty?
       image_url_filter += trailing_whitespace
 
       add_offense(
@@ -87,6 +88,10 @@ module ThemeCheck
           img_url_character_range,
         )
       end
+
+    # If anything goes wrong, fail gracefully by returning the default offense.
+    rescue
+      add_default_offense(node, 'img_url', ['image_url'])
     end
   end
 end
