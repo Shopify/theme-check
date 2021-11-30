@@ -27,10 +27,10 @@ module ThemeCheck
       end
 
       add_offense("#{message} disabled but not re-enabled with theme-check-enable", node: node) do
-        node.source.scan(/(?<comment_open>{% comment %}theme-check-disable)(?<checks>.*?)(?<comment_close>{% endcomment %})(?<enclosed>[^\n]*\n[^\n]*\n)/m)
-        # script = node.source.to_enum(:scan, /(?<comment_open>{% comment %}theme-check-disable)(?<checks>.*?)(?<comment_close>{% endcomment %})(?<enclosed>[^\n]*\n[^\n]*\n)/m).map { Regexp.last_match }[-1]
+        script = node.source.scan(/{% comment %}theme-check-disable.*?{% endcomment %}[^\n]*\n[^\n]*\n/m).last
         next if script.nil?
-        node.source.insert(script.end(:enclosed), "{% comment %}theme-check-enable#{checks_missing_end_index.include?(:all) ? "" : " #{checks_missing_end_index.join(', ')}"}{% endcomment %}\n")
+        index = node.source.rindex(script) + script.length
+        node.source.insert(index, "{% comment %}theme-check-enable#{checks_missing_end_index.include?(:all) ? "" : " #{checks_missing_end_index.join(', ')}"}{% endcomment %}\n")
       end
     end
   end
