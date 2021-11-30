@@ -14,13 +14,13 @@ module ThemeCheck
 
     def on_schema(node)
       schema = node.inner_json
-      pretty_schema = pretty_json(schema, @pretty_json_opts)
+      pretty_schema = pretty_json(schema, **@pretty_json_opts)
       if pretty_schema != node.inner_markup
         add_offense(
           "JSON formatting could be improved",
           node: node,
         ) do |corrector|
-          corrector.replace_inner_json(node, schema, @pretty_json_opts)
+          corrector.replace_inner_json(node, schema, **@pretty_json_opts)
         end
       end
     rescue JSON::ParserError

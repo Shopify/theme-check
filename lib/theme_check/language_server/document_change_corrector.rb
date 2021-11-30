@@ -80,7 +80,7 @@ module ThemeCheck
         }
       end
 
-      def replace_inner_json(node, json, pretty_json_opts = {})
+      def replace_inner_json(node, json, **pretty_json_opts)
         # Kind of brittle alert: We're assuming that modifications are
         # made directly on the same json hash (e.g. schema). As such,
         # if this assumption is true, then it follows that the
@@ -157,7 +157,7 @@ module ThemeCheck
 
       def apply_json_edits
         @json_edits.each do |node, (json, pretty_json_opts)|
-          replace_inner_markup(node, pretty_json(json, pretty_json_opts))
+          replace_inner_markup(node, pretty_json(json, **pretty_json_opts))
         end
       end
 
