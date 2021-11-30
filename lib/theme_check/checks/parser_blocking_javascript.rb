@@ -11,8 +11,7 @@ module ThemeCheck
       return if node.attributes["defer"] || node.attributes["async"] || node.attributes["type"] == "module"
 
       add_offense("Missing async or defer attribute on script tag", node: node) do
-        nl_indices = node.source.enum_for(:scan, /\n/).map { Regexp.last_match.begin(0) }
-        script = %r{(?<script_open><script)(?<attributes>(.|\n)*?)(?<script_close></script>)}m.match(node.source, nl_indices[node.line_number - 2])
+        script = %r{(?<script_open><script)(?<attributes>(.|\n)*?)(?<script_close></script>)}m.match(node.source, node.source.index(node.parseable_markup))
         node.source.insert(script.begin(:attributes), " defer")
       end
     end
