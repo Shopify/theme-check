@@ -4,7 +4,7 @@ require "test_helper"
 class SchemaJsonFormatTest < Minitest::Test
   def test_valid
     offenses = analyze_theme(
-      ThemeCheck::SchemaJsonFormat.new,
+      ThemeCheck::SchemaJsonFormat.new(start_level: 1),
       "templates/index.liquid" => <<~END,
         {% schema %}
           {
@@ -18,7 +18,7 @@ class SchemaJsonFormatTest < Minitest::Test
 
   def test_reports_offenses
     offenses = analyze_theme(
-      ThemeCheck::SchemaJsonFormat.new,
+      ThemeCheck::SchemaJsonFormat.new(start_level: 1),
       "templates/index.liquid" => <<~END,
         {% schema %}
           { "hello": "world" }
@@ -26,7 +26,7 @@ class SchemaJsonFormatTest < Minitest::Test
       END
     )
     assert_offenses(<<~END, offenses)
-      JSON formatting could use some love at templates/index.liquid:1
+      JSON formatting could be improved at templates/index.liquid:1
     END
   end
 
@@ -51,7 +51,7 @@ class SchemaJsonFormatTest < Minitest::Test
     }
 
     source = fix_theme(
-      ThemeCheck::SchemaJsonFormat.new,
+      ThemeCheck::SchemaJsonFormat.new(start_level: 1),
       "sections/product.liquid" => <<~END,
         {% schema %}
           {

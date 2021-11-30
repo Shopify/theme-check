@@ -4,8 +4,9 @@ require "test_helper"
 module ThemeCheck
   class JsonHelpersTest < Minitest::Test
     include JsonHelpers
-    def test_pretty_json
-      test_obj = {
+
+    def setup
+      @test_obj = {
         "a" => {
           "b" => "c",
         },
@@ -23,8 +24,10 @@ module ThemeCheck
           ],
         },
       }
+    end
 
-      assert_equal(<<~JSON, pretty_json(test_obj, 0))
+    def test_pretty_json
+      assert_equal(<<~JSON, pretty_json(@test_obj, start_level: 0))
 
         {
           "a": {
@@ -44,6 +47,30 @@ module ThemeCheck
             ]
           }
         }
+      JSON
+    end
+
+    def test_pretty_json_with_tabs
+      assert_equal(<<~JSON, pretty_json(@test_obj, start_level: 1, indent: "\t"))
+
+        \t{
+        \t\t"a": {
+        \t\t\t"b": "c"
+        \t\t},
+        \t\t"d": [
+        \t\t\t"e",
+        \t\t\t"f",
+        \t\t\t"g"
+        \t\t],
+        \t\t"h": {
+        \t\t\t"i": "j",
+        \t\t\t"k": [
+        \t\t\t\t"l",
+        \t\t\t\t"m",
+        \t\t\t\t"n"
+        \t\t\t]
+        \t\t}
+        \t}
       JSON
     end
   end

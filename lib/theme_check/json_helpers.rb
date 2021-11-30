@@ -6,14 +6,16 @@ module ThemeCheck
       "#{message} in JSON"
     end
 
-    def pretty_json(hash, level = 1)
-      indent = "  " * level
+    def pretty_json(hash, start_level: 1, indent: "  ")
+      start_indent = indent * start_level
+
       <<~JSON
 
-        #{indent}#{JSON.pretty_generate(
+        #{start_indent}#{JSON.pretty_generate(
           hash,
-          array_nl: "\n#{indent}",
-          object_nl: "\n#{indent}",
+          indent: indent,
+          array_nl: "\n#{start_indent}",
+          object_nl: "\n#{start_indent}",
         )}
       JSON
     end

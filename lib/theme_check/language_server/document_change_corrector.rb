@@ -80,7 +80,7 @@ module ThemeCheck
         }
       end
 
-      def replace_inner_json(node, json)
+      def replace_inner_json(node, json, pretty_json_opts = {})
         # Kind of brittle alert: We're assuming that modifications are
         # made directly on the same json hash (e.g. schema). As such,
         # if this assumption is true, then it follows that the
@@ -97,7 +97,7 @@ module ThemeCheck
         # node to the latest one that is called. If all the edits
         # occur on the same hash, this final hash will have all the
         # edits in it.
-        @json_edits[node] = json
+        @json_edits[node] = [json, pretty_json_opts]
       end
 
       def wrap(node, insert_before, insert_after)
@@ -156,8 +156,8 @@ module ThemeCheck
       private
 
       def apply_json_edits
-        @json_edits.each do |node, json|
-          replace_inner_markup(node, pretty_json(json))
+        @json_edits.each do |node, (json, pretty_json_opts)|
+          replace_inner_markup(node, pretty_json(json, pretty_json_opts))
         end
       end
 
