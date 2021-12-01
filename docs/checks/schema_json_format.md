@@ -1,6 +1,6 @@
 # Prevent unformatted schema tags (`SchemaJsonFormat`)
 
-_Version THEME_CHECK_VERSION+_
+_Version 1.9.0+_
 
 This check exists to ensure the JSON in your schemas is pretty.
 
