@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+#
+# Automates most of the stuff to create a release.
+#
+# - Creates a branch
+# - Runs git changelog with correct arguments
+# - Runs rake prerelease[$version]
+# - Commits everything
+# - Opens a PR for you
+
+set -eou pipefail
+
+current="$(bundle exec theme-check --version)"
+
+usage() {
+  cat <<- EOD
+
+  Usage: $(basename $0) <version>
+
+  Automates some of the stuff you need to do.
+
+  Current version: $current
+
+EOD
+}
+
+if [[ $# -lt 1 ]] || [[ $1 = '-h' ]] || [[ $1 = '--help' ]]; then
+  usage
+  exit 1
+fi
+
+if ! command -v gh &> /dev/null; then
+  cat <<- EOF
+
+  'gh' is a required dependency of this script.
+
+  To install: https://github.com/cli/cli#installation
+
+EOF
+  exit 1
+fi
+
+if ! git help changelog &> /dev/null; then
+  cat <<- EOF
+
+  'git-extras' is a required dependency of this script.
+
+  To install: https://github.com/tj/git-extras/blob/master/Installation.md
+
+EOF
+fi
+
+version=${1/#v/}
+branch="bump/$version"
+git branch -d $branch || true
+git checkout -b "$branch"
+rake "prerelease[$version]"
+git changelog -t "v$version"
+git add CHANGELOG.md docs/checks lib/theme_check/version.rb
+git commit -m "v$version"
+git push origin "$branch"
+gh pr create -b main -m "v$version"
