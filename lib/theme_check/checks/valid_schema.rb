@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module ThemeCheck
   class ValidSchema < LiquidCheck
-    severity :suggestion
+    severity :error
     category :json
     doc docs_url(__FILE__)
 
