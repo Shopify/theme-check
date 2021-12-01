@@ -16,6 +16,20 @@ class SchemaJsonFormatTest < Minitest::Test
     assert_offenses("", offenses)
   end
 
+  def test_does_not_report_on_invalid_json
+    offenses = analyze_theme(
+      ThemeCheck::SchemaJsonFormat.new(start_level: 1),
+      "templates/index.liquid" => <<~END,
+        {% schema %}
+          {
+            "hello": "world",
+          }
+        {% endschema %}
+      END
+    )
+    assert_offenses("", offenses)
+  end
+
   def test_reports_offenses
     offenses = analyze_theme(
       ThemeCheck::SchemaJsonFormat.new(start_level: 1),

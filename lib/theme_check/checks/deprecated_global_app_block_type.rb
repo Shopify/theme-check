@@ -10,6 +10,7 @@ module ThemeCheck
 
     def on_schema(node)
       schema = node.inner_json
+      return if schema.nil?
 
       if block_types_from(schema).include?(INVALID_GLOBAL_APP_BLOCK_TYPE)
         add_offense(
@@ -17,8 +18,6 @@ module ThemeCheck
           node: node
         )
       end
-    rescue JSON::ParserError
-      # Ignored, handled in ValidSchema.
     end
 
     def on_case(node)

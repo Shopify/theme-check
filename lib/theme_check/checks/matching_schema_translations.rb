@@ -7,6 +7,7 @@ module ThemeCheck
 
     def on_schema(node)
       schema = node.inner_json
+      return if schema.nil?
       # Get all locales used in the schema
       used_locales = Set.new([theme.default_locale])
       visit_object(schema) do |_, locales|
@@ -29,9 +30,6 @@ module ThemeCheck
       end
 
       check_locales(schema, node: node)
-
-    rescue JSON::ParserError
-      # Ignored, handled in ValidSchema.
     end
 
     private

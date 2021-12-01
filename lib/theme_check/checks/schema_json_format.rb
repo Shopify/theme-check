@@ -14,6 +14,7 @@ module ThemeCheck
 
     def on_schema(node)
       schema = node.inner_json
+      return if schema.nil?
       pretty_schema = pretty_json(schema, **@pretty_json_opts)
       if pretty_schema != node.inner_markup
         add_offense(
@@ -23,8 +24,6 @@ module ThemeCheck
           corrector.replace_inner_json(node, schema, **@pretty_json_opts)
         end
       end
-    rescue JSON::ParserError
-      # Ignored, handled in ValidSchema.
     end
   end
 end

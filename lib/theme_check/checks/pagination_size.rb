@@ -28,12 +28,11 @@ module ThemeCheck
 
     def on_schema(node)
       schema = node.inner_json
+      return if schema.nil?
 
       if (settings = schema["settings"])
         @schema_settings = settings
       end
-    rescue JSON::ParserError
-      # Ignored, handled in ValidSchema.
     end
 
     ##

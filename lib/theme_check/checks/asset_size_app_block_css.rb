@@ -19,6 +19,7 @@ module ThemeCheck
 
     def on_schema(node)
       schema = node.inner_json
+      return if schema.nil?
 
       if (stylesheet = schema["stylesheet"])
         size = asset_size(stylesheet)
@@ -29,8 +30,6 @@ module ThemeCheck
           )
         end
       end
-    rescue JSON::ParserError
-      # Ignored, handled in ValidSchema.
     end
 
     private

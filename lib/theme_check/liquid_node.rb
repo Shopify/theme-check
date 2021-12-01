@@ -81,6 +81,9 @@ module ThemeCheck
     def inner_json
       return nil unless schema?
       @inner_json ||= JSON.parse(inner_markup)
+    rescue JSON::ParserError
+      # Handled by ValidSchema
+      @inner_json = nil
     end
 
     def markup=(markup)
