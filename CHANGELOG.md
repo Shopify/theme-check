@@ -1,4 +1,25 @@
 
+v1.9.0 / 2021-12-01
+===================
+
+## Features
+
+  * Add Corrections as Code Actions in Language Server (quickfix + source.fixAll) (#471)
+  * Add SchemaJsonFormat check ([#512](https://github.com/shopify/theme-check/issues/512))
+  * Add checkOn{Open,Change,Save} Language Server Configurations ([#511](https://github.com/shopify/theme-check/issues/511))
+  * Add support for new filters `image_tag` + `image_url`
+    * Add autocorrection to `img_url` to ease migration
+  * Deprecate `img_tag`, `img_url`
+
+## Fixes
+
+  * Fix missing null check in ValidHTMLTranslation ([#517](https://github.com/shopify/theme-check/issues/517))
+  * Fix MatchingTranslations check + corrections ([#515](https://github.com/shopify/theme-check/issues/515))
+  * Fix RemoteAsset false positive from settings variables ([#516](https://github.com/shopify/theme-check/issues/516))
+  * Make SpaceInsideBraces work for missing cases ([#509](https://github.com/shopify/theme-check/issues/509))
+  * Fix Liquid in HTML parsing
+  * Make TranslationKeyExists also check section translations
+
 v1.8.0 / 2021-11-09
 ===================
 
