@@ -42,8 +42,8 @@ module ThemeCheck
           first_node = @consecutive_nodes[node.line_number][0]
           last_node = @consecutive_nodes[node.line_number][-1]
 
-          if first_node.block? && first_node.inner_markup.lines.map(&:strip)[1..-1].all? { |line| line.start_with?("{%") && line.end_with?("%}") }
-            corrector.insert_before(node, "#{first_node.start_token} #{render_liquid_tag(first_node, last_node)}#{first_node.end_token}", (first_node.outer_markup_start_index)...(first_node.outer_markup_end_index))
+          if first_node.block? && all_branches_liquid_tags?(first_node)
+            corrector.insert_before(node, render_liquid_tag(first_node, last_node), node.outer_markup_range)
             nodes.each { |n| corrector.remove(n, n.outer_markup_range) }
           elsif !first_node.block?
             corrector.replace(node, render_liquid_tag(first_node, last_node))
@@ -51,21 +51,6 @@ module ThemeCheck
           end
         end
       end
-    end
-
-    def render_liquid_tag(first_node, last_node)
-      consecutive = first_node.source[first_node.outer_markup_start_index, last_node.outer_markup_end_index]
-      next_tag = /(?<tag_open>({%-|{%))(?<contents>(.|\n)*?)(?<tag_close>(%}|-%}))/m.match(first_node.source, last_node.outer_markup_end_index)
-      unless next_tag.nil?
-        consecutive += "\n  #{next_tag[:contents].strip}\n" if next_tag[:contents].strip.start_with?("end")
-      end
-
-      consecutive.gsub!(/\n/, "")
-      consecutive.gsub!(TRAILING_WHITESPACE_AND_CLOSING_LIQUID_TAG, "\n")
-      consecutive.gsub!(OPENING_LIQUID_TAG_AND_LEADING_WHITESPACE, "  ")
-
-      consecutive << "\n" if consecutive[-1] != "\n"
-      "liquid\n#{consecutive}"
     end
 
     def increment_consecutive_statements(node)
@@ -81,6 +66,39 @@ module ThemeCheck
       end
       @first_statement = nil
       @consecutive_statements = 0
+    end
+
+    def render_liquid_tag(first_node, last_node)
+      markup = construct_liquid_tag(first_node, last_node)
+      if first_node.block?
+        "#{first_node.start_token} #{markup}#{first_node.end_token}"
+      else
+        markup
+      end
+    end
+
+    def construct_liquid_tag(first_node, last_node)
+      consecutive = first_node.source[first_node.outer_markup_start_index, last_node.outer_markup_end_index]
+      next_tag = /(?<tag_open>({%-|{%))(?<contents>(.|\n)*?)(?<tag_close>(%}|-%}))/m.match(first_node.source, last_node.outer_markup_end_index)
+
+      unless next_tag.nil?
+        consecutive += "\n  #{next_tag[:contents].strip}\n" if next_tag[:contents].strip.start_with?("end")
+      end
+
+      remove_tags(consecutive)
+      consecutive << "\n" if consecutive[-1] != "\n"
+      "liquid\n#{consecutive}"
+    end
+
+    def remove_tags(consecutive)
+      consecutive.gsub!(/\n/, "")
+      consecutive.gsub!(TRAILING_WHITESPACE_AND_CLOSING_LIQUID_TAG, "\n")
+      consecutive.gsub!(OPENING_LIQUID_TAG_AND_LEADING_WHITESPACE, "  ")
+    end
+
+    def all_branches_liquid_tags?(node)
+      return false unless node.block?
+      node.inner_markup.lines.map(&:strip)[1..-1].all? { |line| line.start_with?("{%") && line.end_with?("%}") }
     end
   end
 end
