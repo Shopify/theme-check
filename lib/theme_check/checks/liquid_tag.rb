@@ -2,6 +2,7 @@
 module ThemeCheck
   # Recommends using {% liquid ... %} if 5 or more consecutive {% ... %} are found.
   class LiquidTag < LiquidCheck
+    include RegexHelpers
     severity :suggestion
     category :liquid
     doc docs_url(__FILE__)
@@ -37,26 +38,34 @@ module ThemeCheck
       reset_values
       @first_nodes.each do |node|
         add_offense("Use {% liquid ... %} to write multiple tags", node: node) do |corrector|
-          consecutive = node.source[@consecutive_nodes[node.line_number][0].outer_markup_start_index, @consecutive_nodes[node.line_number][-1].outer_markup_end_index]
-          next_tag = /(?<tag_open>({%-|{%))(?<contents>(.|\n)*?)(?<tag_close>(%}|-%}))/m.match(node.source, @consecutive_nodes[node.line_number][-1].outer_markup_end_index)
-          unless next_tag.nil?
-            consecutive += "\n  #{next_tag[:contents].strip}" if next_tag[:contents].strip.start_with?("end")
-          end
+          nodes = @consecutive_nodes[node.line_number]
+          first_node = @consecutive_nodes[node.line_number][0]
+          last_node = @consecutive_nodes[node.line_number][-1]
 
-          consecutive.gsub!(/\n/, "")
-          consecutive.gsub!(/(\s?|\n)+(?=(-%}|%}))(-%}|%})/, "\n")
-          consecutive.gsub!(/({%-|{%)(\s?|\n)+(?=\w)/, "  ")
-
-          consecutive << "\n" if consecutive[-1] != "\n"
-          if @consecutive_nodes[node.line_number][0].block? && node.inner_markup.lines.map(&:strip)[1..-1].all? { |l| l.start_with?("{%") && l.end_with?("%}") }
-            corrector.insert_before(node, "#{node.start_token} liquid\n#{consecutive}#{node.end_token}", (node.outer_markup_start_index)...(node.outer_markup_end_index))
-            @consecutive_nodes[node.line_number].each { |n| corrector.remove(n, n.outer_markup_range) }
-          elsif !@consecutive_nodes[node.line_number][0].block?
-            corrector.replace(node, "liquid\n#{consecutive}")
-            @consecutive_nodes[node.line_number][1..-1].each { |n| corrector.remove(n, n.outer_markup_range) }
+          if first_node.block? && first_node.inner_markup.lines.map(&:strip)[1..-1].all? { |line| line.start_with?("{%") && line.end_with?("%}") }
+            corrector.insert_before(node, "#{first_node.start_token} #{render_liquid_tag(first_node, last_node)}#{first_node.end_token}", (first_node.outer_markup_start_index)...(first_node.outer_markup_end_index))
+            nodes.each { |n| corrector.remove(n, n.outer_markup_range) }
+          elsif !first_node.block?
+            corrector.replace(node, render_liquid_tag(first_node, last_node))
+            nodes[1..-1].each { |n| corrector.remove(n, n.outer_markup_range) }
           end
         end
       end
+    end
+
+    def render_liquid_tag(first_node, last_node)
+      consecutive = first_node.source[first_node.outer_markup_start_index, last_node.outer_markup_end_index]
+      next_tag = /(?<tag_open>({%-|{%))(?<contents>(.|\n)*?)(?<tag_close>(%}|-%}))/m.match(first_node.source, last_node.outer_markup_end_index)
+      unless next_tag.nil?
+        consecutive += "\n  #{next_tag[:contents].strip}\n" if next_tag[:contents].strip.start_with?("end")
+      end
+
+      consecutive.gsub!(/\n/, "")
+      consecutive.gsub!(TRAILING_WHITESPACE_AND_CLOSING_LIQUID_TAG, "\n")
+      consecutive.gsub!(OPENING_LIQUID_TAG_AND_LEADING_WHITESPACE, "  ")
+
+      consecutive << "\n" if consecutive[-1] != "\n"
+      "liquid\n#{consecutive}"
     end
 
     def increment_consecutive_statements(node)

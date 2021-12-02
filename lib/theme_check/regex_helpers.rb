@@ -7,6 +7,8 @@ module ThemeCheck
     LIQUID_TAG_OR_VARIABLE = /#{LIQUID_TAG}|#{LIQUID_VARIABLE}/om
     HTML_LIQUID_PLACEHOLDER = /≬[0-9a-z\n]+[#\n]*≬/m
     START_OR_END_QUOTE = /(^['"])|(['"]$)/
+    OPENING_LIQUID_TAG_AND_LEADING_WHITESPACE = /({%-|{%)(\s?|\n)+(?=\w)/
+    TRAILING_WHITESPACE_AND_CLOSING_LIQUID_TAG = /(\s?|\n)+(?=(-%}|%}))(-%}|%})/
 
     def matches(s, re)
       start_at = 0
