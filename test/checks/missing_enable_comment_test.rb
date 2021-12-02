@@ -164,4 +164,28 @@ class MissingEnableCommentTest < Minitest::Test
       assert_equal(expected_sources[path], source)
     end
   end
+
+  def test_comment_insert_location
+    expected_sources = {
+      "templates/index.liquid" => <<~END,
+        <p>Hello, world</p>
+        {% comment %}theme-check-disable{% endcomment %}
+        {% assign x = 1 %}
+        {% comment %}theme-check-enable{% endcomment %}
+        {% assign x = 1 %}
+      END
+    }
+    sources = fix_theme(
+      ThemeCheck::MissingEnableComment.new,
+      "templates/index.liquid" => <<~END,
+        <p>Hello, world</p>
+        {% comment %}theme-check-disable{% endcomment %}
+        {% assign x = 1 %}
+        {% assign x = 1 %}
+      END
+    )
+    sources.each do |path, source|
+      assert_equal(expected_sources[path], source)
+    end
+  end
 end
