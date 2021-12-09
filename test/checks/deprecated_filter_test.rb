@@ -28,6 +28,7 @@ class DeprecatedFilterTest < Minitest::Test
     sources = fix_theme(
       ThemeCheck::DeprecatedFilter.new,
       "templates/index.liquid" => <<~END,
+        {{ product.featured_image | img_url: '200x', scale: 2, crop: 'center' }}
         {{ product.featured_image | img_url: '200x', scale: 2 }}
         {{ product.featured_image | img_url: '200x' }}
         {{ product.featured_image | img_url: '200x300' }}
@@ -58,6 +59,7 @@ class DeprecatedFilterTest < Minitest::Test
     )
     expected_sources = {
       "templates/index.liquid" => <<~LIQUID,
+        {{ product.featured_image | image_url: width: 400, crop: 'center' }}
         {{ product.featured_image | image_url: width: 400 }}
         {{ product.featured_image | image_url: width: 200 }}
         {{ product.featured_image | image_url: width: 200, height: 300 }}

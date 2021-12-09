@@ -63,6 +63,8 @@ module ThemeCheck
           case v
           when Liquid::VariableLookup
             "#{k}: #{v.name}"
+          when String
+            "#{k}: '#{v}'"
           else
             "#{k}: #{v}"
           end
