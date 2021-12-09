@@ -1,4 +1,9 @@
 
+v1.9.1 / 2021-12-09
+===================
+
+  * Fix img_url correction for string properties
+
 v1.9.0 / 2021-12-01
 ===================
 
