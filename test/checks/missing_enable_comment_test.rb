@@ -188,4 +188,53 @@ class MissingEnableCommentTest < Minitest::Test
       assert_equal(expected_sources[path], source)
     end
   end
+
+  def test_does_not_correct_first_line_disable
+    expected_sources = {
+      "templates/index.liquid" => <<~END,
+        {% comment %}theme-check-disable{% endcomment %}
+        {% assign x = 1 %}
+      END
+    }
+
+    sources = fix_theme(
+      ThemeCheck::MissingEnableComment.new,
+      "templates/index.liquid" => <<~END,
+        {% comment %}theme-check-disable{% endcomment %}
+        {% assign x = 1 %}
+      END
+    )
+
+    sources.each do |path, source|
+      assert_equal(expected_sources[path], source)
+    end
+  end
+
+  def test_html_check
+    expected_sources = {
+      "templates/index.liquid" => <<~END,
+        <p>Hello, world</p>
+        {% comment %}theme-check-disable ImgWidthAndHeight{% endcomment %}
+        <img src="a.jpg">
+        {% comment %}theme-check-enable ImgWidthAndHeight{% endcomment %}
+        <img src="b.jpg" height="100">
+        <img src="c.jpg" width="100">
+      END
+    }
+
+    sources = fix_theme(
+      ThemeCheck::MissingEnableComment.new,
+      "templates/index.liquid" => <<~END,
+        <p>Hello, world</p>
+        {% comment %}theme-check-disable ImgWidthAndHeight{% endcomment %}
+        <img src="a.jpg">
+        <img src="b.jpg" height="100">
+        <img src="c.jpg" width="100">
+      END
+    )
+
+    sources.each do |path, source|
+      assert_equal(expected_sources[path], source)
+    end
+  end
 end
