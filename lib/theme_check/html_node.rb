@@ -140,9 +140,32 @@ module ThemeCheck
     end
 
     def parseable_markup
+      return @parseable_source if @value.name == "#document-fragment"
+
       start_index = from_row_column_to_index(@parseable_source, line_number - 1, 0)
       @parseable_source
-        .match(/<\s*#{@value.name}[^>]*>/im, start_index)[0]
+        .match(/<\s*#{name}[^>]*>/im, start_index)[0]
+    rescue NoMethodError
+      # Don't know what's up with the following issue. Don't think
+      # null check is correct approach. This should give us more info.
+      # https://github.com/Shopify/theme-check/issues/528
+      ThemeCheck.bug(<<~MSG)
+        Can't find a parseable tag of name #{name} inside the parseable HTML.
+
+        Tag name:
+          #{@value.name.inspect}
+
+        File:
+          #{@theme_file.relative_path}
+
+        Line number:
+          #{line_number}
+
+        Excerpt:
+          ```
+          #{@parseable_source.lines[line_number - 1...line_number + 5]}
+          ```
+      MSG
     end
 
     def content
