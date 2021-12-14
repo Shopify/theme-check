@@ -344,6 +344,18 @@ class UndefinedObjectTest < Minitest::Test
     assert_offenses("", offenses)
   end
 
+  def test_does_not_report_on_pipe_default
+    offenses = analyze_theme(
+      ThemeCheck::UndefinedObject.new(exclude_snippets: false),
+      "layout/checkout.liquid" => <<~END,
+        {% assign obj = param | default: '' %}
+        {% echo variable | default: '' %}
+        {{ class | default: '' }}
+      END
+    )
+    assert_offenses("", offenses)
+  end
+
   def test_reports_on_shopify_plus_objects_other_than_checkout
     offenses = analyze_theme(
       ThemeCheck::UndefinedObject.new(exclude_snippets: false),

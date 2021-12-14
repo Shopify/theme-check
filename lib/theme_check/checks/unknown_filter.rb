@@ -15,7 +15,7 @@ module ThemeCheck
     doc docs_url(__FILE__)
 
     def on_variable(node)
-      used_filters = node.value.filters.map { |name, *_rest| name }
+      used_filters = node.filters.map { |name, *_rest| name }
       undefined_filters = used_filters - ShopifyLiquid::Filter.labels
 
       undefined_filters.each do |undefined_filter|

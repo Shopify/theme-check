@@ -11,7 +11,7 @@ module ThemeCheck
     end
 
     def on_variable(node)
-      used_filters = node.value.filters.map { |name, *_rest| name }
+      used_filters = node.filters.map { |name, *_rest| name }
       return unless used_filters.include?("stylesheet_tag")
       file_size = stylesheet_tag_pipeline_to_file_size(node.markup)
       return if file_size.nil?

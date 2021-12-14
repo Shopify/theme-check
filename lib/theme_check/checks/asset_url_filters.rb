@@ -36,12 +36,12 @@ module ThemeCheck
     end
 
     def html_resource_drop?(variable_node)
-      variable_node.value.filters
+      variable_node.filters
         .any? { |(filter_name, *_filter_args)| HTML_FILTERS.include?(filter_name) }
     end
 
     def variable_hosted_by_shopify?(variable_node)
-      variable_node.value.filters
+      variable_node.filters
         .any? { |(filter_name, *_filter_args)| ASSET_URL_FILTERS.include?(filter_name) }
     end
   end
