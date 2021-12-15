@@ -519,4 +519,39 @@ class LiquidTagTest < Minitest::Test
       assert_equal(expected_sources[path], source)
     end
   end
+
+  def test_case_statement
+    expected_sources = {
+      "templates/index.liquid" => <<~END,
+        {% liquid
+          case handle
+          when 'cake'
+            assign cake = 1
+          when 'cookie'
+            assign cookie = 2
+          else
+            assign neither = 0
+          endcase
+        %}
+      END
+    }
+
+    sources = fix_theme(
+      ThemeCheck::LiquidTag.new(min_consecutive_statements: 4),
+      "templates/index.liquid" => <<~END,
+        {% case handle %}
+        {% when 'cake' %}
+          {% assign cake = 1 %}
+        {% when 'cookie' %}
+          {% assign cookie = 2 %}
+        {% else %}
+          {% assign neither = 0 %}
+        {% endcase %}
+      END
+    )
+
+    sources.each do |path, source|
+      assert_equal(expected_sources[path], source)
+    end
+  end
 end
