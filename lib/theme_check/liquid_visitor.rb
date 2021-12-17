@@ -28,7 +28,7 @@ module ThemeCheck
         call_checks(:after_node, node)
       end
 
-      @disabled_checks.update(node) if node.comment?
+      @disabled_checks.update(node) if node.comment? || node.inline_comment?
     end
 
     def call_checks(method, *args)

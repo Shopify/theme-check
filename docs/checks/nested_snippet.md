@@ -9,32 +9,32 @@ This check is aimed at eliminating excessive nesting of snippets.
 :-1: Examples of **incorrect** code for this check:
 
 ```liquid
-{% comment %}templates/index.liquid{% endcomment %}
+{% # templates/index.liquid %}
   {% render 'one' %}
 
-{% comment %}snippets/one.liquid{% endcomment %}
+{% # snippets/one.liquid %}
   {% render 'two' %}
 
-{% comment %}snippets/two.liquid{% endcomment %}
+{% # snippets/two.liquid %}
   {% render 'three' %}
 
-{% comment %}snippets/three.liquid{% endcomment %}
+{% # snippets/three.liquid %}
   {% render 'four' %}
 
-{% comment %}snippets/four.liquid{% endcomment %}
+{% # snippets/four.liquid %}
   ok
 ```
 
 :+1: Examples of **correct** code for this check:
 
 ```liquid
-{% comment %}templates/index.liquid{% endcomment %}
+{% # templates/index.liquid %}
   {% render 'one' %}
 
-{% comment %}snippets/one.liquid{% endcomment %}
+{% # snippets/one.liquid %}
   {% render 'two' %}
 
-{% comment %}snippets/two.liquid{% endcomment %}
+{% # snippets/two.liquid %}
   ok
 ```
 

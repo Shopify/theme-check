@@ -26,6 +26,10 @@ module ThemeCheck
           {{
             'x'
           }}
+          {%
+            # inline comment
+            # block
+          %}
         </ul>
       END
       assert_can_find_node_with_markup(root, "if true ")
@@ -39,6 +43,7 @@ module ThemeCheck
       assert_can_find_node_with_markup(root, "if\n  true")
       assert_can_find_node_with_markup(root, " 'x' ")
       assert_can_find_node_with_markup(root, "\n    'x'\n  ")
+      assert_can_find_node_with_markup(root, "# inline comment\n    # block\n  ")
     end
 
     def test_inside_liquid_tag?
@@ -545,6 +550,16 @@ module ThemeCheck
         {%comment%}
         {%endcomment%}
       COMMENT
+    end
+
+    def test_outer_markup_repeated_comments_inline_comment
+      liquid = <<~LIQUID
+        {% # theme-check-disable foo %}
+        {% # theme-check-disable bar %}
+        {%# theme-check-disable baz%}
+      LIQUID
+      assert_can_find_node_with_outer_markup('{% # theme-check-disable foo %}', liquid)
+      assert_can_find_node_with_outer_markup('{%# theme-check-disable baz%}', liquid)
     end
 
     def test_inner_markup

@@ -12,7 +12,7 @@ This check aims at eliminating missing `theme-check-enable` comments.
 <!doctype html>
 <html>
   <head>
-    {% comment %}theme-check-disable ParserBlockingJavaScript{% endcomment %}
+    {% # theme-check-disable ParserBlockingJavaScript %}
     <script src="https://cdnjs.com/jquery.min.js"></script>
   </head>
   <body>
@@ -27,9 +27,9 @@ This check aims at eliminating missing `theme-check-enable` comments.
 <!doctype html>
 <html>
   <head>
-    {% comment %}theme-check-disable ParserBlockingJavaScript{% endcomment %}
+    {% # theme-check-disable ParserBlockingJavaScript %}
     <script src="https://cdnjs.com/jquery.min.js"></script>
-    {% comment %}theme-check-enable ParserBlockingJavaScript{% endcomment %}
+    {% # theme-check-enable ParserBlockingJavaScript %}
   </head>
   <body>
     <!-- ... -->

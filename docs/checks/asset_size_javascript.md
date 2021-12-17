@@ -57,9 +57,9 @@ This includes theme and remote scripts.
 When you can't do anything about it, it is preferable to disable this rule using the comment syntax:
 
 ```
-{% comment %}theme-check-disable AssetSizeJavaScript{% endcomment %}
+{% # theme-check-disable AssetSizeJavaScript %}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
-{% comment %}theme-check-enable AssetSizeJavaScript{% endcomment %}
+{% # theme-check-enable AssetSizeJavaScript %}
 ```
 
 This makes disabling the rule an explicit affair and shows that the code is smelly.
