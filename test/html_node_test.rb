@@ -36,13 +36,27 @@ module ThemeCheck
       HTML
       root = root_node(html)
       # traversing tree making sure nothing throws
-      find(root) { |node| node.markup != false }
+      find(root) { |node| node.markup == false }
       assert_markup_equals('<div>', root, "div")
       assert_markup_equals('<link rel="stylesheet" href="{{ "styles.css" | asset_url }}">', root, "link")
       assert_markup_equals('<script src="abc.js" defer>', root, "script")
       assert_markup_equals(html[html.index('<img')...html.index('</img>')], root, "img")
       assert_markup_equals(html[html.index('<iframe')...html.index('</iframe>')], root, "iframe")
       assert_markup_equals(html[html.index('<custom-element>')...html.index('</custom-element>')], root, "custom-element")
+    end
+
+    def test_no_freaking_out_on_rogue_carriage_returns
+      html = <<~HTML
+        <div>
+          {{ 'foo.js' | asset_url | stylesheet_tag }}
+          <link rel="stylesheet" href="{{ "styles.css" | asset_url }}">
+          rogue \r character
+          <script src="{ 'foo.js' }" defer></script>
+        </div>
+      HTML
+      root = root_node(html)
+      # traversing tree making sure nothing throws
+      find(root) { |node| node.markup == false }
     end
 
     def test_line_numbers

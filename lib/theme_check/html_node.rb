@@ -141,6 +141,8 @@ module ThemeCheck
 
     def parseable_markup
       return @parseable_source if @value.name == "#document-fragment"
+      return @value.to_str if @value.comment?
+      return @value.content if literal?
 
       start_index = from_row_column_to_index(@parseable_source, line_number - 1, 0)
       @parseable_source
@@ -163,7 +165,12 @@ module ThemeCheck
 
         Excerpt:
           ```
-          #{@parseable_source.lines[line_number - 1...line_number + 5]}
+          #{@theme_file.source.lines[line_number - 1...line_number + 5].join("")}
+          ```
+
+        Parseable Excerpt:
+          ```
+          #{@parseable_source.lines[line_number - 1...line_number + 5].join("")}
           ```
       MSG
     end
