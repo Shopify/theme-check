@@ -22,7 +22,6 @@ module ThemeCheck
       return if resource_url =~ ABSOLUTE_PATH
       return if resource_url =~ RELATIVE_PATH
       return if url_hosted_by_shopify?(resource_url)
-      return if url_is_setting_variable?(resource_url)
 
       # Ignore non-stylesheet link tags
       rel = node.attributes["rel"]
@@ -37,12 +36,36 @@ module ThemeCheck
     private
 
     def url_hosted_by_shopify?(url)
-      url.start_with?(Liquid::VariableStart) &&
-        AssetUrlFilters::ASSET_URL_FILTERS.any? { |filter| url.include?(filter) }
+      asset_url?(url) || looks_like_hosted_by_shopify?(url) || url_is_setting_variable?(url)
+    end
+
+    # There are some cases where it's kind of hard to tell if it's
+    # hosted by Shopify or not.
+    #
+    # e.g. {{ image }} is hosted on primary domain (not CDN)
+    #
+    # e.g. media.sources are on the CDN
+    # {% for source in media.sources %}
+    #   {{ source.url }}
+    # {% endfor %}
+    #
+    # So I'll go 80/20 here and assume that people name their variable
+    # source in `for source in media.sources`.
+    def looks_like_hosted_by_shopify?(url)
+      liquid_variable?(url) && url =~ /source\.url/
     end
 
     def url_is_setting_variable?(url)
-      url.start_with?(Liquid::VariableStart) && url =~ /settings\./
+      liquid_variable?(url) && url =~ /settings\./
+    end
+
+    def asset_url?(url)
+      liquid_variable?(url) &&
+        AssetUrlFilters::ASSET_URL_FILTERS.any? { |filter| url.include?(filter) }
+    end
+
+    def liquid_variable?(url)
+      url.start_with?(Liquid::VariableStart)
     end
   end
 end
