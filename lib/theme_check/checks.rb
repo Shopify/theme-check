@@ -42,8 +42,7 @@ module ThemeCheck
           check.send(method, *args)
         end
       end
-    rescue Liquid::Error
-      # Pass-through Liquid errors
+    rescue Liquid::Error, ThemeCheckError
       raise
     rescue => e
       node = args.first

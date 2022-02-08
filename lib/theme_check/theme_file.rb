@@ -45,7 +45,9 @@ module ThemeCheck
         @source = @storage.read(@relative_path)
       end
       @eol = @source.include?("\r\n") ? "\r\n" : "\n"
-      @source = @source.gsub("\r\n", "\n")
+      @source = @source
+        .gsub(/\r(?!\n)/, "\r\n") # fix rogue \r without followup \n with \r\n
+        .gsub("\r\n", "\n")
     end
 
     def json?
