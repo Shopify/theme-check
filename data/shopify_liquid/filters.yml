@@ -1,80 +1,91 @@
 ---
 Liquid::StandardFilters:
-- url_encode
-- where
-- uniq
-- escape
-- replace
-- remove
+- times
 - h
-- upcase
-- downcase
-- capitalize
-- date
-- last
-- split
-- size
-- append
-- reverse
-- join
-- concat
-- prepend
+- uniq
+- compact
+- url_encode
+- escape
 - escape_once
 - url_decode
+- base64_encode
+- base64_decode
+- base64_url_safe_encode
+- base64_url_safe_decode
 - truncatewords
 - strip_html
-- strip
-- lstrip
-- rstrip
 - strip_newlines
-- plus
+- replace
+- remove
 - sort_natural
-- compact
 - replace_first
 - remove_first
 - newline_to_br
-- minus
+- upcase
+- downcase
+- capitalize
 - divided_by
-- at_least
+- minus
 - at_most
+- at_least
+- size
+- last
+- split
+- append
+- reverse
+- concat
+- prepend
+- join
+- strip
+- lstrip
+- rstrip
 - sort
-- default
-- modulo
-- slice
-- abs
+- where
 - map
-- floor
+- default
+- first
+- slice
+- modulo
+- abs
+- date
 - ceil
 - round
 - truncate
-- first
-- times
+- plus
+- floor
 FormFilter:
-- payment_button
 - payment_terms
 - installments_pricing
 - default_errors
+- payment_button
 DateFilter:
 - date
 I18nFilter:
 - translate
+- time_tag
+- sentence
 - t
 - date
-- sentence
-- time_tag
+- app_block_path_for
+- dev_shop?
+- app_extension_path_for
+- global_block_type?
+- app_block_path?
+- app_extension_path?
+- app_snippet_path?
+- registration_uuid_from
+- handle_from
 UrlFilter:
 - stylesheet_tag
 - script_tag
 - img_tag
-- image_tag
-- image_url
+- link_to
 - shopify_asset_url
 - payment_type_img_url
 - payment_type_svg_tag
 - placeholder_svg_tag
-- link_to
-- asset_url
 - img_url
+- asset_url
 - asset_img_url
 - global_asset_url
 - file_url
@@ -82,10 +93,12 @@ UrlFilter:
 - product_img_url
 - collection_img_url
 - article_img_url
+- image_url
 - preload_tag
 JsonFilter:
 - json
 ColorFilter:
+- color_mix
 - color_contrast
 - color_difference
 - brightness_difference
@@ -100,40 +113,39 @@ ColorFilter:
 - color_darken
 - color_saturate
 - color_desaturate
-- color_mix
 MoneyFilter:
-- money_without_currency
-- money_without_trailing_zeros
 - money
 - money_with_currency
+- money_without_currency
+- money_without_trailing_zeros
 StringFilter:
+- md5
+- camelcase
+- format_code
+- handle
+- camelize
 - handleize
 - url_param_escape
 - url_escape
-- camelcase
-- camelize
 - encode_url_component
-- format_code
-- md5
-- handle
 CollectionFilter:
+- sort_by
 - within
 - link_to_vendor
-- url_for_vendor
 - link_to_type
 - url_for_type
-- sort_by
+- url_for_vendor
 TagFilter:
-- link_to_add_tag
-- link_to_remove_tag
 - link_to_tag
 - highlight_active_tag
+- link_to_add_tag
+- link_to_remove_tag
 CryptoFilter:
 - hmac_sha1
-- sha256
 - hmac_sha256
 - md5
 - sha1
+- sha256
 CustomerAccountFilter:
 - customer_login_link
 - customer_logout_link
@@ -147,16 +159,16 @@ CurrencyFormFilter:
 PaginationFilter:
 - default_pagination
 WeightFilter:
+- unit
 - weight
 - weight_with_unit
-- unit
 TextFilter:
-- pad_spaces
-- paragraphize
+- pluralize
 - highlight
 - format_address
+- paragraphize
 - excerpt
-- pluralize
+- pad_spaces
 FontFilter:
 - font_face
 - font_url
@@ -164,13 +176,18 @@ FontFilter:
 DistanceFilter:
 - distance_from
 MediaFilter:
-- external_video_url
 - external_video_tag
 - video_tag
 - model_viewer_tag
 - media_tag
+- image_tag
+- external_video_url
 ThemeFilter:
 - theme_url
 - link_to_theme
+- _online_store_editor_live_setting
+MetafieldFilter:
+- metafield_tag
+- metafield_text
 DebugFilter:
 - debug
