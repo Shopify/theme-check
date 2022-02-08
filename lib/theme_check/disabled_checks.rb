@@ -30,6 +30,12 @@ module ThemeCheck
           next unless disabled
           disabled.end_index = node.end_index
         end
+      else
+        # We want to disable checks inside comments
+        # (e.g. html checks inside {% comment %})
+        disabled = @disabled_checks[[node.theme_file, :all]]
+        disabled.start_index = node.inner_markup_start_index
+        disabled.end_index = node.inner_markup_end_index
       end
     end
 
