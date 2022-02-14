@@ -213,5 +213,20 @@ module ThemeCheck
 
       assert_empty(@assign_check.offenses.map(&:theme_file))
     end
+
+    def test_should_ignore_regex_checks_inside_comments
+      liquid_file = parse_liquid(<<~END)
+        {% comment %}
+          RegexError 1
+        {% endcomment %}
+      END
+      @assign_check.ignored_patterns = [
+        liquid_file.relative_path.to_s,
+      ]
+      @visitor.visit_liquid_file(liquid_file)
+      @disabled_checks.remove_disabled_offenses(@checks)
+
+      assert_empty(@regex_check.offenses)
+    end
   end
 end
