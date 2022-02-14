@@ -64,6 +64,7 @@ module ThemeCheck
       end
 
       def on_initialized(_id, _params)
+        return unless @configuration
         @configuration.fetch
         @configuration.register_did_change_capability
       end
