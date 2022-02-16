@@ -3,7 +3,7 @@
 module ThemeCheck
   class Config
     DOTFILE = '.theme-check.yml'
-    BUNDLED_CONFIGS_DIR = "#{__dir__}/../../config"
+    BUNDLED_CONFIGS_DIR = Pathname.new("#{__dir__}/../../config").realpath
     BOOLEAN = [true, false]
 
     attr_reader :root
@@ -14,7 +14,7 @@ module ThemeCheck
 
       def from_path(path)
         if (filename = find(path))
-          new(root: filename.dirname, configuration: load_file(filename))
+          new(root: filename.dirname, configuration: load_config(filename))
         else
           # No configuration file
           new(root: path)
@@ -39,49 +39,57 @@ module ThemeCheck
 
       def load_file(absolute_path)
         @last_loaded_config = absolute_path
-        YAML.load_file(absolute_path)
+        # An empty file returns false, so we || {}.
+        YAML.load_file(absolute_path) || {}
       end
 
       def bundled_config_path(name)
-        "#{BUNDLED_CONFIGS_DIR}/#{name}"
+        "#{BUNDLED_CONFIGS_DIR}/#{name.to_s.sub(/^:/, '')}.yml"
+      end
+
+      def bundled_config?(name)
+        name.is_a?(Symbol) || (name.is_a?(String) && name[0] == ":")
       end
 
       def load_bundled_config(name)
         load_file(bundled_config_path(name))
       end
 
-      def load_config(path)
-        if path[0] == ":"
-          load_bundled_config("#{path[1..]}.yml")
-        elsif path.is_a?(Symbol)
-          load_bundled_config("#{path}.yml")
-        else
-          load_file(path)
+      def load_config(name, pwd = Pathname.pwd)
+        return load_bundled_config(name) if bundled_config?(name)
+        path = name.is_a?(Pathname) ? name : Pathname.new(name)
+        path = pwd.join(path) if path.relative?
+        return {} unless path.exist?
+        config = load_file(path)
+        extends = config["extends"] || :default
+        merge_configurations!(load_config(extends, path.realpath.dirname), config)
+      end
+
+      def merge_configurations!(config, other)
+        config.merge(other) do |_key, old_value, new_value|
+          case old_value
+          when Hash
+            merge_configurations!(old_value, new_value)
+          else
+            new_value
+          end
         end
       end
 
       def default
-        @default ||= load_config(":default")
+        load_config(":default")
       end
     end
 
     def initialize(root: nil, configuration: nil, should_resolve_requires: true)
       @configuration = if configuration
-        # TODO: Do we need to handle extends here? What base configuration
-        # should we validate against once Theme App Extensions has its own
-        # checks? :all?
         validate_configuration(configuration)
       else
-        {}
+        self.class.default
       end
 
-      # Follow extends
-      extends = @configuration["extends"] || ":default"
-      while extends
-        extended_configuration = self.class.load_config(extends)
-        extends = extended_configuration["extends"]
-        @configuration = merge_configurations!(@configuration, extended_configuration)
-      end
+      extends = @configuration["extends"] || :default
+      @configuration = self.class.merge_configurations!(self.class.load_config(extends), @configuration)
 
       @root = if root && @configuration.key?("root")
         Pathname.new(root).join(@configuration["root"])
@@ -177,6 +185,12 @@ module ThemeCheck
           else
             warn("bad configuration type for #{name}: expected a Hash, got #{value.inspect}")
           end
+        elsif key == "extends"
+          if value.is_a?(Symbol) || value.is_a?(String)
+            valid_configuration[key] = value
+          else
+            warn("bad configuration type for extends: expected a Symbol or a String, got #{value.inspect}")
+          end
         elsif key == "severity"
           valid_configuration[key] = value
         elsif default.nil?
@@ -191,20 +205,6 @@ module ThemeCheck
       end
 
       valid_configuration
-    end
-
-    def merge_configurations!(configuration, extended_configuration)
-      extended_configuration.each do |key, default|
-        value = configuration[key]
-
-        case value
-        when Hash
-          merge_configurations!(value, default)
-        when nil
-          configuration[key] = default
-        end
-      end
-      configuration
     end
 
     def resolve_requires
