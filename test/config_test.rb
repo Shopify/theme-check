@@ -78,6 +78,73 @@ class ConfigTest < Minitest::Test
     assert_equal(storage.root.join("dist"), config.root)
   end
 
+  def test_relative_extends
+    storage = make_file_system_storage(
+      ".theme-check.yml" => <<~END,
+        root: src
+        extends: :nothing
+        SyntaxError:
+          enabled: false
+        MatchingTranslations:
+          enabled: false
+      END
+      "dist/.theme-check.yml" => <<~END,
+        root: '.'
+        extends: ../.theme-check.yml
+        MatchingTranslations:
+          enabled: true
+      END
+      "dist/templates/index.liquid" => "",
+    )
+
+    dist_config = ThemeCheck::Config.from_path(storage.root.join('dist'))
+    assert(dist_config.to_h.dig('MatchingTranslations', 'enabled'))
+    refute(dist_config.to_h.dig('SyntaxError', 'enabled'))
+    assert_equal(storage.root.join('dist'), dist_config.root)
+
+    root_config = ThemeCheck::Config.from_path(storage.root)
+    refute(root_config.to_h.dig('MatchingTranslations', 'enabled'))
+    refute(root_config.to_h.dig('SyntaxError', 'enabled'))
+    assert_equal(storage.root.join('src'), root_config.root)
+  end
+
+  def test_relative_extends_reused_root_is_relative_to_found_root
+    storage = make_file_system_storage(
+      ".theme-check.yml" => <<~END,
+        root: src
+      END
+      "project1/.theme-check.yml" => <<~END,
+        extends: ../.theme-check.yml
+      END
+      "project2/.theme-check.yml" => <<~END,
+        extends: ../.theme-check.yml
+      END
+    )
+
+    project1_config = ThemeCheck::Config.from_path(storage.root.join('project1'))
+    assert_equal(storage.root.join('project1/src'), project1_config.root)
+
+    project2_config = ThemeCheck::Config.from_path(storage.root.join('project2'))
+    assert_equal(storage.root.join('project2/src'), project2_config.root)
+  end
+
+  def test_absolute_path_config
+    storage1 = make_file_system_storage(
+      ".theme-check.yml" => <<~END,
+        SyntaxError:
+          enabled: false
+      END
+    )
+    storage = make_file_system_storage(
+      ".theme-check.yml" => <<~END,
+        extends: #{storage1.root.join('.theme-check.yml')}
+      END
+    )
+
+    config = ThemeCheck::Config.from_path(storage.root)
+    refute(config.to_h.dig('SyntaxError', 'enabled'))
+  end
+
   def test_picks_nearest_config
     storage = make_file_system_storage(
       ".theme-check.yml" => <<~END,
@@ -259,6 +326,7 @@ class ConfigTest < Minitest::Test
 
   def mock_default_config(config)
     ThemeCheck::Config.stubs(:default).returns(config)
+    ThemeCheck::Config.stubs(:load_config).with(:default).returns(config)
     ThemeCheck::Config.stubs(:load_config).with(":default").returns(config)
   end
 end
