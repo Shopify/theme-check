@@ -186,6 +186,7 @@ DeprecateLazysizes:
 - `themeCheck.checkOnOpen` (default: `true`) makes it so theme check runs on file open.
 - `themeCheck.checkOnChange` (default: `true`) makes it so theme check runs on file change.
 - `themeCheck.checkOnSave` (default: `true`) makes it so theme check runs on file save.
+- `themeCheck.onlySingleFileChecks` (default: `false`) makes it so we only check the opened files and disable "whole theme" checks (e.g. UnusedSnippet, TranslationKeyExists)
 
 ⚠️ **Note:** Quickfixes only work on a freshly checked file. If any of those configurations are turned off, you will need to rerun theme-check in order to apply quickfixes.
 

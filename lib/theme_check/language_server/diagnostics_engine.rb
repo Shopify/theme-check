@@ -19,14 +19,14 @@ module ThemeCheck
         @diagnostics_manager.first_run?
       end
 
-      def analyze_and_send_offenses(absolute_path, config, force: false)
+      def analyze_and_send_offenses(absolute_path, config, force: false, only_single_file: false)
         return unless @diagnostics_lock.try_lock
         @token += 1
         @bridge.send_create_work_done_progress_request(@token)
         theme = ThemeCheck::Theme.new(storage)
         analyzer = ThemeCheck::Analyzer.new(theme, config.enabled_checks)
 
-        if @diagnostics_manager.first_run? || force
+        if (!only_single_file && @diagnostics_manager.first_run?) || force
           @bridge.send_work_done_progress_begin(@token, "Full theme check")
           @bridge.log("Checking #{storage.root}")
           offenses = nil
@@ -37,6 +37,7 @@ module ThemeCheck
           end
           end_message = "Found #{offenses.size} offenses in #{format("%0.2f", time.real)}s"
           @bridge.send_work_done_progress_end(@token, end_message)
+          @bridge.log(end_message)
           send_diagnostics(offenses)
         else
           # Analyze selected files
@@ -47,14 +48,14 @@ module ThemeCheck
             @bridge.send_work_done_progress_begin(@token, "Partial theme check")
             offenses = nil
             time = Benchmark.measure do
-              offenses = analyzer.analyze_files([file]) do |path, i, total|
+              offenses = analyzer.analyze_files([file], only_single_file: only_single_file) do |path, i, total|
                 @bridge.send_work_done_progress_report(@token, "#{i}/#{total} #{path}", (i.to_f / total * 100.0).to_i)
               end
             end
             end_message = "Found #{offenses.size} new offenses in #{format("%0.2f", time.real)}s"
             @bridge.send_work_done_progress_end(@token, end_message)
             @bridge.log(end_message)
-            send_diagnostics(offenses, [relative_path])
+            send_diagnostics(offenses, [relative_path], only_single_file: only_single_file)
           end
         end
         @diagnostics_lock.unlock
@@ -62,8 +63,12 @@ module ThemeCheck
 
       private
 
-      def send_diagnostics(offenses, analyzed_files = nil)
-        @diagnostics_manager.build_diagnostics(offenses, analyzed_files: analyzed_files).each do |relative_path, diagnostics|
+      def send_diagnostics(offenses, analyzed_files = nil, only_single_file: false)
+        @diagnostics_manager.build_diagnostics(
+          offenses,
+          analyzed_files: analyzed_files,
+          only_single_file: only_single_file
+        ).each do |relative_path, diagnostics|
           send_diagnostic(relative_path, diagnostics)
         end
       end

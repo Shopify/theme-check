@@ -6,6 +6,7 @@ module ThemeCheck
       CHECK_ON_OPEN = :"themeCheck.checkOnOpen"
       CHECK_ON_SAVE = :"themeCheck.checkOnSave"
       CHECK_ON_CHANGE = :"themeCheck.checkOnChange"
+      ONLY_SINGLE_FILE = :"themeCheck.onlySingleFileChecks"
 
       def initialize(bridge, capabilities)
         @bridge = bridge
@@ -13,9 +14,10 @@ module ThemeCheck
         @mutex = Mutex.new
         @initialized = false
         @config = {
-          CHECK_ON_OPEN => @capabilities.initialization_option(CHECK_ON_OPEN) || true,
-          CHECK_ON_SAVE => @capabilities.initialization_option(CHECK_ON_SAVE) || true,
-          CHECK_ON_CHANGE => @capabilities.initialization_option(CHECK_ON_CHANGE) || true,
+          CHECK_ON_OPEN => null_coalesce(@capabilities.initialization_option(CHECK_ON_OPEN), true),
+          CHECK_ON_SAVE => null_coalesce(@capabilities.initialization_option(CHECK_ON_SAVE), true),
+          CHECK_ON_CHANGE => null_coalesce(@capabilities.initialization_option(CHECK_ON_CHANGE), true),
+          ONLY_SINGLE_FILE => null_coalesce(@capabilities.initialization_option(ONLY_SINGLE_FILE), false),
         }
       end
 
@@ -23,17 +25,25 @@ module ThemeCheck
         @mutex.synchronize do
           return unless @capabilities.supports_workspace_configuration?
           return if initialized? && !force
-          check_on_open, check_on_save, check_on_change = @bridge.send_request(
+
+          keys = [
+            CHECK_ON_OPEN,
+            CHECK_ON_SAVE,
+            CHECK_ON_CHANGE,
+            ONLY_SINGLE_FILE,
+          ]
+
+          configs = @bridge.send_request(
             "workspace/configuration",
-            items: [
-              { section: CHECK_ON_OPEN },
-              { section: CHECK_ON_SAVE },
-              { section: CHECK_ON_CHANGE },
-            ],
+            items: keys.map do |key|
+              { section: key }
+            end
           )
-          @config[CHECK_ON_OPEN] = check_on_open unless check_on_open.nil?
-          @config[CHECK_ON_CHANGE] = check_on_change unless check_on_change.nil?
-          @config[CHECK_ON_SAVE] = check_on_save unless check_on_save.nil?
+
+          keys.each.with_index do |key, i|
+            @config[key] = configs[i] unless configs[i].nil?
+          end
+
           @initialized = true
         end
       end
@@ -63,6 +73,15 @@ module ThemeCheck
       def check_on_change?
         fetch # making sure we have for an initialized value
         @config[CHECK_ON_CHANGE]
+      end
+
+      def only_single_file?
+        fetch # making sure we have for an initialized value
+        @config[ONLY_SINGLE_FILE]
+      end
+
+      def null_coalesce(value, default)
+        value.nil? ? default : value
       end
     end
   end

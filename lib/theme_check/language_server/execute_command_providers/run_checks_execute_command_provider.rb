@@ -14,7 +14,12 @@ module ThemeCheck
       end
 
       def execute(_args)
-        @diagnostics_engine.analyze_and_send_offenses(@root_path, @root_config, force: true)
+        @diagnostics_engine.analyze_and_send_offenses(
+          @root_path,
+          @root_config,
+          only_single_file: false,
+          force: true
+        )
         nil
       end
     end
