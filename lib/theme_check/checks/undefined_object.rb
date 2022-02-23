@@ -167,6 +167,8 @@ module ThemeCheck
         node = node.parent
         node = node.parent if %i(condition variable_lookup).include?(node.type_name)
 
+        next if node.variable? && node.filters.any? { |(filter_name)| filter_name == "default" }
+
         if render_node
           add_offense("Missing argument `#{name}`", node: render_node)
         else

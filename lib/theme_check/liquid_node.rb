@@ -184,6 +184,11 @@ module ThemeCheck
       @type_name ||= StringHelpers.underscore(StringHelpers.demodulize(@value.class.name)).to_sym
     end
 
+    def filters
+      raise TypeError, "Attempting to lookup filters of #{type_name}. Only variables have filters." unless variable?
+      @value.filters
+    end
+
     def source
       theme_file&.source
     end

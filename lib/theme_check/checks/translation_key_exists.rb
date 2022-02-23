@@ -16,7 +16,7 @@ module ThemeCheck
 
     def on_variable(node)
       return unless @theme.default_locale_json&.content&.is_a?(Hash)
-      return unless node.value.filters.any? { |name, _| name == "t" || name == "translate" }
+      return unless node.filters.any? { |name, _| name == "t" || name == "translate" }
 
       @nodes[node.theme_file.name] << node
     end
