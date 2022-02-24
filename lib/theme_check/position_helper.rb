@@ -8,11 +8,12 @@ module ThemeCheck
       return 0 unless row.is_a?(Integer) && col.is_a?(Integer)
       i = 0
       safe_row = bounded(0, row, content.count("\n"))
-      scanner = StringScanner.new(content)
-      scanner.scan_until(/\n/) while i < safe_row && (i += 1)
-      result = scanner.charpos || 0
-      scanner.scan_until(/\n|\z/)
-      bounded(result, result + col, scanner.pre_match.size)
+      charpos = -1
+      charpos = content.index("\n", charpos + 1) while i < safe_row && (i += 1) && charpos
+      result = charpos ? charpos + 1 : 0
+      next_line = content.index("\n", result)
+      upper_bound = next_line ? next_line : content.size - 1
+      bounded(result, result + col, upper_bound)
     end
 
     def from_index_to_row_column(content, index)

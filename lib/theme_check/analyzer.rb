@@ -63,30 +63,36 @@ module ThemeCheck
       finish
     end
 
-    def analyze_files(files)
+    def analyze_files(files, only_single_file: false)
       reset
 
       ThemeCheck.with_liquid_c_disabled do
-        # Call all checks that run on the whole theme
-        liquid_visitor = LiquidVisitor.new(@liquid_checks.whole_theme, @disabled_checks)
-        html_visitor = HtmlVisitor.new(@html_checks.whole_theme)
-        total = total_file_count + files.size
-        @theme.liquid.each_with_index do |liquid_file, i|
-          yield(liquid_file.relative_path.to_s, i, total) if block_given?
-          liquid_visitor.visit_liquid_file(liquid_file)
-          html_visitor.visit_liquid_file(liquid_file)
-        end
+        total = files.size
+        offset = 0
 
-        @theme.json.each_with_index do |json_file, i|
-          yield(json_file.relative_path.to_s, liquid_file_count + i, total) if block_given?
-          @json_checks.whole_theme.call(:on_file, json_file)
+        unless only_single_file
+          # Call all checks that run on the whole theme
+          liquid_visitor = LiquidVisitor.new(@liquid_checks.whole_theme, @disabled_checks)
+          html_visitor = HtmlVisitor.new(@html_checks.whole_theme)
+          total += total_file_count
+          offset = total_file_count
+          @theme.liquid.each_with_index do |liquid_file, i|
+            yield(liquid_file.relative_path.to_s, i, total) if block_given?
+            liquid_visitor.visit_liquid_file(liquid_file)
+            html_visitor.visit_liquid_file(liquid_file)
+          end
+
+          @theme.json.each_with_index do |json_file, i|
+            yield(json_file.relative_path.to_s, liquid_file_count + i, total) if block_given?
+            @json_checks.whole_theme.call(:on_file, json_file)
+          end
         end
 
         # Call checks that run on a single files, only on specified file
         liquid_visitor = LiquidVisitor.new(@liquid_checks.single_file, @disabled_checks)
         html_visitor = HtmlVisitor.new(@html_checks.single_file)
         files.each_with_index do |theme_file, i|
-          yield(theme_file.relative_path.to_s, total_file_count + i, total) if block_given?
+          yield(theme_file.relative_path.to_s, offset + i, total) if block_given?
           if theme_file.liquid?
             liquid_visitor.visit_liquid_file(theme_file)
             html_visitor.visit_liquid_file(theme_file)
@@ -96,7 +102,7 @@ module ThemeCheck
         end
       end
 
-      finish
+      finish(only_single_file)
     end
 
     def uncorrectable_offenses
@@ -138,10 +144,16 @@ module ThemeCheck
       end
     end
 
-    def finish
-      @liquid_checks.call(:on_end)
-      @html_checks.call(:on_end)
-      @json_checks.call(:on_end)
+    def finish(only_single_file = false)
+      if only_single_file
+        @liquid_checks.single_file.call(:on_end)
+        @html_checks.single_file.call(:on_end)
+        @json_checks.single_file.call(:on_end)
+      else
+        @liquid_checks.call(:on_end)
+        @html_checks.call(:on_end)
+        @json_checks.call(:on_end)
+      end
 
       @disabled_checks.remove_disabled_offenses(@liquid_checks)
       @disabled_checks.remove_disabled_offenses(@json_checks)

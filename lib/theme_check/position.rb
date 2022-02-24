@@ -4,6 +4,8 @@ module ThemeCheck
   class Position
     include PositionHelper
 
+    attr_reader :contents
+
     def initialize(
       needle_arg,
       contents_arg,
@@ -12,7 +14,13 @@ module ThemeCheck
       node_markup_offset: 0 # the index of markup inside the node_markup
     )
       @needle = needle_arg
-      @contents = contents_arg
+
+      @contents = if contents_arg&.is_a?(String) && !contents_arg.empty?
+        contents_arg
+      else
+        ''
+      end
+
       @line_number_1_indexed = line_number_1_indexed
       @node_markup_offset = node_markup_offset
       @node_markup = node_markup
@@ -77,18 +85,13 @@ module ThemeCheck
       node_markup_start + @node_markup_offset
     end
 
-    def contents
-      return '' unless @contents.is_a?(String) && !@contents.empty?
-      @contents
-    end
-
     def line_number
       return 0 if @line_number_1_indexed.nil?
       bounded(0, @line_number_1_indexed - 1, content_line_count)
     end
 
     def needle
-      if has_content_and_line_number_but_no_needle?
+      @cached_needle ||= if has_content_and_line_number_but_no_needle?
         entire_line_needle
       elsif contents.empty? || @needle.nil?
         ''

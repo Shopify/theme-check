@@ -86,7 +86,7 @@ module ThemeCheck
       def on_text_document_did_change(_id, params)
         relative_path = relative_path_from_text_document_uri(params)
         @storage.write(relative_path, content_changes_text(params), text_document_version(params))
-        analyze_and_send_offenses(text_document_uri(params)) if @configuration.check_on_change?
+        analyze_and_send_offenses(text_document_uri(params), only_single_file: true) if @configuration.check_on_change?
       end
 
       def on_text_document_did_close(_id, params)
@@ -190,10 +190,11 @@ module ThemeCheck
         ThemeCheck::Config.from_path(root)
       end
 
-      def analyze_and_send_offenses(absolute_path)
+      def analyze_and_send_offenses(absolute_path, only_single_file: nil)
         @diagnostics_engine.analyze_and_send_offenses(
           absolute_path,
-          config_for_path(absolute_path)
+          config_for_path(absolute_path),
+          only_single_file: only_single_file.nil? ? @configuration.only_single_file? : only_single_file
         )
       end
 

@@ -27,7 +27,7 @@ module ThemeCheck
         @mutex.synchronize { @latest_diagnostics[relative_path] || [] }
       end
 
-      def build_diagnostics(offenses, analyzed_files: nil)
+      def build_diagnostics(offenses, analyzed_files: nil, only_single_file: false)
         @mutex.synchronize do
           full_check = analyzed_files.nil?
           analyzed_paths = analyzed_files.map { |path| Pathname.new(path) } unless full_check
@@ -46,10 +46,23 @@ module ThemeCheck
           current_paths = paths(current_diagnostics)
 
           diagnostics_update = (current_paths + previous_paths).map do |path|
+            # When doing single file checks, we keep the whole theme old
+            # ones and accept the new single ones
+            if only_single_file && analyzed_paths.include?(path)
+              single_file_diagnostics = current_diagnostics[path] || []
+              whole_theme_diagnostics = whole_theme_diagnostics(path) || []
+              [path, single_file_diagnostics + whole_theme_diagnostics]
+
+            # If doing single file checks that are not in the
+            # analyzed_paths array then we just keep the old
+            # diagnostics
+            elsif only_single_file
+              [path, previous_diagnostics(path) || []]
+
             # When doing a full_check, we either send the current
             # diagnostics or an empty array to clear the diagnostics
             # for that file.
-            if full_check
+            elsif full_check
               [path, current_diagnostics[path] || []]
 
             # When doing a partial check, the single file diagnostics
@@ -63,9 +76,14 @@ module ThemeCheck
             end
           end.to_h
 
-          @latest_diagnostics = diagnostics_update.reject { |_, v| v.empty? }
+          @latest_diagnostics = diagnostics_update
+            .reject { |_, v| v.empty? }
+
           @first_run = false
+
+          # Only send updates for the current file when running with only_single_file
           diagnostics_update
+            .reject { |p, _| only_single_file && !analyzed_paths.include?(p) }
         end
       end
 
@@ -130,6 +148,14 @@ module ThemeCheck
 
       def single_file_diagnostics(relative_path)
         @latest_diagnostics[relative_path]&.select(&:single_file?) || []
+      end
+
+      def whole_theme_diagnostics(relative_path)
+        @latest_diagnostics[relative_path]&.select(&:whole_theme?) || []
+      end
+
+      def previous_diagnostics(relative_path)
+        @latest_diagnostics[relative_path]
       end
     end
   end
