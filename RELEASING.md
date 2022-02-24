@@ -73,11 +73,11 @@
 
 1. Release `theme-check` on RubyGems by following the steps in the previous section.
 
-2. Update the `theme-check` version in [`shopify-cli`](https://github.com/shopify/shopify-cli)'s `Gemfile.lock` and `shopify-cli.gemspec` files.
+2. Update the `theme-check` version in [`shopify-cli`](https://github.com/shopify/shopify-cli)'s `shopify-cli.gemspec` file.
 
-   Such as in [this PR.](https://github.com/Shopify/shopify-cli/pull/1357/files)
+3. Run `bundle update theme-check` and get an updated `Gemfile.lock`
 
-3. Create a branch + a commit on the [`shopify-cli`](https://github.com/Shopify/shopify-cli) repository.
+4. Create a branch + a commit on the [`shopify-cli`](https://github.com/Shopify/shopify-cli) repository.
 
    ```bash
    VERSION=X.X.X
@@ -87,7 +87,7 @@
    git commit -m "Bump theme-check version to $VERSION"
    ```
 
-4. Create a pull-request for those changes on the [`shopify-cli`](https://github.com/Shopify/shopify-cli) repository.
+5. Create a pull-request for those changes on the [`shopify-cli`](https://github.com/Shopify/shopify-cli) repository.
 
    ```bash
    # shortcut if you have `hub` installed
