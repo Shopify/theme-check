@@ -1,4 +1,9 @@
 
+v1.10.1 / 2022-02-24
+====================
+
+  * Revert "Prevent bad render tags from passing theme-check ([#551](https://github.com/shopify/theme-check/issues/551))"
+
 v1.10.0 / 2022-02-24
 ====================
 
