@@ -1,4 +1,27 @@
 
+v1.10.0 / 2022-02-24
+====================
+
+## Features
+
+  * Performance Improvements ([#556](https://github.com/shopify/theme-check/issues/556))
+    - Boasts ~125x faster `checkOnChange` checks.
+
+  * New language server configuration: `"themeCheck.onlySingleFileChecks"` ([#556](https://github.com/shopify/theme-check/issues/556))
+    - When `true`, disables whole theme checks in the editor and makes it so only the open files are checked.
+    - When `false` (default), behaves as before.
+
+## Fixes
+
+  * Do not complain about variables passed to the default filter ([#532](https://github.com/shopify/theme-check/issues/532))
+  * `extend:` should accept absolute and relative paths ([#555](https://github.com/shopify/theme-check/issues/555))
+  * Gracefully handle initialized without config. ([#552](https://github.com/shopify/theme-check/issues/552))
+  * Add missing metafield filters ([#550](https://github.com/shopify/theme-check/issues/550))
+  * Handle media.sources edge case in RemoteAsset ([#549](https://github.com/shopify/theme-check/issues/549))
+  * Disable HTML checks inside Liquid comments ([#548](https://github.com/shopify/theme-check/issues/548))
+  * Prevent bad render tags from passing theme-check ([#551](https://github.com/shopify/theme-check/issues/551))
+  * Handle rogue carriage returns ([#547](https://github.com/shopify/theme-check/issues/547))
+
 v1.9.2 / 2021-12-13
 ===================
 
@@ -14,7 +37,7 @@ v1.9.0 / 2021-12-01
 
 ## Features
 
-  * Add Corrections as Code Actions in Language Server (quickfix + source.fixAll) (#471)
+  * Add Corrections as Code Actions in Language Server (quickfix + source.fixAll) ([#471](https://github.com/shopify/theme-check/issues/471))
   * Add SchemaJsonFormat check ([#512](https://github.com/shopify/theme-check/issues/512))
   * Add checkOn{Open,Change,Save} Language Server Configurations ([#511](https://github.com/shopify/theme-check/issues/511))
   * Add support for new filters `image_tag` + `image_url`
