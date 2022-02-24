@@ -125,7 +125,7 @@ module ThemeCheck
     end
 
     class Render < Liquid::Tag
-      SYNTAX = /((?:#{Liquid::QuotedString}|\A#{Liquid::VariableSegment})+)(\s+(with|#{Liquid::Render::FOR})\s+(#{Liquid::QuotedFragment}+))?(\s+(?:as)\s+(#{Liquid::VariableSegment}+))?/o
+      SYNTAX = /((?:#{Liquid::QuotedString}|#{Liquid::VariableSegment})+)(\s+(with|#{Liquid::Render::FOR})\s+(#{Liquid::QuotedFragment}+))?(\s+(?:as)\s+(#{Liquid::VariableSegment}+))?/o
 
       disable_tags "include"
 
@@ -134,7 +134,7 @@ module ThemeCheck
       def initialize(tag_name, markup, options)
         super
 
-        raise Liquid::SyntaxError, options[:locale].t("errors.syntax.render") unless markup =~ SYNTAX
+        raise SyntaxError, options[:locale].t("errors.syntax.render") unless markup =~ SYNTAX
 
         template_name = Regexp.last_match(1)
         with_or_for = Regexp.last_match(3)

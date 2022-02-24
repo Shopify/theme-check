@@ -41,14 +41,4 @@ class SyntaxErrorTest < Minitest::Test
       Expected end_of_string but found pipe at templates/index.liquid:3
     END
   end
-
-  def test_invalid_render_tag
-    offenses = analyze_theme(
-      ThemeCheck::SyntaxError.new,
-      "templates/index.liquid" => "{% render ‘foo’ %}",
-    )
-    assert_offenses(<<~END, offenses)
-      Syntax error in tag 'render' - Template name must be a quoted string at templates/index.liquid:1
-    END
-  end
 end
