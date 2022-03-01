@@ -125,7 +125,23 @@ module ThemeCheck
     end
 
     class Render < Liquid::Tag
-      SYNTAX = /((?:#{Liquid::QuotedString}|#{Liquid::VariableSegment})+)(\s+(with|#{Liquid::Render::FOR})\s+(#{Liquid::QuotedFragment}+))?(\s+(?:as)\s+(#{Liquid::VariableSegment}+))?/o
+      SYNTAX = %r{
+        (
+          ## for {% render "snippet" %}
+          #{Liquid::QuotedString}+ |
+          ## for {% render block %}
+          ## We require the variable # segment to be at the beginning of the
+          ## string (with \A). This is to prevent code like {% render !foo! %}
+          ## from parsing
+          \A#{Liquid::VariableSegment}+
+        )
+        ## for {% render "snippet" with product as p %}
+        ## or {% render "snippet" for products p %}
+        (\s+(with|#{Liquid::Render::FOR})\s+(#{Liquid::QuotedFragment}+))?
+        (\s+(?:as)\s+(#{Liquid::VariableSegment}+))?
+        ## variables passed into the tag (e.g. {% render "snippet", var1: value1, var2: value2 %}
+        ## are not matched by this regex and are handled by Liquid::Render.initialize
+      }xo
 
       disable_tags "include"
 
@@ -134,7 +150,7 @@ module ThemeCheck
       def initialize(tag_name, markup, options)
         super
 
-        raise SyntaxError, options[:locale].t("errors.syntax.render") unless markup =~ SYNTAX
+        raise Liquid::SyntaxError, options[:locale].t("errors.syntax.render") unless markup =~ SYNTAX
 
         template_name = Regexp.last_match(1)
         with_or_for = Regexp.last_match(3)
