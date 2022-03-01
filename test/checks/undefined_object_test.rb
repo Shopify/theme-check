@@ -387,4 +387,12 @@ class UndefinedObjectTest < Minitest::Test
       Missing argument `some_end_condition` at snippets/one.liquid:1
     END
   end
+
+  def test_render_block
+    offenses = analyze_theme(
+      ThemeCheck::UndefinedObject.new(exclude_snippets: false),
+      "sections/apps.liquid" => "{% render block %}"
+    )
+    assert_offenses("", offenses)
+  end
 end
