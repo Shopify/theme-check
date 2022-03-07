@@ -25,7 +25,7 @@ module ThemeCheck
             styleCount: path_offenses.count { |offense| offense[:severity] == Check::SEVERITY_VALUES[:style] },
           }
         end
-        .sort_by { |o| o[:path] }
+        .sort_by { |o| o[:path] || Pathname.new('') }
     end
   end
 end

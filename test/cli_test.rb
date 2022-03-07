@@ -25,6 +25,10 @@ class CliTest < Minitest::Test
         {% assign x = 1 %}
         {% assign y = 2 %}
       LIQUID
+      "config/placeholder" => '',
+      "assets/placeholder" => '',
+      "locales/placeholder" => '',
+      "snippets/example.liquid" => '',
       "templates/example.liquid" => <<~LIQUID,
         {% assign z = 1 %}
       LIQUID
@@ -32,6 +36,9 @@ class CliTest < Minitest::Test
         extends: :nothing
         UnusedAssign:
           enabled: true
+        RequiredDirectories:
+          enabled: true
+          severity: suggestion
       YAML
     )
 
@@ -41,6 +48,23 @@ class CliTest < Minitest::Test
 
     assert_equal(
       JSON.dump([
+        {
+          "path" => nil,
+          "offenses" => [
+            {
+              "check" => "RequiredDirectories",
+              "severity" => 1,
+              "start_row" => 0,
+              "start_column" => 0,
+              "end_row" => 0,
+              "end_column" => 0,
+              "message" => "Theme is missing 'sections' directory",
+            },
+          ],
+          "errorCount" => 0,
+          "suggestionCount" => 1,
+          "styleCount" => 0,
+        },
         {
           "path" => "layout/theme.liquid",
           "offenses" => [
