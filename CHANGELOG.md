@@ -1,4 +1,10 @@
 
+v1.10.2 / 2022-03-07
+====================
+
+  * Handle nil paths in json_printer's sort_by ([#561](https://github.com/shopify/theme-check/issues/561))
+  * Prevent bad render tags from passing theme-check ([#559](https://github.com/shopify/theme-check/issues/559))
+
 v1.10.1 / 2022-02-24
 ====================
 
