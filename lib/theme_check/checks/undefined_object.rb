@@ -55,7 +55,8 @@ module ThemeCheck
       end
     end
 
-    def initialize(exclude_snippets: true)
+    def initialize(config_type: :default, exclude_snippets: true)
+      @config_type = config_type
       @exclude_snippets = exclude_snippets
       @files = {}
     end
@@ -111,6 +112,9 @@ module ThemeCheck
       shopify_plus_objects = ThemeCheck::ShopifyLiquid::Object.plus_labels
       shopify_plus_objects.freeze
 
+      theme_app_extension_objects = ThemeCheck::ShopifyLiquid::Object.theme_app_extension_labels
+      theme_app_extension_objects.freeze
+
       each_template do |(name, info)|
         if 'templates/customers/reset_password' == name
           # NOTE: `email` is exceptionally exposed as a theme object in
@@ -121,6 +125,8 @@ module ThemeCheck
           #       the checkout template
           # https://shopify.dev/docs/themes/theme-templates/checkout-liquid#optional-objects
           check_object(info, all_global_objects + shopify_plus_objects)
+        elsif config_type == :theme_app_extension
+          check_object(info, all_global_objects + theme_app_extension_objects)
         else
           check_object(info, all_global_objects)
         end
@@ -128,6 +134,8 @@ module ThemeCheck
     end
 
     private
+
+    attr_reader :config_type
 
     def ignore?(node)
       @exclude_snippets && node.theme_file.snippet?
