@@ -279,7 +279,7 @@ class ConfigTest < Minitest::Test
 
   def test_custom_check_with_root
     storage = make_file_system_storage(
-      ".theme-check.yml" => <<~END,
+      ".config/.theme-check.yml" => <<~END,
         root: dist
         include_categories: []
         require:
@@ -287,10 +287,7 @@ class ConfigTest < Minitest::Test
         CustomCheck:
           enabled: true
       END
-      "dist/layout/theme.liquid" => <<~END,
-        <html>
-        </html>
-        END
+      "dist/layout/theme.liquid" => "",
       "checks/custom_check.rb" => <<~END,
         module ThemeCheck
           class CustomCheck < Check
@@ -298,7 +295,12 @@ class ConfigTest < Minitest::Test
         end
         END
     )
-    config = ThemeCheck::Config.from_path(storage.root)
+
+    config = ThemeCheck::Config.new(
+      root: storage.root,
+      configuration: ThemeCheck::Config.load_config(storage.root.join('.config/.theme-check.yml'))
+    )
+
     assert(check_enabled?(config, ThemeCheck::CustomCheck))
   end
 
