@@ -209,7 +209,8 @@ module ThemeCheck
 
     def resolve_requires
       self["require"]&.each do |path|
-        require(File.join(@root, path))
+        file_to_require = @root.join(path).realpath
+        require(file_to_require.to_s)
       end
     end
   end
