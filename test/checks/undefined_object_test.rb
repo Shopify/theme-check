@@ -395,4 +395,29 @@ class UndefinedObjectTest < Minitest::Test
     )
     assert_offenses("", offenses)
   end
+
+  def test_report_on_app_liquid_drop_in_themes
+    offenses = analyze_theme(
+      ThemeCheck::UndefinedObject.new(exclude_snippets: false),
+      "blocks/block_a.liquid" => <<~END,
+        <p>{{ app.metafields.namespace.key }}</p>
+      END
+    )
+    assert_offenses(<<~END, offenses)
+      Undefined object `app` at blocks/block_a.liquid:1
+    END
+  end
+
+  def test_does_not_report_on_app_liquid_drop_in_theme_app_extensions
+    offenses = analyze_theme(
+      ThemeCheck::UndefinedObject.new(exclude_snippets: false, config_type: :theme_app_extension),
+      "blocks/block_a.liquid" => <<~END,
+        <p>{{ app.metafields.namespace.key }}</p>
+      END
+      "snippets/snippet_a.liquid" => <<~END,
+        <p>{{ app.metafields.namespace.key }}</p>
+      END
+    )
+    assert_offenses("", offenses)
+  end
 end

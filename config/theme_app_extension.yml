@@ -89,6 +89,7 @@ UndefinedObject:
   enabled: true
   ignore: []
   exclude_snippets: true
+  config_type: theme_app_extension
 
 RequiredDirectories:
   enabled: false
