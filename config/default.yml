@@ -101,6 +101,7 @@ UndefinedObject:
   enabled: true
   ignore: []
   exclude_snippets: true
+  config_type: :default
 
 RequiredDirectories:
   enabled: true
