@@ -12,4 +12,4 @@ There are three types of checks currently supported:
 
 - [`LiquidCheck`](/docs/api/liquid_check.md)
 - [`HtmlCheck`](/docs/api/html_check.md)
-- [`JsonCheck`](/docs/api/html_check.md)
+- [`JsonCheck`](/docs/api/json_check.md)
