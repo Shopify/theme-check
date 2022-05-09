@@ -89,9 +89,12 @@ module ThemeCheck
 
         assert_can_find_token(engine, content, "{% rend %}")
         assert_can_find_token(engine, content, "{{ 'foo.js' |  }}")
-        assert_can_find_token(engine, content, "<head>\n  ")
-        assert_can_find_token(engine, content, "\"></script>\n  ")
-        assert_can_find_token(engine, content, "{% rend\n</head>\n")
+        assert_can_find_token(engine, content, "<head>")
+        assert_can_find_token(engine, content, "\">")
+        assert_can_find_token(engine, content, "</script>")
+        assert_can_find_token(engine, content, "\n  ")
+        assert_can_find_token(engine, content, "{% rend\n")
+        assert_can_find_token(engine, content, "</head>")
       end
 
       private

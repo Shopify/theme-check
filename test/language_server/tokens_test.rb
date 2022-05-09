@@ -26,7 +26,7 @@ module ThemeCheck
       LIQUID
       tokens = Tokens.new(contents).to_a
 
-      assert_includes(tokens, token(contents, "<html>\n  <head>\n    "))
+      assert_includes(tokens, token(contents, "<html>"))
       assert_includes(tokens, token(contents, "{% assign foo = 1 %}"))
       assert_includes(tokens, token(contents, "{{ 'foo.js' | asset_url | script_tag }}"))
       assert_includes(tokens, token(contents, "{% if foo == 1 %}"))

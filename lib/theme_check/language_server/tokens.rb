@@ -11,9 +11,11 @@ module ThemeCheck
   TAG_END = Liquid::TagEnd
   VARIABLE_START = Liquid::VariableStart
   VARIABLE_END = Liquid::VariableEnd
+  HTML_TAG_START = %r{</?}
+  HTML_TAG_END = />/
   SPLITTER = %r{
-    (?=(?:#{TAG_START}|#{VARIABLE_START}))| # positive lookahead on tag/variable start
-    (?<=(?:#{TAG_END}|#{VARIABLE_END}))     # positive lookbehind on tag/variable end
+    (?=(?:#{TAG_START}|#{VARIABLE_START}|#{HTML_TAG_START}))| # positive lookahead on tag/variable start
+    (?<=(?:#{TAG_END}|#{VARIABLE_END}|#{HTML_TAG_END}))     # positive lookbehind on tag/variable end
   }xom
 
   # Implemented as an Enumerable so we stop iterating on the find once
