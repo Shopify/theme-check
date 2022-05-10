@@ -14,7 +14,7 @@ module ThemeCheck
 
       CAPABILITIES = {
         completionProvider: {
-          triggerCharacters: ['.', '{{ ', '{% '],
+          triggerCharacters: ['.', '{{ ', '{% ', '<'],
           context: true,
         },
         codeActionProvider: {
