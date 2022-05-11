@@ -5,6 +5,7 @@ module ThemeCheck
     :content,
     :start, # inclusive
     :end, # exclusive
+    :tag_name,
   )
 
   TAG_START = Liquid::TagStart
@@ -45,6 +46,7 @@ module ThemeCheck
       return to_enum(:each) unless block_given?
 
       cursor = 0
+      curr_tag_name = nil
 
       while cursor <= @buffer.size
         closest_open_match = /#{HTML_TAG_START}|#{VARIABLE_START}|#{TAG_START}|#{HTML_TAG_END}/oi.match(@buffer, cursor)
@@ -54,31 +56,40 @@ module ThemeCheck
         tail = -1
 
         head += 1 if closest_open_match[0] == '>'
-        block.call(token(cursor, head)) if head > cursor
+        block.call(token(cursor, head, curr_tag_name)) if head > cursor
         if closest_open_match[0] == '>'
+          curr_tag_name = nil
           cursor = head
           next
         end
 
+        should_reset_tag_name = false
+
         case closest_open_match[0]
         when '<'
+          curr_tag_name_match = /(?<name>[a-z][a-z0-9\-:]*)/i.match(@buffer, closest_open_match.begin(0))
+          curr_tag_name = if curr_tag_name_match && curr_tag_name_match.begin(0) == closest_open_match.end(0)
+            curr_tag_name_match[:name]
+          end
           closest_close_match = /#{HTML_TAG_END}|#{TAG_START}|#{VARIABLE_START}|\Z/oi.match(@buffer, closest_open_match.end(0))
-          return block.call(token(head, -1)) unless closest_close_match
+          return block.call(token(head, -1, curr_tag_name)) unless closest_close_match
           tail = closest_close_match.begin(0)
           tail += 1 if closest_close_match[0] == '>'
+          should_reset_tag_name = closest_close_match[0] == '>'
         when '{{'
           closest_close_match = /#{VARIABLE_END}|#{TAG_START}|#{VARIABLE_START}|#{HTML_TAG_START}|\Z/oi.match(@buffer, closest_open_match.end(0))
-          return block.call(token(head, -1)) unless closest_close_match
+          return block.call(token(head, -1, curr_tag_name)) unless closest_close_match
           tail = closest_close_match.begin(0)
           tail += 2 if closest_close_match[0] == '}}'
         when '{%'
           closest_close_match = /#{TAG_END}|#{TAG_START}|#{VARIABLE_START}|#{HTML_TAG_START}|\Z/oi.match(@buffer, closest_open_match.end(0))
-          return block.call(token(head, -1)) unless closest_close_match
+          return block.call(token(head, -1, curr_tag_name)) unless closest_close_match
           tail = closest_close_match.begin(0)
           tail += 2 if closest_close_match[0] == '%}'
         end
 
-        block.call(token(head, tail))
+        block.call(token(head, tail, curr_tag_name))
+        curr_tag_name = nil if should_reset_tag_name
 
         cursor = tail
 
@@ -87,11 +98,12 @@ module ThemeCheck
       end
     end
 
-    def token(head, tail = -1)
+    def token(head, tail, tag_name = nil)
       Token.new(
         @buffer[head...tail],
         head,
         tail == -1 ? @buffer.size : tail,
+        tag_name,
       )
     end
   end
