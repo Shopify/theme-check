@@ -20,7 +20,7 @@ module ThemeCheck
         @storage = storage
       end
 
-      def completions(content, cursor)
+      def completions(token, cursor)
         raise NotImplementedError
       end
     end

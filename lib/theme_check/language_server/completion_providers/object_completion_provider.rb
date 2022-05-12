@@ -3,7 +3,8 @@
 module ThemeCheck
   module LanguageServer
     class ObjectCompletionProvider < CompletionProvider
-      def completions(content, cursor)
+      def completions(token, cursor)
+        content = token.content
         return [] unless (variable_lookup = variable_lookup_at_cursor(content, cursor))
         return [] unless variable_lookup.lookups.empty?
         return [] if content[cursor - 1] == "."

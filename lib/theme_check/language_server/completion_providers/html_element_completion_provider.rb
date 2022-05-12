@@ -3,7 +3,8 @@
 module ThemeCheck
   module LanguageServer
     class HtmlElementCompletionProvider < CompletionProvider
-      def completions(content, cursor)
+      def completions(token, cursor)
+        content = token.content
         return [] unless (name = html_element_name_at_cursor(content, cursor))
         Docsets::Html.names
           .select { |w| w.start_with?(name || '') }

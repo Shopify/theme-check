@@ -154,49 +154,56 @@ module Minitest
       assert_includes(offenses.sort_by(&:location).join("\n"), output.chomp)
     end
 
+    Token = ThemeCheck::Token
+
     module CompletionProviderTestHelper
-      def assert_can_complete(provider, token, offset = 0)
+      def assert_can_complete(provider, content, offset = 0, tag_name = nil)
+        token = Token.new(content, 0, content.size, tag_name)
+
         refute_empty(
-          provider.completions(token, token.size + offset).map { |x| x[:label] },
+          provider.completions(token, content.size + offset).map { |x| x[:label] },
           <<~ERRMSG,
             Expected completions at the specified cursor position:
-            #{token}
-            #{' ' * (token.size + offset)}^
+            #{content}
+            #{' ' * (content.size + offset)}^
           ERRMSG
         )
       end
 
-      def assert_can_complete_with(provider, token, label, offset = 0)
+      def assert_can_complete_with(provider, content, label, offset = 0, tag_name = nil)
+        token = Token.new(content, 0, content.size, tag_name)
         assert_includes(
-          provider.completions(token, token.size + offset).map { |x| x[:label] },
+          provider.completions(token, content.size + offset).map { |x| x[:label] },
           label,
           <<~ERRMSG,
             Expected '#{label}' to be suggested at the specified cursor position:
-            #{token}
-            #{' ' * (token.size + offset)}^
+            #{content}
+            #{' ' * (content.size + offset)}^
           ERRMSG
         )
       end
 
-      def refute_can_complete(provider, token, offset = 0)
+      def refute_can_complete(provider, content, offset = 0, tag_name = nil)
+        token = Token.new(content, 0, content.size, tag_name)
         assert_empty(
-          provider.completions(token, token.size + offset),
+          provider.completions(token, content.size + offset),
           <<~ERRMSG,
             Expected no completions at the specified cursor location:
-            #{token}
-            #{' ' * (token.size + offset)}^
+            #{content}
+            #{' ' * (content.size + offset)}^
           ERRMSG
         )
       end
 
-      def refute_can_complete_with(provider, token, label, offset = 0)
+      def refute_can_complete_with(provider, content, label, offset = 0, tag_name = nil)
+        token = Token.new(content, 0, content.size, tag_name)
         refute_includes(
-          provider.completions(token, token.size + offset).map { |x| x[:label] },
+          provider.completions(token, content.size + offset).map { |x| x[:label] },
           label,
           <<~ERRMSG,
             Expected '#{label}' not to be suggested at the specified cursor position:
-            #{token}
-            #{' ' * (token.size + offset)}^
+            #{content}
+            #{' ' * (content.size + offset)}^
           ERRMSG
         )
       end

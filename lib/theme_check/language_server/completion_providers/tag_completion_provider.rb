@@ -3,7 +3,8 @@
 module ThemeCheck
   module LanguageServer
     class TagCompletionProvider < CompletionProvider
-      def completions(content, cursor)
+      def completions(token, cursor)
+        content = token.content
         return [] unless can_complete?(content, cursor)
         partial = first_word(content) || ''
         labels = ShopifyLiquid::Tag.labels

@@ -5,7 +5,8 @@ module ThemeCheck
     class FilterCompletionProvider < CompletionProvider
       NAMED_FILTER = /#{Liquid::FilterSeparator}\s*(\w+)/o
 
-      def completions(content, cursor)
+      def completions(token, cursor)
+        content = token.content
         return [] unless can_complete?(content, cursor)
         available_labels
           .select { |w| w.start_with?(partial(content, cursor)) }

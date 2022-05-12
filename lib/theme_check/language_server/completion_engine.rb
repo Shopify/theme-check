@@ -18,7 +18,7 @@ module ThemeCheck
 
         @providers.flat_map do |p|
           p.completions(
-            token.content,
+            token,
             cursor - token.start
           )
         end
