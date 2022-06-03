@@ -148,4 +148,22 @@ class TranslationKeyExistsTest < Minitest::Test
 
     assert_equal(expected, actual)
   end
+
+  def test_handles_key_conflicts
+    theme = make_theme(
+      "locales/en.default.json" => JSON.dump({
+        product: { quantity: "TODO" },
+      }),
+      "templates/index.liquid" => <<~END,
+        {{"product.quantity.decrease" | t}}
+      END
+    )
+
+    analyzer = ThemeCheck::Analyzer.new(theme, [ThemeCheck::TranslationKeyExists.new], true)
+    analyzer.analyze_theme
+
+    assert_offenses(<<~END, analyzer.offenses)
+      'product.quantity.decrease' does not have a matching entry in 'locales/en.default.json' at templates/index.liquid:1
+    END
+  end
 end
