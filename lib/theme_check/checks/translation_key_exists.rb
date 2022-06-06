@@ -48,6 +48,7 @@ module ThemeCheck
 
     def key_exists?(key, pointer)
       key.split(".").each do |token|
+        return false unless pointer.is_a?(Hash)
         return false unless pointer.key?(token)
         pointer = pointer[token]
       end
