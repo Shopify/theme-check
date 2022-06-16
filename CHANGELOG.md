@@ -1,9 +1,14 @@
 
-v1.10.3 / 2022-03-25
-====================
+v1.10.3 / 2022-06-16
+==================
 
   * Support app drop in theme app extensions ([#566](https://github.com/shopify/theme-check/issues/566))
   * Fix requiring custom check when root is specified ([#565](https://github.com/shopify/theme-check/issues/565))
+  * Fix TranslationKeyExists.on_end issue ([#587](https://github.com/shopify/theme-check/issues/587))
+  * Fix bad link on check documentation ([#575](https://github.com/shopify/theme-check/issues/575))
+  * Update TEMPLATE.md.erb to use shopify.dev URL
+  * Fixed broken URL ([#574](https://github.com/shopify/theme-check/issues/574))
+  * Fix unknown configuration issue for UndefinedObject checker ([#568](https://github.com/shopify/theme-check/issues/568))
 
 v1.10.2 / 2022-03-07
 ====================
