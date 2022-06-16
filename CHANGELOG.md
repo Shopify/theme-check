@@ -1,4 +1,10 @@
 
+v1.10.3 / 2022-03-25
+====================
+
+  * Support app drop in theme app extensions ([#566](https://github.com/shopify/theme-check/issues/566))
+  * Fix requiring custom check when root is specified ([#565](https://github.com/shopify/theme-check/issues/565))
+
 v1.10.2 / 2022-03-07
 ====================
 
