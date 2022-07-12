@@ -131,6 +131,10 @@ ParserBlockingScriptTag:
   enabled: true
   ignore: []
 
+AssetPreload:
+  enabled: true
+  ignore: []
+
 AssetSizeJavaScript:
   enabled: false
   threshold_in_bytes: 10_000
