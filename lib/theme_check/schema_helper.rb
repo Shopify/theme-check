@@ -8,7 +8,7 @@ module ThemeCheck
       path.each_with_index.reduce(hash) do |pointer, (token, index)|
         if index == path.size - 1
           pointer[token] = value
-        elsif !pointer.key?(token)
+        elsif !pointer.key?(token) || !pointer[token].is_a?(Hash)
           pointer[token] = {}
         end
         pointer[token]

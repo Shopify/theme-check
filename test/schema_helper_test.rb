@@ -7,6 +7,9 @@ module ThemeCheck
       assert_equal({ "a" => { "b" => 1 } }, SchemaHelper.set({}, 'a.b', 1))
       assert_equal({ "a" => { "b" => 1 } }, SchemaHelper.set({}, ['a', 'b'], 1))
       assert_equal({ "a" => { "b" => 1 } }, SchemaHelper.set({ "a" => { "b" => 0 } }, 'a.b', 1))
+      assert_equal({ "a" => { "1" => "str" } }, SchemaHelper.set({ "a" => "b" }, 'a.1', "str"))
+      assert_equal({ "a" => { "b" => "str" } }, SchemaHelper.set({ "a" => "b" }, 'a.b', "str"))
+      assert_equal({ "a" => 1 }, SchemaHelper.set({ "a" => { "b" => 1 } }, 'a', 1))
     end
 
     def test_delete

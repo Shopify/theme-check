@@ -195,4 +195,36 @@ class MatchingTranslationsTest < Minitest::Test
 
     assert_offenses("", offenses)
   end
+
+  def test_shape_change
+    sources = fix_theme(
+      ThemeCheck::MatchingTranslations.new,
+      "locales/en.default.json" => JSON.dump(
+        hello: {
+          another_key: "world",
+          shape_change: "world",
+        },
+      ),
+      "locales/fr.json" => JSON.dump(
+        hello: "Bonjour",
+      ),
+    )
+    expected_sources = {
+      "locales/en.default.json" => JSON.dump(
+        hello: {
+          another_key: "world",
+          shape_change: "world",
+        },
+      ),
+      "locales/fr.json" => JSON.dump(
+        hello: {
+          another_key: "TODO",
+          shape_change: "TODO",
+        },
+      ),
+    }
+    sources.each do |path, source|
+      assert_equal(expected_sources[path], source)
+    end
+  end
 end
