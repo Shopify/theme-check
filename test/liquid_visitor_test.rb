@@ -114,6 +114,54 @@ class LiquidVisitorTest < Minitest::Test
     ], @tracer.calls)
   end
 
+  def test_render
+    theme_file = parse_liquid(<<~END)
+      {% for block in section.blocks %}
+        {% assign x = 1 %}
+        {% render block with x %}
+      {% endfor %}
+    END
+    @visitor.visit_liquid_file(theme_file)
+    assert_equal([
+      :on_document,
+      :on_tag,
+      :on_for,
+      :on_block_body,
+      :on_string,
+      "\n" + "  ",
+      :on_tag,
+      :on_assign,
+      :on_variable,
+      :on_integer,
+      1,
+      :after_variable,
+      :after_assign,
+      :after_tag,
+      :on_string,
+      "\n" + "  ",
+      :on_tag,
+      :on_render,
+      :on_variable_lookup,
+      :after_variable_lookup,
+      :on_variable_lookup,
+      :after_variable_lookup,
+      :after_render,
+      :after_tag,
+      :on_string,
+      "\n",
+      :after_block_body,
+      :on_variable_lookup,
+      :on_string,
+      "blocks",
+      :after_variable_lookup,
+      :after_for,
+      :after_tag,
+      :on_string,
+      "\n",
+      :after_document,
+    ], @tracer.calls)
+  end
+
   def test_form
     theme_file = parse_liquid(<<~END)
       {% form 'type', object, key: value %}
