@@ -145,7 +145,7 @@ module ThemeCheck
 
       disable_tags "include"
 
-      attr_reader :template_name_expr, :attributes
+      attr_reader :template_name_expr, :variable_name_expr, :attributes
 
       def initialize(tag_name, markup, options)
         super
@@ -171,6 +171,7 @@ module ThemeCheck
         def children
           [
             @node.template_name_expr,
+            @node.variable_name_expr,
           ] + @node.attributes.values
         end
       end
