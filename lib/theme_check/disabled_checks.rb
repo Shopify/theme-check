@@ -41,7 +41,7 @@ module ThemeCheck
 
     def disabled?(check, theme_file, check_name, index)
       return true if check.ignored_patterns&.any? do |pattern|
-        theme_file.relative_path.fnmatch?(pattern)
+        theme_file&.relative_path&.fnmatch?(pattern)
       end
 
       @disabled_checks[[theme_file, :all]]&.disabled?(index) ||

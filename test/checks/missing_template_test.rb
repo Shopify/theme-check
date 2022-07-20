@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "test_helper"
 
 class MissingTemplateTest < Minitest::Test
@@ -69,6 +70,29 @@ class MissingTemplateTest < Minitest::Test
         {% section 'anything' %}
       END
     )
+    assert_offenses("", offenses)
+  end
+
+  # Slightly different config, if you top-level ignore all snippets/icon-*,
+  # then you should probably also ignore missing templates of all snippets/icon-*
+  # See #489 or #589 for more context.
+  def test_ignore_config
+    check = ThemeCheck::MissingTemplate.new
+
+    # this is what config.rb would do
+    check.ignored_patterns = [
+      "snippets/icon-*",
+      "sections/*",
+    ]
+
+    offenses = analyze_theme(
+      check,
+      "templates/index.liquid" => <<~END,
+        {% render 'icon-nope' %}
+        {% section 'anything' %}
+      END
+    )
+
     assert_offenses("", offenses)
   end
 

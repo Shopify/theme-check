@@ -28,7 +28,11 @@ module ThemeCheck
     private
 
     def ignore?(path)
-      @ignore_missing.any? { |pattern| File.fnmatch?(pattern, path) }
+      all_ignored_patterns.any? { |pattern| File.fnmatch?(pattern, path) }
+    end
+
+    def all_ignored_patterns
+      @all_ignored_patterns ||= @ignore_missing + ignored_patterns
     end
 
     def add_missing_offense(name, node:)

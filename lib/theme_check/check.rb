@@ -6,7 +6,8 @@ module ThemeCheck
     include JsonHelpers
 
     attr_accessor :theme
-    attr_accessor :options, :ignored_patterns
+    attr_accessor :options
+    attr_writer :ignored_patterns
     attr_writer :offenses
 
     # The order matters.
@@ -128,6 +129,10 @@ module ThemeCheck
 
     def ignored?
       defined?(@ignored) && @ignored
+    end
+
+    def ignored_patterns
+      @ignored_patterns ||= []
     end
 
     def can_disable?
