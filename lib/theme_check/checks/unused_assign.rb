@@ -39,7 +39,12 @@ module ThemeCheck
     end
 
     def on_variable_lookup(node)
-      @templates[node.theme_file.name].used_assigns << node.value.name
+      @templates[node.theme_file.name].used_assigns << case node.value.name
+      when Liquid::VariableLookup
+        node.value.name.name
+      else
+        node.value.name
+      end
     end
 
     def on_end
