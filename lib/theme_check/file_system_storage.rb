@@ -21,6 +21,8 @@ module ThemeCheck
 
     def read(relative_path)
       file(relative_path).read(mode: 'rb', encoding: 'UTF-8')
+    rescue Errno::ENOENT
+      nil
     end
 
     def write(relative_path, content)

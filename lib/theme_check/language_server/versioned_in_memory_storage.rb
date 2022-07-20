@@ -58,6 +58,13 @@ module ThemeCheck
       @mutex.synchronize { [read(relative_path), version(relative_path)] }
     end
 
+    def remove(relative_path)
+      @mutex.synchronize do
+        @versions.delete(relative_path)
+        super(relative_path)
+      end
+    end
+
     def versioned?
       true
     end
