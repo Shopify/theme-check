@@ -31,6 +31,20 @@ class UnusedAssignTest < Minitest::Test
     assert_offenses("", offenses)
   end
 
+  def test_do_not_report_used_assigns_bracket_syntax
+    offenses = analyze_theme(
+      ThemeCheck::UnusedAssign.new,
+      "templates/index.liquid" => <<~END,
+        {% liquid
+          assign resource = request.page_type
+          assign meta_value = [resource].metafields.namespace.key
+          echo meta_value
+        %}
+      END
+    )
+    assert_offenses("", offenses)
+  end
+
   def test_do_not_report_assigns_used_before_defined
     offenses = analyze_theme(
       ThemeCheck::UnusedAssign.new,
