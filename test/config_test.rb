@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "test_helper"
 
 class ConfigTest < Minitest::Test
@@ -8,7 +9,7 @@ class ConfigTest < Minitest::Test
         enabled: false
     END
     config = ThemeCheck::Config.from_path(storage.root).to_h
-    assert_equal(false, config.dig("TemplateLength", "enabled"))
+    refute(config.dig("TemplateLength", "enabled"))
   end
 
   def test_load_file_in_parent_dir
@@ -20,7 +21,7 @@ class ConfigTest < Minitest::Test
       "dist/templates/index.liquid" => "",
     )
     config = ThemeCheck::Config.from_path(storage.root.join("dist")).to_h
-    assert_equal(false, config.dig("TemplateLength", "enabled"))
+    refute(config.dig("TemplateLength", "enabled"))
   end
 
   def test_missing_file
@@ -39,7 +40,7 @@ class ConfigTest < Minitest::Test
       TemplateLength:
         enabled: false
     CONFIG
-    assert_equal(false, config.to_h.dig("TemplateLength", "enabled"))
+    refute(config.to_h.dig("TemplateLength", "enabled"))
   end
 
   def test_from_hash
@@ -48,7 +49,7 @@ class ConfigTest < Minitest::Test
         "enabled" => false,
       },
     })
-    assert_equal(false, config.to_h.dig("TemplateLength", "enabled"))
+    refute(config.to_h.dig("TemplateLength", "enabled"))
   end
 
   def test_enabled_checks_excludes_disabled_checks
@@ -154,7 +155,7 @@ class ConfigTest < Minitest::Test
       "src/.theme-check.yml" => <<~END,
         TemplateLength:
           enabled: true
-        END
+      END
     )
     config = ThemeCheck::Config.from_path(storage.root.join("src"))
     assert_equal(storage.root.join("src"), config.root)
@@ -271,7 +272,7 @@ class ConfigTest < Minitest::Test
           class CustomCheck < Check
           end
         end
-        END
+      END
     )
     config = ThemeCheck::Config.from_path(storage.root)
     assert(check_enabled?(config, ThemeCheck::CustomCheck))
@@ -293,7 +294,7 @@ class ConfigTest < Minitest::Test
           class CustomCheck < Check
           end
         end
-        END
+      END
     )
 
     config = ThemeCheck::Config.new(
@@ -343,6 +344,27 @@ class ConfigTest < Minitest::Test
     )
     config = ThemeCheck::Config.from_path(storage.root)
     assert_equal(["node_modules", "dist/*.json"], config.ignored_patterns)
+  end
+
+  def test_merged_ignored_patterns
+    storage = make_file_system_storage(
+      ".theme-check.yml" => <<~END,
+        extends: nothing
+        ignore:
+          - node_modules
+          - dist/*.json
+        MissingTemplate:
+          enabled: true
+          ignore:
+            - 'snippets/foo.js'
+      END
+    )
+    config = ThemeCheck::Config.from_path(storage.root)
+    missing_snippets_check = config.enabled_checks.find { |c| c.code_name == 'MissingTemplate' }
+    assert_equal(
+      ["snippets/foo.js", "node_modules", "dist/*.json"],
+      missing_snippets_check.ignored_patterns
+    )
   end
 
   private
