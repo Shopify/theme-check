@@ -67,6 +67,24 @@ module ThemeCheck
       assert_empty(@regex_check.offenses)
     end
 
+    def test_ignore_all_checks_issue_583
+      liquid_file = parse_liquid(<<~END)
+        {% comment %}theme-check-disable{% endcomment %}
+        {% comment %}
+          This is some comment about the file...
+          Adding a comment here should not mess with theme-check-disable
+        {% endcomment %}
+        {% assign x = 'x' %}
+        RegexError 1
+        {% comment %}theme-check-enable{% endcomment %}
+      END
+      @visitor.visit_liquid_file(liquid_file)
+      @disabled_checks.remove_disabled_offenses(@checks)
+
+      assert_empty(@assign_check.offenses)
+      assert_empty(@regex_check.offenses)
+    end
+
     def test_ignore_all_checks_without_end
       liquid_file = parse_liquid(<<~END)
         {% comment %}theme-check-disable{% endcomment %}
