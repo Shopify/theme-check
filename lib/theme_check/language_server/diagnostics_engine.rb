@@ -33,6 +33,16 @@ module ThemeCheck
         @diagnostics_lock.unlock
       end
 
+      def clear_diagnostics(relative_paths)
+        return unless @diagnostics_lock.try_lock
+
+        as_array(relative_paths).each do |relative_path|
+          send_clearing_diagnostics(relative_path)
+        end
+
+        @diagnostics_lock.unlock
+      end
+
       private
 
       def run_full_theme_check(analyzer)
@@ -65,28 +75,29 @@ module ThemeCheck
           .reject(&:nil?)
 
         deleted_relative_paths = relative_paths - theme_files.map(&:relative_path)
+        deleted_relative_paths
+          .each { |p| send_clearing_diagnostics(p) }
 
-        unless deleted_relative_paths.empty?
-          deleted_relative_paths.each do |relative_path|
-            @diagnostics_manager.clear_diagnostics(relative_path)
-            send_diagnostic(relative_path, DiagnosticsManager::NO_DIAGNOSTICS)
+        token = @bridge.send_create_work_done_progress_request
+        @bridge.send_work_done_progress_begin(token, "Partial theme check")
+        offenses = nil
+        time = Benchmark.measure do
+          offenses = analyzer.analyze_files(theme_files, only_single_file: only_single_file) do |path, i, total|
+            @bridge.send_work_done_progress_report(token, "#{i}/#{total} #{path}", (i.to_f / total * 100.0).to_i)
           end
         end
+        end_message = "Found #{offenses.size} new offenses in #{format("%0.2f", time.real)}s"
+        @bridge.send_work_done_progress_end(token, end_message)
+        @bridge.log(end_message)
+        send_diagnostics(offenses, theme_files.map(&:relative_path), only_single_file: only_single_file)
+      end
 
-        unless theme_files.empty?
-          token = @bridge.send_create_work_done_progress_request
-          @bridge.send_work_done_progress_begin(token, "Partial theme check")
-          offenses = nil
-          time = Benchmark.measure do
-            offenses = analyzer.analyze_files(theme_files, only_single_file: only_single_file) do |path, i, total|
-              @bridge.send_work_done_progress_report(token, "#{i}/#{total} #{path}", (i.to_f / total * 100.0).to_i)
-            end
-          end
-          end_message = "Found #{offenses.size} new offenses in #{format("%0.2f", time.real)}s"
-          @bridge.send_work_done_progress_end(token, end_message)
-          @bridge.log(end_message)
-          send_diagnostics(offenses, theme_files.map(&:relative_path), only_single_file: only_single_file)
-        end
+      def send_clearing_diagnostics(relative_path)
+        raise 'Unsafe operation' unless @diagnostics_lock.owned?
+
+        relative_path = Pathname.new(relative_path) unless relative_path.is_a?(Pathname)
+        @diagnostics_manager.clear_diagnostics(relative_path)
+        send_diagnostic(relative_path, DiagnosticsManager::NO_DIAGNOSTICS)
       end
 
       def as_array(maybe_array)

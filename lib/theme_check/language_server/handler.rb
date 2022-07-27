@@ -117,6 +117,8 @@ module ThemeCheck
         # the file no longer exists because either the user deleted it, or the user renamed it.
         rescue Errno::ENOENT
           @storage.remove(relative_path)
+        ensure
+          @diagnostics_engine.clear_diagnostics(relative_path) if @configuration.only_single_file?
         end
       end
 
@@ -163,15 +165,17 @@ module ThemeCheck
       end
 
       def on_workspace_did_delete_files(_id, params)
-        paths = params[:files]
+        absolute_paths = params[:files]
           &.map { |file| file[:uri] }
           &.map { |uri| file_path(uri) }
-        return unless paths
+        return unless absolute_paths
 
-        paths.each do |path|
+        absolute_paths.each do |path|
           relative_path = @storage.relative_path(path)
           @storage.remove(relative_path)
         end
+
+        analyze_and_send_offenses(absolute_paths)
       end
 
       # We're using workspace/willRenameFiles here because we want this to run

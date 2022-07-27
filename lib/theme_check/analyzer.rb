@@ -74,6 +74,10 @@ module ThemeCheck
     #   Runs single file checks for each file in `files`
     #   Does not run whole theme checks
     #   Returns single file checks offenses for file in `files`
+    # When files is empty and only_single_file is false:
+    #   Only returns whole theme checks
+    # When files is empty and only_single_file is true:
+    #   Returns empty array
     def analyze_files(files, only_single_file: false)
       reset
 
