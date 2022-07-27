@@ -18,7 +18,7 @@ module ThemeCheck
         @diagnostics_manager.first_run?
       end
 
-      def analyze_and_send_offenses(absolute_path, config, force: false, only_single_file: false)
+      def analyze_and_send_offenses(absolute_path_or_paths, config, force: false, only_single_file: false)
         return unless @diagnostics_lock.try_lock
 
         theme = ThemeCheck::Theme.new(storage)
@@ -27,7 +27,7 @@ module ThemeCheck
         if (!only_single_file && @diagnostics_manager.first_run?) || force
           run_full_theme_check(analyzer)
         else
-          run_partial_theme_check(absolute_path, theme, analyzer, only_single_file)
+          run_partial_theme_check(absolute_path_or_paths, theme, analyzer, only_single_file)
         end
 
         @diagnostics_lock.unlock
@@ -36,7 +36,7 @@ module ThemeCheck
       private
 
       def run_full_theme_check(analyzer)
-        # raise 'Unsafe operation' unless @diagnostics_lock.owned?
+        raise 'Unsafe operation' unless @diagnostics_lock.owned?
 
         token = @bridge.send_create_work_done_progress_request
         @bridge.send_work_done_progress_begin(token, "Full theme check")
@@ -53,27 +53,41 @@ module ThemeCheck
         send_diagnostics(offenses)
       end
 
-      def run_partial_theme_check(absolute_path, theme, analyzer, only_single_file)
+      def run_partial_theme_check(absolute_path_or_paths, theme, analyzer, only_single_file)
         raise 'Unsafe operation' unless @diagnostics_lock.owned?
 
-        # Analyze selected files
-        relative_path = Pathname.new(storage.relative_path(absolute_path))
-        file = theme[relative_path]
+        relative_paths = path_to_paths(absolute_path_or_paths).map do |absolute_path|
+          Pathname.new(storage.relative_path(absolute_path))
+        end
 
-        # Skip if not a theme file
-        if file
+        theme_files = relative_paths
+          .map { |relative_path| theme[relative_path] }
+          .reject(&:nil?)
+
+        # deleted_relative_paths = relative_paths - theme_files.map(&:relative_path)
+
+        unless theme_files.empty?
           token = @bridge.send_create_work_done_progress_request
           @bridge.send_work_done_progress_begin(token, "Partial theme check")
           offenses = nil
           time = Benchmark.measure do
-            offenses = analyzer.analyze_files([file], only_single_file: only_single_file) do |path, i, total|
+            offenses = analyzer.analyze_files(theme_files, only_single_file: only_single_file) do |path, i, total|
               @bridge.send_work_done_progress_report(token, "#{i}/#{total} #{path}", (i.to_f / total * 100.0).to_i)
             end
           end
           end_message = "Found #{offenses.size} new offenses in #{format("%0.2f", time.real)}s"
           @bridge.send_work_done_progress_end(token, end_message)
           @bridge.log(end_message)
-          send_diagnostics(offenses, [relative_path], only_single_file: only_single_file)
+          send_diagnostics(offenses, theme_files.map(&:relative_path), only_single_file: only_single_file)
+        end
+      end
+
+      def path_to_paths(absolute_path_or_paths)
+        case absolute_path_or_paths
+        when Array
+          absolute_path_or_paths
+        else
+          [absolute_path_or_paths]
         end
       end
 
