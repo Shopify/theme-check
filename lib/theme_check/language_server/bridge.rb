@@ -31,6 +31,9 @@ module ThemeCheck
 
         # Whether the client supports work done progress notifications
         @supports_work_done_progress = false
+
+        @work_done_progress_mutex = Mutex.new
+        @work_done_progress_token = 1
       end
 
       def log(message)
@@ -110,15 +113,28 @@ module ThemeCheck
         @supports_work_done_progress
       end
 
-      def send_create_work_done_progress_request(token)
-        return unless supports_work_done_progress?
+      def send_create_work_done_progress_request
+        # This isn't necessary, but it kind of is to make it obvious
+        # that this variable is not thread safe. Don't try to refactor
+        # this with @work_done_progress_token because you're going to
+        # have a hard time.
+        token = @work_done_progress_mutex.synchronize do
+          @work_done_progress_token += 1
+        end
+
+        return token unless supports_work_done_progress?
+
+        # We're going to wait for a response here...
         send_request("window/workDoneProgress/create", {
           token: token,
         })
+
+        token
       end
 
       def send_work_done_progress_begin(token, title)
         return unless supports_work_done_progress?
+
         send_progress(token, {
           kind: 'begin',
           title: title,
@@ -129,6 +145,7 @@ module ThemeCheck
 
       def send_work_done_progress_report(token, message, percentage)
         return unless supports_work_done_progress?
+
         send_progress(token, {
           kind: 'report',
           message: message,
@@ -139,6 +156,7 @@ module ThemeCheck
 
       def send_work_done_progress_end(token, message)
         return unless supports_work_done_progress?
+
         send_progress(token, {
           kind: 'end',
           message: message,
