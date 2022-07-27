@@ -56,7 +56,7 @@ module ThemeCheck
       def run_partial_theme_check(absolute_path_or_paths, theme, analyzer, only_single_file)
         raise 'Unsafe operation' unless @diagnostics_lock.owned?
 
-        relative_paths = path_to_paths(absolute_path_or_paths).map do |absolute_path|
+        relative_paths = as_array(absolute_path_or_paths).map do |absolute_path|
           Pathname.new(storage.relative_path(absolute_path))
         end
 
@@ -64,7 +64,14 @@ module ThemeCheck
           .map { |relative_path| theme[relative_path] }
           .reject(&:nil?)
 
-        # deleted_relative_paths = relative_paths - theme_files.map(&:relative_path)
+        deleted_relative_paths = relative_paths - theme_files.map(&:relative_path)
+
+        unless deleted_relative_paths.empty?
+          deleted_relative_paths.each do |relative_path|
+            @diagnostics_manager.clear_diagnostics(relative_path)
+            send_diagnostic(relative_path, DiagnosticsManager::NO_DIAGNOSTICS)
+          end
+        end
 
         unless theme_files.empty?
           token = @bridge.send_create_work_done_progress_request
@@ -82,12 +89,12 @@ module ThemeCheck
         end
       end
 
-      def path_to_paths(absolute_path_or_paths)
-        case absolute_path_or_paths
+      def as_array(maybe_array)
+        case maybe_array
         when Array
-          absolute_path_or_paths
+          maybe_array
         else
-          [absolute_path_or_paths]
+          [maybe_array]
         end
       end
 

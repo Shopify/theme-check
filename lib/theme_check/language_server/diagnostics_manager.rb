@@ -4,6 +4,11 @@ require "logger"
 module ThemeCheck
   module LanguageServer
     class DiagnosticsManager
+      # The empty array is used in the protocol to mean that no
+      # diagnostics exist for this file. It's not always evident when
+      # reading code.
+      NO_DIAGNOSTICS = [].freeze
+
       # This class exists to facilitate LanguageServer diagnostics tracking.
       #
       # Motivations:
@@ -49,27 +54,27 @@ module ThemeCheck
             # When doing single file checks, we keep the whole theme old
             # ones and accept the new single ones
             if only_single_file && analyzed_paths.include?(path)
-              single_file_diagnostics = current_diagnostics[path] || []
-              whole_theme_diagnostics = whole_theme_diagnostics(path) || []
+              single_file_diagnostics = current_diagnostics[path] || NO_DIAGNOSTICS
+              whole_theme_diagnostics = whole_theme_diagnostics(path) || NO_DIAGNOSTICS
               [path, single_file_diagnostics + whole_theme_diagnostics]
 
             # If doing single file checks that are not in the
             # analyzed_paths array then we just keep the old
             # diagnostics
             elsif only_single_file
-              [path, previous_diagnostics(path) || []]
+              [path, previous_diagnostics(path) || NO_DIAGNOSTICS]
 
             # When doing a full_check, we either send the current
             # diagnostics or an empty array to clear the diagnostics
             # for that file.
             elsif full_check
-              [path, current_diagnostics[path] || []]
+              [path, current_diagnostics[path] || NO_DIAGNOSTICS]
 
             # When doing a partial check, the single file diagnostics
             # from the previous runs should be sent. Otherwise the
             # latest results are the good ones.
             else
-              new_diagnostics = current_diagnostics[path] || []
+              new_diagnostics = current_diagnostics[path] || NO_DIAGNOSTICS
               should_use_cached_results = !analyzed_paths.include?(path)
               old_diagnostics = should_use_cached_results ? single_file_diagnostics(path) : []
               [path, new_diagnostics + old_diagnostics]
@@ -113,6 +118,13 @@ module ThemeCheck
         end.to_h
       end
 
+      # For when you know there shouldn't be anything on that file
+      # anymore. (e.g. file delete or file rename)
+      def clear_diagnostics(relative_path)
+        relative_path = sanitize_path(relative_path)
+        @latest_diagnostics.delete(relative_path)
+      end
+
       private
 
       def sanitize(diagnostics)
@@ -120,8 +132,17 @@ module ThemeCheck
         diagnostics
       end
 
+      def sanitize_path(relative_path)
+        case relative_path
+        when String
+          Pathname.new(relative_path)
+        else
+          relative_path
+        end
+      end
+
       def delete(relative_path, diagnostic)
-        relative_path = Pathname.new(relative_path) if relative_path.is_a?(String)
+        relative_path = sanitize_path(relative_path)
         @mutex.synchronize do
           @latest_diagnostics[relative_path]&.delete(diagnostic)
           @latest_diagnostics.delete(relative_path) if @latest_diagnostics[relative_path]&.empty?

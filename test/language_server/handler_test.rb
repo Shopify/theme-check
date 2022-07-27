@@ -11,7 +11,15 @@ module ThemeCheck
         @mock_messenger = MockMessenger.new
         @bridge = Bridge.new(@mock_messenger)
         @handler = Handler.new(@bridge)
-        @storage = make_file_system_storage("layout/theme.liquid" => "<html>hello world</html>")
+        @storage = make_file_system_storage(
+          "layout/theme.liquid" => "<html>hello world</html>",
+          "snippets/error.liquid" => "{% if unclosed %}",
+          ".theme-check.yml" => <<~YAML,
+            extends: nothing
+            SyntaxError:
+              enabled: true
+          YAML
+        )
       end
 
       def test_handle_initialize_no_path
@@ -49,15 +57,19 @@ module ThemeCheck
         })
       end
 
-      def test_handle_document_did_open
+      def test_handle_document_did_open_does_not_crash
         initialize!(1, nil, @storage.root)
-        @handler.on_text_document_did_open(nil, {
-          textDocument: {
-            text: @storage.read('layout/theme.liquid'),
-            uri: file_uri(@storage.path('layout/theme.liquid')),
-            version: 1,
-          },
-        })
+        did_open!('layout/theme.liquid')
+      end
+
+      def test_handle_document_did_open_checks_by_default
+        initialize!(1, nil, @storage.root)
+        did_open!('snippets/error.liquid')
+        assert_notification_received('textDocument/publishDiagnostics') do |params|
+          params[:diagnostics].find do |diagnostic|
+            diagnostic[:code] == "SyntaxError"
+          end
+        end
       end
 
       # issue 588
@@ -75,7 +87,6 @@ module ThemeCheck
       def test_handle_workspace_did_create_files
         initialize!(1, nil, @storage.root)
 
-        handler_storage = @handler.instance_variable_get('@storage')
         new_file_path = 'snippets/new.liquid'
 
         # here, we write to the file system without the handler knowing
@@ -100,7 +111,6 @@ module ThemeCheck
       def test_handle_workspace_did_delete_files
         initialize!(1, nil, @storage.root)
 
-        handler_storage = @handler.instance_variable_get('@storage')
         old_file_path = 'layout/theme.liquid'
 
         # here, we delete the file from the file system without the handler knowing
@@ -124,28 +134,12 @@ module ThemeCheck
       def test_handle_workspace_will_rename_files
         initialize!(1, nil, @storage.root)
 
-        handler_storage = @handler.instance_variable_get('@storage')
         old_file_path = 'layout/theme.liquid'
         new_file_path = 'layout/theme2.liquid'
 
-        # here, we rename the file
-        @storage.write(new_file_path, @storage.read(old_file_path))
-        @storage.remove(old_file_path)
-
-        # we make sure the handler doesn't know
-        assert(handler_storage.read(old_file_path))
-        refute(handler_storage.read(new_file_path))
-
         # We send a workspace/willRenameFiles request to the server
         # and ask for potential WorkspaceEdits in response
-        @handler.on_workspace_will_rename_files(2, {
-          files: [
-            {
-              oldUri: file_uri(@storage.path(old_file_path)),
-              newUri: file_uri(@storage.path(new_file_path)),
-            },
-          ],
-        })
+        will_rename!(old_file_path, new_file_path)
 
         # We respond nil here because we're not doing a
         # WorkspaceEdit in response to the rename.
@@ -161,13 +155,92 @@ module ThemeCheck
         assert_equal(handler_storage.read(new_file_path), '<html>hello world</html>')
       end
 
+      def test_handle_workspace_will_rename_files_diagnostics_handling
+        initialize!(1, nil, @storage.root)
+        old_file_path = "snippets/error.liquid"
+        new_file_path = "snippets/error2.liquid"
+
+        # opening the file
+        did_open!(old_file_path)
+
+        # expecting diagnostics to be received
+        assert_notification_received("textDocument/publishDiagnostics") do |params|
+          params[:uri] == file_uri(@storage.path(old_file_path)) &&
+            !params[:diagnostics].empty?
+        end
+
+        # renaming file
+        will_rename!(old_file_path, new_file_path)
+
+        # expecting diagnostics to be flushed for old file
+        assert_notification_received("textDocument/publishDiagnostics") do |params|
+          params[:uri] == file_uri(@storage.path(old_file_path)) &&
+            params[:diagnostics].empty?
+        end
+
+        # expecting diagnostics to be added to new file
+        assert_notification_received("textDocument/publishDiagnostics") do |params|
+          params[:uri] == file_uri(@storage.path(new_file_path)) &&
+            !params[:diagnostics].empty?
+        end
+      end
+
       private
+
+      def handler_storage
+        @handler.instance_variable_get('@storage')
+      end
 
       def initialize!(id, root_uri_path, root_path = nil)
         @handler.on_initialize(id, {
           rootUri: file_uri(root_uri_path),
           rootPath: root_path,
         })
+      end
+
+      def did_open!(relative_path)
+        @handler.on_text_document_did_open(nil, {
+          textDocument: {
+            text: @storage.read(relative_path),
+            uri: file_uri(@storage.path(relative_path)),
+            version: 1,
+          },
+        })
+      end
+
+      def will_rename!(old_file_path, new_file_path)
+        # here, we rename the file
+        @storage.write(new_file_path, @storage.read(old_file_path))
+        @storage.remove(old_file_path)
+
+        # we make sure the handler doesn't know
+        assert(handler_storage.read(old_file_path))
+        refute(handler_storage.read(new_file_path))
+
+        @handler.on_workspace_will_rename_files(2, {
+          files: [
+            {
+              oldUri: file_uri(@storage.path(old_file_path)),
+              newUri: file_uri(@storage.path(new_file_path)),
+            },
+          ],
+        })
+      end
+
+      # @param method [String]
+      # @param &pred [Block] - a predicate (params) => Boolean
+      def assert_notification_received(method, &pred)
+        notifications = @mock_messenger.sent_messages
+          .filter { |message| message[:method] == method }
+        refute_empty(notifications)
+
+        return unless pred
+
+        notification = notifications
+          .map { |message| message[:params] }
+          .reverse!
+          .find(&pred)
+        assert(notification, "Did not find message matching predicate in #{JSON.pretty_generate(notifications)}")
       end
     end
   end

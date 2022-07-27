@@ -41,6 +41,7 @@ module ThemeCheck
       json_file_count + liquid_file_count
     end
 
+    # Returns all offenses for all files in theme
     def analyze_theme
       reset
 
@@ -60,9 +61,19 @@ module ThemeCheck
         @json_checks.call(:on_file, json_file)
       end
 
-      finish
+      finish(false)
+
+      offenses
     end
 
+    # When only_single_file is false:
+    #   Runs single file checks for each file in `files`
+    #   Runs whole theme checks
+    #   Returns single file checks offenses for file in `files` + whole theme checks
+    # When only_single_file is true:
+    #   Runs single file checks for each file in `files`
+    #   Does not run whole theme checks
+    #   Returns single file checks offenses for file in `files`
     def analyze_files(files, only_single_file: false)
       reset
 
@@ -103,6 +114,8 @@ module ThemeCheck
       end
 
       finish(only_single_file)
+
+      offenses
     end
 
     def uncorrectable_offenses
@@ -158,8 +171,6 @@ module ThemeCheck
       @disabled_checks.remove_disabled_offenses(@liquid_checks)
       @disabled_checks.remove_disabled_offenses(@json_checks)
       @disabled_checks.remove_disabled_offenses(@html_checks)
-
-      offenses
     end
   end
 end
