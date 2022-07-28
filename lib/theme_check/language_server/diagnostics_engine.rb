@@ -24,7 +24,7 @@ module ThemeCheck
         theme = ThemeCheck::Theme.new(storage)
         analyzer = ThemeCheck::Analyzer.new(theme, config.enabled_checks)
 
-        if (!only_single_file && @diagnostics_manager.first_run?) || force
+        if !only_single_file && (@diagnostics_manager.first_run? || force)
           run_full_theme_check(analyzer)
         else
           run_partial_theme_check(absolute_path_or_paths, theme, analyzer, only_single_file)
