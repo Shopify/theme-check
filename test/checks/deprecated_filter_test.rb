@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "test_helper"
 
 class DeprecatedFilterTest < Minitest::Test
@@ -52,7 +53,6 @@ class DeprecatedFilterTest < Minitest::Test
         {{ product.featured_image | img_url: '4000x', scale: 2 }}
 
         // not supported:
-        {{ product.featured_image | img_url: 'small' }}
         {{ product.featured_image | img_url: variable }}
         {{ product.featured_image | img_url: '200x', scale: variable }}
       END
@@ -82,13 +82,67 @@ class DeprecatedFilterTest < Minitest::Test
         {{ product.featured_image | image_url: width: 5760 }}
 
         // not supported:
-        {{ product.featured_image | img_url: 'small' }}
         {{ product.featured_image | img_url: variable }}
         {{ product.featured_image | img_url: '200x', scale: variable }}
       LIQUID
     }
     sources.each do |path, source|
       assert_equal(expected_sources[path], source)
+    end
+  end
+
+  def test_fixes_img_url_named_sizes
+    named_sizes = [
+      ["pico", 16],
+      ["icon", 32],
+      ["thumb", 50],
+      ["small", 100],
+      ["compact", 160],
+      ["medium", 240],
+      ["large", 480],
+      ["grande", 600],
+      ["original", 1024],
+    ]
+    named_sizes.each do |(name, size)|
+      sources = fix_theme(
+        ThemeCheck::DeprecatedFilter.new,
+        "templates/index.liquid" => <<~END,
+          {{ product.featured_image | img_url: '#{name}', scale: 2, crop: 'center' }}
+          {{ product.featured_image | img_url: '#{name}', scale: 2 }}
+          {{ product.featured_image | img_url: '#{name}' }}
+        END
+      )
+      expected_sources = {
+        "templates/index.liquid" => <<~LIQUID,
+          {{ product.featured_image | image_url: width: #{size * 2}, height: #{size * 2}, crop: 'center' }}
+          {{ product.featured_image | image_url: width: #{size * 2}, height: #{size * 2} }}
+          {{ product.featured_image | image_url: width: #{size}, height: #{size} }}
+        LIQUID
+      }
+      sources.each do |path, source|
+        assert_equal(expected_sources[path], source, name)
+      end
+    end
+  end
+
+  def test_fixes_img_url_master
+    sources = fix_theme(
+      ThemeCheck::DeprecatedFilter.new,
+      "templates/index.liquid" => <<~END,
+        {{ product.featured_image | img_url: 'master', scale: 2, crop: 'center' }}
+        {{ product.featured_image | img_url: 'master', scale: 2 }}
+        {{ product.featured_image | img_url: 'master' }}
+      END
+    )
+    expected_sources = {
+      "templates/index.liquid" => <<~LIQUID,
+        {{ product.featured_image | image_url: crop: 'center' }}
+        {{ product.featured_image | image_url }}
+        {{ product.featured_image | image_url }}
+      LIQUID
+    }
+    sources.each do |path, source|
+      assert_equal(expected_sources[path], source, name)
     end
   end
 end

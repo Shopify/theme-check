@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module ThemeCheck
   class DeprecatedFilter < LiquidCheck
     doc docs_url(__FILE__)
@@ -8,6 +9,19 @@ module ThemeCheck
     # The image_url filter does not accept width or height values
     # greater than this numbr.
     MAX_SIZE = 5760
+    SIZE_REGEX = /^\d*x\d*$/
+    NAMED_SIZES = {
+      "pico" => 16,
+      "icon" => 32,
+      "thumb" => 50,
+      "small" => 100,
+      "compact" => 160,
+      "medium" => 240,
+      "large" => 480,
+      "grande" => 600,
+      "original" => 1024,
+      "master" => nil,
+    }
 
     def on_variable(node)
       used_filters = node.filters.map { |name, *_rest| name }
@@ -40,19 +54,29 @@ module ThemeCheck
 
       # Can't correct those.
       return add_default_offense(node, 'img_url', ['image_url']) unless
-       (size_spec.nil? || size_spec.is_a?(String)) &&
-       (scale.nil? || scale.is_a?(Numeric)) &&
-       size_spec != 'small'
+        (size_spec.nil? || size_spec.is_a?(String)) &&
+          (scale.nil? || scale.is_a?(Numeric))
+
+      return add_default_offense(node, 'img_url', ['image_url']) if
+        size_spec.is_a?(String) &&
+          size_spec !~ SIZE_REGEX &&
+          !NAMED_SIZES.key?(size_spec)
 
       node_source = node.markup
+
       node_start_index = node.start_index
       match = node_source.match(/img_url[^|]*/)
       img_url_character_range =
         (node_start_index + match.begin(0))...(node_start_index + match.end(0))
 
       scale = (scale || 1).to_i
-      width, height = (size_spec&.split('x') || [100, 100])
-        .map { |v| v.to_i * scale }
+      width, height = if size_spec.nil?
+        [100, 100]
+      elsif NAMED_SIZES.key?(size_spec)
+        [NAMED_SIZES[size_spec], NAMED_SIZES[size_spec]]
+      else
+        size_spec.split('x')
+      end.map { |v| v.to_i * scale }
 
       image_url_filter_params = [
         width && width > 0 ? "width: #{[width, MAX_SIZE].min}" : nil,
