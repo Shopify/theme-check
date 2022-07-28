@@ -12,6 +12,16 @@ module ThemeCheck
         version: ThemeCheck::VERSION,
       }
 
+      # https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#fileOperationFilter
+      FILE_OPERATION_FILTER = {
+        filters: [{
+          scheme: 'file',
+          pattern: {
+            glob: '**/*',
+          },
+        }],
+      }
+
       CAPABILITIES = {
         completionProvider: {
           triggerCharacters: ['.', '{{ ', '{% '],
@@ -32,6 +42,13 @@ module ThemeCheck
           change: TextDocumentSyncKind::FULL,
           willSave: false,
           save: true,
+        },
+        workspace: {
+          fileOperations: {
+            didCreate: FILE_OPERATION_FILTER,
+            didDelete: FILE_OPERATION_FILTER,
+            willRename: FILE_OPERATION_FILTER,
+          },
         },
       }
 
@@ -65,6 +82,7 @@ module ThemeCheck
 
       def on_initialized(_id, _params)
         return unless @configuration
+
         @configuration.fetch
         @configuration.register_did_change_capability
       end
@@ -91,9 +109,17 @@ module ThemeCheck
 
       def on_text_document_did_close(_id, params)
         relative_path = relative_path_from_text_document_uri(params)
-        file_system_content = Pathname.new(text_document_uri(params)).read(mode: 'rb', encoding: 'UTF-8')
-        # On close, the file system becomes the source of truth
-        @storage.write(relative_path, file_system_content, nil)
+        begin
+          file_system_content = Pathname.new(text_document_uri(params)).read(mode: 'rb', encoding: 'UTF-8')
+          # On close, the file system becomes the source of truth
+          @storage.write(relative_path, file_system_content, nil)
+
+        # the file no longer exists because either the user deleted it, or the user renamed it.
+        rescue Errno::ENOENT
+          @storage.remove(relative_path)
+        ensure
+          @diagnostics_engine.clear_diagnostics(relative_path) if @configuration.only_single_file?
+        end
       end
 
       def on_text_document_did_save(_id, params)
@@ -123,6 +149,52 @@ module ThemeCheck
           end_position,
           only_code_action_kinds,
         ))
+      end
+
+      def on_workspace_did_create_files(_id, params)
+        paths = params[:files]
+          &.map { |file| file[:uri] }
+          &.map { |uri| file_path(uri) }
+        return unless paths
+
+        paths.each do |path|
+          relative_path = @storage.relative_path(path)
+          file_system_content = Pathname.new(path).read(mode: 'rb', encoding: 'UTF-8')
+          @storage.write(relative_path, file_system_content, nil)
+        end
+      end
+
+      def on_workspace_did_delete_files(_id, params)
+        absolute_paths = params[:files]
+          &.map { |file| file[:uri] }
+          &.map { |uri| file_path(uri) }
+        return unless absolute_paths
+
+        absolute_paths.each do |path|
+          relative_path = @storage.relative_path(path)
+          @storage.remove(relative_path)
+        end
+
+        analyze_and_send_offenses(absolute_paths)
+      end
+
+      # We're using workspace/willRenameFiles here because we want this to run
+      # before textDocument/didOpen and textDocumetn/didClose of the files
+      # (which might trigger another theme analysis).
+      def on_workspace_will_rename_files(id, params)
+        relative_paths = params[:files]
+          &.map { |file| [file[:oldUri], file[:newUri]] }
+          &.map { |(old_uri, new_uri)| [relative_path_from_uri(old_uri), relative_path_from_uri(new_uri)] }
+        return @bridge.send_response(id, nil) unless relative_paths
+
+        relative_paths.each do |(old_path, new_path)|
+          @storage.write(new_path, @storage.read(old_path), nil)
+          @storage.remove(old_path)
+        end
+        @bridge.send_response(id, nil)
+
+        absolute_paths = relative_paths.flatten(2).map { |p| @storage.path(p) }
+        analyze_and_send_offenses(absolute_paths)
       end
 
       def on_workspace_execute_command(id, params)
@@ -159,6 +231,10 @@ module ThemeCheck
         file_path(params.dig(:textDocument, :uri))
       end
 
+      def relative_path_from_uri(uri)
+        @storage.relative_path(file_path(uri))
+      end
+
       def relative_path_from_text_document_uri(params)
         @storage.relative_path(text_document_uri(params))
       end
@@ -185,15 +261,16 @@ module ThemeCheck
         params.dig(:contentChanges, 0, :text)
       end
 
-      def config_for_path(path)
+      def config_for_path(path_or_paths)
+        path = path_or_paths.is_a?(Array) ? path_or_paths[0] : path_or_paths
         root = ThemeCheck::Config.find(path) || @root_path
         ThemeCheck::Config.from_path(root)
       end
 
-      def analyze_and_send_offenses(absolute_path, only_single_file: nil)
+      def analyze_and_send_offenses(absolute_path_or_paths, only_single_file: nil)
         @diagnostics_engine.analyze_and_send_offenses(
-          absolute_path,
-          config_for_path(absolute_path),
+          absolute_path_or_paths,
+          config_for_path(absolute_path_or_paths),
           only_single_file: only_single_file.nil? ? @configuration.only_single_file? : only_single_file
         )
       end
