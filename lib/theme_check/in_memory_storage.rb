@@ -9,7 +9,7 @@ module ThemeCheck
     attr_reader :root
 
     def initialize(files = {}, root = "/dev/null")
-      @files = files
+      @files = files # Hash<String, String>
       @root = Pathname.new(root)
     end
 
