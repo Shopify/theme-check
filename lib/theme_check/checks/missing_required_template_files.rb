@@ -33,7 +33,11 @@ module ThemeCheck
           if REQUIRED_LIQUID_TEMPLATE_FILES.include?(file)
             corrector.create_file(@theme.storage, "#{file}.liquid", "")
           else
-            corrector.create_file(@theme.storage, "#{file}.json", "")
+            corrector.create_file(@theme.storage, "#{file}.json", JSON.pretty_generate({
+              name: "TODO",
+              sections: {},
+              order: [],
+            }))
           end
         end
       end
