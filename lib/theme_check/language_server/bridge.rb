@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "timeout"
+
 # This class exists as a bridge (or boundary) between our handlers and the outside world.
 #
 # It is concerned with all the Language Server Protocol constructs. i.e.
@@ -78,12 +80,17 @@ module ThemeCheck
 
       # https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#responseError
       def send_internal_error(id, e)
+        # For a reason I can't comprehend, sometimes
+        # e.full_message _hangs_ and brings your CPU to 100%.
+        # It's wrapped in here because it prints anyway...
+        # This shit is weird, yo.
+        Timeout.timeout(1) do
+          $stderr.puts e.full_message
+        end
+      ensure
         send_response(id, nil, {
           code: ErrorCodes::INTERNAL_ERROR,
-          message: <<~EOS,
-            #{e.class}: #{e.message}
-              #{e.backtrace.join("\n  ")}
-          EOS
+          message: "A theme-check-language-server has occured, inspect OUTPUT logs for details.",
         })
       end
 

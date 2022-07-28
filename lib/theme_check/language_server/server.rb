@@ -1,6 +1,8 @@
 # frozen_string_literal: true
+
 require 'json'
 require 'stringio'
+require 'timeout'
 
 module ThemeCheck
   module LanguageServer
@@ -45,10 +47,29 @@ module ThemeCheck
       def listen
         start_handler_threads
         start_json_rpc_thread
-        status_code = status_code_from_error(@error.pop)
+        err = @error.pop
+        status_code = status_code_from_error(err)
+
+        if status_code > 0
+          # For a reason I can't comprehend, this hangs but prints
+          # anyway. So it's wrapped in this ugly timeout...
+          Timeout.timeout(1) do
+            $stderr.puts err.full_message
+          end
+
+          # Warn user of error, otherwise server might restart
+          # without telling you.
+          @bridge.send_notification("window/showMessage", {
+            type: 1,
+            message: "A theme-check-language-server error has occurred, search OUTPUT logs for details.",
+          })
+        end
+
         cleanup(status_code)
       rescue SignalException
         0
+      rescue StandardError
+        2
       end
 
       def start_json_rpc_thread
@@ -65,24 +86,31 @@ module ThemeCheck
             else
               @queue << message
             end
-          rescue Exception => e # rubocop:disable Lint/RescueException
-            break @error << e
           end
+        rescue Exception => e # rubocop:disable Lint/RescueException
+          @bridge.log("rescuing #{e.class} in jsonrpc thread")
+          @error << e
         end
       end
 
       def start_handler_threads
         @number_of_threads.times do
           @handlers << Thread.new do
-            loop do
-              message = @queue.pop
-              break if @queue.closed? && @queue.empty?
-              handle_message(message)
-            rescue Exception => e # rubocop:disable Lint/RescueException
-              break @error << e
-            end
+            handle_messages
           end
         end
+      end
+
+      def handle_messages
+        loop do
+          message = @queue.pop
+          return if @queue.closed? && @queue.empty?
+
+          handle_message(message)
+        end
+      rescue Exception => e # rubocop:disable Lint/RescueException
+        @bridge.log("rescuing #{e.class} in handler thread")
+        @error << e
       end
 
       def status_code_from_error(e)
@@ -91,10 +119,10 @@ module ThemeCheck
       # support ctrl+c and stuff
       rescue SignalException, DoneStreaming
         0
-
       rescue Exception => e # rubocop:disable Lint/RescueException
         raise e if should_raise_errors
-        @bridge.log("#{e.class}: #{e.message}\n#{e.backtrace.join("\n")}")
+
+        @bridge.log("Fatal #{e.class}")
         2
       end
 
@@ -109,15 +137,14 @@ module ThemeCheck
         if @handler.respond_to?(method_name)
           @handler.send(method_name, id, params)
         end
-
       rescue DoneStreaming => e
         raise e
       rescue StandardError => e
         is_request = id
         raise e unless is_request
+
         # Errors obtained in request handlers should be sent
         # back as internal errors instead of closing the program.
-        @bridge.log("#{e.class}: #{e.message}\n#{e.backtrace.join("\n")}")
         @bridge.send_internal_error(id, e)
       end
 
@@ -132,6 +159,7 @@ module ThemeCheck
       end
 
       def cleanup(status_code)
+        @bridge.log("Closing server... status code = #{status_code}")
         # Stop listenting to RPC calls
         @messenger.close_input
         # Wait for rpc loop to close
