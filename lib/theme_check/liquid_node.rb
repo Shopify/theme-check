@@ -7,6 +7,7 @@ module ThemeCheck
 
     def initialize(value, parent, theme_file)
       raise ArgumentError, "Expected a Liquid AST Node" if value.is_a?(LiquidNode)
+
       @value = value
       @parent = parent
       @theme_file = theme_file
@@ -37,7 +38,9 @@ module ThemeCheck
             node
           end
         end
-        nodes.map { |node| LiquidNode.new(node, self, @theme_file) }
+        nodes
+          .reject(&:nil?) # We don't want nil nodes, and they can happen
+          .map { |node| LiquidNode.new(node, self, @theme_file) }
       end
     end
 
@@ -75,11 +78,13 @@ module ThemeCheck
 
     def inner_markup
       return '' unless block?
+
       @inner_markup ||= source[block_start_end_index...block_end_start_index]
     end
 
     def inner_json
       return nil unless schema?
+
       @inner_json ||= JSON.parse(inner_markup)
     rescue JSON::ParserError
       # Handled by ValidSchema
@@ -186,11 +191,31 @@ module ThemeCheck
 
     def filters
       raise TypeError, "Attempting to lookup filters of #{type_name}. Only variables have filters." unless variable?
+
       @value.filters
     end
 
     def source
       theme_file&.source
+    end
+
+    # For debugging purposes, this might be easier for the eyes.
+    def to_h
+      if literal?
+        return @value
+      elsif variable_lookup?
+        return {
+          type_name: type_name,
+          name: value.name.to_s,
+          lookups: children.map(&:to_h),
+        }
+      end
+
+      {
+        type_name: type_name,
+        markup: outer_markup,
+        children: children.map(&:to_h),
+      }
     end
 
     def block_start_markup
@@ -217,11 +242,13 @@ module ThemeCheck
 
     def block_end_start_index
       return block_start_end_index unless tag? && block?
+
       @block_end_start_index ||= block_end_match&.begin(0) || block_start_end_index
     end
 
     def block_end_end_index
       return block_end_start_index unless tag? && block?
+
       @block_end_end_index ||= block_end_match&.end(0) || block_start_end_index
     end
 
