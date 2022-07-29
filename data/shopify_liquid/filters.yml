@@ -19,7 +19,9 @@ Liquid::StandardFilters:
 - remove
 - sort_natural
 - replace_first
+- replace_last
 - remove_first
+- remove_last
 - newline_to_br
 - upcase
 - downcase
