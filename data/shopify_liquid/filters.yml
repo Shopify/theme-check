@@ -1,4 +1,20 @@
 ---
+# Here's an example workflow that's going to get ya the list of filters available
+# ```bash
+# spin up storefront-renderer
+# spin ssh
+# cd storefront-renderer
+# bundle exec rake console
+# ```
+# ```ruby
+# Pathname(ENV["HOME"]).join('filters.yml').write(YAML.dump(Liquid::StrainerFactory.global_filter_names))
+# ```
+# ```bash
+# exit
+# scp $(spin show -o fqdn):/filters.yml .
+# ```
+# The list of filters is now in a file named filters.yml in your $(pwd).
+# Note that it'll probably need a bit of massaging before including here...
 Liquid::StandardFilters:
 - times
 - h
