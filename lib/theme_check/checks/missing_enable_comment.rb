@@ -16,6 +16,10 @@ module ThemeCheck
       @disabled_checks.update(node)
     end
 
+    def on_inline_comment(node)
+      @disabled_checks.update(node)
+    end
+
     def after_document(node)
       checks_missing_end_index = @disabled_checks.checks_missing_end_index
       return if checks_missing_end_index.empty?

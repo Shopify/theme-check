@@ -158,6 +158,11 @@ module ThemeCheck
       @value.is_a?(Liquid::Comment)
     end
 
+    # {% # comment %}
+    def inline_comment?
+      @value.is_a?(Liquid::InlineComment)
+    end
+
     # Top level node of every liquid_file.
     def document?
       @value.is_a?(Liquid::Document)

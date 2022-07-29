@@ -9,7 +9,7 @@ This check is aimed at eliminating the use of translations that do not exist.
 :-1: Examples of **incorrect** code for this check:
 
 ```liquid
-{% comment %}locales/en.default.json{% endcomment %}
+{% # locales/en.default.json %}
 {
   "greetings": "Hello, world!",
   "general": {
@@ -17,14 +17,14 @@ This check is aimed at eliminating the use of translations that do not exist.
   }
 }
 
-{% comment %}templates/index.liquid{% endcomment %}
+{% # templates/index.liquid %}
 {{ "notfound" | t }}
 ```
 
 :+1: Examples of **correct** code for this check:
 
 ```liquid
-{% comment %}locales/en.default.json{% endcomment %}
+{% # locales/en.default.json %}
 {
   "greetings": "Hello, world!",
   "general": {
@@ -32,7 +32,7 @@ This check is aimed at eliminating the use of translations that do not exist.
   }
 }
 
-{% comment %}templates/index.liquid{% endcomment %}
+{% # templates/index.liquid %}
 {{ "greetings" | t }}
 {{ "general.close" | t }}
 ```

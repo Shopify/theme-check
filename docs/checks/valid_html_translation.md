@@ -18,7 +18,7 @@ This check is aimed at eliminating invalid HTML in translations.
 :+1: Examples of **correct** code for this check:
 
 ```liquid
-{% comment %}locales/en.default.json{% endcomment %}
+{% # locales/en.default.json %}
 {
   "hello_html": "<h1>Hello, world</h1>",
   "image_html": "<img src='spongebob.png'>",

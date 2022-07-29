@@ -115,32 +115,31 @@ See [config/default.yml](config/default.yml) for available options & defaults.
 Use Liquid comments to disable and re-enable all checks for a section of your template:
 
 ```liquid
-{% comment %}theme-check-disable{% endcomment %}
+{% # theme-check-disable %}
 {% assign x = 1 %}
-{% comment %}theme-check-enable{% endcomment %}
+{% # theme-check-enable %}
 ```
 
 Disable a specific check by including it in the comment:
 
 ```liquid
-{% comment %}theme-check-disable UnusedAssign{% endcomment %}
+{% # theme-check-disable UnusedAssign %}
 {% assign x = 1 %}
-{% comment %}theme-check-enable UnusedAssign{% endcomment %}
+{% # theme-check-enable UnusedAssign %}
 ```
 
 Disable multiple checks by including them as a comma-separated list:
 
 ```liquid
-{% comment %}theme-check-disable UnusedAssign,SpaceInsideBraces{% endcomment %}
+{% # theme-check-disable UnusedAssign,SpaceInsideBraces %}
 {%assign x = 1%}
-{% comment %}theme-check-enable UnusedAssign,SpaceInsideBraces{% endcomment %}
+{% # theme-check-enable UnusedAssign,SpaceInsideBraces %}
 ```
 
 Disable checks for the _entire document_ by placing the comment on the first line:
 
 ```liquid
-{% comment %}theme-check-disable SpaceInsideBraces{% endcomment %}
-
+{% # theme-check-disable SpaceInsideBraces %}
 {%assign x = 1%}
 ```
 

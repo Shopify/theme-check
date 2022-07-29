@@ -67,7 +67,12 @@ module ThemeCheck
     private
 
     def comment_text(node)
-      node.value.nodelist.join
+      case node.type_name
+      when :comment
+        node.value.nodelist.join
+      when :inline_comment
+        node.markup.sub(/\s*#+\s*/, '')
+      end
     end
 
     def start_disabling?(text)
