@@ -8,7 +8,7 @@ module ThemeCheck
 
     def initialize(files, root = "/dev/null")
       super(files, root)
-      @versions = {}
+      @versions = {} # Hash<relative_path, number>
       @mutex = Mutex.new
     end
 
@@ -49,7 +49,11 @@ module ThemeCheck
     #   - Only offer fixes on "clean" files (or offer the change but specify the version so the editor knows what to do with it)
     def write(relative_path, content, version)
       @mutex.synchronize do
-        @versions[relative_path] = version
+        if version.nil?
+          @versions.delete(relative_path)
+        else
+          @versions[relative_path] = version
+        end
         super(relative_path, content)
       end
     end
@@ -71,6 +75,10 @@ module ThemeCheck
 
     def version(relative_path)
       @versions[relative_path.to_s]
+    end
+
+    def opened_files
+      @versions.keys
     end
   end
 end

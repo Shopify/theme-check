@@ -7,17 +7,18 @@ module ThemeCheck
 
       command "runChecks"
 
-      def initialize(diagnostics_engine, root_path, root_config)
+      def initialize(diagnostics_engine, storage, linter_config, language_server_config)
         @diagnostics_engine = diagnostics_engine
-        @root_path = root_path
-        @root_config = root_config
+        @storage = storage
+        @linter_config = linter_config
+        @language_server_config = language_server_config
       end
 
       def execute(_args)
         @diagnostics_engine.analyze_and_send_offenses(
-          @root_path,
-          @root_config,
-          only_single_file: false,
+          @storage.opened_files.map { |relative_path| @storage.path(relative_path) },
+          @linter_config,
+          only_single_file: @language_server_config.only_single_file?,
           force: true
         )
         nil
