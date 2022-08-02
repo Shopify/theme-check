@@ -26,6 +26,8 @@ class UnusedAssignTest < Minitest::Test
         {{ 'a' | t: tags: c }}
         {% assign d = 1 %}
         {% render 'foo' with d %}
+        {% assign e = "01234" | split: "" %}
+        {% render 'foo' for e as item %}
       END
     )
     assert_offenses("", offenses)
