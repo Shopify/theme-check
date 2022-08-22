@@ -33,7 +33,22 @@ module ThemeCheck
 
     def source_excerpt(line)
       original_lines = source.split("\n")
-      original_lines[line - 1].strip
+      original_lines[bounded(0, line - 1, original_lines.size - 1)].strip
+    rescue => e
+      ThemeCheck.bug(<<~EOS)
+        Exception while running `source_excerpt(#{line})`:
+        ```
+        #{e.class}: #{e.message}
+          #{e.backtrace.join("\n  ")}
+        ```
+
+        path: #{path}
+
+        source:
+        ```
+        #{source}
+        ```
+      EOS
     end
 
     def parse
@@ -56,6 +71,12 @@ module ThemeCheck
         error_mode: :warn,
         disable_liquid_c_nodes: true,
       )
+    end
+
+    private
+
+    def bounded(lower, x, upper)
+      [lower, [x, upper].min].max
     end
   end
 end
