@@ -1,4 +1,45 @@
 
+v1.11.0 / 2022-08-22
+====================
+
+## TL;DR
+
+  * New check, overdue fixes and dropped support for ruby 2.6.
+
+## Features
+
+  * :new: [AssetPreload](https://github.com/Shopify/theme-check/blob/main/docs/checks/asset_preload.md) check ([#605](https://github.com/shopify/theme-check/issues/605)). Thanks @krzksz!
+    * Encourages the use of the new platform features for some sweet 103 Early Hints gains powered by the `preload_tag` and `preload: true` media filter argument.
+
+## Fixes:
+
+### General
+
+  * Add support for new comment syntax `{% # this is an inline comment %}` ([#533](https://github.com/shopify/theme-check/issues/533))
+  * Fix UnusedAssign false positives from `{% render ... with|for var %}` ([#608](https://github.com/shopify/theme-check/issues/608))
+  * Update list of platform filters ([#626](https://github.com/shopify/theme-check/issues/626))
+
+### Language Server
+
+  * Make `runChecks` command respect `onlySingleFileChecks` LSP config ([#624](https://github.com/shopify/theme-check/issues/624))
+  * Handle file delete|rename ([#611](https://github.com/shopify/theme-check/issues/611))
+  * Prevent server from hanging on error ([#623](https://github.com/shopify/theme-check/issues/623))
+
+### Linter
+
+  * Help migrate named sizes (master|pico|etc.) in `img_url` with `DeprecatedFilter` corrector ([#619](https://github.com/shopify/theme-check/issues/619))
+  * Fix MissingTemplate `ignore` config interactions (#613)
+  * Fix MissingRequiredTemplateFiles JSON file corrector ([#616](https://github.com/shopify/theme-check/issues/616))
+  * Fixes theme-check-disable when disable comment is followed by another (#617)
+  * Fix handling of `{% render block %}` in UnusedSnippet ([#615](https://github.com/shopify/theme-check/issues/615))
+  * Fix IndexError: string not matched in matching translation keys fixer ([#602](https://github.com/shopify/theme-check/issues/602))
+  * Handle variable lookup as names in UnusedAssign ([#612](https://github.com/shopify/theme-check/issues/612))
+
+## Breaking change (maybe)
+
+  * Bump min version of ruby to 2.7 ([#609](https://github.com/shopify/theme-check/issues/609))
+    * Upstream change from Shopify/liquid as ruby 2.6 is now EOL.
+
 v1.10.3 / 2022-06-16
 ==================
 

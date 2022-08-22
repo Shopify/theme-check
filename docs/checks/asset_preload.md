@@ -1,6 +1,6 @@
 # Prevent Manual Preloading of Assets (`AssetPreload`)
 
-_Version THEME_CHECK_VERSION+_
+_Version 1.11.0+_
 
 Preloading can be a useful way of making sure that critical assets are downloaded by the browser as soon as possible for better rendering performance.
 
