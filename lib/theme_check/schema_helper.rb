@@ -6,9 +6,11 @@ module ThemeCheck
     def self.set(hash, path, value)
       path = path.split('.') if path.is_a?(String)
       path.each_with_index.reduce(hash) do |pointer, (token, index)|
-        if index == path.size - 1
+        if index == path.size - 1 # Last element
           pointer[token] = value
-        elsif !pointer.key?(token) || !pointer[token].is_a?(Hash)
+        elsif !pointer.key?(token) # Parent (pointer) does not a value for token
+          pointer[token] = {}
+        elsif !pointer[token].is_a?(Hash) # Parent's (pointer) value for token is not a Hash, for example: String
           pointer[token] = {}
         end
         pointer[token]
