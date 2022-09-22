@@ -23,6 +23,10 @@ module ThemeCheck
       end
     end
 
+    def resources
+      @liquid_checks.flat_map(&:resources)
+    end
+
     def offenses
       @liquid_checks.flat_map(&:offenses) +
         @json_checks.flat_map(&:offenses) +
@@ -59,6 +63,8 @@ module ThemeCheck
         yield(json_file.relative_path.to_s, liquid_file_count + i, total_file_count) if block_given?
         @json_checks.call(:on_file, json_file)
       end
+
+      puts resources.map(&:as_json)
 
       finish
     end

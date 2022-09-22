@@ -44,6 +44,12 @@ require_relative "theme_check/corrector"
 require_relative "theme_check/liquid_visitor"
 require_relative "theme_check/html_visitor"
 require_relative "theme_check/language_server"
+require_relative "theme_check/shopify_liquid/drop_schema.rb"
+require_relative "theme_check/shopify_liquid/drop_schemas.rb"
+require_relative "theme_check/shopify_liquid/template_schema.rb"
+require_relative "theme_check/shopify_liquid/template_schemas.rb"
+
+Dir[__dir__ + "/theme_check/resources/*.rb"].each { |file| require file }
 
 Dir[__dir__ + "/theme_check/checks/*.rb"].each { |file| require file }
 

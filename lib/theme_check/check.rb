@@ -87,6 +87,14 @@ module ThemeCheck
       end
     end
 
+    def resources
+      @resources ||= []
+    end
+
+    def add_resource(resource)
+      resources << resource
+    end
+
     def offenses
       @offenses ||= []
     end
