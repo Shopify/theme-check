@@ -14,3 +14,6 @@ Gemfile.lock
 packaging/builds
 .vscode
 *.DS_Store
+
+# Theme Liquid docs live at git@github.com:Shopify/theme-liquid-docs.git,
+/data/shopify_liquid/documentation/
