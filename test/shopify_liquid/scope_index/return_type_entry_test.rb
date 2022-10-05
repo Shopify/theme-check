@@ -4,7 +4,7 @@ require 'test_helper'
 
 module ThemeCheck
   module ShopifyLiquid
-    class ScopeIndex
+    class SourceIndex
       class ReturnTypeEntryTest < Minitest::Test
         def test_to_s
           entry = ReturnTypeEntry.new('type' => 'string')

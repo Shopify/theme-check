@@ -4,7 +4,7 @@ require 'test_helper'
 
 module ThemeCheck
   module ShopifyLiquid
-    class ScopeIndex
+    class SourceIndex
       class TagEntryTest < Minitest::Test
         def setup
           @entry = TagEntry.new(hash)

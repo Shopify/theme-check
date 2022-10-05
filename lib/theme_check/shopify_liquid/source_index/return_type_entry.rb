@@ -2,7 +2,7 @@
 
 module ThemeCheck
   module ShopifyLiquid
-    class ScopeIndex
+    class SourceIndex
       class ReturnTypeEntry < BaseEntry
         def summary
           nil

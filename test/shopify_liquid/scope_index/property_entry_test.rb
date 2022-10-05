@@ -4,7 +4,7 @@ require 'test_helper'
 
 module ThemeCheck
   module ShopifyLiquid
-    class ScopeIndex
+    class SourceIndex
       class PropertyEntryTest < Minitest::Test
         def setup
           @entry = PropertyEntry.new(hash)

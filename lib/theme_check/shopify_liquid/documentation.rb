@@ -7,19 +7,19 @@ module ThemeCheck
     class Documentation
       class << self
         def filter_doc(filter_name)
-          render_doc(ScopeIndex.filters.find { |entry| entry.name == filter_name })
+          render_doc(SourceIndex.filters.find { |entry| entry.name == filter_name })
         end
 
         def object_doc(object_name)
-          render_doc(ScopeIndex.objects.find { |entry| entry.name == object_name })
+          render_doc(SourceIndex.objects.find { |entry| entry.name == object_name })
         end
 
         def tag_doc(tag_name)
-          render_doc(ScopeIndex.tags.find { |entry| entry.name == tag_name })
+          render_doc(SourceIndex.tags.find { |entry| entry.name == tag_name })
         end
 
         def object_property_doc(object_name, property_name)
-          property_entry = ScopeIndex
+          property_entry = SourceIndex
             .objects
             .find { |entry| entry.name == object_name }
             &.properties

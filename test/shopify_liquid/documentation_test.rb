@@ -6,7 +6,7 @@ module ThemeCheck
   module ShopifyLiquid
     class DocumentationTest < Minitest::Test
       def test_filter_doc
-        ScopeIndex.stubs(:filters).returns([filter_entry])
+        SourceIndex.stubs(:filters).returns([filter_entry])
 
         actual_doc = Documentation.filter_doc('size')
         expected_doc = "### size\n" \
@@ -18,7 +18,7 @@ module ThemeCheck
       end
 
       def test_tag_doc
-        ScopeIndex.stubs(:tags).returns([tag_entry])
+        SourceIndex.stubs(:tags).returns([tag_entry])
 
         actual_doc = Documentation.tag_doc('tablerow')
         expected_doc = "### tablerow\n" \
@@ -28,7 +28,7 @@ module ThemeCheck
       end
 
       def test_object_doc
-        ScopeIndex.stubs(:objects).returns([object_entry])
+        SourceIndex.stubs(:objects).returns([object_entry])
 
         actual_doc = Documentation.object_doc('product')
         expected_doc = "### product\n" \
@@ -38,7 +38,7 @@ module ThemeCheck
       end
 
       def test_object_property_doc
-        ScopeIndex.stubs(:objects).returns([object_entry])
+        SourceIndex.stubs(:objects).returns([object_entry])
 
         actual_doc = Documentation.object_property_doc('product', 'available')
         expected_doc = "### available\n" \
@@ -50,7 +50,7 @@ module ThemeCheck
       private
 
       def filter_entry
-        ScopeIndex::FilterEntry.new(
+        SourceIndex::FilterEntry.new(
           'name' => 'size',
           'summary' => 'Returns the size of a string or array.',
           'description' => 'You can use the "size" filter with dot notation.'
@@ -58,7 +58,7 @@ module ThemeCheck
       end
 
       def object_entry
-        ScopeIndex::ObjectEntry.new(
+        SourceIndex::ObjectEntry.new(
           'name' => 'product',
           'summary' => 'A product in the store.',
           'properties' => [
@@ -72,7 +72,7 @@ module ThemeCheck
       end
 
       def tag_entry
-        ScopeIndex::TagEntry.new(
+        SourceIndex::TagEntry.new(
           'name' => 'tablerow',
           'summary' => 'The "tablerow" tag must be wrapped in HTML "table" tags.'
         )

@@ -11,7 +11,7 @@ module ThemeCheck
         end
 
         def test_render
-          entry = ScopeIndex::BaseEntry.new(
+          entry = SourceIndex::BaseEntry.new(
             'name' => 'product',
             'summary' => 'A product in the store.',
             'description' => 'A more detailed description of a product in the store.',
@@ -27,7 +27,7 @@ module ThemeCheck
         end
 
         def test_render_with_summary_only
-          entry = ScopeIndex::BaseEntry.new(
+          entry = SourceIndex::BaseEntry.new(
             'name' => 'product',
             'summary' => 'A product in the store.'
           )
@@ -40,7 +40,7 @@ module ThemeCheck
         end
 
         def test_render_with_description_only
-          entry = ScopeIndex::BaseEntry.new(
+          entry = SourceIndex::BaseEntry.new(
             'name' => 'product',
             'description' => 'A more detailed description of a product in the store.'
           )

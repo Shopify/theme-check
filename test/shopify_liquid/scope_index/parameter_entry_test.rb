@@ -4,7 +4,7 @@ require 'test_helper'
 
 module ThemeCheck
   module ShopifyLiquid
-    class ScopeIndex
+    class SourceIndex
       class ParameterEntryTest < Minitest::Test
         def setup
           @entry = ParameterEntry.new(hash)

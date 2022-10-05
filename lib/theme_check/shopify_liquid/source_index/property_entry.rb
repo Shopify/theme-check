@@ -2,7 +2,7 @@
 
 module ThemeCheck
   module ShopifyLiquid
-    class ScopeIndex
+    class SourceIndex
       class PropertyEntry < BaseEntry; end
     end
   end

@@ -2,7 +2,7 @@
 
 module ThemeCheck
   module ShopifyLiquid
-    class ScopeIndex
+    class SourceIndex
       class BaseEntry
         attr_reader :hash
 

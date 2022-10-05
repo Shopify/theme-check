@@ -3,30 +3,30 @@
 require 'json'
 require 'pathname'
 
-require_relative 'scope_index/base_entry'
-require_relative 'scope_index/filter_entry'
-require_relative 'scope_index/object_entry'
-require_relative 'scope_index/parameter_entry'
-require_relative 'scope_index/property_entry'
-require_relative 'scope_index/return_type_entry'
-require_relative 'scope_index/tag_entry'
+require_relative 'source_index/base_entry'
+require_relative 'source_index/filter_entry'
+require_relative 'source_index/object_entry'
+require_relative 'source_index/parameter_entry'
+require_relative 'source_index/property_entry'
+require_relative 'source_index/return_type_entry'
+require_relative 'source_index/tag_entry'
 
 module ThemeCheck
   module ShopifyLiquid
-    class ScopeIndex
+    class SourceIndex
       TYPE_SOURCE = Pathname.new("#{__dir__}/../../../data/shopify_liquid/documentation")
 
       class << self
         def filters
-          @filters ||= load_file(:filters).map { |hash| ScopeIndex::FilterEntry.new(hash) }
+          @filters ||= load_file(:filters).map { |hash| SourceIndex::FilterEntry.new(hash) }
         end
 
         def objects
-          @objects ||= load_file(:objects).map { |hash| ScopeIndex::ObjectEntry.new(hash) }
+          @objects ||= load_file(:objects).map { |hash| SourceIndex::ObjectEntry.new(hash) }
         end
 
         def tags
-          @tags ||= load_file(:tags).map { |hash| ScopeIndex::TagEntry.new(hash) }
+          @tags ||= load_file(:tags).map { |hash| SourceIndex::TagEntry.new(hash) }
         end
 
         private
