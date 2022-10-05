@@ -120,6 +120,10 @@ module ThemeCheck
           # NOTE: `email` is exceptionally exposed as a theme object in
           #       the customers' reset password template
           check_object(info, all_global_objects + ['email'])
+        elsif 'templates/robots.txt' == name
+          # NOTE: `robots` is the only object exposed object in
+          #       the robots.txt template
+          check_object(info, ['robots'])
         elsif 'layout/checkout' == name
           # NOTE: Shopify Plus has exceptionally exposed objects in
           #       the checkout template
