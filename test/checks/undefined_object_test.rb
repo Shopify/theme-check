@@ -334,6 +334,48 @@ class UndefinedObjectTest < Minitest::Test
     END
   end
 
+  def test_does_not_report_on_robots_in_robots
+    offenses = analyze_theme(
+      ThemeCheck::UndefinedObject.new(exclude_snippets: false),
+      "templates/robots.txt.liquid" => <<~END,
+        {% for group in robots.default_groups %}
+          {{- group.user_agent -}}
+
+          {% for rule in group.rules %}
+            {{- rule -}}
+          {% endfor %}
+
+          {%- if group.sitemap != blank -%}
+            {{ group.sitemap }}
+          {%- endif -%}
+        {% endfor %}
+      END
+    )
+    assert_offenses("", offenses)
+  end
+
+  def test_reports_on_robots_other_than_robots
+    offenses = analyze_theme(
+      ThemeCheck::UndefinedObject.new(exclude_snippets: false),
+      "templates/index.liquid" => <<~END,
+        {% for group in robots.default_groups %}
+          {{- group.user_agent -}}
+
+          {% for rule in group.rules %}
+            {{- rule -}}
+          {% endfor %}
+
+          {%- if group.sitemap != blank -%}
+            {{ group.sitemap }}
+          {%- endif -%}
+        {% endfor %}
+      END
+    )
+    assert_offenses(<<~END, offenses)
+      Undefined object `robots` at templates/index.liquid:1
+    END
+  end
+
   def test_does_not_report_on_shopify_plus_objects_in_checkout
     offenses = analyze_theme(
       ThemeCheck::UndefinedObject.new(exclude_snippets: false),
