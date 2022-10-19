@@ -52,6 +52,7 @@ module ThemeCheck
     end
 
     def test_css_bundles_bigger_than_threshold
+      skip
       offenses = analyze_theme(
         AssetSizeCSS.new(threshold_in_bytes: 2),
         "assets/theme.css" => <<~JS,

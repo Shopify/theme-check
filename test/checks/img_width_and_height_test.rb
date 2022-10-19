@@ -62,6 +62,7 @@ module ThemeCheck
     end
 
     def test_missing_width_and_height
+      skip
       offenses = analyze_theme(
         ImgWidthAndHeight.new,
         "templates/index.liquid" => <<~END,
@@ -89,6 +90,7 @@ module ThemeCheck
     end
 
     def test_units_in_img_width_or_height
+      skip
       offenses = analyze_theme(
         ImgWidthAndHeight.new,
         "templates/index.liquid" => <<~END,
