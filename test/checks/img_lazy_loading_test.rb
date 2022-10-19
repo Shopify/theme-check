@@ -28,6 +28,16 @@ module ThemeCheck
       END
     end
 
+    def test_does_not_report_missing_loading_lazy_attribute_without_whitespace
+      offenses = analyze_theme(
+        ImgLazyLoading.new,
+        "templates/index.liquid" => <<~END,
+          <img {{ "something" }}loading="lazy">
+        END
+      )
+      assert_offenses("", offenses)
+    end
+
     def test_prefer_lazy_to_auto
       offenses = analyze_theme(
         ImgLazyLoading.new,

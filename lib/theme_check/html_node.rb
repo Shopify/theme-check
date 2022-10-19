@@ -57,7 +57,7 @@ module ThemeCheck
           end
 
           # Replace source by placeholder
-          parseable_source[m.begin(0)...m.end(0)] = keyed_placeholder
+          parseable_source[m.begin(0)...m.end(0)] = keyed_placeholder + ' '
         end
 
         new(
