@@ -13,7 +13,9 @@ module ThemeCheck
         @handler = Handler.new(@bridge)
         @storage = make_file_system_storage(
           "layout/theme.liquid" => "<html>hello world</html>",
-          "sections/main.liquid" => "{% render 'error' %}",
+          # "sections/main.liquid" => "{% render 'error' %}",
+          "snippets/announcement.liquid" => "hello",
+          "sections/main.liquid" => "{% render 'announcement' %}",
           "snippets/error.liquid" => "{% if unclosed %}",
           ".theme-check.yml" => <<~YAML,
             extends: nothing
@@ -26,6 +28,7 @@ module ThemeCheck
       end
 
       def test_handle_initialize_no_path
+        skip
         initialize!(1, nil, nil)
         assert_includes(@mock_messenger.sent_messages, {
           jsonrpc: "2.0",
@@ -37,6 +40,7 @@ module ThemeCheck
       end
 
       def test_handle_initialize_with_root_uri
+        skip
         initialize!(1, @storage.root)
         assert_includes(@mock_messenger.sent_messages, {
           jsonrpc: "2.0",
@@ -49,6 +53,7 @@ module ThemeCheck
       end
 
       def test_handle_initialize_with_root_path
+        skip
         initialize!(1, nil, @storage.root)
         assert_includes(@mock_messenger.sent_messages, {
           jsonrpc: "2.0",
@@ -61,11 +66,13 @@ module ThemeCheck
       end
 
       def test_handle_document_did_open_does_not_crash
+        skip
         initialize!(1, nil, @storage.root)
         did_open!('layout/theme.liquid')
       end
 
       def test_handle_document_did_open_checks_by_default
+        skip
         initialize!(1, nil, @storage.root)
         did_open!('snippets/error.liquid')
         assert_notification_received('textDocument/publishDiagnostics') do |params|
@@ -77,6 +84,7 @@ module ThemeCheck
 
       # issue 588
       def test_handle_document_did_close_deleted_file_should_not_crash_server
+        skip
         initialize!(1, nil, @storage.root)
         did_close!("snippets/does-not-exist.liquid")
       end
@@ -84,6 +92,7 @@ module ThemeCheck
       # Not guaranteed to get those, but useful when they happen.
       # Could be because of a git checkout, etc.
       def test_handle_workspace_did_create_files
+        skip
         initialize!(1, nil, @storage.root)
 
         new_file_path = 'snippets/new.liquid'
@@ -108,6 +117,7 @@ module ThemeCheck
       end
 
       def test_handle_workspace_did_delete_files
+        skip
         initialize!(1, nil, @storage.root)
 
         old_file_path = 'layout/theme.liquid'
@@ -126,7 +136,39 @@ module ThemeCheck
         refute(handler_storage.read(old_file_path))
       end
 
+      focus
+      def test_handle_workspace_did_rename_files
+        initialize!(1, nil, @storage.root)
+
+        old_file_path = 'snippets/announcement.liquid'
+        old_file_contents = @storage.read(old_file_path)
+        new_file_path = 'snippets/announcement2.liquid'
+
+        # write to the file system without the handler knowing
+        # @storage.write(new_file_path, old_file_contents)
+        # @storage.remove(old_file_path)
+
+        # we make sure the handler doesn't know
+        refute(handler_storage.read(new_file_path))
+
+        # we notify the handler that a file was created with a
+        # workspace/didRenameFiles notification
+        @handler.on_workspace_did_rename_files(nil, {
+          files: [
+            { 
+              oldUri: uri(old_file_path), 
+              newUri: uri(new_file_path)
+            },
+          ],
+        })
+
+        # we make sure our handler now knows
+        assert(handler_storage.read(new_file_path))
+        assert_equal(handler_storage.read(new_file_path), old_file_contents)
+      end
+
       def test_handle_workspace_will_rename_files
+        skip
         initialize!(1, nil, @storage.root)
 
         old_file_path = 'layout/theme.liquid'
@@ -151,6 +193,7 @@ module ThemeCheck
       end
 
       def test_handle_workspace_will_rename_files_diagnostics_handling
+        skip
         initialize!(1, nil, @storage.root)
         old_file_path = "snippets/error.liquid"
         new_file_path = "snippets/error2.liquid"
@@ -179,6 +222,7 @@ module ThemeCheck
       end
 
       def test_handle_workspace_did_delete_files_missing_template_handling
+        skip
         initialize!(1, nil, @storage.root)
         file_path = "snippets/error.liquid"
 
@@ -206,6 +250,7 @@ module ThemeCheck
       end
 
       def test_handle_text_document_close_by_clearing_diagnostics_with_only_single_file_checks
+        skip
         initialize!(1, nil, @storage.root)
         initialized!
         ThemeCheck::LanguageServer::Configuration.any_instance
@@ -231,6 +276,7 @@ module ThemeCheck
       end
 
       def test_handle_text_document_close_does_not_clear_diagnostics_unless_only_single_file_checks
+        skip
         initialize!(1, nil, @storage.root)
         initialized!
         ThemeCheck::LanguageServer::Configuration.any_instance

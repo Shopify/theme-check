@@ -82,11 +82,13 @@ module ThemeCheck
       reset
 
       ThemeCheck.with_liquid_c_disabled do
+        byebug
         total = files.size
         offset = 0
 
         unless only_single_file
           # Call all checks that run on the whole theme
+          byebug
           liquid_visitor = LiquidVisitor.new(@liquid_checks.whole_theme, @disabled_checks)
           html_visitor = HtmlVisitor.new(@html_checks.whole_theme)
           total += total_file_count
@@ -115,6 +117,7 @@ module ThemeCheck
             @json_checks.single_file.call(:on_file, theme_file)
           end
         end
+        byebug
       end
 
       finish(only_single_file)

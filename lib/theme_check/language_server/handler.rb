@@ -47,6 +47,7 @@ module ThemeCheck
           fileOperations: {
             didCreate: FILE_OPERATION_FILTER,
             didDelete: FILE_OPERATION_FILTER,
+            didRename: FILE_OPERATION_FILTER, # FileOperationRegistrationOptions -> file operation filter -> string and pattern match -> matches https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#fileOperationPattern
             willRename: FILE_OPERATION_FILTER,
           },
         },
@@ -185,6 +186,19 @@ module ThemeCheck
         analyze_and_send_offenses(absolute_paths)
       end
 
+      def on_workspace_did_rename_files(id, params)
+        relative_paths = params[:files]
+          &.map { |file| [file[:oldUri], file[:newUri]] }
+          &.map { |(old_uri, new_uri)| [relative_path_from_uri(old_uri), relative_path_from_uri(new_uri)] }
+        return unless relative_paths
+
+        workspace_edit = FileRenameHandler.to_workspace_edit(@storage, relative_paths)
+        # Send applyEdit using bridge 
+        @bridge.send_request("workspace/applyEdits", {
+
+        })
+      end
+
       # We're using workspace/willRenameFiles here because we want this to run
       # before textDocument/didOpen and textDocumetn/didClose of the files
       # (which might trigger another theme analysis).
@@ -202,6 +216,8 @@ module ThemeCheck
 
         absolute_paths = relative_paths.flatten(2).map { |p| @storage.path(p) }
         analyze_and_send_offenses(absolute_paths)
+
+        #return workspace edit?
       end
 
       def on_workspace_execute_command(id, params)

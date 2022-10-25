@@ -27,7 +27,7 @@ module ThemeCheck
     private
 
     def call_check_method(check, method, *args)
-      return unless check.respond_to?(method) && !check.ignored?
+      return unless check.respond_to?(method) && !check.ignored? #on_assign
 
       # If you want to use binding.pry in unit tests, define the
       # THEME_CHECK_DEBUG environment variable. e.g.

@@ -52,11 +52,15 @@ module ThemeCheck
         @bridge.send_work_done_progress_begin(token, "Full theme check")
         @bridge.log("Checking #{storage.root}")
         offenses = nil
+
+        hey =  analyzer.analyze_theme
+
         time = Benchmark.measure do
           offenses = analyzer.analyze_theme do |path, i, total|
             @bridge.send_work_done_progress_report(token, "#{i}/#{total} #{path}", (i.to_f / total * 100.0).to_i)
           end
         end
+
         end_message = "Found #{offenses.size} offenses in #{format("%0.2f", time.real)}s"
         @bridge.send_work_done_progress_end(token, end_message)
         @bridge.log(end_message)

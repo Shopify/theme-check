@@ -37,6 +37,8 @@ module ThemeCheck
       @theme_file.rewriter.wrap(node, insert_before, insert_after)
     end
 
+    # TODO replace_file??
+
     def create_file(storage, relative_path, content)
       storage.write(relative_path, content)
     end

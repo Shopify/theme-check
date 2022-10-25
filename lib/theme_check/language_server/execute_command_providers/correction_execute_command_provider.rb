@@ -21,7 +21,9 @@ module ThemeCheck
       # @param diagnostic_hashes [Array] - of diagnostics
       def execute(diagnostic_hashes)
         # attempt to apply the document changes
+        # logger = IOMessenger.new
         workspace_edit = diagnostics_manager.workspace_edit(diagnostic_hashes)
+        # logger.log("===========>>\n#{workspace_edit}")
         result = bridge.send_request('workspace/applyEdit', {
           label: 'Theme Check correction',
           edit: workspace_edit,
