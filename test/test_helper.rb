@@ -156,8 +156,9 @@ module Minitest
 
     module CompletionProviderTestHelper
       def assert_can_complete(provider, token, offset = 0)
+        relative_path, line, col = mock_token_and_cursor(provider, token, offset)
         refute_empty(
-          provider.completions(token, token.size + offset).map { |x| x[:label] },
+          provider.completions(relative_path, line, col).map { |x| x[:label] },
           <<~ERRMSG,
             Expected completions at the specified cursor position:
             #{token}
@@ -167,8 +168,9 @@ module Minitest
       end
 
       def assert_can_complete_with(provider, token, label, offset = 0)
+        relative_path, line, col = mock_token_and_cursor(provider, token, offset)
         assert_includes(
-          provider.completions(token, token.size + offset).map { |x| x[:label] },
+          provider.completions(relative_path, line, col).map { |x| x[:label] },
           label,
           <<~ERRMSG,
             Expected '#{label}' to be suggested at the specified cursor position:
@@ -179,8 +181,9 @@ module Minitest
       end
 
       def refute_can_complete(provider, token, offset = 0)
+        relative_path, line, col = mock_token_and_cursor(provider, token, offset)
         assert_empty(
-          provider.completions(token, token.size + offset),
+          provider.completions(relative_path, line, col),
           <<~ERRMSG,
             Expected no completions at the specified cursor location:
             #{token}
@@ -190,8 +193,10 @@ module Minitest
       end
 
       def refute_can_complete_with(provider, token, label, offset = 0)
+        relative_path, line, col = mock_token_and_cursor(provider, token, offset)
+
         refute_includes(
-          provider.completions(token, token.size + offset).map { |x| x[:label] },
+          provider.completions(relative_path, line, col).map { |x| x[:label] },
           label,
           <<~ERRMSG,
             Expected '#{label}' not to be suggested at the specified cursor position:
@@ -199,6 +204,19 @@ module Minitest
             #{' ' * (token.size + offset)}^
           ERRMSG
         )
+      end
+
+      private
+
+      def mock_token_and_cursor(provider, token, offset)
+        relative_path = "file:///fake_path"
+        provider.storage.stubs(:read).with(relative_path).returns(token)
+
+        lines = token.split("\n")
+        line = lines.size + 1
+        col = lines.last.size + offset
+
+        [relative_path, line, col]
       end
     end
 
