@@ -3,6 +3,10 @@ require 'yaml'
 
 module ThemeCheck
   module ShopifyLiquid
+    # TODO: (1/X): https://github.com/shopify/theme-check/issues/n
+    # -
+    # Remove 'filters.yml' in favor of 'SourceIndex.filters'
+    # -
     module Filter
       extend self
 
