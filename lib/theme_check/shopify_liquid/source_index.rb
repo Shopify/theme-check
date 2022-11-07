@@ -45,23 +45,26 @@ module ThemeCheck
           JSON.parse(path.read)
         end
 
+        # TODO: (1/X): https://github.com/shopify/theme-check/issues/n
+        # -
+        # Remove this implementation in favor of a proper/stable approach to
+        # download/update theme-liquid-docs files.
         def download_files
-          # TODO: (1/X): https://github.com/shopify/theme-check/issues/n
-          # -
-          # Remove this implementation in favor of a proper/stable approach to
-          # download/update theme-liquid-docs files.
-          # -
-          commands = [
-            'wget https://github.com/Shopify/theme-liquid-docs/raw/main/data/filters.json',
-            'wget https://github.com/Shopify/theme-liquid-docs/raw/main/data/objects.json',
-            'wget https://github.com/Shopify/theme-liquid-docs/raw/main/data/tags.json',
-            "mkdir -p #{__dir__}/../../../data/shopify_liquid/documentation",
-            "mv filters.json #{__dir__}/../../../data/shopify_liquid/documentation",
-            "mv objects.json #{__dir__}/../../../data/shopify_liquid/documentation",
-            "mv tags.json #{__dir__}/../../../data/shopify_liquid/documentation",
-          ].join(' && ')
+          require 'open-uri'
 
-          Kernel.exec(commands)
+          documentation_directory = "#{__dir__}/../../../data/shopify_liquid/documentation"
+
+          Dir.mkdir(documentation_directory) unless File.exist?(documentation_directory)
+
+          ['filters', 'objects', 'tags'].each do |file_name|
+            local_path = "#{documentation_directory}/#{file_name}.json"
+            remote_path = "https://github.com/Shopify/theme-liquid-docs/raw/main/data/#{file_name}.json"
+
+            File.open(local_path, "wb") do |file|
+              content = URI.open(remote_path).read # rubocop:disable Security/Open
+              file.write(content)
+            end
+          end
         end
 
         def has_files?
