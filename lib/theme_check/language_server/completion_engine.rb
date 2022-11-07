@@ -3,35 +3,23 @@
 module ThemeCheck
   module LanguageServer
     class CompletionEngine
-      include PositionHelper
-
-      def initialize(storage)
+      def initialize(storage, bridge = nil)
         @storage = storage
+        @bridge = bridge
         @providers = CompletionProvider.all.map { |x| x.new(storage) }
       end
 
       def completions(relative_path, line, col)
-        buffer = @storage.read(relative_path)
-        cursor = from_row_column_to_index(buffer, line, col)
-        token = find_token(buffer, cursor)
-        return [] if token.nil?
-
-        @providers.flat_map do |p|
-          p.completions(
-            token.content,
-            cursor - token.start
-          )
+        @providers.flat_map do |provider|
+          provider.completions(relative_path, line, col)
         end
-      end
+      rescue StandardError => error
+        @bridge || raise(error)
 
-      def find_token(buffer, cursor)
-        Tokens.new(buffer).find do |token|
-          # Here we include the next character and exclude the first
-          # one becase when we want to autocomplete inside a token
-          # and at most 1 outside it since the cursor could be placed
-          # at the end of the token.
-          token.start < cursor && cursor <= token.end
-        end
+        message = error.message
+        backtrace = error.backtrace.join("\n")
+
+        @bridge.log("[completion error] error: #{message}\n#{backtrace}")
       end
     end
   end

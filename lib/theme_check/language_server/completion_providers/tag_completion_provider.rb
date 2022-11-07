@@ -3,7 +3,12 @@
 module ThemeCheck
   module LanguageServer
     class TagCompletionProvider < CompletionProvider
-      def completions(content, cursor)
+      def completions(relative_path, line, col)
+        token = current_token(relative_path, line, col)
+        content = token.content
+        cursor = token.cursor
+
+        return [] if content.nil?
         return [] unless can_complete?(content, cursor)
         partial = first_word(content) || ''
         labels = ShopifyLiquid::Tag.labels
@@ -23,9 +28,12 @@ module ThemeCheck
       private
 
       def tag_to_completion(tag)
+        content = ShopifyLiquid::Documentation.tag_doc(tag)
+
         {
           label: tag,
           kind: CompletionItemKinds::KEYWORD,
+          **doc_hash(content),
         }
       end
     end
