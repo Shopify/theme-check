@@ -25,7 +25,7 @@ module ThemeCheck
         end
 
         def horizontal_rule
-          "\n---\n"
+          "\n\n--\n\n"
         end
       end
     end

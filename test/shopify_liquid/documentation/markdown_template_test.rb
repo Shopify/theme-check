@@ -20,7 +20,7 @@ module ThemeCheck
           actual_temaplte = @markdown_template.render(entry)
           expected_template = "### product\n" \
             "A product in the store.\n" \
-            "---\n" \
+            "\n--\n\n" \
             "A more detailed description of a product in the store."
 
           assert_equal(expected_template, actual_temaplte)

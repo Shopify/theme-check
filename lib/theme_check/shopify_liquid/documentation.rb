@@ -28,12 +28,12 @@ module ThemeCheck
           render_doc(property_entry)
         end
 
-        private
-
         def render_doc(entry)
           return nil unless entry
           markdown_template.render(entry)
         end
+
+        private
 
         def markdown_template
           @markdown_template ||= MarkdownTemplate.new
