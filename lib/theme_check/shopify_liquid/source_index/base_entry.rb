@@ -7,7 +7,7 @@ module ThemeCheck
         attr_reader :hash
 
         def initialize(hash = {})
-          @hash = hash
+          @hash = hash || {}
         end
 
         def name
@@ -15,11 +15,11 @@ module ThemeCheck
         end
 
         def summary
-          hash['summary']
+          hash['summary'] || ''
         end
 
         def description
-          hash['description']
+          hash['description'] || ''
         end
 
         def return_type
