@@ -45,7 +45,7 @@ module ThemeCheck
           JSON.parse(path.read)
         end
 
-        # TODO: (1/X): https://github.com/shopify/theme-check/issues/n
+        # TODO: (1/6) https://github.com/Shopify/theme-check/issues/651
         # -
         # Remove this implementation in favor of a proper/stable approach to
         # download/update theme-liquid-docs files.
@@ -76,13 +76,10 @@ module ThemeCheck
         end
 
         def built_in_objects
-          # TODO: (1/X): https://github.com/shopify/theme-check/issues/n
+          # TODO: (2/6) https://github.com/Shopify/theme-check/issues/657
           # -
-          # Manualy create an 'built_in_objects.json' file at 'Shopify/theme-liquid-docs'
-          # to hold primitive types, and consume it here.
-          #
-          # In the future, we may generate this files, but consiering how frequent
-          # they change, the goal is to just manually create this file for now.
+          # Manualy introduce a 'data/shopify_liquid/built_in_liquid_objects.json' file
+          # using https://shopify.dev/api/liquid/basics#types as a reference.
           # -
           [
             {

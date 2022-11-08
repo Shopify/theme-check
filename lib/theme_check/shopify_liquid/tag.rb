@@ -37,7 +37,7 @@ module ThemeCheck
         label.keys[0]
       end
 
-      # TODO: (1/X): https://github.com/shopify/theme-check/issues/n
+      # TODO: (5/6) https://github.com/Shopify/theme-check/issues/656
       # -
       # Remove 'tags.yml' in favor of 'SourceIndex.tags'
       # -

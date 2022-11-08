@@ -53,13 +53,18 @@ module ThemeCheck
 
           assignments = finder.assignments
 
-          # TODO: (1/X): https://github.com/shopify/theme-check/issues/n
+          # TODO: (3/6) https://github.com/Shopify/theme-check/issues/655
+          #
           # -
           # AssignmentsFinder shouldn't suggest the usage of target, because
           # we can't guess the correct type
           # -
+          #
+          # In other words, the two following lines should pass:
+          #
           # assert_equal(1, assignments.size)
           # assert_nil(assignments['target'])
+          #
           assert_equal('cart', assignments['foo'].name)
         end
       end
