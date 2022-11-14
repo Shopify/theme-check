@@ -10,9 +10,9 @@ module ThemeCheck
 
       PotentialLookup = Struct.new(:name, :lookups)
 
-      def lookup(token)
-        content = token.content
-        cursor = token.cursor
+      def lookup(context)
+        content = context.content
+        cursor = context.cursor
 
         return if cursor_is_on_bracket_position_that_cant_be_completed(content, cursor)
         variable_lookup = lookup_liquid_variable(content, cursor) || lookup_liquid_tag(content, cursor)
@@ -20,15 +20,15 @@ module ThemeCheck
         # And we only return it if it's parsed by Liquid as VariableLookup
         return unless variable_lookup.is_a?(Liquid::VariableLookup)
 
-        potential_lookup(variable_lookup, token)
+        potential_lookup(variable_lookup, context)
       end
 
       private
 
-      def potential_lookup(variable, token)
-        return variable if token.buffer.nil? || token.buffer.empty?
+      def potential_lookup(variable, context)
+        return variable if context.buffer.nil? || context.buffer.empty?
 
-        buffer = token.buffer[0...token.absolute_cursor]
+        buffer = context.buffer[0...context.absolute_cursor]
         lookups = variable.lookups
         assignments = find_assignments(buffer)
 

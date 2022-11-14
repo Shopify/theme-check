@@ -5,10 +5,9 @@ module ThemeCheck
     class FilterCompletionProvider < CompletionProvider
       NAMED_FILTER = /#{Liquid::FilterSeparator}\s*(\w+)/o
 
-      def completions(relative_path, line, col)
-        token = current_token(relative_path, line, col)
-        content = token.content
-        cursor = token.cursor
+      def completions(context)
+        content = context.content
+        cursor = context.cursor
 
         return [] if content.nil?
         return [] unless can_complete?(content, cursor)

@@ -11,7 +11,7 @@ module ThemeCheck
 
       def completions(relative_path, line, col)
         @providers.flat_map do |provider|
-          provider.completions(relative_path, line, col)
+          provider.completions(context(relative_path, line, col))
         end
       rescue StandardError => error
         @bridge || raise(error)
@@ -20,6 +20,10 @@ module ThemeCheck
         backtrace = error.backtrace.join("\n")
 
         @bridge.log("[completion error] error: #{message}\n#{backtrace}")
+      end
+
+      def context(relative_path, line, col)
+        CompletionContext.new(@storage, relative_path, line, col)
       end
     end
   end

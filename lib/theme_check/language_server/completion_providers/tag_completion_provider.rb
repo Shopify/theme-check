@@ -3,10 +3,9 @@
 module ThemeCheck
   module LanguageServer
     class TagCompletionProvider < CompletionProvider
-      def completions(relative_path, line, col)
-        token = current_token(relative_path, line, col)
-        content = token.content
-        cursor = token.cursor
+      def completions(context)
+        content = context.content
+        cursor = context.cursor
 
         return [] if content.nil?
         return [] unless can_complete?(content, cursor)

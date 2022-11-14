@@ -3,13 +3,13 @@
 module ThemeCheck
   module LanguageServer
     class ObjectCompletionProvider < CompletionProvider
-      def completions(relative_path, line, col)
-        token = current_token(relative_path, line, col)
+      def completions(context)
+        content = context.content
 
-        return [] if token.content.nil?
-        return [] unless (variable_lookup = VariableLookupFinder.lookup(token))
+        return [] if content.nil?
+        return [] unless (variable_lookup = VariableLookupFinder.lookup(context))
         return [] unless variable_lookup.lookups.empty?
-        return [] if token.content[token.cursor - 1] == "."
+        return [] if content[context.cursor - 1] == "."
 
         ShopifyLiquid::Object.labels
           .select { |w| w.start_with?(partial(variable_lookup)) }

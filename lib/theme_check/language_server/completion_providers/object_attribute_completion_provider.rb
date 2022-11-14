@@ -3,11 +3,9 @@
 module ThemeCheck
   module LanguageServer
     class ObjectAttributeCompletionProvider < CompletionProvider
-      def completions(relative_path, line, col)
-        token = current_token(relative_path, line, col)
-
-        return [] if token.content.nil?
-        return [] unless (variable_lookup = VariableLookupFinder.lookup(token))
+      def completions(context)
+        return [] if context.content.nil?
+        return [] unless (variable_lookup = VariableLookupFinder.lookup(context))
 
         # Navigate through lookups until the last valid [object, property] level
         object, property = lookup_object_and_property(variable_lookup)

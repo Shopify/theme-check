@@ -156,9 +156,9 @@ module Minitest
 
     module CompletionProviderTestHelper
       def assert_can_complete(provider, token, offset = 0)
-        relative_path, line, col = mock_token_and_cursor(provider, token, offset)
+        context = mock_context(provider, token, offset)
         refute_empty(
-          provider.completions(relative_path, line, col).map { |x| x[:label] },
+          provider.completions(context).map { |x| x[:label] },
           <<~ERRMSG,
             Expected completions at the specified cursor position:
             #{token}
@@ -168,9 +168,9 @@ module Minitest
       end
 
       def assert_can_complete_with(provider, token, label, offset = 0)
-        relative_path, line, col = mock_token_and_cursor(provider, token, offset)
+        context = mock_context(provider, token, offset)
         assert_includes(
-          provider.completions(relative_path, line, col).map { |x| x[:label] },
+          provider.completions(context).map { |x| x[:label] },
           label,
           <<~ERRMSG,
             Expected '#{label}' to be suggested at the specified cursor position:
@@ -181,9 +181,9 @@ module Minitest
       end
 
       def refute_can_complete(provider, token, offset = 0)
-        relative_path, line, col = mock_token_and_cursor(provider, token, offset)
+        context = mock_context(provider, token, offset)
         assert_empty(
-          provider.completions(relative_path, line, col),
+          provider.completions(context),
           <<~ERRMSG,
             Expected no completions at the specified cursor location:
             #{token}
@@ -193,10 +193,10 @@ module Minitest
       end
 
       def refute_can_complete_with(provider, token, label, offset = 0)
-        relative_path, line, col = mock_token_and_cursor(provider, token, offset)
+        context = mock_context(provider, token, offset)
 
         refute_includes(
-          provider.completions(relative_path, line, col).map { |x| x[:label] },
+          provider.completions(context).map { |x| x[:label] },
           label,
           <<~ERRMSG,
             Expected '#{label}' not to be suggested at the specified cursor position:
@@ -208,15 +208,17 @@ module Minitest
 
       private
 
-      def mock_token_and_cursor(provider, token, offset)
+      def mock_context(provider, token, offset)
         relative_path = "file:///fake_path"
-        provider.storage.stubs(:read).with(relative_path).returns(token)
+        storage = provider.storage
+
+        storage.stubs(:read).with(relative_path).returns(token)
 
         lines = token.split("\n")
         line = lines.size + 1
         col = lines.last.size + offset
 
-        [relative_path, line, col]
+        ThemeCheck::LanguageServer::CompletionContext.new(storage, relative_path, line, col)
       end
     end
 
