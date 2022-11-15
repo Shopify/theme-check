@@ -1,0 +1,51 @@
+[
+  {
+    "category": "collection",
+    "deprecated": false,
+    "deprecation_reason": "",
+    "description": "",
+    "parameters": [
+      {
+        "description": "attribute [string] You can specify the value of supported [HTML attributes](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes).",
+        "name": "HTML",
+        "required": false,
+        "types": [
+
+        ]
+      }
+    ],
+    "return_type": [
+      {
+        "type": "string",
+        "name": "",
+        "description": "",
+        "array_value": ""
+      }
+    ],
+    "examples": [
+      {
+        "name": "",
+        "description": "",
+        "syntax": "",
+        "path": "/",
+        "raw_liquid": "{{ 'Health' | link_to_type }}",
+        "parameter": false,
+        "display_type": "text",
+        "show_data_tab": true
+      },
+      {
+        "name": "HTML attributes",
+        "description": "You can specify [HTML attributes](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attributes) by including a parameter that matches the attribute name, and the desired value.\n",
+        "syntax": "string | link_to_type: attribute: string",
+        "path": "/",
+        "raw_liquid": "{{ 'Health' | link_to_type: class: 'link-class' }}",
+        "parameter": true,
+        "display_type": "text",
+        "show_data_tab": true
+      }
+    ],
+    "summary": "Generates an HTML `&lt;a&gt;` tag with an `href` attribute linking to a collection page that lists all products of the given\nproduct type.",
+    "syntax": "string | link_to_type",
+    "name": "link_to_type"
+  }
+]
