@@ -18,7 +18,9 @@ Gem::Specification.new do |spec|
   spec.metadata['allowed_push_host'] = 'https://rubygems.org'
 
   spec.files = Dir.chdir(File.expand_path('..', __FILE__)) do
-    %x{git ls-files -z}.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+    # Load all files tracked in git except files in test directory
+    # Include untracked files in liquid documentation folder
+    %x{git ls-files -z}.split("\x0").reject { |f| f.match(%r{^test/}) } + Dir['data/shopify_liquid/documentation/**']
   end
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }

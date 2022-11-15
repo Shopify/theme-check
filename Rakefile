@@ -53,6 +53,13 @@ task :prerelease, [:version] do |_t, args|
   ThemeCheck::Releaser.new.release(args.version)
 end
 
+desc("Download theme-liquid-docs")
+task :download_theme_liquid_docs do
+  require 'theme_check/shopify_liquid/source_manager'
+
+  ThemeCheck::ShopifyLiquid::SourceManager.download
+end
+
 desc "Create a new check"
 task :new_check, [:name] do |_t, args|
   require "theme_check/string_helpers"
