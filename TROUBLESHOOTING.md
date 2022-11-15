@@ -46,5 +46,20 @@ chruby 3.1.2 #your theme ruby version
 bundle install
 ```
 
+### Language server sends an `initialize()` request to the client and stops
+
+To debug, confirm these steps are included in your local language server startup script:
+
+```bash 
+export THEME_CHECK_DEBUG=true
+export THEME_CHECK_DEBUG_LOG_FILE="/tmp/theme-check-debug.log"
+touch "$THEME_CHECK_DEBUG_LOG_FILE"
+```
+
+An example script can be found [here](/CONTRIBUTING.md#run-language-server).
+
+Open `/tmp/theme-check-debug.log` in your IDE. Check if there are any exceptions being raised by language server. 
+
+If there are no exceptions, check if there are any logs that aren't in jsonrpc. The language server and client use stdin and stdout to communicate using jsonrpc. Debugging statements that aren't in a jsonrpc format might trigger unexpected behavior (this includes any logs from language server or echo statements in your language server script).
 
 
