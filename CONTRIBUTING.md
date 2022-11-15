@@ -204,4 +204,4 @@ What you'll see is an interactive version of the following image:
 
 ## Troubleshooting
 
-If you run into issues during development, see the [troubleshooting guide](/TROUBLESHOOTING)
+If you run into issues during development, see the [troubleshooting guide](/TROUBLESHOOTING.md)
