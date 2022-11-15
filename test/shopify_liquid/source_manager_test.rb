@@ -14,12 +14,32 @@ module ThemeCheck
         SourceManager.stubs(:open_uri).with(objects_uri).returns(objects_content)
         SourceManager.stubs(:open_uri).with(filters_uri).returns(filters_content)
         SourceManager.stubs(:open_uri).with(tags_uri).returns(tags_content)
+        SourceManager.stubs(:open_uri).with(revision_uri).returns(revision_content)
+      end
+
+      def test_refresh_files_after_files_are_out_of_date
+        SourceManager.download
+
+        create_dummy_tags_file
+        create_out_of_date_revision_file
+
+        SourceManager.download_or_refresh_files
+        assert_test_documentation_up_to_date
+      ensure
+        remove_test_documentation
+      end
+
+      def test_download_or_refresh_noop_when_docs_up_to_date
+        SourceManager.stubs(:documentation_directory).returns(SOURCE_DOCUMENTATION_DIRECTORY)
+        SourceManager.expects(:download).never
+
+        SourceManager.download_or_refresh_files
       end
 
       def test_download_creates_directory
         SourceManager.download
 
-        assert_download_succeeded
+        assert_test_documentation_up_to_date
       ensure
         remove_test_documentation
       end
@@ -29,7 +49,7 @@ module ThemeCheck
 
         SourceManager.download
 
-        assert_download_succeeded
+        assert_test_documentation_up_to_date
       ensure
         remove_test_documentation
       end
@@ -54,17 +74,18 @@ module ThemeCheck
 
       private
 
-      def assert_download_succeeded
+      def assert_test_documentation_up_to_date
         assert_equal(objects_content, File.read(TEST_DOCUMENTATION_DIRECTORY + "objects.json"))
         assert_equal(filters_content, File.read(TEST_DOCUMENTATION_DIRECTORY + "filters.json"))
         assert_equal(tags_content, File.read(TEST_DOCUMENTATION_DIRECTORY + "tags.json"))
+        assert_equal(revision_content, File.read(TEST_DOCUMENTATION_DIRECTORY + "latest.json"))
 
         downloaded_files = Dir.glob(TEST_DOCUMENTATION_DIRECTORY + '*')
           .select { |file| File.file?(file) }
           .map { |file| File.basename(file) }
           .to_set
 
-        assert_equal(["filters.json", "objects.json", "tags.json"].to_set, downloaded_files)
+        assert_equal(["filters.json", "objects.json", "tags.json", "latest.json"].to_set, downloaded_files)
       end
 
       def objects_uri
@@ -79,6 +100,10 @@ module ThemeCheck
         @tags_uri ||= "https://github.com/Shopify/theme-liquid-docs/raw/main/data/tags.json"
       end
 
+      def revision_uri
+        @revision_uri ||= "https://github.com/Shopify/theme-liquid-docs/raw/main/data/latest.json"
+      end
+
       def objects_content
         @objects_content ||= load_file(:objects)
       end
@@ -89,6 +114,10 @@ module ThemeCheck
 
       def tags_content
         @tags_content ||= load_file(:tags)
+      end
+
+      def revision_content
+        @revision_content ||= load_file(:latest)
       end
 
       def remove_test_documentation
@@ -107,6 +136,13 @@ module ThemeCheck
         Dir.mkdir(TEST_DOCUMENTATION_DIRECTORY) unless TEST_DOCUMENTATION_DIRECTORY.exist?
         File.open(TEST_DOCUMENTATION_DIRECTORY + 'tags.json', "wb") do |file|
           file.write({})
+        end
+      end
+
+      def create_out_of_date_revision_file
+        Dir.mkdir(TEST_DOCUMENTATION_DIRECTORY) unless TEST_DOCUMENTATION_DIRECTORY.exist?
+        File.open(TEST_DOCUMENTATION_DIRECTORY + 'latest.json', "wb") do |file|
+          file.write('{ "revision": "out_of_date_sha" }')
         end
       end
     end

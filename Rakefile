@@ -57,7 +57,7 @@ desc("Download theme-liquid-docs")
 task :download_theme_liquid_docs do
   require 'theme_check/shopify_liquid/source_manager'
 
-  ThemeCheck::ShopifyLiquid::SourceManager.download
+  ThemeCheck::ShopifyLiquid::SourceManager.download_or_refresh_files
 end
 
 desc "Create a new check"

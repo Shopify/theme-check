@@ -8,13 +8,7 @@ module ThemeCheck
       extend self
 
       def download_or_refresh_files
-        if has_required_files?
-          # TODO: https://github.com/Shopify/theme-check/issues/651
-          #
-          # Refresh files if they exist locally
-        else
-          download
-        end
+        download if !has_required_files? || refresh_needed?
       end
 
       def download
@@ -25,6 +19,14 @@ module ThemeCheck
         end
       end
 
+      def refresh_needed?
+        if remote_revision != local_revision
+          return true
+        end
+
+        false 
+      end
+
       def local_path(file_name)
         documentation_directory + "#{file_name}.json"
       end
@@ -33,7 +35,21 @@ module ThemeCheck
 
       DOCUMENTATION_FETCH_URL = "https://github.com/Shopify/theme-liquid-docs/raw/main/data"
       DOCUMENTATION_DIRECTORY = Pathname.new("#{__dir__}/../../../data/shopify_liquid/documentation")
-      REQUIRED_FILE_NAMES = [:filters, :objects, :tags].freeze
+      REQUIRED_FILE_NAMES = [:filters, :objects, :tags, :latest].freeze
+
+      def local_revision
+        local_revision_file = local_path(:latest).read
+
+        # raise an error if revision isn't found to avoid returning nil
+        JSON.parse(local_revision_file).fetch('revision')
+      end
+
+      def remote_revision
+        remote_revision_file = open_uri(remote_path(:latest))
+
+        # raise an error if revision isn't found to avoid returning nil
+        JSON.parse(remote_revision_file).fetch('revision')
+      end
 
       def remote_path(file_name)
         "#{documentation_fetch_url}/#{file_name}.json"
