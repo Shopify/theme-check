@@ -8,8 +8,6 @@ module ThemeCheck
       include Constants
       extend self
 
-      PotentialLookup = Struct.new(:name, :lookups)
-
       def lookup(context)
         content = context.content
         cursor = context.cursor
@@ -32,7 +30,8 @@ module ThemeCheck
         lookups = variable.lookups
         assignments = find_assignments(buffer)
 
-        variable = assignments[variable.name] while assignments[variable.name].is_a?(Liquid::VariableLookup) && assignments[variable.name]
+        variable = assignments[variable.name] while assignments[variable.name]
+        lookups = variable.lookups unless variable.lookups.empty?
 
         PotentialLookup.new(variable.name, lookups)
       end

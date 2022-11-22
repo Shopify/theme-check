@@ -84,9 +84,9 @@ module ThemeCheck
           [
             {
               'properties' => [
-                { 'name' => 'first', 'description' => 'Returns the first item of an array.' },
+                { 'name' => 'first', "return_type" => [{ "type" => "generic" }], 'description' => 'Returns the first item of an array.' },
                 { 'name' => 'size', 'description' => 'Returns the number of items in an array.' },
-                { 'name' => 'last', 'description' => 'Returns the last item of an array.' },
+                { 'name' => 'last', "return_type" => [{ "type" => "generic" }], 'description' => 'Returns the last item of an array.' },
               ],
               'name' => 'array',
               'description' => 'Arrays hold lists of variables of any type.',
