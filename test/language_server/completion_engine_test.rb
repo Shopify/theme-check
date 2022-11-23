@@ -77,6 +77,16 @@ module ThemeCheck
         assert_empty(engine.completions(filename, 0, 1))
       end
 
+      def test_unique_completions
+        engine = make_engine(filename => <<~LIQUID)
+          {% assign product = all_products.first %}
+          {{  }}
+        LIQUID
+        assert_equal(1, engine
+          .completions(filename, 1, 3)
+          .count { |y| y[:label] == "product" })
+      end
+
       private
 
       def assert_completions(completion_items, item)
