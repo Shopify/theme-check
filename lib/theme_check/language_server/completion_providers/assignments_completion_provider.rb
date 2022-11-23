@@ -4,14 +4,20 @@ module ThemeCheck
   module LanguageServer
     class AssignmentsCompletionProvider < CompletionProvider
       def completions(context)
-        content = context.content
+        content = context.buffer[0..context.absolute_cursor].lines[0...-1].join
 
         return [] if content.nil?
-        return [] if content[context.cursor - 1] == "."
+        return [] unless (variable_lookup = VariableLookupFinder.lookup(context))
+        return [] unless variable_lookup.lookups.empty?
+        return [] if context.content[context.cursor - 1] == "."
 
         finder = VariableLookupFinder::AssignmentsFinder.new(content)
         finder.find!
-        finder.assignments.map { |label, value| object_to_completion(label, value.name) }
+
+        finder.assignments.map do |label, potential_lookup|
+          object, _property = VariableLookupTraverser.lookup_object_and_property(potential_lookup)
+          object_to_completion(label, object.name)
+        end
       end
 
       private

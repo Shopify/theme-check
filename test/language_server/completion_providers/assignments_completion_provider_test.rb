@@ -12,6 +12,8 @@ module ThemeCheck
           {%- liquid
             assign target = cart
             assign product_2 = product
+          %}
+          {{
         LIQUID
       end
 
@@ -28,13 +30,8 @@ module ThemeCheck
       end
 
       def test_suggests_nothing_when_method_of_object_is_called
-        refute_can_complete(@provider,
-          "#{@token}
-          target.")
-        # TODO: FIXME:
-        # refute_can_complete(@provider,
-        #   "#{@token}
-        #   target.prod")
+        refute_can_complete(@provider, "#{@token} target.")
+        refute_can_complete(@provider, "#{@token} target.prod")
       end
     end
   end
