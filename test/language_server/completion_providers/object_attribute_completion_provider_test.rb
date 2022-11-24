@@ -36,6 +36,11 @@ module ThemeCheck
         assert_can_complete_with(@provider, "{%- if form.", 'author')
       end
 
+      def test_completions_when_it_completes_array_types
+        assert_can_complete_with(@provider, "{{ articles.first.", 'comments')
+        assert_can_complete_with(@provider, "{{ product.images.first.", 'alt')
+      end
+
       def test_completions_when_it_completes_nested_attributes
         assert_can_complete_with(@provider, '{{ product.featured_image.', 'src')
         assert_can_complete_with(@provider, '{{ product.featured_image.src', 'size')
@@ -47,6 +52,10 @@ module ThemeCheck
         refute_can_complete(@provider, '{% rend')
         refute_can_complete(@provider, "{% render '")
         refute_can_complete(@provider, 'some text')
+      end
+
+      def test_completions_when_it_has_multiple_dots
+        refute_can_complete(@provider, '{{ cart..')
       end
     end
   end

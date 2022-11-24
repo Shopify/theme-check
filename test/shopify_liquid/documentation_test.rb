@@ -11,7 +11,7 @@ module ThemeCheck
         actual_doc = Documentation.filter_doc('size')
         expected_doc = "### size\n" \
           "Returns the size of a string or array.\n" \
-          "\n--\n\n" \
+          "\n---\n\n" \
           'You can use the "size" filter with dot notation.'
 
         assert_equal(expected_doc, actual_doc)

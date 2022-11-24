@@ -12,8 +12,12 @@ module ThemeCheck
           hash['type']
         end
 
+        def generic_type?
+          hash['type'] == 'generic'
+        end
+
         def array_type?
-          !hash['array_value'].empty?
+          !array_type.nil? && !array_type.empty?
         end
 
         def array_type

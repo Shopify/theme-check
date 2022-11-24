@@ -53,19 +53,466 @@ module ThemeCheck
 
           assignments = finder.assignments
 
-          # TODO: (3/6) https://github.com/Shopify/theme-check/issues/655
-          #
-          # -
-          # AssignmentsFinder shouldn't suggest the usage of target, because
-          # we can't guess the correct type
-          # -
-          #
-          # In other words, the two following lines should pass:
-          #
-          # assert_equal(1, assignments.size)
-          # assert_nil(assignments['target'])
-          #
+          assert_equal(1, assignments.size)
+          assert_nil(assignments['target'])
           assert_equal('cart', assignments['foo'].name)
+        end
+
+        def test_assignments_finder_single_line_assignments
+          assert_assignments_finder("{% assign target = cart %}", 'target' => 'cart')
+          assert_assignments_finder("{% assign target = cart█", 'target' => 'cart')
+        end
+
+        def test_assignments_finder_with_multi_line_assignments
+          template1 = <<~LIQUID
+            {%- liquid
+              assign target = cart
+            -%}
+          LIQUID
+
+          template2 = <<~LIQUID
+            {%- liquid
+              assign target = cart█
+          LIQUID
+
+          assert_assignments_finder(template1, 'target' => 'cart')
+          assert_assignments_finder(template2, 'target' => 'cart')
+        end
+
+        def test_assignments_finder_with_if_statements
+          template = <<~LIQUID
+            {%- liquid
+              assign var1 = product
+
+              if use_variant
+                assign var2 = var1
+                assign var3 = var2█
+          LIQUID
+
+          assert_assignments_finder(template, {
+            'var1' => 'product',
+            'var2' => 'var1',
+            'var3' => 'var2',
+          })
+        end
+
+        def test_assignments_finder_with_if_and_else_statements
+          template = <<~LIQUID
+            {%- liquid
+              assign var1 = product
+
+              if use_variant
+                assign var2 = var1
+                assign var3 = var2
+              else
+                assign var4 = var1
+                assign var5 = var4█
+          LIQUID
+
+          assert_assignments_finder(template, {
+            'var1' => 'product',
+            'var4' => 'var1',
+            'var5' => 'var4',
+          })
+        end
+
+        def test_assignments_finder_with_if_and_elsif_statements
+          template = <<~LIQUID
+            {%- liquid
+              assign var1 = product
+
+              if use_variant
+                assign var2 = var1
+                assign var3 = var2
+              elsif something
+                assign var4 = var1
+                assign var5 = var4█
+          LIQUID
+
+          assert_assignments_finder(template, {
+            'var1' => 'product',
+            'var4' => 'var1',
+            'var5' => 'var4',
+          })
+        end
+
+        def test_assignments_finder_with_if_statements_when_local_scope_must_not_be_considered
+          template = <<~LIQUID
+            {%- liquid
+              assign var1 = product
+
+              if use_variant
+                assign var2 = var1
+                assign var3 = var2
+              elsif something
+                assign var4 = var1
+                assign var5 = var4
+              else
+                assign var6 = var5
+                assign var7 = var6
+              endif
+
+              assign var8 = cart█
+          LIQUID
+
+          assert_assignments_finder(template, {
+            'var1' => 'product',
+            'var8' => 'cart',
+          })
+        end
+
+        def test_assignments_finder_with_unless_statements
+          template = <<~LIQUID
+            {%- liquid
+              assign var1 = product
+
+              unless use_variant
+                assign var2 = var1
+                assign var3 = var2█
+          LIQUID
+
+          assert_assignments_finder(template, {
+            'var1' => 'product',
+            'var2' => 'var1',
+            'var3' => 'var2',
+          })
+        end
+
+        def test_assignments_finder_with_unless_and_else_statements
+          template = <<~LIQUID
+            {%- liquid
+              assign var1 = product
+
+              unless use_variant
+                assign var2 = var1
+                assign var3 = var2
+              else
+                assign var4 = var1
+                assign var5 = var4█
+          LIQUID
+
+          assert_assignments_finder(template, {
+            'var1' => 'product',
+            'var4' => 'var1',
+            'var5' => 'var4',
+          })
+        end
+
+        def test_assignments_finder_with_unless_statements_when_local_scope_must_not_be_considered
+          template = <<~LIQUID
+            {%- liquid
+              assign var1 = product
+
+              unless use_variant
+                assign var2 = var1
+                assign var3 = var2
+              elsif something
+                assign var4 = var1
+                assign var5 = var4
+              else
+                assign var6 = var5
+                assign var7 = var6
+              endunless
+
+              assign var8 = cart█
+          LIQUID
+
+          assert_assignments_finder(template, {
+            'var1' => 'product',
+            'var8' => 'cart',
+          })
+        end
+
+        def test_assignments_finder_with_for_statements
+          template = <<~LIQUID
+            {%- liquid
+              assign var1 = product
+            -%}
+            {%- for var2 in collections.first.products -%}
+              {% assign var3 = var2 %}
+              {{ var3.title }}
+          LIQUID
+
+          assert_assignments_finder(template, {
+            'var1' => 'product',
+            'var2' => 'collections',
+            'var3' => 'var2',
+          })
+        end
+
+        def test_assignments_finder_with_for_and_else_statements
+          template = <<~LIQUID
+            {%- liquid
+              assign var1 = product
+            -%}
+            {% for var2 in collections.first.products %}
+              {% assign var3 = var2 %}
+              {{ var3.title }}
+            {% else %}
+              {% assign var4 = var1 %}
+              {% assign var5 = var4█
+          LIQUID
+
+          assert_assignments_finder(template, {
+            'var1' => 'product',
+            'var4' => 'var1',
+            'var5' => 'var4',
+          })
+        end
+
+        def test_assignments_finder_with_for_statements_when_local_scope_must_not_be_considered
+          template = <<~LIQUID
+            {%- liquid
+              assign var1 = product
+            -%}
+            {%- for var2 in collections.first.products -%}
+              {% assign var3 = var2 %}
+              {{ var3.title }}
+            {%- else -%}
+              {% assign var4 = var2 %}
+              There are no products in this collection.
+            {%- endfor -%}
+            {%- liquid
+              assign var5 = cart█
+          LIQUID
+
+          assert_assignments_finder(template, {
+            'var1' => 'product',
+            'var5' => 'cart',
+          })
+        end
+
+        def test_assignments_finder_with_table_row_statements
+          template = <<~LIQUID
+            {%- liquid
+              assign var1 = product
+            -%}
+            <table>
+              {% tablerow var2 in collections.first.products %}
+                {% assign var3 = var2 %}
+                {{ var3.title█
+          LIQUID
+
+          assert_assignments_finder(template, {
+            'var1' => 'product',
+            'var2' => 'collections',
+            'var3' => 'var2',
+          })
+        end
+
+        def test_assignments_finder_with_table_row_statements_when_local_scope_must_not_be_considered
+          template = <<~LIQUID
+            {%- liquid
+              assign var1 = product
+            -%}
+            <table>
+              {% tablerow var2 in collections.first.products %}
+                {% assign var3 = var2 %}
+                {{ var3.title }}
+              {% endtablerow %}
+            </table>
+            {%- liquid
+              assign var4 = cart█
+          LIQUID
+
+          assert_assignments_finder(template, {
+            'var1' => 'product',
+            'var4' => 'cart',
+          })
+        end
+
+        def test_assignments_finder_with_case_statements
+          template = <<~LIQUID
+            {% assign var1 = product %}
+
+            {% case var1.type %}
+              {% when "type1" %}
+                {% assign var2 = var1 %}
+                {% assign var3 = var2█
+          LIQUID
+
+          assert_assignments_finder(template, {
+            'var1' => 'product',
+            'var2' => 'var1',
+            'var3' => 'var2',
+          })
+        end
+
+        def test_assignments_finder_with_case_and_when_statements
+          template = <<~LIQUID
+            {% assign var1 = product %}
+
+            {% case var1.type %}
+              {% when "type1" %}
+                {% assign var2 = var1 %}
+                {% assign var3 = var2 %}
+              {% when "type2", "type3" %}
+                {% assign var4 = var1 %}
+                {% assign var5 = var4█
+          LIQUID
+
+          assert_assignments_finder(template, {
+            'var1' => 'product',
+            'var4' => 'var1',
+            'var5' => 'var4',
+          })
+        end
+
+        def test_assignments_finder_with_case_and_else_statements
+          template = <<~LIQUID
+            {% assign var1 = product %}
+
+            {% case var1.type %}
+              {% when "type1" %}
+                {% assign var2 = var1 %}
+                {% assign var3 = var2 %}
+              {% when "type2", "type3" %}
+                {% assign var4 = var1 %}
+                {% assign var5 = var4 %}
+              {% else %}
+                {% assign var6 = var1 %}
+                {% assign var7 = var6█
+          LIQUID
+
+          assert_assignments_finder(template, {
+            'var1' => 'product',
+            'var6' => 'var1',
+            'var7' => 'var6',
+          })
+        end
+
+        def test_assignments_finder_with_case_statements_when_local_scope_must_not_be_considered
+          template = <<~LIQUID
+            {% assign var1 = product %}
+
+            {% case var1.type %}
+              {% when "type1" %}
+                {% assign var2 = var1 %}
+                {% assign var3 = var2 %}
+              {% when "type2", "type3" %}
+                {% assign var4 = var1 %}
+                {% assign var5 = var4 %}
+              {% else %}
+                {% assign var6 = var1 %}
+                {% assign var7 = var6 %}
+            {% endcase %}
+
+            {% assign var8 = cart█
+          LIQUID
+
+          assert_assignments_finder(template, {
+            'var1' => 'product',
+            'var8' => 'cart',
+          })
+        end
+
+        def test_assignments_finder_with_colisions_between_variables_and_if_statements
+          template = <<~LIQUID
+            {%- liquid
+              assign var1 = color
+              assign var2 = article
+
+              if use_variant
+                assign var1 = product
+              else
+                assign var1 = cart
+              endif
+            -%}
+          LIQUID
+
+          assert_assignments_finder(template, {
+            'var2' => 'article',
+          })
+        end
+
+        def test_assignments_finder_with_colisions_between_if_statements_and_variables
+          template = <<~LIQUID
+            {%- liquid
+              if use_variant
+                assign var1 = product
+              else
+                assign var1 = cart
+              endif
+              assign var1 = color
+              assign var2 = article
+            -%}
+          LIQUID
+
+          assert_assignments_finder(template, {
+            'var1' => 'color',
+            'var2' => 'article',
+          })
+        end
+
+        def test_assignments_finder_with_nested_scopes
+          template = <<~LIQUID
+            {%- liquid
+              assign var1 = product
+            -%}
+            {% if var1.something %}
+              {% assign var2 = var1 %}
+
+              {% if var2.something %}
+                {% assign var3 = var2 %}
+
+                {% if var3.something %}
+                  {% assign var4 = var3 %}
+                {% endif %}
+
+                {% assign var5 = var3 %}█
+          LIQUID
+
+          assert_assignments_finder(template, {
+            'var1' => 'product',
+            'var2' => 'var1',
+            'var3' => 'var2',
+            'var5' => 'var3',
+          })
+        end
+
+        private
+
+        def assert_assignments_finder(template, expected_assignments)
+          template = template.split('█').first
+
+          finder = AssignmentsFinder.new(template)
+          finder.find!
+
+          actual_assignments = finder.assignments
+
+          assert_equal(
+            expected_assignments.size,
+            actual_assignments.size,
+            debug_message(actual_assignments)
+          )
+
+          expected_assignments.each do |variable, expected_target|
+            actual_target = actual_assignments[variable]&.name
+            error_prefix = "The variable '#{variable}' must point to '#{expected_target}' instead '#{actual_target}'"
+
+            assert_equal(
+              expected_target,
+              actual_target,
+              debug_message(actual_assignments, error_prefix)
+            )
+          end
+        end
+
+        def debug_message(scope, prefix = '')
+          output = [prefix]
+
+          scope.each do |variable, target|
+            output << " > variable: #{variable}"
+
+            output << "   target > lookup: #{target.name} (#{target.lookups})"
+            output << "          > scope:"
+
+            target.scope.each do |sub_variable, sub_target|
+              output << "            > #{sub_variable} -> #{sub_target.name}"
+            end
+          end
+
+          output.join("\n")
         end
       end
     end
