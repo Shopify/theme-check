@@ -3,6 +3,11 @@
     "properties": [
       {
         "name": "first",
+        "return_type": [
+          {
+            "type": "generic"
+          }
+        ],
         "description": "Returns the first item of an array."
       },
       {
@@ -11,6 +16,11 @@
       },
       {
         "name": "last",
+        "return_type": [
+          {
+            "type": "generic"
+          }
+        ],
         "description": "Returns the last item of an array."
       }
     ],
