@@ -1,0 +1,60 @@
+[
+  {
+    "properties": [
+      {
+        "name": "first",
+        "return_type": [
+          {
+            "type": "generic"
+          }
+        ],
+        "description": "Returns the first item of an array."
+      },
+      {
+        "name": "size",
+        "description": "Returns the number of items in an array."
+      },
+      {
+        "name": "last",
+        "return_type": [
+          {
+            "type": "generic"
+          }
+        ],
+        "description": "Returns the last item of an array."
+      }
+    ],
+    "name": "array",
+    "description": "Arrays hold lists of variables of any type."
+  },
+  {
+    "properties": [
+      {
+        "name": "size",
+        "description": "Returns the number of characters in a string."
+      }
+    ],
+    "name": "string",
+    "description": "Strings are sequences of characters wrapped in single or double quotes."
+  },
+  {
+    "properties": [],
+    "name": "number",
+    "description": "Numeric values, including floats and integers."
+  },
+  {
+    "properties": [],
+    "name": "boolean",
+    "description": "A binary value, either true or false."
+  },
+  {
+    "properties": [],
+    "name": "nil",
+    "description": "An undefined value. Tags or outputs that return nil don't print anything to the page. They are also treated as false."
+  },
+  {
+    "properties": [],
+    "name": "empty",
+    "description": "An empty object is returned if you try to access an object that is defined, but has no value. For example a page or product that’s been deleted, or a setting with no value. You can compare an object with empty to check whether an object exists before you access any of its attributes."
+  }
+]

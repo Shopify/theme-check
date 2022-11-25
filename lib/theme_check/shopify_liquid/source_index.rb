@@ -76,32 +76,7 @@ module ThemeCheck
         end
 
         def built_in_objects
-          # TODO: (2/6) https://github.com/Shopify/theme-check/issues/657
-          # -
-          # Manualy introduce a 'data/shopify_liquid/built_in_liquid_objects.json' file
-          # using https://shopify.dev/api/liquid/basics#types as a reference.
-          # -
-          [
-            {
-              'properties' => [
-                { 'name' => 'first', "return_type" => [{ "type" => "generic" }], 'description' => 'Returns the first item of an array.' },
-                { 'name' => 'size', 'description' => 'Returns the number of items in an array.' },
-                { 'name' => 'last', "return_type" => [{ "type" => "generic" }], 'description' => 'Returns the last item of an array.' },
-              ],
-              'name' => 'array',
-              'description' => 'Arrays hold lists of variables of any type.',
-            },
-            {
-              'properties' => [
-                {
-                  'name' => 'size',
-                  'description' => 'Returns the number of characters in a string.',
-                },
-              ],
-              'name' => 'string',
-              'description' => 'Strings are sequences of characters wrapped in single or double quotes.',
-            },
-          ]
+          load_file("../built_in_liquid_objects")
         end
       end
     end
