@@ -190,3 +190,7 @@ DeprecateLazysizes:
 ⚠️ **Note:** Quickfixes only work on a freshly checked file. If any of those configurations are turned off, you will need to rerun theme-check in order to apply quickfixes.
 
 In VS Code, these can be set directly in your `settings.json`.
+
+## Contributing
+
+For guidance on contributing, refer to this [doc](/CONTRIBUTING)

@@ -21,6 +21,84 @@ For your contribution to be accepted you will need to sign the [Shopify Contribu
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
 
+## Run Language Server 
+If you're making changes to the language server and you want to debug, you can run the repo's version of `theme-check-language-server`.
+
+### Setup
+
+Before configuring your IDE, run the following commands in a terminal:
+
+  * Make sure you have a `$HOME/bin`
+      ```bash
+      mkdir -p $HOME/bin
+      ```
+  * Paste this script to create an executable wrapper in `$HOME/bin/theme-check-language-server` for language server
+      ```bash
+      cat <<-'EOF' > $HOME/bin/theme-check-language-server
+      #!/usr/bin/env bash
+      cd "$HOME/src/github.com/Shopify/theme-check" &> /dev/null
+      chruby () {
+        source '/opt/dev/sh/chruby/chruby.sh'
+        chruby "$@"
+      }
+      export THEME_CHECK_DEBUG=true
+      export THEME_CHECK_DEBUG_LOG_FILE="/tmp/theme-check-debug.log"
+      touch "$THEME_CHECK_DEBUG_LOG_FILE"
+      chruby 2.7 &>/dev/null
+      gem env &>/dev/null
+      bin/theme-check-language-server
+      EOF
+      ```
+  * Make the script executable
+      ```bash
+      chmod u+x $HOME/bin/theme-check-language-server
+      ```
+
+#### Configure VS Code
+
+* Install the [Shopify Liquid](https://github.com/shopify/theme-check-vscode) plugin
+
+* Add the following to `settings.json`:
+
+```json
+"shopifyLiquid.formatterDevPreview": true,
+"shopifyLiquid.languageServerPath": "/Users/<YOUR_USERNAME>/bin/theme-check-language-server",
+```
+
+#### Configure Vim
+
+If you use `coc.nvim` as your completion engine, add this to your CocConfig:
+
+```json
+"languageserver": {
+  "theme-check": {
+    "command": "/Users/<YOUR_USERNAME>/bin/theme-check-language-server",
+    "trace.server": "verbose",
+    "filetypes": ["liquid", "liquid.html"],
+    "rootPatterns": [".theme-check.yml", "snippets/*"],
+    "settings": {
+      "themeCheck": {
+        "checkOnSave": true,
+        "checkOnEnter": true,
+        "checkOnChange": false
+      }
+    }
+  }
+```
+
+### Confirm Setup
+
+* In another terminal from the root of theme check run `tail -f /tmp/theme-check-debug.log` to watch the server logs 
+* Restart your IDE, confirm the response for initialize in the logs is pointing to the language server in the `$HOME/bin` directory (the version will be different)
+
+```json
+    "serverInfo": {
+        "name": "/Users/johndoe/bin/theme-check-language-server",
+        "version": "1.10.3"
+    }
+```
+
+
 ## Running Tests
 
 ```
@@ -123,3 +201,7 @@ chrome /tmp/fg.svg
 What you'll see is an interactive version of the following image:
 
 ![flamegraph](docs/flamegraph.svg)
+
+## Troubleshooting
+
+If you run into issues during development, see the [troubleshooting guide](/TROUBLESHOOTING.md)
