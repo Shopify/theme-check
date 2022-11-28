@@ -6,6 +6,10 @@ module ThemeCheck
       include CompletionHelper
       include RegexHelpers
 
+      attr_reader :storage
+
+      CurrentToken = Struct.new(:content, :cursor, :absolute_cursor, :buffer)
+
       class << self
         def all
           @all ||= []
@@ -20,8 +24,19 @@ module ThemeCheck
         @storage = storage
       end
 
-      def completions(content, cursor)
+      def completions(relative_path, line, col)
         raise NotImplementedError
+      end
+
+      def doc_hash(content)
+        return {} if content.nil? || content.empty?
+
+        {
+          documentation: {
+            kind: MarkupKinds::MARKDOWN,
+            value: content,
+          },
+        }
       end
     end
   end

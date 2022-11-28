@@ -3,7 +3,11 @@
 module ThemeCheck
   module LanguageServer
     class RenderSnippetCompletionProvider < CompletionProvider
-      def completions(content, cursor)
+      def completions(context)
+        content = context.content
+        cursor = context.cursor
+
+        return [] if content.nil?
         return [] unless cursor_on_quoted_argument?(content, cursor)
         partial = snippet(content) || ''
         snippets

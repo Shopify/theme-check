@@ -165,6 +165,52 @@ module ThemeCheck
         LIQUID
       end
 
+      def test_lookup_liquid_variable_when_it_is_desclared_in_a_different_token
+        token = CompletionProvider::CurrentToken.new(
+          '{{ foo.selected_selling_plan.checkout_charge.val }}',
+          48,
+          106,
+          <<~LIQUID
+            {%- liquid
+              assign foo = product
+            -%}
+
+            <div>Hello!</div>
+
+            {{ foo.selected_selling_plan.checkout_charge.val }}
+          LIQUID
+        )
+
+        potential_lookup = VariableLookupFinder.lookup(token)
+
+        assert_equal('product', potential_lookup.name)
+        assert_equal(%w(selected_selling_plan checkout_charge val), potential_lookup.lookups)
+      end
+
+      def test_lookup_liquid_variable_when_it_is_desclared_in_following_token
+        token = CompletionProvider::CurrentToken.new(
+          '{{ foo. }}',
+          7,
+          26,
+          <<~LIQUID
+            <div>Hello!</div>
+
+            {{ foo. }}
+
+            {%- liquid
+              assign foo = product
+            -%}
+          LIQUID
+        )
+
+        potential_lookup = VariableLookupFinder.lookup(token)
+
+        assert_equal('foo', potential_lookup.name)
+        assert_equal([], potential_lookup.lookups)
+      end
+
+      private
+
       def assert_can_lookup_var(variable_content, expected_markup, offset = 0)
         assert_can_lookup("{{ #{variable_content}", expected_markup, offset)
         assert_can_lookup("{{- #{variable_content}", expected_markup, offset)
@@ -192,12 +238,16 @@ module ThemeCheck
         # Make sure nothing blows up by doing lookups at every point
         # in every test strings.
         (0...token.size).each do |i|
-          assert(VariableLookupFinder.lookup(token, i) || true)
+          current_token = CompletionProvider::CurrentToken.new(token, i)
+
+          assert(VariableLookupFinder.lookup(current_token) || true)
         end if ENV["PARANOID"]
+
+        current_token = CompletionProvider::CurrentToken.new(token, token.size + offset)
 
         assert_equal(
           Liquid::VariableLookup.parse(expected_markup),
-          VariableLookupFinder.lookup(token, token.size + offset),
+          VariableLookupFinder.lookup(current_token),
           <<~ERRMSG,
             Expected to find a variable lookup for '#{expected_markup}' in the following content:
             #{token}
@@ -217,11 +267,15 @@ module ThemeCheck
         # Make sure nothing blows up by doing lookups at every point
         # in every test strings.
         (0...token.size).each do |i|
-          assert(VariableLookupFinder.lookup(token, i) || true)
+          current_token = CompletionProvider::CurrentToken.new(token, i)
+
+          assert(VariableLookupFinder.lookup(current_token) || true)
         end if ENV["PARANOID"]
 
+        current_token = CompletionProvider::CurrentToken.new(token, token.size + offset)
+
         assert_nil(
-          VariableLookupFinder.lookup(token, token.size + offset),
+          VariableLookupFinder.lookup(current_token),
           <<~ERRMSG,
             Expected lookup to be nil at the specified cursor position:
             #{token}

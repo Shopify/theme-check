@@ -18,15 +18,19 @@ module ThemeCheck
 
       class << self
         def filters
-          @filters ||= load_file(:filters).map { |hash| SourceIndex::FilterEntry.new(hash) }
+          @filters ||= load_file(:filters)
+            .map { |hash| SourceIndex::FilterEntry.new(hash) }
         end
 
         def objects
-          @objects ||= load_file(:objects).map { |hash| SourceIndex::ObjectEntry.new(hash) }
+          @objects ||= load_file(:objects)
+            .concat(built_in_objects)
+            .map { |hash| SourceIndex::ObjectEntry.new(hash) }
         end
 
         def tags
-          @tags ||= load_file(:tags).map { |hash| SourceIndex::TagEntry.new(hash) }
+          @tags ||= load_file(:tags)
+            .map { |hash| SourceIndex::TagEntry.new(hash) }
         end
 
         private
@@ -41,23 +45,26 @@ module ThemeCheck
           JSON.parse(path.read)
         end
 
+        # TODO: (1/6) https://github.com/Shopify/theme-check/issues/651
+        # -
+        # Remove this implementation in favor of a proper/stable approach to
+        # download/update theme-liquid-docs files.
         def download_files
-          ################################################################################
-          ## TODO (REMOVE ME):
-          ##   Remove this implementation in favor of a proper/stable approach
-          ##   to download/update theme-liquid-docs files.
-          ################################################################################
-          commands = [
-            'git clone git@github.com:Shopify/theme-liquid-docs.git /tmp/theme-liquid-docs-tmp',
-            'cd /tmp/theme-liquid-docs-tmp',
-            'git reset origin/init-repo --hard',
-            "mv data/filters.json #{__dir__}/../../../data/shopify_liquid/documentation",
-            "mv data/objects.json #{__dir__}/../../../data/shopify_liquid/documentation",
-            "mv data/tags.json #{__dir__}/../../../data/shopify_liquid/documentation",
-            'cd -',
-          ].join(' && ')
+          require 'open-uri'
 
-          Kernel.exec(commands)
+          documentation_directory = "#{__dir__}/../../../data/shopify_liquid/documentation"
+
+          Dir.mkdir(documentation_directory) unless File.exist?(documentation_directory)
+
+          ['filters', 'objects', 'tags'].each do |file_name|
+            local_path = "#{documentation_directory}/#{file_name}.json"
+            remote_path = "https://github.com/Shopify/theme-liquid-docs/raw/main/data/#{file_name}.json"
+
+            File.open(local_path, "wb") do |file|
+              content = URI.open(remote_path).read # rubocop:disable Security/Open
+              file.write(content)
+            end
+          end
         end
 
         def has_files?
@@ -66,6 +73,10 @@ module ThemeCheck
 
         def file_path(file_name)
           TYPE_SOURCE + "#{file_name}.json"
+        end
+
+        def built_in_objects
+          load_file("../built_in_liquid_objects")
         end
       end
     end

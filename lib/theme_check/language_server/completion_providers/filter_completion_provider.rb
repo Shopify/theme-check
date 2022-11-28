@@ -5,8 +5,13 @@ module ThemeCheck
     class FilterCompletionProvider < CompletionProvider
       NAMED_FILTER = /#{Liquid::FilterSeparator}\s*(\w+)/o
 
-      def completions(content, cursor)
+      def completions(context)
+        content = context.content
+        cursor = context.cursor
+
+        return [] if content.nil?
         return [] unless can_complete?(content, cursor)
+
         available_labels
           .select { |w| w.start_with?(partial(content, cursor)) }
           .map { |filter| filter_to_completion(filter) }
@@ -42,9 +47,12 @@ module ThemeCheck
       end
 
       def filter_to_completion(filter)
+        content = ShopifyLiquid::Documentation.filter_doc(filter)
+
         {
           label: filter,
           kind: CompletionItemKinds::FUNCTION,
+          **doc_hash(content),
         }
       end
     end

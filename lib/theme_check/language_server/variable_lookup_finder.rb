@@ -1,50 +1,46 @@
 # frozen_string_literal: true
 
+require 'ostruct'
+
 module ThemeCheck
   module LanguageServer
     module VariableLookupFinder
+      include Constants
       extend self
 
-      UNCLOSED_SQUARE_BRACKET = /\[[^\]]*\Z/
-      ENDS_IN_BRACKET_POSITION_THAT_CANT_BE_COMPLETED = %r{
-        (
-          # quotes not preceded by a [
-          (?<!\[)['"]|
-          # closing ]
-          \]|
-          # opening [
-          \[
-        )$
-      }x
+      def lookup(context)
+        content = context.content
+        cursor = context.cursor
 
-      VARIABLE_LOOKUP_CHARACTERS = /[a-z0-9_.'"\]\[]/i
-      VARIABLE_LOOKUP = /#{VARIABLE_LOOKUP_CHARACTERS}+/o
-      SYMBOLS_PRECEDING_POTENTIAL_LOOKUPS = %r{
-        (?:
-          \s(?:
-            if|elsif|unless|and|or|#{Liquid::Condition.operators.keys.join("|")}
-            |echo
-            |case|when
-            |cycle
-            |in
-          )
-          |[:,=]
-        )
-        \s+
-      }omix
-      ENDS_WITH_BLANK_POTENTIAL_LOOKUP = /#{SYMBOLS_PRECEDING_POTENTIAL_LOOKUPS}$/oimx
-      ENDS_WITH_POTENTIAL_LOOKUP = /#{SYMBOLS_PRECEDING_POTENTIAL_LOOKUPS}#{VARIABLE_LOOKUP}$/oimx
-
-      def lookup(content, cursor)
         return if cursor_is_on_bracket_position_that_cant_be_completed(content, cursor)
-        potential_lookup = lookup_liquid_variable(content, cursor) || lookup_liquid_tag(content, cursor)
+        variable_lookup = lookup_liquid_variable(content, cursor) || lookup_liquid_tag(content, cursor)
 
         # And we only return it if it's parsed by Liquid as VariableLookup
-        return unless potential_lookup.is_a?(Liquid::VariableLookup)
-        potential_lookup
+        return unless variable_lookup.is_a?(Liquid::VariableLookup)
+
+        potential_lookup(variable_lookup, context)
       end
 
       private
+
+      def potential_lookup(variable, context)
+        return variable if context.buffer.nil? || context.buffer.empty?
+
+        buffer = context.buffer[0...context.absolute_cursor]
+        lookups = variable.lookups
+        assignments = find_assignments(buffer)
+
+        variable = assignments[variable.name] while assignments[variable.name]
+        lookups = variable.lookups unless variable.lookups.empty?
+
+        PotentialLookup.new(variable.name, lookups)
+      end
+
+      def find_assignments(buffer)
+        finder = AssignmentsFinder.new(buffer)
+        finder.find!
+        finder.assignments
+      end
 
       def cursor_is_on_bracket_position_that_cant_be_completed(content, cursor)
         content[0..cursor - 1] =~ ENDS_IN_BRACKET_POSITION_THAT_CANT_BE_COMPLETED
@@ -122,12 +118,12 @@ module ThemeCheck
         return unless cursor_is_on_liquid_tag_lookup_position(content, cursor)
 
         markup = parseable_markup(content, cursor)
-        return empty_lookup if markup == :empty_lookup_markup
+        return empty_lookup if markup.empty?
 
         template = Liquid::Template.parse(markup)
         current_tag = template.root.nodelist[0]
 
-        case current_tag.tag_name
+        case current_tag&.tag_name
         when "if", "unless"
           variable_lookup_for_if_tag(current_tag)
         when "case"
@@ -144,70 +140,16 @@ module ThemeCheck
           variable_lookup_for_assign_tag(current_tag)
         when "echo"
           variable_lookup_for_echo_tag(current_tag)
+        else
+          empty_lookup
         end
-
-      # rubocop:disable Style/RedundantReturn
       rescue Liquid::SyntaxError
         # We don't complete variable for liquid syntax errors
-        return
+        empty_lookup
       end
-      # rubocop:enable Style/RedundantReturn
 
-      def parseable_markup(content, cursor)
-        start_index = 0
-        end_index = cursor - 1
-        markup = content[start_index..end_index]
-
-        # Welcome to Hackcity
-        markup += "'" if markup.count("'").odd?
-        markup += '"' if markup.count('"').odd?
-        markup += "]" if markup =~ UNCLOSED_SQUARE_BRACKET
-
-        # Now check if it's a liquid tag
-        is_liquid_tag = markup =~ tag_regex('liquid')
-        ends_with_blank_potential_lookup = markup =~ ENDS_WITH_BLANK_POTENTIAL_LOOKUP
-        last_line = markup.rstrip.lines.last
-        markup = "{% #{last_line}" if is_liquid_tag
-
-        # Close the tag
-        markup += ' %}'
-
-        # if statements
-        is_if_tag = markup =~ tag_regex('if')
-        return :empty_lookup_markup if is_if_tag && ends_with_blank_potential_lookup
-        markup += '{% endif %}' if is_if_tag
-
-        # unless statements
-        is_unless_tag = markup =~ tag_regex('unless')
-        return :empty_lookup_markup if is_unless_tag && ends_with_blank_potential_lookup
-        markup += '{% endunless %}' if is_unless_tag
-
-        # elsif statements
-        is_elsif_tag = markup =~ tag_regex('elsif')
-        return :empty_lookup_markup if is_elsif_tag && ends_with_blank_potential_lookup
-        markup = '{% if x %}' + markup + '{% endif %}' if is_elsif_tag
-
-        # case statements
-        is_case_tag = markup =~ tag_regex('case')
-        return :empty_lookup_markup if is_case_tag && ends_with_blank_potential_lookup
-        markup += "{% endcase %}" if is_case_tag
-
-        # when
-        is_when_tag = markup =~ tag_regex('when')
-        return :empty_lookup_markup if is_when_tag && ends_with_blank_potential_lookup
-        markup = "{% case x %}" + markup + "{% endcase %}" if is_when_tag
-
-        # for statements
-        is_for_tag = markup =~ tag_regex('for')
-        return :empty_lookup_markup if is_for_tag && ends_with_blank_potential_lookup
-        markup += "{% endfor %}" if is_for_tag
-
-        # tablerow statements
-        is_tablerow_tag = markup =~ tag_regex('tablerow')
-        return :empty_lookup_markup if is_tablerow_tag && ends_with_blank_potential_lookup
-        markup += "{% endtablerow %}" if is_tablerow_tag
-
-        markup
+      def parseable_markup(content, cursor = nil)
+        LiquidFixer.new(content, cursor).parsable
       end
 
       def variable_lookup_for_if_tag(if_tag)
