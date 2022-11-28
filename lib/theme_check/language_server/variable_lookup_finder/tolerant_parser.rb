@@ -41,6 +41,11 @@ module ThemeCheck
 
         class Tags
           module TolerantBlockBody
+            ##
+            # This module defines the tolerant parse body that doesn't
+            # raise syntax errors when a block is not closed. Thus, the
+            # tolerant parser can build the AST for templates with this
+            # kind of error, which is quite common in language servers.
             def parse_body(body, tokens)
               super
             rescue StandardError

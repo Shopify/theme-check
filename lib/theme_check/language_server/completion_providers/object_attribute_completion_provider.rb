@@ -23,7 +23,7 @@ module ThemeCheck
         object
           .properties
           .select { |prop| partial.nil? || prop.name.start_with?(partial) }
-          .map { |prop| property_doc(prop) }
+          .map { |prop| property_to_completion(prop) }
       end
 
       private
@@ -70,7 +70,7 @@ module ThemeCheck
         last_property if last_property != property&.name
       end
 
-      def property_doc(prop)
+      def property_to_completion(prop)
         content = ShopifyLiquid::Documentation.render_doc(prop)
 
         {

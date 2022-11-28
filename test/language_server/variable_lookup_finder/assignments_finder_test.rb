@@ -19,7 +19,7 @@ module ThemeCheck
             -%}
 
             {%- liquid
-              assign bar = foo
+              assign bar = foo█
           LIQUID
 
           finder.find!
@@ -230,7 +230,7 @@ module ThemeCheck
             -%}
             {%- for var2 in collections.first.products -%}
               {% assign var3 = var2 %}
-              {{ var3.title }}
+              {{ var3.title }}█
           LIQUID
 
           assert_assignments_finder(template, {
@@ -457,6 +457,7 @@ module ThemeCheck
 
                 {% if var3.something %}
                   {% assign var4 = var3 %}
+                  {% assign var2 = var4 %}
                 {% endif %}
 
                 {% assign var5 = var3 %}█
@@ -464,7 +465,6 @@ module ThemeCheck
 
           assert_assignments_finder(template, {
             'var1' => 'product',
-            'var2' => 'var1',
             'var3' => 'var2',
             'var5' => 'var3',
           })

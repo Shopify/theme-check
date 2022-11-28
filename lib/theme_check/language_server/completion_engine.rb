@@ -10,8 +10,10 @@ module ThemeCheck
       end
 
       def completions(relative_path, line, col)
+        context = context(relative_path, line, col)
+
         @providers.flat_map do |provider|
-          provider.completions(context(relative_path, line, col))
+          provider.completions(context)
         end
       rescue StandardError => error
         @bridge || raise(error)
