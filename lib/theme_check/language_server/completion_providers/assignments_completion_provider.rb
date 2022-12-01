@@ -4,7 +4,7 @@ module ThemeCheck
   module LanguageServer
     class AssignmentsCompletionProvider < CompletionProvider
       def completions(context)
-        content = context.buffer[0..context.absolute_cursor].lines[0...-1].join
+        content = context.buffer_until_previous_row
 
         return [] if content.nil?
         return [] unless (variable_lookup = VariableLookupFinder.lookup(context))
