@@ -12,9 +12,9 @@ module ThemeCheck
       def completions(relative_path, line, col)
         context = context(relative_path, line, col)
 
-        @providers.flat_map do |provider|
-          provider.completions(context)
-        end
+        @providers
+          .flat_map { |provider| provider.completions(context) }
+          .uniq { |completion_item| completion_item[:label] }
       rescue StandardError => error
         @bridge || raise(error)
 

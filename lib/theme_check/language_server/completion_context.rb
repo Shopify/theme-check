@@ -18,6 +18,10 @@ module ThemeCheck
         @buffer ||= storage.read(relative_path)
       end
 
+      def buffer_until_previous_row
+        @buffer_without_current_row ||= buffer[0..absolute_cursor].lines[0...-1].join
+      end
+
       def absolute_cursor
         @absolute_cursor ||= from_row_column_to_index(buffer, line, col)
       end
