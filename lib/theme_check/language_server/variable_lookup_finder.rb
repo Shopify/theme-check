@@ -21,6 +21,10 @@ module ThemeCheck
         potential_lookup(variable_lookup, context)
       end
 
+      def lookup_literal(context)
+        lookup_liquid_variable(context.content, context.cursor)
+      end
+
       private
 
       def potential_lookup(variable, context)

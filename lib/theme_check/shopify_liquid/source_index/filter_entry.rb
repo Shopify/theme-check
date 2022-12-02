@@ -8,6 +8,10 @@ module ThemeCheck
           (hash['parameters'] || [])
             .map { |hash| ParameterEntry.new(hash) }
         end
+
+        def input_type
+          hash['syntax'].split(' | ')[0]
+        end
       end
     end
   end
