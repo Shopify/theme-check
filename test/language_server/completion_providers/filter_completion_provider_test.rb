@@ -77,7 +77,6 @@ module ThemeCheck
       end
 
       def test_filters_compatible_with_the_string_type_and_assignment_and_variable_in_next_line
-        skip('NoMethodError: undefined method `name\' for "  Some potions create whitespace.      ":String')
         input_type = 'string'
         token = "{%- assign text = '  Some potions create whitespace.      ' -%}\n{{ text | "
         assert_can_only_complete_with(token, input_type)
@@ -108,7 +107,6 @@ module ThemeCheck
       end
 
       def test_filters_compatible_with_the_variable_type_and_assignment
-        skip("Throws NoMethodError: undefined method `name' for false:FalseClass")
         token = "{%- assign display_price = false -%}\n{{ display_price | "
         assert_can_complete_with(@provider, token, FILTER_WITH_INPUT_TYPE_VARIABLE)
       end
