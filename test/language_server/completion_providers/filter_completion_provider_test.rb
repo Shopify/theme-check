@@ -60,9 +60,14 @@ module ThemeCheck
       end
 
       def test_filters_compatible_with_the_string_type_and_assignment_and_attribute
-        skip("Suggests ALL filters (for collection_product), but should suggest only string filters (for .url)")
         input_type = 'string'
         token = "{%- assign collection_product = collection.products.first -%}\n{{ collection_product.url | "
+        assert_can_only_complete_with(token, input_type)
+      end
+
+      def test_filters_compatible_with_the_string_type_and_multi_level_assignments_and_attributes
+        input_type = 'string'
+        token = "{%- assign my_products = collection.products -%}{%- assign my_product = my_products.first -%}\n{{ my_product.url | "
         assert_can_only_complete_with(token, input_type)
       end
 

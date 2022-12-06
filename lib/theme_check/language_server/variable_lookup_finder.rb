@@ -34,8 +34,10 @@ module ThemeCheck
         lookups = variable.lookups
         assignments = find_assignments(buffer)
 
-        variable = assignments[variable.name] while assignments[variable.name]
-        lookups = variable.lookups unless variable.lookups.empty?
+        while assignments[variable.name]
+          variable = assignments[variable.name]
+          lookups = variable.lookups + lookups
+        end
 
         PotentialLookup.new(variable.name, lookups)
       end
