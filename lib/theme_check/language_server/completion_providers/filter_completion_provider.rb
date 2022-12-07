@@ -17,7 +17,8 @@ module ThemeCheck
         context = context_with_cursor_before_potential_filter_separator(context)
         available_labels_for(determine_input_type(context))
           .select { |w| w.start_with?(partial(content, cursor)) }
-          .map { |filter| filter_to_completion(filter) }
+          .each_with_index
+          .map { |filter, index| filter_to_completion(filter, index) }
       end
 
       def can_complete?(content, cursor)
@@ -57,7 +58,7 @@ module ThemeCheck
         return available_labels_for(nil) if filters.empty?
         return filters if input_type == INPUT_TYPE_VARIABLE
 
-        filters + available_labels_for(INPUT_TYPE_VARIABLE)
+        filters.sort + available_labels_for(INPUT_TYPE_VARIABLE).sort
       end
 
       def cursor_on_filter?(content, cursor)
@@ -79,12 +80,13 @@ module ThemeCheck
         partial_match[1]
       end
 
-      def filter_to_completion(filter)
+      def filter_to_completion(filter, index)
         content = ShopifyLiquid::Documentation.filter_doc(filter)
 
         {
           label: filter,
           kind: CompletionItemKinds::FUNCTION,
+          sortText: index.to_s.rjust(4, '0'),
           **doc_hash(content),
         }
       end
