@@ -43,14 +43,8 @@ module ThemeCheck
 
         if variable_lookup
           object, property = VariableLookupTraverser.lookup_object_and_property(variable_lookup)
-          return property ? property.return_type : object.name
-        end
-
-        case VariableLookupFinder.lookup_literal(context)
-        when String
-          'string'
-        when Numeric
-          'number'
+          return property.return_type if property
+          return object.name if object
         end
       end
 
@@ -58,7 +52,7 @@ module ThemeCheck
         filters = ShopifyLiquid::SourceIndex.filters
           .filter_map do |filter|
           filter.name if input_type.nil? ||
-                    filter.input_type == input_type
+            filter.input_type == input_type
         end
         return available_labels_for(nil) if filters.empty?
         return filters if input_type == INPUT_TYPE_VARIABLE
@@ -68,6 +62,7 @@ module ThemeCheck
 
       def cursor_on_filter?(content, cursor)
         return false unless content.match?(NAMED_FILTER)
+
         matches(content, NAMED_FILTER).any? do |match|
           match.begin(1) <= cursor && cursor < match.end(1) + 1 # including next character
         end
@@ -75,10 +70,12 @@ module ThemeCheck
 
       def partial(content, cursor)
         return '' unless content.match?(NAMED_FILTER)
+
         partial_match = matches(content, NAMED_FILTER).find do |match|
           match.begin(1) <= cursor && cursor < match.end(1) + 1 # including next character
         end
         return '' if partial_match.nil?
+
         partial_match[1]
       end
 

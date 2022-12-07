@@ -5,6 +5,8 @@ module ThemeCheck
     module VariableLookupFinder
       class AssignmentsFinder
         class Scope < Struct.new(:variables, :parent)
+          include TypeHelper
+
           def new_child
             child_scope = dup
             child_scope.variables = variables.dup
@@ -30,7 +32,9 @@ module ThemeCheck
           def assign_tag_as_potential_lookup(tag)
             variable_lookup = tag.from.name
 
-            return potential_literal(variable_lookup) unless variable_lookup.is_a?(Liquid::VariableLookup)
+            unless variable_lookup.is_a?(Liquid::VariableLookup)
+              return PotentialLookup.new(input_type_of(variable_lookup), [], variables)
+            end
 
             name = variable_lookup.name
             lookups = variable_lookup.lookups
@@ -45,23 +49,6 @@ module ThemeCheck
             lookups = [*variable_lookup.lookups, 'first']
 
             PotentialLookup.new(name, lookups, variables)
-          end
-
-          def potential_literal(potential_literal)
-            type = case potential_literal
-            when String
-              'string'
-            when Numeric
-              'number'
-            when TrueClass, FalseClass
-              'boolean'
-            when NilClass
-              'nil'
-            else
-              'untyped'
-            end
-
-            PotentialLookup.new(type, [], variables)
           end
         end
       end

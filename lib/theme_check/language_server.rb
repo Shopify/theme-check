@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative "language_server/protocol"
 require_relative "language_server/constants"
 require_relative "language_server/configuration"
@@ -7,6 +8,7 @@ require_relative "language_server/messenger"
 require_relative "language_server/io_messenger"
 require_relative "language_server/bridge"
 require_relative "language_server/uri_helper"
+require_relative "language_server/type_helper"
 require_relative "language_server/server"
 require_relative "language_server/tokens"
 require_relative "language_server/variable_lookup_finder/potential_lookup"

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "test_helper"
 
 module ThemeCheck
@@ -72,7 +73,7 @@ module ThemeCheck
       end
 
       def test_filters_compatible_with_the_string_type_and_assignment_in_same_line
-        skip('VariableLookupFinder will not find assignment')
+        input_type = 'string'
         assert_can_only_complete_with("{% assign secret_potion = 'Polyjuice' | ", input_type)
       end
 
@@ -87,6 +88,11 @@ module ThemeCheck
         assert_can_only_complete_with("{{ cart.total_price | ", input_type)
         assert_can_only_complete_with("{% assign tp = cart.total_price %}\n{{ tp | ", input_type)
         assert_can_only_complete_with("{{ -4.2 | ", input_type)
+      end
+
+      def test_filters_compatible_with_the_number_type_and_assignment_in_same_line
+        input_type = 'number'
+        assert_can_only_complete_with("{% assign secret_potion = 2 | ", input_type)
       end
 
       def test_filters_compatible_with_the_form_type
