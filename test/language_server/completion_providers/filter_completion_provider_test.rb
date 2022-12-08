@@ -40,6 +40,13 @@ module ThemeCheck
         assert_can_complete_with(@provider, "{{ 'foo.js' | asset_url | image", "image_url")
       end
 
+      def test_completions_with_content_after_cursor
+        offset = -2
+        assert_can_only_complete_with("{{ form | }}", 'form', offset)
+        assert_can_only_complete_with("{{ 'test%40test.com' | }}", 'string', offset)
+        assert_can_only_complete_with("{% assign tp = cart.total_price %}\n{{ tp | }}", 'number', offset)
+      end
+
       def test_filters_compatible_with_the_array_type
         input_type = 'array'
         assert_can_only_complete_with("{% assign ct = current_tags | ", input_type)
@@ -160,12 +167,12 @@ module ThemeCheck
 
       private
 
-      def assert_can_only_complete_with(token, input_type_to_be_tested)
+      def assert_can_only_complete_with(token, input_type_to_be_tested, offset = 0)
         @filter_compatible_with.each do |input_type, filter_name|
           if input_type.to_s == input_type_to_be_tested
-            assert_can_complete_with(@provider, token, filter_name)
+            assert_can_complete_with(@provider, token, filter_name, offset)
           else
-            refute_can_complete_with(@provider, token, filter_name)
+            refute_can_complete_with(@provider, token, filter_name, offset)
           end
         end
       rescue StandardError => e

@@ -32,7 +32,7 @@ module ThemeCheck
 
       def context_with_cursor_before_potential_filter_separator(context)
         content = context.content
-        diff = content.index(FILTER_SEPARATOR_INCLUDING_SPACES) - content.size
+        diff = content.index(FILTER_SEPARATOR_INCLUDING_SPACES) - context.cursor
 
         return context unless content.scan(FILTER_SEPARATOR_INCLUDING_SPACES).size == 1
 
