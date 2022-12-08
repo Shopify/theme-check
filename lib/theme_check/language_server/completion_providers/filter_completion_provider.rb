@@ -55,10 +55,18 @@ module ThemeCheck
           filter.name if input_type.nil? ||
             filter.input_type == input_type
         end
-        return available_labels_for(nil) if filters.empty?
+        return all_labels if filters.empty?
         return filters if input_type == INPUT_TYPE_VARIABLE
 
-        filters.sort + available_labels_for(INPUT_TYPE_VARIABLE).sort
+        filters.sort + labels_for_input_type_variable
+      end
+
+      def all_labels
+        @all_labels ||= available_labels_for(nil).sort
+      end
+
+      def labels_for_input_type_variable
+        @labels_for_input_type_variable ||= available_labels_for(INPUT_TYPE_VARIABLE).sort
       end
 
       def cursor_on_filter?(content, cursor)
