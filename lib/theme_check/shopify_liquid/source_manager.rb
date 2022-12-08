@@ -7,7 +7,7 @@ require 'tmpdir'
 module ThemeCheck
   module ShopifyLiquid
     class SourceManager
-      REQUIRED_FILE_NAMES = %i(filters objects tags latest).freeze
+      REQUIRED_FILE_NAMES = [:filters, :objects, :tags, :latest].freeze
 
       class << self
         def download_or_refresh_files(destination = default_destination)

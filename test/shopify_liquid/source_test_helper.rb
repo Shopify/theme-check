@@ -25,7 +25,7 @@ module ThemeCheck
 
       class FakeSourceIndex < SourceIndex
         class << self
-          def local_path(file_name, dest = default_destination)
+          def local_path!(file_name, dest = default_destination)
             dest + "#{file_name}.json"
           end
 

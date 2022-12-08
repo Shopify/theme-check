@@ -35,10 +35,10 @@ module ThemeCheck
         private
 
         def load_file(file_name)
-          read_json(local_path(file_name))
+          read_json(local_path!(file_name))
         end
 
-        def local_path(file_name)
+        def local_path!(file_name)
           SourceManager.download unless SourceManager.has_required_files?
           SourceManager.local_path(file_name)
         end
