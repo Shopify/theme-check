@@ -20,7 +20,7 @@ module ThemeCheck
         end
 
         def body(entry)
-          [entry.summary, entry.description]
+          [entry.deprecation_reason, entry.summary, entry.description]
             .reject(&:nil?)
             .reject(&:empty?)
             .join(horizontal_rule)

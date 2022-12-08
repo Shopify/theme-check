@@ -15,10 +15,9 @@ module ThemeCheck
         return [] unless can_complete?(content, cursor)
 
         context = context_with_cursor_before_potential_filter_separator(context)
-        available_labels_for(determine_input_type(context))
-          .select { |w| w.start_with?(partial(content, cursor)) }
-          .each_with_index
-          .map { |filter, index| filter_to_completion(filter, index) }
+        available_filters_for(determine_input_type(context))
+          .select { |w| w.name.start_with?(partial(content, cursor)) }
+          .map { |filter| filter_to_completion(filter) }
       end
 
       def can_complete?(content, cursor)
@@ -49,20 +48,17 @@ module ThemeCheck
         end
       end
 
-      def available_labels_for(input_type)
+      def available_filters_for(input_type)
         filters = ShopifyLiquid::SourceIndex.filters
-          .filter_map do |filter|
-          filter.name if input_type.nil? ||
-            filter.input_type == input_type
-        end
+          .select { |filter| input_type.nil? || filter.input_type == input_type }
         return all_labels if filters.empty?
         return filters if input_type == INPUT_TYPE_VARIABLE
 
-        filters.sort + available_labels_for(INPUT_TYPE_VARIABLE).sort
+        filters + available_filters_for(INPUT_TYPE_VARIABLE)
       end
 
       def all_labels
-        available_labels_for(nil).sort
+        available_filters_for(nil)
       end
 
       def cursor_on_filter?(content, cursor)
@@ -84,13 +80,13 @@ module ThemeCheck
         partial_match[1]
       end
 
-      def filter_to_completion(filter, index)
-        content = ShopifyLiquid::Documentation.filter_doc(filter)
+      def filter_to_completion(filter)
+        content = ShopifyLiquid::Documentation.render_doc(filter)
 
         {
-          label: filter,
+          label: filter.name,
           kind: CompletionItemKinds::FUNCTION,
-          sortText: sort_text_for(index),
+          tags: filter.deprecated? ? [CompletionItemTag::DEPRECATED] : [],
           **doc_hash(content),
         }
       end
