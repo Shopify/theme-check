@@ -90,13 +90,6 @@ module ThemeCheck
           **doc_hash(content),
         }
       end
-
-      # By default, filters are sorted alphabetically by label
-      # With sort text based on index, we keep the initial order
-      # (i.e. filters for exact input type first, and for variable input type second)
-      def sort_text_for(index)
-        index.to_s.rjust(4, '0')
-      end
     end
   end
 end
