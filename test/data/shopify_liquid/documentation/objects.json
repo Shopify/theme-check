@@ -1,0 +1,159 @@
+[
+  {
+    "access": {
+      "global": false,
+      "parents": [
+        {
+          "object": "product",
+          "property": "media"
+        },
+        {
+          "object": "product",
+          "property": "featured_media"
+        },
+        {
+          "object": "variant",
+          "property": "featured_media"
+        }
+      ],
+      "template": [
+
+      ]
+    },
+    "deprecated": false,
+    "deprecation_reason": "",
+    "description": "The `media` object can be returned by the [`product.media` array](/api/liquid/objects#product-media) or a\n[`file_reference` metafield](/apps/metafields/types).\n\nYou can use [media filters](/api/liquid/filters#media-filters) to generate URLs and media displays. To learn about how\nto use media in your theme, refer to [Support product media](/themes/product-merchandising/media/support-media).\n\n&gt; Note:\n&gt; Each media type has unique properties in addition to the general `media` properties. To learn about these\n&gt; additional properties, refer to the reference for each type.",
+    "properties": [
+      {
+        "deprecated": false,
+        "deprecation_reason": "",
+        "description": "",
+        "examples": [
+
+        ],
+        "return_type": [
+          {
+            "type": "number",
+            "name": "",
+            "description": "",
+            "array_value": ""
+          }
+        ],
+        "summary": "The ID of the media.",
+        "name": "id"
+      },
+      {
+        "deprecated": false,
+        "deprecation_reason": "",
+        "description": "If the source is a [`file_reference` metafield](/apps/metafields/types), then `nil` is returned.",
+        "examples": [
+
+        ],
+        "return_type": [
+          {
+            "type": "number",
+            "name": "",
+            "description": "",
+            "array_value": ""
+          }
+        ],
+        "summary": "The position of the media in the [`product.media` array](/api/liquid/objects#product-media).",
+        "name": "position"
+      },
+      {
+        "deprecated": false,
+        "deprecation_reason": "",
+        "description": "",
+        "examples": [
+          {
+            "name": "Filter for media of a specific type",
+            "description": "You can use the `media_type` property with the [`where` filter](/api/liquid/filters#where) to filter the [`product.media` array](/api/liquid/objects#product-media) for all media of a desired type.\n",
+            "syntax": "",
+            "path": "/products/snake-venom",
+            "raw_liquid": "{% assign images = product.media | where: 'media_type', 'image' %}\n\n{% for image in images %}\n  {{- image | image_url: width: 300 | image_tag }}\n{% endfor %}",
+            "parameter": false,
+            "display_type": "text",
+            "show_data_tab": true
+          }
+        ],
+        "return_type": [
+          {
+            "type": "string",
+            "name": "image",
+            "description": "",
+            "array_value": ""
+          },
+          {
+            "type": "string",
+            "name": "model",
+            "description": "",
+            "array_value": ""
+          },
+          {
+            "type": "string",
+            "name": "video",
+            "description": "",
+            "array_value": ""
+          },
+          {
+            "type": "string",
+            "name": "external_video",
+            "description": "",
+            "array_value": ""
+          }
+        ],
+        "summary": "The media type.",
+        "name": "media_type"
+      },
+      {
+        "deprecated": false,
+        "deprecation_reason": "",
+        "description": "&gt; Note:\n&gt; Preview images don't have an ID attribute.",
+        "examples": [
+
+        ],
+        "return_type": [
+          {
+            "type": "image",
+            "name": "",
+            "description": "",
+            "array_value": ""
+          }
+        ],
+        "summary": "A preview image of the media.",
+        "name": "preview_image"
+      },
+      {
+        "deprecated": false,
+        "deprecation_reason": "",
+        "description": "",
+        "examples": [
+
+        ],
+        "return_type": [
+          {
+            "type": "string",
+            "name": "",
+            "description": "",
+            "array_value": ""
+          }
+        ],
+        "summary": "The alt text of the media.",
+        "name": "alt"
+      }
+    ],
+    "summary": "An abstract media object that can represent the following object types:\n\n- [`image`](/api/liquid/objects#image)\n- [`model`](/api/liquid/objects#model)\n- [`video`](/api/liquid/objects#video)\n- [`external_video`](/api/liquid/objects#external_video)",
+    "name": "media",
+    "examples": [
+
+    ],
+    "json_data": {
+      "path": "/products/dandelion-milk",
+      "handle": "product.media[0]",
+      "data_from_file": ""
+    },
+    "return_type": [
+
+    ]
+  }
+]

@@ -37,6 +37,10 @@ module ThemeCheck
         label.keys[0]
       end
 
+      # TODO: (5/6) https://github.com/Shopify/theme-check/issues/656
+      # -
+      # Remove 'tags.yml' in favor of 'SourceIndex.tags'
+      # -
       def tags_file_contents
         @tags_file_contents ||= YAML.load(File.read("#{__dir__}/../../../data/shopify_liquid/tags.yml"))
       end

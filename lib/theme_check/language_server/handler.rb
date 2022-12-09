@@ -67,7 +67,7 @@ module ThemeCheck
         @bridge.supports_work_done_progress = @client_capabilities.supports_work_done_progress?
         @storage = in_memory_storage(@root_path)
         @diagnostics_manager = DiagnosticsManager.new
-        @completion_engine = CompletionEngine.new(@storage)
+        @completion_engine = CompletionEngine.new(@storage, @bridge)
         @document_link_engine = DocumentLinkEngine.new(@storage)
         @diagnostics_engine = DiagnosticsEngine.new(@storage, @bridge, @diagnostics_manager)
         @execute_command_engine = ExecuteCommandEngine.new
@@ -90,6 +90,8 @@ module ThemeCheck
 
         @configuration.fetch
         @configuration.register_did_change_capability
+
+        ShopifyLiquid::SourceManager.download_or_refresh_files
       end
 
       def on_shutdown(id, _params)

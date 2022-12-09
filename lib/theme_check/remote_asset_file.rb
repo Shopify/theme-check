@@ -31,13 +31,7 @@ module ThemeCheck
       return if @uri.nil?
       return @content unless @content.nil?
 
-      res = Net::HTTP.start(@uri.hostname, @uri.port, use_ssl: @uri.scheme == 'https') do |http|
-        req = Net::HTTP::Get.new(@uri)
-        req['Accept-Encoding'] = 'gzip, deflate, br'
-        http.request(req)
-      end
-
-      @content = res.body
+      @content = request(@uri)
 
     rescue OpenSSL::SSL::SSLError, Zlib::StreamError, *NET_HTTP_EXCEPTIONS
       @contents = ''
@@ -46,6 +40,18 @@ module ThemeCheck
     def gzipped_size
       return if @uri.nil?
       @gzipped_size ||= content.bytesize
+    end
+
+    private
+
+    def request(uri)
+      res = Net::HTTP.start(uri.hostname, uri.port, use_ssl: uri.scheme == 'https') do |http|
+        req = Net::HTTP::Get.new(uri)
+        req['Accept-Encoding'] = 'gzip, deflate, br'
+        http.request(req)
+      end
+
+      res.body
     end
   end
 end

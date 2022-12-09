@@ -41,5 +41,14 @@ module ThemeCheck
     module ErrorCodes
       INTERNAL_ERROR = -32603
     end
+
+    module MarkupKinds
+      PLAIN_TEXT = 'plaintext'
+      MARKDOWN = 'markdown'
+    end
+
+    module CompletionItemTag
+      DEPRECATED = 1
+    end
   end
 end

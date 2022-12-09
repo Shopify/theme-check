@@ -3,6 +3,10 @@ require 'yaml'
 
 module ThemeCheck
   module ShopifyLiquid
+    # TODO: (4/6) https://github.com/Shopify/theme-check/issues/656
+    # -
+    # Remove 'objects.yml' in favor of 'SourceIndex.objects'
+    # -
     module Object
       extend self
 

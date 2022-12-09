@@ -1,6 +1,22 @@
 # frozen_string_literal: true
+
 require_relative 'shopify_liquid/deprecated_filter'
+require_relative 'shopify_liquid/documentation'
 require_relative 'shopify_liquid/filter'
 require_relative 'shopify_liquid/object'
-require_relative 'shopify_liquid/tag'
+require_relative 'shopify_liquid/source_manager'
+require_relative 'shopify_liquid/source_index'
 require_relative 'shopify_liquid/system_translations'
+require_relative 'shopify_liquid/tag'
+
+require_relative 'shopify_liquid/source_index/base_entry'
+require_relative 'shopify_liquid/source_index/filter_entry'
+require_relative 'shopify_liquid/source_index/object_entry'
+require_relative 'shopify_liquid/source_index/parameter_entry'
+require_relative 'shopify_liquid/source_index/property_entry'
+require_relative 'shopify_liquid/source_index/return_type_entry'
+require_relative 'shopify_liquid/source_index/tag_entry'
+require_relative 'shopify_liquid/source_index/base_state'
+require_relative 'shopify_liquid/source_index/filter_state'
+require_relative 'shopify_liquid/source_index/object_state'
+require_relative 'shopify_liquid/source_index/tag_state'
