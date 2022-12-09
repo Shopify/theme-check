@@ -46,5 +46,9 @@ module ThemeCheck
       PLAIN_TEXT = 'plaintext'
       MARKDOWN = 'markdown'
     end
+
+    module CompletionItemTag
+      DEPRECATED = 1
+    end
   end
 end

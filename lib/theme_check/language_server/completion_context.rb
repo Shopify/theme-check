@@ -43,6 +43,10 @@ module ThemeCheck
           t.start < absolute_cursor && absolute_cursor <= t.end
         end
       end
+
+      def clone_and_overwrite(col:)
+        CompletionContext.new(storage, relative_path, line, col)
+      end
     end
   end
 end

@@ -470,6 +470,26 @@ module ThemeCheck
           })
         end
 
+        def test_assignments_finder_with_literal_types
+          template = <<~LIQUID
+            {%- liquid
+              assign var1 = 'something'
+              assign var2 = 2
+              assign var3 = 2.0
+              assign var4 = true
+              assign var5 = nil
+            -%}
+          LIQUID
+
+          assert_assignments_finder(template, {
+            'var1' => 'string',
+            'var2' => 'number',
+            'var3' => 'number',
+            'var4' => 'boolean',
+            'var5' => 'nil',
+          })
+        end
+
         private
 
         def assert_assignments_finder(template, expected_assignments)

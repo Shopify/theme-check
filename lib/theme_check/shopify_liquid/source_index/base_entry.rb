@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "forwardable"
 
 module ThemeCheck
@@ -26,6 +27,16 @@ module ThemeCheck
 
         def description
           hash['description'] || ''
+        end
+
+        def deprecated?
+          hash['deprecated']
+        end
+
+        def deprecation_reason
+          return nil unless deprecated?
+
+          hash['deprecation_reason'] || nil
         end
 
         attr_writer :return_type

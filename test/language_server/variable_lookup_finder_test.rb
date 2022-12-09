@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "test_helper"
 
 module ThemeCheck
@@ -36,12 +37,6 @@ module ThemeCheck
         refute_can_lookup_var('cart | ')
         refute_can_lookup_var('cart | image')
 
-        # no lookup for primitives
-        refute_can_lookup_var('1')
-        refute_can_lookup_var('true')
-        refute_can_lookup_var('"foo')
-        refute_can_lookup_var('"foo"')
-
         # square brackets
         assert_can_lookup_var('product["handle', 'product.handle')
         refute_can_lookup_var('product["handle"')
@@ -53,6 +48,19 @@ module ThemeCheck
         # finished typing. This could be a positional argument or a
         # named key.
         # refute_can_lookup('{{ cart | image: attr')
+      end
+
+      def test_lookup_potential_lookup
+        [
+          ['1', 'number'],
+          ['true', 'boolean'],
+          ['"foo', 'string'],
+          ['"foo"', 'string'],
+        ].each do |(token, expected_name)|
+          token = "{{ #{token}"
+          current_token = CompletionProvider::CurrentToken.new(token, token.size)
+          assert_potential_lookup(current_token, expected_name)
+        end
       end
 
       def test_can_lookup_echo_statements
@@ -170,7 +178,7 @@ module ThemeCheck
           '{{ foo.selected_selling_plan.checkout_charge.val }}',
           48,
           106,
-          <<~LIQUID
+          <<~LIQUID,
             {%- liquid
               assign foo = product
             -%}
@@ -181,10 +189,7 @@ module ThemeCheck
           LIQUID
         )
 
-        potential_lookup = VariableLookupFinder.lookup(token)
-
-        assert_equal('product', potential_lookup.name)
-        assert_equal(%w(selected_selling_plan checkout_charge val), potential_lookup.lookups)
+        assert_potential_lookup(token, 'product', ['selected_selling_plan', 'checkout_charge', 'val'])
       end
 
       def test_lookup_liquid_variable_when_it_is_desclared_in_following_token
@@ -192,7 +197,7 @@ module ThemeCheck
           '{{ foo. }}',
           7,
           26,
-          <<~LIQUID
+          <<~LIQUID,
             <div>Hello!</div>
 
             {{ foo. }}
@@ -203,10 +208,7 @@ module ThemeCheck
           LIQUID
         )
 
-        potential_lookup = VariableLookupFinder.lookup(token)
-
-        assert_equal('foo', potential_lookup.name)
-        assert_equal([], potential_lookup.lookups)
+        assert_potential_lookup(token, 'foo')
       end
 
       private
@@ -252,6 +254,13 @@ module ThemeCheck
             Expected to find a variable lookup for '#{expected_markup}' in the following content:
             #{token}
           ERRMSG
+        )
+      end
+
+      def assert_potential_lookup(token, expected_name, expected_lookups = [])
+        assert_equal(
+          VariableLookupFinder::PotentialLookup.new(expected_name, expected_lookups),
+          VariableLookupFinder.lookup(token),
         )
       end
 
