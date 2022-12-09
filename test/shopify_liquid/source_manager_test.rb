@@ -1,113 +1,103 @@
 # frozen_string_literal: true
 
 require 'test_helper'
+require_relative './source_test_helper'
 
 module ThemeCheck
   module ShopifyLiquid
     class SourceManagerTest < Minitest::Test
-      # Use a documentation folder in the test/ directory
-      SOURCE_DOCUMENTATION_DIRECTORY = Pathname.new("#{__dir__}/../data/shopify_liquid/documentation")
-      TEST_DOCUMENTATION_DIRECTORY = Pathname.new("#{__dir__}/../data/shopify_liquid/documentation/tmp")
+      include SourceTestHelper
 
       def setup
-        SourceManager.stubs(:documentation_directory).returns(TEST_DOCUMENTATION_DIRECTORY)
-        SourceManager.stubs(:open_uri).with(objects_uri).returns(objects_content)
-        SourceManager.stubs(:open_uri).with(filters_uri).returns(filters_content)
-        SourceManager.stubs(:open_uri).with(tags_uri).returns(tags_content)
+        @source_manager_class = SourceTestHelper::FakeSourceManager.dup
+        @tmp_dir = @source_manager_class.default_destination
+      end
+
+      def test_refresh_files_after_files_are_out_of_date
+        create_documentation_in_destination(@tmp_dir)
+        create_dummy_tags_file(@tmp_dir)
+        create_out_of_date_revision_file(@tmp_dir)
+
+        download_or_refresh_files
+
+        assert_test_documentation_up_to_date(@tmp_dir)
+      ensure
+        FileUtils.remove_entry(@tmp_dir)
+      end
+
+      def test_download_or_refresh_noop_when_docs_up_to_date
+        create_documentation_in_destination(@tmp_dir)
+
+        @source_manager_class.expects(:download).never
+
+        download_or_refresh_files
+      ensure
+        FileUtils.remove_entry(@tmp_dir)
       end
 
       def test_download_creates_directory
-        SourceManager.download
+        tmp_dir = Pathname.new("#{@tmp_dir}/new")
 
-        assert_download_succeeded
+        @source_manager_class.stubs(:default_destination).returns(tmp_dir)
+
+        download_or_refresh_files
+
+        assert_test_documentation_up_to_date(tmp_dir)
       ensure
-        remove_test_documentation
+        FileUtils.remove_entry(@tmp_dir)
       end
 
       def test_download_overwrites_existing_directory
-        create_dummy_tags_file
+        create_dummy_tags_file(@tmp_dir)
 
-        SourceManager.download
+        download_or_refresh_files
 
-        assert_download_succeeded
+        assert_test_documentation_up_to_date(@tmp_dir)
       ensure
-        remove_test_documentation
+        FileUtils.remove_entry(@tmp_dir)
       end
 
       def test_has_files_returns_false_in_directory_that_does_not_exist
-        refute(SourceManager.send(:has_required_files?))
+        refute(@source_manager_class.send(:has_required_files?, Pathname.new("/path/does/not/exist")))
+      ensure
+        FileUtils.remove_entry(@tmp_dir)
       end
 
       def test_has_files_returns_false_when_not_all_files_present
-        create_dummy_tags_file
+        create_dummy_tags_file(@tmp_dir)
 
-        refute(SourceManager.send(:has_required_files?))
+        refute(@source_manager_class.send(:has_required_files?, @source_manager_class.default_destination))
       ensure
-        remove_test_documentation
+        FileUtils.remove_entry(@tmp_dir)
       end
 
       def test_has_files_returns_true
-        SourceManager.stubs(:documentation_directory).returns(SOURCE_DOCUMENTATION_DIRECTORY)
+        create_documentation_in_destination(@tmp_dir)
 
-        assert(SourceManager.send(:has_required_files?))
+        assert(@source_manager_class.send(:has_required_files?, @source_manager_class.default_destination))
+      ensure
+        FileUtils.remove_entry(@tmp_dir)
       end
 
       private
 
-      def assert_download_succeeded
-        assert_equal(objects_content, File.read(TEST_DOCUMENTATION_DIRECTORY + "objects.json"))
-        assert_equal(filters_content, File.read(TEST_DOCUMENTATION_DIRECTORY + "filters.json"))
-        assert_equal(tags_content, File.read(TEST_DOCUMENTATION_DIRECTORY + "tags.json"))
+      def assert_test_documentation_up_to_date(destination)
+        assert_equal(objects_content, File.read(destination + "objects.json"))
+        assert_equal(filters_content, File.read(destination + "filters.json"))
+        assert_equal(tags_content, File.read(destination + "tags.json"))
+        assert_equal(revision_content, File.read(destination + "latest.json"))
 
-        downloaded_files = Dir.glob(TEST_DOCUMENTATION_DIRECTORY + '*')
+        downloaded_files = Dir.glob(destination + '*')
           .select { |file| File.file?(file) }
           .map { |file| File.basename(file) }
           .to_set
 
-        assert_equal(["filters.json", "objects.json", "tags.json"].to_set, downloaded_files)
+        assert_equal(["filters.json", "objects.json", "tags.json", "latest.json"].to_set, downloaded_files)
       end
 
-      def objects_uri
-        @objects_uri ||= "https://github.com/Shopify/theme-liquid-docs/raw/main/data/objects.json"
-      end
-
-      def filters_uri
-        @filters_uri ||= "https://github.com/Shopify/theme-liquid-docs/raw/main/data/filters.json"
-      end
-
-      def tags_uri
-        @tags_uri ||= "https://github.com/Shopify/theme-liquid-docs/raw/main/data/tags.json"
-      end
-
-      def objects_content
-        @objects_content ||= load_file(:objects)
-      end
-
-      def filters_content
-        @filters_content ||= load_file(:filters)
-      end
-
-      def tags_content
-        @tags_content ||= load_file(:tags)
-      end
-
-      def remove_test_documentation
-        return unless TEST_DOCUMENTATION_DIRECTORY.exist?
-
-        TEST_DOCUMENTATION_DIRECTORY.rmtree
-      end
-
-      def load_file(file_name)
-        path = SOURCE_DOCUMENTATION_DIRECTORY + "#{file_name}.json"
-        raise "File not found: #{path}" unless File.file?(path)
-        File.read(path)
-      end
-
-      def create_dummy_tags_file
-        Dir.mkdir(TEST_DOCUMENTATION_DIRECTORY) unless TEST_DOCUMENTATION_DIRECTORY.exist?
-        File.open(TEST_DOCUMENTATION_DIRECTORY + 'tags.json', "wb") do |file|
-          file.write({})
-        end
+      def download_or_refresh_files
+        @source_manager_class.download_or_refresh_files
+        @source_manager_class.wait_downloads
       end
     end
   end
