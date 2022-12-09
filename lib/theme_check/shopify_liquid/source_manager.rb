@@ -1,81 +1,110 @@
 # frozen_string_literal: true
 
+require 'net/http'
 require 'pathname'
+require 'tmpdir'
 
 module ThemeCheck
   module ShopifyLiquid
-    module SourceManager
-      extend self
+    class SourceManager
+      REQUIRED_FILE_NAMES = [:filters, :objects, :tags, :latest].freeze
 
-      def download_or_refresh_files
-        if has_required_files?
-          # TODO: https://github.com/Shopify/theme-check/issues/651
-          #
-          # Refresh files if they exist locally
-        else
-          download
+      class << self
+        def download_or_refresh_files(destination = default_destination)
+          if has_required_files?(destination)
+            refresh(destination)
+          else
+            download(destination)
+          end
         end
-      end
 
-      def download
-        create_destination unless destination_exist?
+        def download(destination = default_destination)
+          Dir.mkdir(destination) unless destination.exist?
 
-        required_file_names.each do |file_name|
-          download_file(local_path(file_name), remote_path(file_name))
+          REQUIRED_FILE_NAMES.each do |file_name|
+            download_file(local_path(file_name, destination), remote_path(file_name))
+          end
         end
-      end
 
-      def local_path(file_name)
-        documentation_directory + "#{file_name}.json"
-      end
-
-      private
-
-      DOCUMENTATION_FETCH_URL = "https://github.com/Shopify/theme-liquid-docs/raw/main/data"
-      DOCUMENTATION_DIRECTORY = Pathname.new("#{__dir__}/../../../data/shopify_liquid/documentation")
-      REQUIRED_FILE_NAMES = [:filters, :objects, :tags].freeze
-
-      def remote_path(file_name)
-        "#{documentation_fetch_url}/#{file_name}.json"
-      end
-
-      def download_file(local, remote)
-        File.open(local, "wb") do |file|
-          content = open_uri(remote)
-
-          file.write(content)
+        def refresh(destination = default_destination)
+          refresh_threads << Thread.new { refresh_thread(destination) }
         end
-      end
 
-      def open_uri(remote)
-        # require at usage point to not slow down theme-check on startup
-        require 'open-uri'
+        def local_path(file_name, destination = default_destination)
+          destination + "#{file_name}.json"
+        end
 
-        URI.parse(remote).open.read
-      end
+        def has_required_files?(destination = default_destination)
+          REQUIRED_FILE_NAMES.all? { |file_name| local_path(file_name, destination).exist? }
+        end
 
-      def destination_exist?
-        documentation_directory.exist?
-      end
+        def wait_downloads
+          refresh_threads.each(&:join)
+        end
 
-      def create_destination
-        Dir.mkdir(documentation_directory)
-      end
+        private
 
-      def documentation_directory
-        DOCUMENTATION_DIRECTORY
-      end
+        def refresh_thread(destination)
+          return unless refresh_needed?(destination)
 
-      def documentation_fetch_url
-        DOCUMENTATION_FETCH_URL
-      end
+          Dir.mktmpdir do |tmp_dir|
+            download(Pathname.new(tmp_dir))
 
-      def required_file_names
-        REQUIRED_FILE_NAMES
-      end
+            FileUtils.cp_r("#{tmp_dir}/.", destination)
 
-      def has_required_files?
-        required_file_names.all? { |file_name| local_path(file_name).exist? }
+            mark_all_indexes_outdated
+          end
+        end
+
+        def refresh_needed?(destination)
+          local_latest_content = local_path(:latest, destination).read
+          remote_latest_content = open_uri(remote_path(:latest))
+
+          revision(local_latest_content) != revision(remote_latest_content)
+        end
+
+        def revision(json_content)
+          # Raise an error if revision isn't found to avoid returning nil
+          JSON.parse(json_content).fetch('revision')
+        end
+
+        def remote_path(file_name)
+          "https://raw.githubusercontent.com/Shopify/theme-liquid-docs/main/data/#{file_name}.json"
+        end
+
+        def download_file(local_path, remote_uri)
+          File.open(local_path, "wb") do |file|
+            content = open_uri(remote_uri)
+            file.write(content)
+          end
+        end
+
+        def mark_all_indexes_outdated
+          SourceIndex::FilterState.mark_outdated
+          SourceIndex::ObjectState.mark_outdated
+          SourceIndex::TagState.mark_outdated
+        end
+
+        # State
+
+        def default_destination
+          @default_destination ||= Pathname.new("#{__dir__}/../../../data/shopify_liquid/documentation")
+        end
+
+        def refresh_threads
+          @refresh_threads ||= []
+        end
+
+        def open_uri(uri_str)
+          uri = URI.parse(uri_str)
+
+          res = Net::HTTP.start(uri.hostname, uri.port, use_ssl: uri.scheme == 'https') do |http|
+            req = Net::HTTP::Get.new(uri)
+            http.request(req)
+          end
+
+          res.body
+        end
       end
     end
   end

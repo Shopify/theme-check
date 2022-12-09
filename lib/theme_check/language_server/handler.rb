@@ -90,6 +90,8 @@ module ThemeCheck
 
         @configuration.fetch
         @configuration.register_did_change_capability
+
+        ShopifyLiquid::SourceManager.download_or_refresh_files
       end
 
       def on_shutdown(id, _params)
