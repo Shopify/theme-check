@@ -192,7 +192,7 @@ module ThemeCheck
           &.map { |(old_uri, new_uri)| [relative_path_from_uri(old_uri), relative_path_from_uri(new_uri)] }
         return unless relative_paths
 
-        workspace_edit = FileRenameHandler.to_workspace_edit(@storage, relative_paths)
+        workspace_edit = FileRenameHandler.new.to_workspace_edit(@storage, relative_paths)
         # Send applyEdit using bridge 
         @bridge.send_request("workspace/applyEdits", {
 

@@ -9,6 +9,7 @@ module ThemeCheck
         }
       end
 
+      private
 
       def to_text_document_edits(storage, relative_paths)
         snippets = relative_paths
@@ -18,13 +19,11 @@ module ThemeCheck
           
         theme = ThemeCheck::Theme.new(storage)
 
-        binding.pry
-
         # find all files that contain either {% render 'snippetName' %} or {% include 'snippetName' %}
         theme.liquid.map do |liquid_file|
           {
             textDocument: {
-              uri: file_uri(liquid_file.path)
+              uri: file_uri(liquid_file.path),
               version: storage.version(liquid_file.relative_path)
             },
             edits: to_text_edits(liquid_file, storage, relative_paths)
@@ -34,12 +33,19 @@ module ThemeCheck
       end
 
       def to_text_edits(liquid_file, storage, relative_paths)
-        node_finder = ...
-        visitor = ...
-        visitor.visit
-        const [renderNodes, assetUrlNodes, sectionsNodes] = render_finder
-        ## ... 
-        text_edits = renderNodeTextEdits + assetUrlTextEdits + sectionsTextEdits
+        handler = LiquidNodeRenameHandler.new
+        visitor = LiquidNodeVisitor.new([handler])
+        visitor.visit_liquid_file(liquid_file)
+        
+        # have an array of nodes
+        # turn this into an array of edits
+        
+        # node_finder = ...
+        # visitor = ...
+        # visitor.visit
+        # const [renderNodes, assetUrlNodes, sectionsNodes] = render_finder
+        # ## ... 
+        # text_edits = renderNodeTextEdits + assetUrlTextEdits + sectionsTextEdits
       end
     end
   end
