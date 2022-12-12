@@ -1,3 +1,10 @@
+v1.12.0 / 2022-12-12
+==================
+
+  * Introduce Intelligent Code Completion ([#672](https://github.com/Shopify/theme-check/issues/672))
+  * Update TROUBLESHOOTING.md to include language server stopping guide ([#664](https://github.com/Shopify/theme-check/issues/664))
+  * Create troubleshooting doc, update contributing and readme with links ([#630](https://github.com/Shopify/theme-check/issues/630))
+  * robots Object in robots.txt file ([#644](https://github.com/Shopify/theme-check/issues/644)). Thanks @we5!
 
 v1.11.0 / 2022-08-22
 ====================
