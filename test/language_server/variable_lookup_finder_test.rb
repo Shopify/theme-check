@@ -173,6 +173,15 @@ module ThemeCheck
         LIQUID
       end
 
+      def test_can_lookup_with_circular_references
+        assert_can_lookup(<<~LIQUID, 'p')
+          {% liquid
+            assign a = p
+            assign p = a
+            assign c = p
+        LIQUID
+      end
+
       def test_lookup_liquid_variable_when_it_is_desclared_in_a_different_token
         token = CompletionProvider::CurrentToken.new(
           '{{ foo.selected_selling_plan.checkout_charge.val }}',
@@ -242,19 +251,31 @@ module ThemeCheck
         (0...token.size).each do |i|
           current_token = CompletionProvider::CurrentToken.new(token, i)
 
-          assert(VariableLookupFinder.lookup(current_token) || true)
+          assert(VariableLookupFinder.lookup(context(current_token)) || true)
         end if ENV["PARANOID"]
 
         current_token = CompletionProvider::CurrentToken.new(token, token.size + offset)
 
-        assert_equal(
-          Liquid::VariableLookup.parse(expected_markup),
-          VariableLookupFinder.lookup(current_token),
-          <<~ERRMSG,
-            Expected to find a variable lookup for '#{expected_markup}' in the following content:
-            #{token}
-          ERRMSG
-        )
+        expected_lookup = Liquid::VariableLookup.parse(expected_markup)
+        actual_lookup = VariableLookupFinder.lookup(context(current_token))
+
+        assert_lookup(expected_lookup, actual_lookup, <<~ERRMSG)
+          Expected to find a variable lookup for '#{expected_markup}' in the following content:
+          #{token}
+        ERRMSG
+      end
+
+      def assert_lookup(expected, actual, err_msg = "")
+        assert_equal(expected.lookups, actual.lookups, err_msg)
+
+        ##
+        # `assert_equal(nil, nil)` is deprecated and
+        #  will fail on Minitest 6.
+        if expected.name.nil?
+          assert_nil(actual.name, err_msg)
+        else
+          assert_equal(expected.name, actual.name, err_msg)
+        end
       end
 
       def assert_potential_lookup(token, expected_name, expected_lookups = [])
@@ -278,18 +299,28 @@ module ThemeCheck
         (0...token.size).each do |i|
           current_token = CompletionProvider::CurrentToken.new(token, i)
 
-          assert(VariableLookupFinder.lookup(current_token) || true)
+          assert(VariableLookupFinder.lookup(context(current_token)) || true)
         end if ENV["PARANOID"]
 
         current_token = CompletionProvider::CurrentToken.new(token, token.size + offset)
 
         assert_nil(
-          VariableLookupFinder.lookup(current_token),
+          VariableLookupFinder.lookup(context(current_token)),
           <<~ERRMSG,
             Expected lookup to be nil at the specified cursor position:
             #{token}
             #{' ' * (token.size + offset)}^
           ERRMSG
+        )
+      end
+
+      def context(token)
+        stub(
+          token: token,
+          cursor: token.cursor,
+          absolute_cursor: token.absolute_cursor,
+          content: token.content,
+          buffer: token.content,
         )
       end
     end
