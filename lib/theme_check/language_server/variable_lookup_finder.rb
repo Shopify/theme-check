@@ -30,24 +30,31 @@ module ThemeCheck
       private
 
       def potential_lookup(variable, context)
-        return variable if context.buffer.nil? || context.buffer.empty?
+        return as_potential_lookup(variable) if context.buffer.nil? || context.buffer.empty?
 
         buffer = context.buffer[0...context.absolute_cursor]
         lookups = variable.lookups
         assignments = find_assignments(buffer)
+        assignments_path = []
 
-        while assignments[variable.name]
+        while assignments[variable.name] && !assignments_path.include?(assignments[variable.name])
           variable = assignments[variable.name]
           lookups = variable.lookups + lookups
+
+          assignments_path << variable
         end
 
-        PotentialLookup.new(variable.name, lookups)
+        as_potential_lookup(variable, lookups: lookups)
       end
 
       def find_assignments(buffer)
         finder = AssignmentsFinder.new(buffer)
         finder.find!
         finder.assignments
+      end
+
+      def as_potential_lookup(variable, lookups: nil)
+        PotentialLookup.new(variable.name, lookups || variable.lookups)
       end
 
       def cursor_is_on_bracket_position_that_cant_be_completed(content, cursor)
