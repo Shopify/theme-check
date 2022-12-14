@@ -27,6 +27,7 @@ module ThemeCheck
             \s(?:
               if|elsif|unless|and|or|#{Liquid::Condition.operators.keys.join("|")}
               |echo
+              |paginate
               |case|when
               |cycle
               |in
