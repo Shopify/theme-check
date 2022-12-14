@@ -73,12 +73,32 @@ module ThemeCheck
             include TolerantBlockBody
           end
 
+          class Paginate < Liquid::Tag
+            include TolerantBlockBody
+          end
+
+          class Form < Liquid::Tag
+            include TolerantBlockBody
+          end
+
+          class Style < Liquid::Tag
+            include TolerantBlockBody
+          end
+
+          class Stylesheet < Liquid::Tag
+            include TolerantBlockBody
+          end
+
           def initialize(standard_tags)
             @standard_tags = standard_tags
             @tolerant_tags = {
               'case' => Case,
               'for' => For,
+              'form' => Form,
               'if' => If,
+              'paginate' => Paginate,
+              'style' => Style,
+              'stylesheet' => Stylesheet,
               'tablerow' => TableRow,
               'unless' => Unless,
             }

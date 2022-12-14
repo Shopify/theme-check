@@ -12,16 +12,23 @@ module ThemeCheck
           {%- liquid
             assign target = cart
             assign product_2 = product
+            assign columns_mobile_int = section.settings.columns_mobile_int
+            assign show_mobile_slider = false
           %}
           {{
         LIQUID
       end
 
       def test_suggests_assigned_variables
-        ShopifyLiquid::Documentation.expects(:object_doc).with("cart")
-        ShopifyLiquid::Documentation.expects(:object_doc).with("product")
+        ShopifyLiquid::Documentation.stubs(:object_doc).with("cart")
+        ShopifyLiquid::Documentation.stubs(:object_doc).with("boolean")
+        ShopifyLiquid::Documentation.stubs(:object_doc).with("product")
+        ShopifyLiquid::Documentation.stubs(:object_doc).with(nil)
 
+        assert_can_complete_with(@provider, @token, 'target')
         assert_can_complete_with(@provider, @token, 'product_2')
+        assert_can_complete_with(@provider, @token, 'columns_mobile_int')
+        assert_can_complete_with(@provider, @token, 'show_mobile_slider')
       end
 
       def test_does_not_suggest_global_objects

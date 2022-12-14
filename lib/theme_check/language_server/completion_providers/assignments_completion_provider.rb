@@ -13,11 +13,10 @@ module ThemeCheck
 
         finder = VariableLookupFinder::AssignmentsFinder.new(content)
         finder.find!
-
-        finder.assignments.map do |label, potential_lookup|
-          object, _property = VariableLookupTraverser.lookup_object_and_property(potential_lookup)
-          object_to_completion(label, object.name)
-        end
+        finder
+          .assignments
+          .map { |label, potential_lookup| object_to_completion(label, object_name(potential_lookup)) }
+          .compact
       end
 
       private
@@ -30,6 +29,11 @@ module ThemeCheck
           kind: CompletionItemKinds::VARIABLE,
           **doc_hash(content),
         }
+      end
+
+      def object_name(potential_lookup)
+        object, _property = VariableLookupTraverser.lookup_object_and_property(potential_lookup)
+        object&.name
       end
     end
   end
