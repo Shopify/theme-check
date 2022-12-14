@@ -255,7 +255,7 @@ module ThemeCheck
           })
         end
 
-        def test_assignments_finder_with_for_statements_and_complex_ranges
+        def test_assignments_finder_with_for_statements_and_variable_based_ranges
           template = <<~LIQUID
             {%- liquid
               assign var1 = product
@@ -271,6 +271,23 @@ module ThemeCheck
             'var2' => 'number',
             'var3' => 'number',
             'var4' => 'var2',
+          })
+        end
+
+        def test_assignments_finder_with_for_statements_and_variable_and_literal_ranges
+          template = <<~LIQUID
+            {%- liquid
+              assign var1 = product
+            -%}
+            {% assign var2 = 1 %}
+            {%- for var3 in (1..var2) -%}
+              {% echo█
+          LIQUID
+
+          assert_assignments_finder(template, {
+            'var1' => 'product',
+            'var2' => 'number',
+            'var3' => 'number',
           })
         end
 
