@@ -5,6 +5,8 @@ module ThemeCheck
     module VariableLookupFinder
       class AssignmentsFinder
         class ScopeVisitor
+          SCOPE_UNAWARE_NODES = %i(range range_lookup variable variable_lookup)
+
           attr_reader :global_scope, :current_scope
 
           def initialize
@@ -22,7 +24,7 @@ module ThemeCheck
           private
 
           def visit(node, scope)
-            return if node.type_name == :variable_lookup
+            return if SCOPE_UNAWARE_NODES.include?(node.type_name)
 
             method = :"on_#{node.type_name}"
             scope = @node_handler.send(method, node, scope) if @node_handler.respond_to?(method)

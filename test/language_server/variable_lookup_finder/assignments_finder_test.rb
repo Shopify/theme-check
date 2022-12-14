@@ -240,6 +240,107 @@ module ThemeCheck
           })
         end
 
+        def test_assignments_finder_with_for_statements_and_ranges
+          template = <<~LIQUID
+            {%- liquid
+              assign var1 = product
+            -%}
+            {%- for var2 in (1..4) -%}
+              {% echo█
+          LIQUID
+
+          assert_assignments_finder(template, {
+            'var1' => 'product',
+            'var2' => 'number',
+          })
+        end
+
+        def test_assignments_finder_with_for_statements_and_variable_based_ranges
+          template = <<~LIQUID
+            {%- liquid
+              assign var1 = product
+            -%}
+            {% assign var2 = 1 %}
+            {% assign var3 = 4 %}
+            {%- for var4 in (var2..var3) -%}
+              {% echo█
+          LIQUID
+
+          assert_assignments_finder(template, {
+            'var1' => 'product',
+            'var2' => 'number',
+            'var3' => 'number',
+            'var4' => 'var2',
+          })
+        end
+
+        def test_assignments_finder_with_for_statements_and_variable_and_literal_ranges
+          template = <<~LIQUID
+            {%- liquid
+              assign var1 = product
+            -%}
+            {% assign var2 = 1 %}
+            {%- for var3 in (1..var2) -%}
+              {% echo█
+          LIQUID
+
+          assert_assignments_finder(template, {
+            'var1' => 'product',
+            'var2' => 'number',
+            'var3' => 'number',
+          })
+        end
+
+        def test_assignments_finder_with_form_tag
+          template = <<~LIQUID
+            {%- form 'localization', id: 'FooterLanguageFormNoScript', class: 'localization-form' -%}
+              {%- for language in localization.available_languages -%}
+                <option value="{{ language.█
+          LIQUID
+
+          assert_assignments_finder(template, {
+            'language' => 'localization',
+          })
+        end
+
+        def test_assignments_finder_with_paginate_tag
+          template = <<~LIQUID
+            {% paginate collection.products by 5 %}
+              {% for var1 in collection.products -%}
+                {% echo █
+          LIQUID
+
+          assert_assignments_finder(template, {
+            'var1' => 'collection',
+          })
+        end
+
+        def test_assignments_finder_with_style_tag
+          template = <<~LIQUID
+            {% style %}
+              .h1 {
+                  {%- for language in localization.available_languages -%}
+                    <option value="{{ language.█
+          LIQUID
+
+          assert_assignments_finder(template, {
+            'language' => 'localization',
+          })
+        end
+
+        def test_assignments_finder_with_stylesheet_tag
+          template = <<~LIQUID
+            {% stylesheet %}
+              .h1 {
+                  {%- for language in localization.available_languages -%}
+                    <option value="{{ language.█
+          LIQUID
+
+          assert_assignments_finder(template, {
+            'language' => 'localization',
+          })
+        end
+
         def test_assignments_finder_with_for_and_else_statements
           template = <<~LIQUID
             {%- liquid
