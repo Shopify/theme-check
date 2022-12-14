@@ -123,6 +123,10 @@ module ThemeCheck
         assert_can_lookup_tag("cycle '', cart.error", "cart.error")
       end
 
+      def test_can_lookup_paginate_statements
+        assert_can_lookup('{% paginate %}', '', -2)
+      end
+
       def test_can_lookup_for_statements
         assert_can_lookup_tag("for p in ", "")
         assert_can_lookup_tag("for p in cart", "cart")
