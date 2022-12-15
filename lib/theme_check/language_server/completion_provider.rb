@@ -38,6 +38,16 @@ module ThemeCheck
           },
         }
       end
+
+      def deprecated_hash(entry)
+        return {} unless entry
+        return { sortText: entry.name } unless entry.deprecated?
+
+        {
+          tags: [CompletionItemTag::DEPRECATED],
+          sortText: "~#{entry.name}",
+        }
+      end
     end
   end
 end

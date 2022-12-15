@@ -22,12 +22,14 @@ module ThemeCheck
 
       private
 
-      def object_to_completion(object)
-        content = ShopifyLiquid::Documentation.object_doc(object)
+      def object_to_completion(object_name)
+        object = ShopifyLiquid::SourceIndex.objects.find { |entry| entry.name == object_name }
+        content = ShopifyLiquid::Documentation.render_doc(object)
 
         {
-          label: object,
+          label: object_name,
           kind: CompletionItemKinds::VARIABLE,
+          **deprecated_hash(object),
           **doc_hash(content),
         }
       end
