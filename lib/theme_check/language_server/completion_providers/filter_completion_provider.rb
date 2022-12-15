@@ -86,7 +86,7 @@ module ThemeCheck
         {
           label: filter.name,
           kind: CompletionItemKinds::FUNCTION,
-          **deprecated_hash(filter),
+          **format_hash(filter),
           **doc_hash(content),
         }
       end

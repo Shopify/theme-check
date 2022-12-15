@@ -11,8 +11,9 @@ module ThemeCheck
         return [] unless variable_lookup.lookups.empty?
         return [] if content[context.cursor - 1] == "."
 
-        ShopifyLiquid::Object.labels
-          .select { |w| w.start_with?(partial(variable_lookup)) }
+        ShopifyLiquid::SourceIndex
+          .objects
+          .select { |object| object.name.start_with?(partial(variable_lookup)) }
           .map { |object| object_to_completion(object) }
       end
 
@@ -22,14 +23,13 @@ module ThemeCheck
 
       private
 
-      def object_to_completion(object_name)
-        object = ShopifyLiquid::SourceIndex.objects.find { |entry| entry.name == object_name }
+      def object_to_completion(object)
         content = ShopifyLiquid::Documentation.render_doc(object)
 
         {
-          label: object_name,
+          label: object.name,
           kind: CompletionItemKinds::VARIABLE,
-          **deprecated_hash(object),
+          **format_hash(object),
           **doc_hash(content),
         }
       end

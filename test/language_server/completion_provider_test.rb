@@ -26,29 +26,29 @@ module ThemeCheck
         assert_equal({}, make_provider.doc_hash(''))
       end
 
-      def test_deprecated_hash_when_entry_is_nil
+      def test_format_hash_when_entry_is_nil
         entry = nil
 
         expected_hash = {}
-        actual_hash = make_provider.deprecated_hash(entry)
+        actual_hash = make_provider.format_hash(entry)
 
         assert_equal(expected_hash, actual_hash)
       end
 
-      def test_deprecated_hash_when_entry_is_deprecated
+      def test_format_hash_when_entry_is_deprecated
         entry = make_entry('name' => 'title', 'deprecated' => true)
 
         expected_hash = { tags: [1], sortText: '~title' }
-        actual_hash = make_provider.deprecated_hash(entry)
+        actual_hash = make_provider.format_hash(entry)
 
         assert_equal(expected_hash, actual_hash)
       end
 
-      def test_deprecated_hash_when_entry_is_not_deprecated
+      def test_format_hash_when_entry_is_not_deprecated
         entry = make_entry('name' => 'title', 'deprecated' => false)
 
         expected_hash = { sortText: 'title' }
-        actual_hash = make_provider.deprecated_hash(entry)
+        actual_hash = make_provider.format_hash(entry)
 
         assert_equal(expected_hash, actual_hash)
       end

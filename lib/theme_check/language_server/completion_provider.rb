@@ -39,7 +39,7 @@ module ThemeCheck
         }
       end
 
-      def deprecated_hash(entry)
+      def format_hash(entry)
         return {} unless entry
         return { sortText: entry.name } unless entry.deprecated?
 

@@ -39,7 +39,7 @@ module ThemeCheck
         {
           label: prop.name,
           kind: CompletionItemKinds::PROPERTY,
-          **deprecated_hash(prop),
+          **format_hash(prop),
           **doc_hash(content),
         }
       end
