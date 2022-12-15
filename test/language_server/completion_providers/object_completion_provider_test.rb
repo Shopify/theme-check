@@ -55,9 +55,7 @@ module ThemeCheck
         assert_can_complete_with(@provider, "{{ all_", 'all_products')
 
         object_not_in_source_index = 'customer_address'
-        assert_includes(ShopifyLiquid::Object::LABELS_NOT_IN_SOURCE_INDEX, object_not_in_source_index)
-        assert_can_complete_with(@provider, "{{ cust", object_not_in_source_index)
-
+        refute_can_complete_with(@provider, "{{ cust", object_not_in_source_index)
         refute_can_complete_with(@provider, "{{ all_", 'cart')
       end
     end
