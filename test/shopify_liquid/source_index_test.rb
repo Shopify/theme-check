@@ -48,7 +48,7 @@ module ThemeCheck
           .stubs(:default_destination)
           .returns(SourceManager.send(:default_destination))
         @source_index_class.objects
-        assert_equal(113, @source_index_class.objects.length)
+        assert_equal(111, @source_index_class.objects.length)
 
         SourceIndex::ObjectState.mark_outdated
         assert(SourceIndex::ObjectState.outdated?)

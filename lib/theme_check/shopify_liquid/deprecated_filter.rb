@@ -17,7 +17,7 @@ module ThemeCheck
       private
 
       def all
-        @all ||= YAML.load(File.read("#{__dir__}/../../../data/shopify_liquid/deprecated_filters.yml"))
+        @all ||= SourceIndex.deprecated_filters
           .values
           .each_with_object({}) do |filters, acc|
           filters.each do |(filter, alternatives)|
