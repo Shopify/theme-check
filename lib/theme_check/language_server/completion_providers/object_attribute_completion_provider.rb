@@ -39,6 +39,7 @@ module ThemeCheck
         {
           label: prop.name,
           kind: CompletionItemKinds::PROPERTY,
+          **format_hash(prop),
           **doc_hash(content),
         }
       end

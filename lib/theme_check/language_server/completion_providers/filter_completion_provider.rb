@@ -86,7 +86,7 @@ module ThemeCheck
         {
           label: filter.name,
           kind: CompletionItemKinds::FUNCTION,
-          tags: filter.deprecated? ? [CompletionItemTag::DEPRECATED] : [],
+          **format_hash(filter),
           **doc_hash(content),
         }
       end
