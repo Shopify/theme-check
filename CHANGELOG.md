@@ -1,3 +1,14 @@
+
+v1.12.1 / 2022-12-15
+==================
+
+  * `ObjectCompletionProvider` should not provide completion items that don't live in the `SourceIndex` ([#690](https://github.com/Shopify/theme-check/issues/690))
+  * Suggest deprecated completion items at the end of the list ([#688](https://github.com/Shopify/theme-check/issues/688))
+  * Only suggest filters in SourceIndex ([#689](https://github.com/Shopify/theme-check/issues/689))
+  * Remove the `data/shopify_liquid/(tags|filters|objects).yml` files ([#674](https://github.com/Shopify/theme-check/issues/674))
+  * Introduce support to range iterations and SFR tags ([#685](https://github.com/Shopify/theme-check/issues/685))
+  * Suggest objects for `paginate` ([#686](https://github.com/Shopify/theme-check/issues/686))
+
 v1.12.0 / 2022-12-12
 ==================
 
