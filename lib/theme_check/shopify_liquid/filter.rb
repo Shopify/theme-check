@@ -40,24 +40,8 @@ module ThemeCheck
         "debug",
       ]
 
-      def filters
-        @filters ||= SourceIndex.filters +
-          LABELS_NOT_IN_SOURCE_INDEX.map { |name| build_filter_entry_for(name) }.freeze
-      end
-
       def labels
         @labels ||= SourceIndex.filters.map(&:name) + LABELS_NOT_IN_SOURCE_INDEX
-      end
-
-      private
-
-      def build_filter_entry_for(name)
-        SourceIndex::FilterEntry.new({
-          "name" => name,
-          "summary" => name,
-          "syntax" => "variable | ",
-          "return_type" => [],
-        })
       end
     end
   end
