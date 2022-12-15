@@ -37,8 +37,15 @@ module ThemeCheck
         visitor = LiquidNodeVisitor.new([handler])
         visitor.visit_liquid_file(liquid_file)
         
+        binding.pry
         # have an array of nodes
         # turn this into an array of edits
+        # replace old with new, and we wont replace with the full path... should only be part 
+        # of the path
+
+        # for nodes 
+        # for relative paths, see if need to be replaced and create a text edit
+        #filter out empty text edits 
         
         # node_finder = ...
         # visitor = ...
@@ -46,6 +53,11 @@ module ThemeCheck
         # const [renderNodes, assetUrlNodes, sectionsNodes] = render_finder
         # ## ... 
         # text_edits = renderNodeTextEdits + assetUrlTextEdits + sectionsTextEdits
+        def to_text_edit(node, relative_paths)
+          # assume no path to file YET, might have to eventually... and can just replace file name
+          # for each relative path, get text edit for node 
+          # if no edit just add empty hash
+        end
       end
     end
   end
