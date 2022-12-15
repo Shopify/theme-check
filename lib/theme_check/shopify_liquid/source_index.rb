@@ -21,7 +21,11 @@ module ThemeCheck
           @objects ||= ObjectState.mark_up_to_date &&
             load_file(:objects)
               .concat(built_in_objects)
-              .map { |hash| ObjectEntry.new(hash) }
+              .filter_map do |hash|
+                next if (theme_app_extension_labels + labels_only_exposed_in_certain_contexts).include?(hash['name'])
+
+                ObjectEntry.new(hash)
+              end
         end
 
         def tags
@@ -30,6 +34,22 @@ module ThemeCheck
           @tags ||= TagState.mark_up_to_date &&
             load_file(:tags)
               .map { |hash| TagEntry.new(hash) }
+        end
+
+        def plus_labels
+          @plus_objects ||= load_file("../plus_labels")
+        end
+
+        def theme_app_extension_labels
+          @theme_app_extension_labels ||= load_file("../theme_app_extension_labels")
+        end
+
+        def labels_only_exposed_in_certain_contexts
+          ['robots'].freeze
+        end
+
+        def deprecated_filters
+          @deprecated_filters ||= load_file("../deprecated_filters")
         end
 
         private

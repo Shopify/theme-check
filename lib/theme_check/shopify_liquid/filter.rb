@@ -3,17 +3,61 @@ require 'yaml'
 
 module ThemeCheck
   module ShopifyLiquid
-    # TODO: (6/6) https://github.com/Shopify/theme-check/issues/656
-    # -
-    # Remove 'filters.yml' in favor of 'SourceIndex.filters'
-    # -
     module Filter
       extend self
 
+      LABELS_NOT_IN_SOURCE_INDEX = [
+        "h",
+        "installments_pricing",
+        "sentence",
+        "t",
+        "app_block_path_for",
+        "dev_shop?",
+        "app_extension_path_for",
+        "global_block_type?",
+        "app_block_path?",
+        "app_extension_path?",
+        "app_snippet_path?",
+        "registration_uuid_from",
+        "handle_from",
+        "camelcase",
+        "format_code",
+        "handle",
+        "encode_url_component",
+        "recover_password_link",
+        "delete_customer_address_link",
+        "edit_customer_address_link",
+        "cancel_customer_order_link",
+        "unit",
+        "weight",
+        "paragraphize",
+        "excerpt",
+        "pad_spaces",
+        "distance_from",
+        "theme_url",
+        "link_to_theme",
+        "_online_store_editor_live_setting",
+        "debug",
+      ]
+
+      def filters
+        @filters ||= SourceIndex.filters +
+          LABELS_NOT_IN_SOURCE_INDEX.map { |name| build_filter_entry_for(name) }.freeze
+      end
+
       def labels
-        @labels ||= YAML.load(File.read("#{__dir__}/../../../data/shopify_liquid/filters.yml"))
-          .values
-          .flatten
+        @labels ||= SourceIndex.filters.map(&:name) + LABELS_NOT_IN_SOURCE_INDEX
+      end
+
+      private
+
+      def build_filter_entry_for(name)
+        SourceIndex::FilterEntry.new({
+          "name" => name,
+          "summary" => name,
+          "syntax" => "variable | ",
+          "return_type" => [],
+        })
       end
     end
   end

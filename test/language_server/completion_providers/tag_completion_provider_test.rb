@@ -26,6 +26,12 @@ module ThemeCheck
         assert_can_complete_with(@provider, "{% comm", "comment")
       end
 
+      def test_completions_with_tag_not_in_source_index
+        tag_not_in_source_index = 'ifchanged'
+        assert_includes(ShopifyLiquid::Tag::LABELS_NOT_IN_SOURCE_INDEX, tag_not_in_source_index)
+        assert_can_complete_with(@provider, "{% ", tag_not_in_source_index)
+      end
+
       def test_complete_block_ends
         assert_can_complete_with(@provider, "{% end", "endcomment")
         assert_can_complete_with(@provider, "{% endcomm", "endcomment")
