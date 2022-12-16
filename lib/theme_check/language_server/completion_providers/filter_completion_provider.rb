@@ -15,8 +15,10 @@ module ThemeCheck
         return [] unless can_complete?(content, cursor)
 
         context = context_with_cursor_before_potential_filter_separator(context)
-        available_filters_for(determine_input_type(context))
-          .select { |w| w.name.start_with?(partial(content, cursor)) }
+        variable_lookup = VariableLookupFinder.lookup(context)
+        denied_filters = denied_filters_for(variable_lookup)
+        available_filters_for(determine_input_type(variable_lookup))
+          .select { |filter| filter.name.start_with?(partial(content, cursor)) && denied_filters.none?(filter.name) }
           .map { |filter| filter_to_completion(filter) }
       end
 
@@ -38,14 +40,18 @@ module ThemeCheck
         context.clone_and_overwrite(col: context.col + diff)
       end
 
-      def determine_input_type(context)
-        variable_lookup = VariableLookupFinder.lookup(context)
+      def determine_input_type(variable_lookup)
+        return if variable_lookup.nil?
 
-        if variable_lookup
-          object, property = VariableLookupTraverser.lookup_object_and_property(variable_lookup)
-          return property.return_type if property
-          return object.name if object
-        end
+        object, property = VariableLookupTraverser.lookup_object_and_property(variable_lookup)
+        return property.return_type if property
+        return object.name if object
+      end
+
+      def denied_filters_for(variable_lookup)
+        return [] if variable_lookup.nil?
+
+        VariableLookupTraverser.find_object(variable_lookup.name).denied_filters
       end
 
       def available_filters_for(input_type)

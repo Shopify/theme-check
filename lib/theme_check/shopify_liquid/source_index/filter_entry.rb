@@ -10,7 +10,7 @@ module ThemeCheck
         end
 
         def input_type
-          hash['syntax'].split(' | ')[0]
+          @input_type ||= hash['syntax'].split(' | ')[0]
         end
       end
     end

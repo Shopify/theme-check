@@ -24,6 +24,10 @@ module ThemeCheck
           hash['array_value']
         end
 
+        def denied_filters
+          hash['denied_filters'] || []
+        end
+
         private
 
         def return_type_hash

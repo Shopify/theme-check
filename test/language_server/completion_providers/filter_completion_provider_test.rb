@@ -94,6 +94,10 @@ module ThemeCheck
         assert_can_only_complete_with(token, input_type)
       end
 
+      def test_filters_incompatible_with_already_escaped_string
+        refute_can_complete_with(@provider, "{{ page_description | ", "escape")
+      end
+
       def test_filters_compatible_with_the_number_type
         input_type = 'number'
         assert_can_only_complete_with("{{ cart.total_price | ", input_type)
