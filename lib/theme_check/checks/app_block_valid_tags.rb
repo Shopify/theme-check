@@ -32,5 +32,9 @@ module ThemeCheck
     def on_section(node)
       add_offense(OFFENSE_MSG % 'section', node: node)
     end
+
+    def on_sections(node)
+      add_offense(OFFENSE_MSG % 'sections', node: node)
+    end
   end
 end

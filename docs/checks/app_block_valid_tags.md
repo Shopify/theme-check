@@ -11,6 +11,7 @@ This rule verifies none of the below tags are used in theme app extension blocks
 - `{% include 'foo' %}`
 - `{% layout 'foo' %}`
 - `{% section 'foo' %}`
+- `{% sections 'foo' %}`
 
 :-1: **Incorrect** code for this check occurs with the use of any of the above tags in the liquid code of theme app extension blocks.
 

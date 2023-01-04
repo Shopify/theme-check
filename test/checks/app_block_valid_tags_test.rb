@@ -4,7 +4,7 @@ require "test_helper"
 module ThemeCheck
   class AppBlockValidTagsTest < Minitest::Test
     def test_include_layout_section_tags
-      ['include', 'layout', 'section'].each do |tag|
+      ['include', 'layout', 'section', 'sections'].each do |tag|
         extension_files = {
           "blocks/app.liquid" => <<~BLOCK,
             {% #{tag} 'test' %}
