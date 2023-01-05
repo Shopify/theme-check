@@ -22,6 +22,24 @@ module ThemeCheck
       end
     end
 
+    class Sections < Liquid::Tag
+      SYNTAX = /\A\s*(?<sections_name>#{Liquid::QuotedString})\s*\z/o
+
+      attr_reader :sections_name
+
+      def initialize(tag_name, markup, options)
+        super
+
+        match = markup.match(SYNTAX)
+        raise(
+          Liquid::SyntaxError,
+          "Error in tag 'sections' - Valid syntax: sections '[type]'",
+        ) unless match
+        @sections_name = match[:sections_name].tr(%('"), '')
+        @sections_name.chomp!(".liquid") if @sections_name.end_with?(".liquid")
+      end
+    end
+
     class Form < Liquid::Block
       TAG_ATTRIBUTES = /([\w\-]+)\s*:\s*(#{Liquid::QuotedFragment})/o
       # Matches forms with arguments:
@@ -204,6 +222,7 @@ module ThemeCheck
         register_tag('render', Render)
         register_tag('paginate', Paginate)
         register_tag('section', Section)
+        register_tag('sections', Sections)
         register_tag('style', Style)
         register_tag('schema', Schema)
         register_tag('javascript', Javascript)

@@ -51,4 +51,14 @@ class LiquidTagTest < Minitest::Test
     )
     assert_offenses("", offenses)
   end
+
+  def test_allows_sections_tag_in_layout
+    offenses = analyze_theme(
+      "sections/theme.liquid" => <<~END,
+        {% sections 'foo' %}
+      END
+    )
+
+    assert_offenses("", offenses)
+  end
 end

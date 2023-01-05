@@ -20,7 +20,7 @@ module ThemeCheck
           .stubs(:default_destination)
           .returns(SourceManager.send(:default_destination))
         @source_index_class.filters
-        assert_equal(137, @source_index_class.filters.length)
+        assert_equal(138, @source_index_class.filters.length)
 
         SourceIndex::FilterState.mark_outdated
         assert(SourceIndex::FilterState.outdated?)

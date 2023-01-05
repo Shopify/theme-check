@@ -1,4 +1,9 @@
 
+v1.13.0 / 2023-01-04
+==================
+
+  * Add support for new sections liquid tag in theme check ([#694](https://github.com/Shopify/theme-check/issues/694))
+
 v1.12.1 / 2022-12-15
 ==================
 
