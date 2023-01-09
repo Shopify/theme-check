@@ -10,7 +10,7 @@ module ThemeCheck
 
         attr_reader :hash
 
-        def_delegators :return_type_instance, :generic_type?, :array_type?, :array_type, :to_s
+        def_delegators :return_type_instance, :generic_type?, :array_type?, :array_type, :to_s, :denied_filters
 
         def initialize(hash = {})
           @hash = hash || {}
