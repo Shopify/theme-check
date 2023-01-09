@@ -7,7 +7,7 @@ module ThemeCheck
     class SourceIndex
       class PropertyEntryTest < Minitest::Test
         def setup
-          @entry = PropertyEntry.new(hash)
+          @entry = PropertyEntry.new(hash, "user_agent")
         end
 
         def test_return_type

@@ -6,7 +6,13 @@ module ThemeCheck
       class ObjectEntry < BaseEntry
         def properties
           (hash['properties'] || [])
-            .map { |hash| PropertyEntry.new(hash) }
+            .map do |prop_hash|
+              PropertyEntry.new(prop_hash, hash['name'])
+            end
+        end
+
+        def shopify_dev_url
+          "#{SHOPIFY_DEV_ROOT_URL}/objects/#{hash['name']}"
         end
       end
     end
