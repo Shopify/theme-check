@@ -19,7 +19,7 @@ The following examples contain code snippets that either fail or pass this check
 "en": {
   "title": "Welcome", "product": "Product"
 },
-          "fr": { "title": "Bienvenue", "produit": "Produit" }
+          "fr": { "title": "Bienvenue", "product": "Produit" }
   }
 }
 {% endschema %}
@@ -33,11 +33,11 @@ The following examples contain code snippets that either fail or pass this check
   "locales": {
     "en": {
       "title": "Welcome",
-      "missing": "Product"
+      "product": "Product"
     },
     "fr": {
       "title": "Bienvenue",
-      "missing": "TODO"
+      "product": "Produit"
     }
   }
 }
