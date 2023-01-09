@@ -16,7 +16,7 @@ module ThemeCheck
         private
 
         def title(entry)
-          "### #{entry.name}"
+          "### [#{entry.name}](#{entry.shopify_dev_url})"
         end
 
         def body(entry)

@@ -12,6 +12,8 @@ module ThemeCheck
 
         def_delegators :return_type_instance, :generic_type?, :array_type?, :array_type, :to_s, :denied_filters
 
+        SHOPIFY_DEV_ROOT_URL = "https://shopify.dev/api/liquid"
+
         def initialize(hash = {})
           @hash = hash || {}
           @return_type = nil
@@ -37,6 +39,10 @@ module ThemeCheck
           return nil unless deprecated?
 
           hash['deprecation_reason'] || nil
+        end
+
+        def shopify_dev_url
+          SHOPIFY_DEV_ROOT_URL
         end
 
         attr_writer :return_type

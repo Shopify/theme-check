@@ -8,6 +8,10 @@ module ThemeCheck
           nil
         end
 
+        def shopify_dev_url
+          "#{SHOPIFY_DEV_ROOT_URL}/filters/#{hash['name']}"
+        end
+
         private
 
         def return_type_hash

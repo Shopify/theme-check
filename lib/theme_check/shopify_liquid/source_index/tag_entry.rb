@@ -14,6 +14,10 @@ module ThemeCheck
             'type' => "tag<#{name}>",
           }
         end
+
+        def shopify_dev_url
+          "#{SHOPIFY_DEV_ROOT_URL}/tags/#{hash['name']}"
+        end
       end
     end
   end

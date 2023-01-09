@@ -12,6 +12,10 @@ module ThemeCheck
         def input_type
           @input_type ||= hash['syntax'].split(' | ')[0]
         end
+
+        def shopify_dev_url
+          "#{SHOPIFY_DEV_ROOT_URL}/filters/#{hash['name']}"
+        end
       end
     end
   end
