@@ -1,4 +1,11 @@
 
+v1.14.0 / 2023-01-10
+==================
+
+  * Add shopify-dev link to code completion suggestion title ([#700](https://github.com/Shopify/theme-check/issues/700))
+  * Fix examples in `SchemaJsonFormat` ([#698](https://github.com/Shopify/theme-check/issues/698))
+  * Do not suggest `escape` filter for already escaped strings ([#692](https://github.com/Shopify/theme-check/issues/692))
+
 v1.13.0 / 2023-01-04
 ==================
 
