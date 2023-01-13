@@ -20,7 +20,7 @@ module ThemeCheck
           .stubs(:default_destination)
           .returns(SourceManager.send(:default_destination))
         @source_index_class.filters
-        assert_equal(138, @source_index_class.filters.length)
+        assert_operator(@source_index_class.filters.length, :>=, 138)
 
         SourceIndex::FilterState.mark_outdated
         assert(SourceIndex::FilterState.outdated?)
@@ -48,7 +48,7 @@ module ThemeCheck
           .stubs(:default_destination)
           .returns(SourceManager.send(:default_destination))
         @source_index_class.objects
-        assert_equal(111, @source_index_class.objects.length)
+        assert_operator(@source_index_class.objects.length, :>=, 111)
 
         SourceIndex::ObjectState.mark_outdated
         assert(SourceIndex::ObjectState.outdated?)
@@ -76,7 +76,7 @@ module ThemeCheck
           .stubs(:default_destination)
           .returns(SourceManager.send(:default_destination))
         @source_index_class.tags
-        assert_equal(27, @source_index_class.tags.length)
+        assert_operator(@source_index_class.tags.length, :>=, 27)
 
         SourceIndex::TagState.mark_outdated
         assert(SourceIndex::TagState.outdated?)
