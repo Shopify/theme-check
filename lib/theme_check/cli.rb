@@ -15,6 +15,7 @@ module ThemeCheck
       @include_categories = []
       @exclude_categories = []
       @auto_correct = false
+      @update_resources = false
       @config_path = nil
       @fail_level = :error
       @format = :text
@@ -65,6 +66,10 @@ module ThemeCheck
         "--print",
         "Output active config to STDOUT"
       ) { @command = :print }
+      @option_parser.on(
+        "--update-resources",
+        "Update Theme Check resources (objects, filters, and tags)"
+      ) { @update_resources = true }
       @option_parser.on(
         "-h", "--help",
         "Show this. Hi!"
@@ -181,6 +186,8 @@ module ThemeCheck
     end
 
     def check(out_stream = STDOUT)
+      update_resources
+
       STDERR.puts "Checking #{@config.root} ..."
       storage = ThemeCheck::FileSystemStorage.new(@config.root, ignored_patterns: @config.ignored_patterns)
       theme = ThemeCheck::Theme.new(storage)
@@ -197,6 +204,14 @@ module ThemeCheck
       raise Abort, "" if analyzer.uncorrectable_offenses.any? do |offense|
         offense.check.severity_value <= Check.severity_value(@fail_level)
       end
+    end
+
+    def update_resources
+      return unless @update_resources
+
+      puts 'Updating resources...'
+
+      ThemeCheck::ShopifyLiquid::SourceManager.download
     end
 
     def profile

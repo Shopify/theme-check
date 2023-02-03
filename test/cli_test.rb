@@ -175,6 +175,25 @@ class CliTest < Minitest::Test
     assert_includes(out, "LiquidTag:")
   end
 
+  def test_update_resources
+    ThemeCheck::ShopifyLiquid::SourceManager.expects(:download)
+
+    storage = make_file_system_storage(
+      'layout/theme.liquid' => '',
+      '.theme-check.yml' => <<~YAML,
+        extends: :nothing
+        RequiredDirectories:
+          enabled: false
+      YAML
+    )
+
+    out, _err = capture_io do
+      ThemeCheck::Cli.parse_and_run!([storage.root, '--update-resources'])
+    end
+
+    assert_includes(out, 'Updating resources...')
+  end
+
   def test_auto_correct
     storage = make_file_system_storage(
       "templats/theme.liquid" => <<~LIQUID,
