@@ -175,7 +175,7 @@ class CliTest < Minitest::Test
     assert_includes(out, "LiquidTag:")
   end
 
-  def test_update_resources
+  def test_update_docs
     ThemeCheck::ShopifyLiquid::SourceManager.expects(:download)
 
     storage = make_file_system_storage(
@@ -188,10 +188,10 @@ class CliTest < Minitest::Test
     )
 
     out, _err = capture_io do
-      ThemeCheck::Cli.parse_and_run!([storage.root, '--update-resources'])
+      ThemeCheck::Cli.parse_and_run!([storage.root, '--update-docs'])
     end
 
-    assert_includes(out, 'Updating resources...')
+    assert_includes(out, 'Updating documentation...')
   end
 
   def test_auto_correct

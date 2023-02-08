@@ -15,7 +15,7 @@ module ThemeCheck
       @include_categories = []
       @exclude_categories = []
       @auto_correct = false
-      @update_resources = false
+      @update_docs = false
       @config_path = nil
       @fail_level = :error
       @format = :text
@@ -67,9 +67,9 @@ module ThemeCheck
         "Output active config to STDOUT"
       ) { @command = :print }
       @option_parser.on(
-        "--update-resources",
-        "Update Theme Check resources (objects, filters, and tags)"
-      ) { @update_resources = true }
+        "--update-docs",
+        "Update Theme Check docs (objects, filters, and tags)"
+      ) { @update_docs = true }
       @option_parser.on(
         "-h", "--help",
         "Show this. Hi!"
@@ -186,7 +186,7 @@ module ThemeCheck
     end
 
     def check(out_stream = STDOUT)
-      update_resources
+      update_docs
 
       STDERR.puts "Checking #{@config.root} ..."
       storage = ThemeCheck::FileSystemStorage.new(@config.root, ignored_patterns: @config.ignored_patterns)
@@ -206,10 +206,10 @@ module ThemeCheck
       end
     end
 
-    def update_resources
-      return unless @update_resources
+    def update_docs
+      return unless @update_docs
 
-      puts 'Updating resources...'
+      puts 'Updating documentation...'
 
       ThemeCheck::ShopifyLiquid::SourceManager.download
     end
