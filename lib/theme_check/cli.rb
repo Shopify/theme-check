@@ -209,7 +209,7 @@ module ThemeCheck
     def update_docs
       return unless @update_docs
 
-      puts 'Updating documentation...'
+      STDERR.puts 'Updating documentation...'
 
       ThemeCheck::ShopifyLiquid::SourceManager.download
     end
