@@ -197,6 +197,9 @@ PaginationSize:
 DeprecatedGlobalAppBlockType:
   enabled: true
 
+VariableName:
+  enabled: true
+
 SchemaJsonFormat:
   enabled: true
   start_level: 0
