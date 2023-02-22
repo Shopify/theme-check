@@ -8,6 +8,8 @@ module ThemeCheck
     def on_link(node)
       return if node.attributes["rel"]&.downcase != "preload"
       case node.attributes["as"]&.downcase
+      when "font"
+        # Ignored as it is not supported
       when "style"
         add_offense("For better performance, prefer using the preload argument of the stylesheet_tag filter", node: node)
       when "image"

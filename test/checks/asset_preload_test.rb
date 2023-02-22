@@ -13,6 +13,16 @@ class AssetPreloadTest < Minitest::Test
     assert_offenses("", offenses)
   end
 
+  def test_no_offense_for_font_preload
+    offenses = analyze_theme(
+      ThemeCheck::AssetPreload.new,
+      "templates/index.liquid" => <<~END,
+        <link as="font" href="{{ setting.type_body_font | font_url }}" rel="preload">
+      END
+    )
+    assert_offenses("", offenses)
+  end
+
   def test_reports_stylesheet_preloading
     offenses = analyze_theme(
       ThemeCheck::AssetPreload.new,
