@@ -15,4 +15,4 @@ jobs:
       - uses: actions/add-to-project@main
         with:
           project-url: https://github.com/orgs/Shopify/projects/2929
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.SHOPIFY_GH_ACCESS_TOKEN }}
