@@ -6,7 +6,7 @@ class AssetPreloadTest < Minitest::Test
     offenses = analyze_theme(
       ThemeCheck::AssetPreload.new,
       "templates/index.liquid" => <<~END,
-        <link href="a.css" rel="stylesheet">
+        <link href="{{ 'a.css' | asset_url }}" rel="stylesheet">
         <link href="b.com" rel="preconnect">
       END
     )
@@ -23,11 +23,21 @@ class AssetPreloadTest < Minitest::Test
     assert_offenses("", offenses)
   end
 
+  def test_no_warning_for_external_assets
+    offenses = analyze_theme(
+      ThemeCheck::AssetPreload.new,
+      "templates/index.liquid" => <<~END,
+        <link rel="preload" as="script" href="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js">
+      END
+    )
+    assert_offenses("", offenses)
+  end
+
   def test_reports_stylesheet_preloading
     offenses = analyze_theme(
       ThemeCheck::AssetPreload.new,
       "templates/index.liquid" => <<~END,
-        <link href="a.css" rel="preload" as="style">
+        <link href="{{ 'a.css' | asset_url }}" rel="preload" as="style">
       END
     )
     assert_offenses(<<~END, offenses)
@@ -39,7 +49,7 @@ class AssetPreloadTest < Minitest::Test
     offenses = analyze_theme(
       ThemeCheck::AssetPreload.new,
       "templates/index.liquid" => <<~END,
-        <link href="a.png" rel="preload" as="image">
+        <link href="{{ 'a.png' | image_url }}" rel="preload" as="image">
       END
     )
     assert_offenses(<<~END, offenses)
@@ -51,7 +61,7 @@ class AssetPreloadTest < Minitest::Test
     offenses = analyze_theme(
       ThemeCheck::AssetPreload.new,
       "templates/index.liquid" => <<~END,
-        <link href="a..js" rel="preload" as="script">
+        <link href="{{ 'script.js' | asset_url  }}" rel="preload" as="script">
       END
     )
     assert_offenses(<<~END, offenses)

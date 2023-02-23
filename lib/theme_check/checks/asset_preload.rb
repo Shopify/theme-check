@@ -6,10 +6,12 @@ module ThemeCheck
     doc docs_url(__FILE__)
 
     def on_link(node)
-      return if node.attributes["rel"]&.downcase != "preload"
+      return unless node.attributes["rel"]&.downcase == "preload"
+      return if node.literal? # literal urls cannot use the preload_tag
+      return unless node.attributes["href"]&.match?(/(?:assets?|image|file)_url\b/i)
       case node.attributes["as"]&.downcase
       when "font"
-        # Ignored as it is not supported
+        # fonts are not supported yet
       when "style"
         add_offense("For better performance, prefer using the preload argument of the stylesheet_tag filter", node: node)
       when "image"
