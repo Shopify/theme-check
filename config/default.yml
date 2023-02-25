@@ -25,6 +25,11 @@ MissingTemplate:
   ignore: []
   ignore_missing: []
 
+
+NestedLoop:
+  enabled: true
+  max_nesting_level: 2
+
 NestedSnippet:
   enabled: true
   ignore: []
