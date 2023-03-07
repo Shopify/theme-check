@@ -24,7 +24,7 @@ module ThemeCheck
         END
       )
       assert_offenses(<<~END, offenses)
-        Add a loading="lazy" attribute to defer loading of images at templates/index.liquid:1
+        Use loading="eager" for images visible in the viewport on load and loading="lazy" for others at templates/index.liquid:1
       END
     end
 
@@ -36,7 +36,7 @@ module ThemeCheck
         END
       )
       assert_offenses(<<~END, offenses)
-        Prefer loading="lazy" to defer loading of images at templates/index.liquid:1
+        Use loading="eager" for images visible in the viewport on load and loading="lazy" for others at templates/index.liquid:1
       END
     end
   end

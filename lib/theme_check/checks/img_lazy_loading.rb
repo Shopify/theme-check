@@ -10,11 +10,7 @@ module ThemeCheck
     def on_img(node)
       loading = node.attributes["loading"]&.downcase
       return if ACCEPTED_LOADING_VALUES.include?(loading)
-      if loading == "auto"
-        add_offense("Prefer loading=\"lazy\" to defer loading of images", node: node)
-      else
-        add_offense("Add a loading=\"lazy\" attribute to defer loading of images", node: node)
-      end
+      add_offense("Use loading=\"eager\" for images visible in the viewport on load and loading=\"lazy\" for others", node: node)
     end
   end
 end
