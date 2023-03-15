@@ -187,11 +187,11 @@ class CliTest < Minitest::Test
       YAML
     )
 
-    out, _err = capture_io do
+    _out, err = capture_io do
       ThemeCheck::Cli.parse_and_run!([storage.root, '--update-docs'])
     end
 
-    assert_includes(out, 'Updating documentation...')
+    assert_includes(err, 'Updating documentation...')
   end
 
   def test_auto_correct
