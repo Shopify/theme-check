@@ -8,17 +8,19 @@ Very often, webpages contain many images that contribute to data-usage and how f
 
 _Quoted from [MDN - Lazy loading][mdn]_
 
+As a general rule you should apply `loading="lazy"` to elements that are **not initially visible** when the page loads. Only images that require user interaction (scrolling, hovering, clicking etc.) to be seen can be safely lazy loaded without negatively impacting the rendering performance.
+
 ## Check Details
 
-This check is aimed at defering loading non-critical images.
+This check is aimed at deferring loading non-critical images.
 
 :-1: Examples of **incorrect** code for this check:
 
 ```liquid
 <img src="a.jpg">
 
-<!-- Replaces lazysize.js -->
-<img src="a.jpg" class="lazyload">
+<!-- Replaces lazysizes.js -->
+<img data-src="a.jpg" class="lazyload">
 
 <!-- `auto` is deprecated -->
 <img src="a.jpg" loading="auto">
@@ -29,7 +31,7 @@ This check is aimed at defering loading non-critical images.
 ```liquid
 <img src="a.jpg" loading="lazy">
 
-<!-- `eager` is also accepted, but prefer `lazy` -->
+<!-- `eager` is also accepted -->
 <img src="a.jpg" loading="eager">
 ```
 
@@ -44,7 +46,7 @@ ImgLazyLoading:
 
 ## When Not To Use It
 
-If you don't want to defer loading of images, then it's safe to disable this rule.
+There should be no cases where disabling this rule is needed. When it comes to rendering performance, it is generally better to specify `loading="eager"` as a default. You may want to do that for sections that are often placed in different parts of the page (top, middle, bottom), which makes it hard to reason about which value should be used.
 
 ## Version
 
