@@ -1,4 +1,10 @@
 
+v1.15.0 / 2023-04-14
+==================
+
+  * Improve rule for lazy loading to prevent developers from overusing it
+  * Introduce `--update-docs` flag to synchronously update Theme Check resources (objects, filters, and tags) (#707)
+
 v1.14.0 / 2023-01-10
 ==================
 
