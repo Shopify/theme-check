@@ -22,7 +22,7 @@ module ThemeCheck
             load_file(:objects)
               .concat(built_in_objects)
               .filter_map do |hash|
-                next if (theme_app_extension_labels + labels_only_exposed_in_certain_contexts).include?(hash['name'])
+                next if labels_only_exposed_in_certain_contexts.include?(hash['name'])
 
                 ObjectEntry.new(hash)
               end
@@ -45,7 +45,7 @@ module ThemeCheck
         end
 
         def labels_only_exposed_in_certain_contexts
-          ['robots'].freeze
+          ['robots', 'app'].freeze
         end
 
         def deprecated_filters

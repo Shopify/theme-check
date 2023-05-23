@@ -450,6 +450,16 @@ class UndefinedObjectTest < Minitest::Test
     END
   end
 
+  def test_does_not_report_when_section_is_used
+    offenses = analyze_theme(
+      ThemeCheck::UndefinedObject.new(exclude_snippets: false),
+      "blocks/block_a.liquid" => <<~END,
+        <p>{{ section.id }}</p>
+      END
+    )
+    assert_offenses("", offenses)
+  end
+
   def test_does_not_report_on_app_liquid_drop_in_theme_app_extensions
     offenses = analyze_theme(
       ThemeCheck::UndefinedObject.new(exclude_snippets: false, config_type: :theme_app_extension),
