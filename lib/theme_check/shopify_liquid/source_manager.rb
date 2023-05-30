@@ -9,6 +9,8 @@ module ThemeCheck
     class SourceManager
       REQUIRED_FILE_NAMES = [:filters, :objects, :tags, :latest].freeze
 
+      class DownloadResourceError < StandardError; end
+
       class << self
         def download_or_refresh_files(destination = default_destination)
           if has_required_files?(destination)
@@ -24,6 +26,9 @@ module ThemeCheck
           REQUIRED_FILE_NAMES.each do |file_name|
             download_file(local_path(file_name, destination), remote_path(file_name))
           end
+        rescue DownloadResourceError
+          # If a request error occurs, ignore it. This ensures that Theme Check
+          # can rely on the sources included during the bundling phase.
         end
 
         def refresh(destination = default_destination)
@@ -73,8 +78,8 @@ module ThemeCheck
         end
 
         def download_file(local_path, remote_uri)
+          content = open_uri(remote_uri)
           File.open(local_path, "wb") do |file|
-            content = open_uri(remote_uri)
             file.write(content)
           end
         end
@@ -104,6 +109,8 @@ module ThemeCheck
           end
 
           res.body
+        rescue StandardError
+          raise DownloadResourceError
         end
       end
     end

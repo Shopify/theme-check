@@ -56,6 +56,9 @@ module ThemeCheck
 
         def load_file(file_name)
           read_json(local_path!(file_name))
+        rescue StandardError
+          # If files get manually deleted, fallback with an empty list.
+          []
         end
 
         def local_path!(file_name)
