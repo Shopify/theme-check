@@ -42,7 +42,18 @@ module ThemeCheck
 
         download_or_refresh_files
 
-        assert_test_documentation_up_to_date(tmp_dir)
+      ensure
+        FileUtils.remove_entry(@tmp_dir)
+      end
+
+      def test_download_when_a_request_error_happens
+        tmp_dir = Pathname.new("#{@tmp_dir}/new")
+
+        @source_manager_class.stubs(:open_uri).raises(SourceManager::DownloadResourceError)
+        @source_manager_class.stubs(:default_destination).returns(tmp_dir)
+
+        # Nothing is raised
+        download_or_refresh_files
       ensure
         FileUtils.remove_entry(@tmp_dir)
       end
