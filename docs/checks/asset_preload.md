@@ -6,6 +6,13 @@ Preloading can be a useful way of making sure that critical assets are downloade
 
 Liquid provides multiple filters to [preload key resources][preload_key_resources] so they can be converted into `Link` headers automatically. This enables them to be discovered even faster, especially when combined with Early Hints that Shopify supports.
 
+Third party assets and font preloads that are not supported by `preload_tag` are ignored by this check:
+
+```liquid
+<!-- safely ignored -->
+<link rel="preload" as="script" href="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js">
+```
+
 ## Examples
 
 The following examples contain code snippets that either fail or pass this check.
