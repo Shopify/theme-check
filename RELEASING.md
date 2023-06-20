@@ -9,6 +9,8 @@
    rake prerelease[$VERSION]
    ```
 
+   **NOTE:** command line enthusiasts can run `scripts/release <version>` to automate steps 2-4.
+
 3. Run [`git changelog`](https://github.com/tj/git-extras) to update `CHANGELOG.md`.
 
 4. Commit your changes and make a PR.
