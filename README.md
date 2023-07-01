@@ -193,4 +193,4 @@ In VS Code, these can be set directly in your `settings.json`.
 
 ## Contributing
 
-For guidance on contributing, refer to this [doc](/CONTRIBUTING)
+For guidance on contributing, refer to this [doc](/CONTRIBUTING.md)
