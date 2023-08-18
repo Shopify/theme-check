@@ -21,6 +21,10 @@ module ThemeCheck
       add_offense(OFFENSE_MSG % 'stylesheet', node: node)
     end
 
+    def on_background(node)
+      add_offense(OFFENSE_MSG % 'background', node: node)
+    end
+
     def on_include(node)
       add_offense(OFFENSE_MSG % 'include', node: node)
     end

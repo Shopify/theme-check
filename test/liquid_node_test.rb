@@ -246,6 +246,20 @@ module ThemeCheck
       assert_equal(262, node.inner_markup_end_index)
     end
 
+    def test_background_block_start_and_end_form
+      background = root_node(<<~END)
+      {% background source_name: 'job name', variable: 'hello', delay: delay_minutes %}
+        {{ variable }} World
+      {% endbackground %}
+      END
+
+      node = find(background) { |n| n.type_name == :background }
+
+      assert_equal(89, node.inner_markup_start_index)
+      assert_equal(262, node.inner_markup_end_index)
+    end
+
+
     def test_block_start_and_end_paginate
       paginate = root_node(<<~END)
         {% paginate collection.products by 5 %}
