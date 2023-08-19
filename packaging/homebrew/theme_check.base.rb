@@ -3,7 +3,7 @@
 require 'formula'
 require 'fileutils'
 
-class ThemeCheck < Formula
+class PlatformosCheck < Formula
   module RubyBin
     def ruby_bin
       Formula["ruby"].opt_bin
@@ -14,15 +14,15 @@ class ThemeCheck < Formula
     include RubyBin
 
     def fetch(_timeout: nil, **_options)
-      ohai("Fetching theme-check from gem source")
+      ohai("Fetching platformos-check from gem source")
       cache.cd do
         ENV['GEM_SPEC_CACHE'] = "#{cache}/gem_spec_cache"
-        system("#{ruby_bin}/gem", "fetch", "theme-check", "--version", gem_version)
+        system("#{ruby_bin}/gem", "fetch", "platformos-check", "--version", gem_version)
       end
     end
 
     def cached_location
-      Pathname.new("#{cache}/theme-check-#{gem_version}.gem")
+      Pathname.new("#{cache}/platformos-check-#{gem_version}.gem")
     end
 
     def cache
@@ -43,9 +43,9 @@ class ThemeCheck < Formula
 
   include RubyBin
 
-  url "theme-check", using: RubyGemsDownloadStrategy
-  version "THEME_CHECK_VERSION"
-  sha256 'THEME_CHECK_GEM_CHECKSUM'
+  url "platformos-check", using: RubyGemsDownloadStrategy
+  version "PLATFORMOS_CHECK_VERSION"
+  sha256 'PLATFORMOS_CHECK_GEM_CHECKSUM'
   depends_on "ruby"
 
   def install
@@ -72,14 +72,14 @@ class ThemeCheck < Formula
       "--bindir", bin
     )
 
-    raise "gem install 'theme-check' failed with status #{$CHILD_STATUS.exitstatus}" unless $CHILD_STATUS.success?
+    raise "gem install 'platformos-check' failed with status #{$CHILD_STATUS.exitstatus}" unless $CHILD_STATUS.success?
 
     bin.rmtree if bin.exist?
     bin.mkpath
 
-    brew_gem_prefix = "#{prefix}/gems/theme-check-#{version}"
+    brew_gem_prefix = "#{prefix}/gems/platformos-check-#{version}"
 
-    gemspec = Gem::Specification.load("#{prefix}/specifications/theme-check-#{version}.gemspec")
+    gemspec = Gem::Specification.load("#{prefix}/specifications/platformos-check-#{version}.gemspec")
     ruby_libs = Dir.glob("#{prefix}/gems/*/lib")
     gemspec.executables.each do |exe|
       file = Pathname.new("#{brew_gem_prefix}/#{gemspec.bindir}/#{exe}")

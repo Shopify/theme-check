@@ -4,7 +4,7 @@ require "test_helper"
 class RequiredDirectories < Minitest::Test
   def test_does_not_report_missing_directories
     offenses = analyze_theme(
-      ThemeCheck::RequiredDirectories.new,
+      PlatformosCheck::RequiredDirectories.new,
       "assets/gift-card.js" => "",
       "config/settings_data.json" => "",
       "layout/theme.liquid" => "",
@@ -19,7 +19,7 @@ class RequiredDirectories < Minitest::Test
 
   def test_reports_missing_directories
     offenses = analyze_theme(
-      ThemeCheck::RequiredDirectories.new,
+      PlatformosCheck::RequiredDirectories.new,
       "assets/gift-card.js" => "",
       "config/settings_data.json" => "",
       "layout/theme.liquid" => "",
@@ -41,7 +41,7 @@ class RequiredDirectories < Minitest::Test
       "templates/index.liquid" => ""
     )
 
-    analyzer = ThemeCheck::Analyzer.new(theme, [ThemeCheck::RequiredDirectories.new], true)
+    analyzer = PlatformosCheck::Analyzer.new(theme, [PlatformosCheck::RequiredDirectories.new], true)
     analyzer.analyze_theme
     analyzer.correct_offenses
 

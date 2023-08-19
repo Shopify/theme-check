@@ -87,5 +87,5 @@ This check has been introduced in Theme Check 0.1.0.
 - [Documentation Source][docsource]
 
 [styleguide]: https://github.com/Shopify/liquid-style-guide
-[codesource]: /lib/theme_check/checks/space_inside_braces.rb
+[codesource]: /lib/platformos_check/checks/space_inside_braces.rb
 [docsource]: /docs/checks/space_inside_braces.md

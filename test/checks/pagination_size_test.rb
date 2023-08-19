@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "test_helper"
 
-module ThemeCheck
+module PlatformosCheck
   class PaginationSizeTest < Minitest::Test
     def test_no_offense_for_good_behaviour
       offenses = analyze_theme(

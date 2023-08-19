@@ -46,5 +46,5 @@ This check has been introduced in Theme Check 1.0.0
 - [Rule Source][codesource]
 - [Documentation Source][docsource]
 
-[codesource]: /lib/theme_check/checks/asset_size_css_stylesheet_tag.rb
+[codesource]: /lib/platformos_check/checks/asset_size_css_stylesheet_tag.rb
 [docsource]: /docs/checks/asset_size_css_stylesheet_tag.md

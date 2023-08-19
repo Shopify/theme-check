@@ -75,5 +75,5 @@ This check has been introduced in Theme Check 0.6.0.
 [codepenshift]: https://codepen.io/charlespwd/pen/YzpxPEp?editors=1100
 [codepenlazy]: https://codepen.io/charlespwd/pen/abZmqXJ?editors=0111
 [aspect-ratio]: https://caniuse.com/mdn-css_properties_aspect-ratio
-[codesource]: /lib/theme_check/checks/img_aspect_ratio.rb
+[codesource]: /lib/platformos_check/checks/img_aspect_ratio.rb
 [docsource]: /docs/checks/img_aspect_ratio.md

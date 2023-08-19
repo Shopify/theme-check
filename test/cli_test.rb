@@ -4,7 +4,7 @@ require "test_helper"
 class CliTest < Minitest::Test
   def test_help
     out, _err = capture_io do
-      ThemeCheck::Cli.parse_and_run!(%w(--help))
+      PlatformosCheck::Cli.parse_and_run!(%w(--help))
     end
 
     assert_includes(out, "Usage: theme-check")
@@ -12,8 +12,8 @@ class CliTest < Minitest::Test
 
   def test_check
     out, _err = capture_io do
-      assert_raises(ThemeCheck::Cli::Abort) do
-        ThemeCheck::Cli.parse_and_run!([__dir__ + "/theme"])
+      assert_raises(PlatformosCheck::Cli::Abort) do
+        PlatformosCheck::Cli.parse_and_run!([__dir__ + "/theme"])
       end
     end
     assert_includes(out, "files inspected")
@@ -43,7 +43,7 @@ class CliTest < Minitest::Test
     )
 
     out, _err = capture_io do
-      ThemeCheck::Cli.parse_and_run!([storage.root.to_s, '--output', 'json'])
+      PlatformosCheck::Cli.parse_and_run!([storage.root.to_s, '--output', 'json'])
     end
 
     assert_equal(
@@ -115,7 +115,7 @@ class CliTest < Minitest::Test
 
   def test_print
     out, _err = capture_io do
-      ThemeCheck::Cli.parse_and_run!([__dir__ + "/theme", '--print'])
+      PlatformosCheck::Cli.parse_and_run!([__dir__ + "/theme", '--print'])
     end
 
     assert_includes(out, <<~EXPECTED)
@@ -133,7 +133,7 @@ class CliTest < Minitest::Test
     )
 
     out, _err = capture_io do
-      ThemeCheck::Cli.parse_and_run!([__dir__ + "/theme", "-C", storage.path(".theme-check.yml").to_s, '--print'])
+      PlatformosCheck::Cli.parse_and_run!([__dir__ + "/theme", "-C", storage.path(".theme-check.yml").to_s, '--print'])
     end
 
     assert_includes(out, <<~EXPECTED)
@@ -144,8 +144,8 @@ class CliTest < Minitest::Test
 
   def test_check_with_category
     out, _err = capture_io do
-      assert_raises(ThemeCheck::Cli::Abort) do
-        ThemeCheck::Cli.parse_and_run!([__dir__ + "/theme", "-c", "translation", "--fail-level", "style"])
+      assert_raises(PlatformosCheck::Cli::Abort) do
+        PlatformosCheck::Cli.parse_and_run!([__dir__ + "/theme", "-c", "translation", "--fail-level", "style"])
       end
     end
     refute_includes(out, "liquid")
@@ -153,30 +153,30 @@ class CliTest < Minitest::Test
 
   def test_check_with_exclude_category
     out, _err = capture_io do
-      assert_raises(ThemeCheck::Cli::Abort) do
-        ThemeCheck::Cli.parse_and_run!([__dir__ + "/theme", "-x", "liquid", "--fail-level", "style"])
+      assert_raises(PlatformosCheck::Cli::Abort) do
+        PlatformosCheck::Cli.parse_and_run!([__dir__ + "/theme", "-x", "liquid", "--fail-level", "style"])
       end
     end
     refute_includes(out, "liquid")
   end
 
   def test_check_no_templates
-    assert_raises(ThemeCheck::Cli::Abort, /^No templates found./) do
+    assert_raises(PlatformosCheck::Cli::Abort, /^No templates found./) do
       capture_io do
-        ThemeCheck::Cli.parse_and_run!([__dir__])
+        PlatformosCheck::Cli.parse_and_run!([__dir__])
       end
     end
   end
 
   def test_list
     out, _err = capture_io do
-      ThemeCheck::Cli.parse_and_run!(%w(--list))
+      PlatformosCheck::Cli.parse_and_run!(%w(--list))
     end
     assert_includes(out, "LiquidTag:")
   end
 
   def test_update_docs
-    ThemeCheck::ShopifyLiquid::SourceManager.expects(:download)
+    PlatformosCheck::ShopifyLiquid::SourceManager.expects(:download)
 
     storage = make_file_system_storage(
       'layout/theme.liquid' => '',
@@ -188,7 +188,7 @@ class CliTest < Minitest::Test
     )
 
     _out, err = capture_io do
-      ThemeCheck::Cli.parse_and_run!([storage.root, '--update-docs'])
+      PlatformosCheck::Cli.parse_and_run!([storage.root, '--update-docs'])
     end
 
     assert_includes(err, 'Updating documentation...')
@@ -201,7 +201,7 @@ class CliTest < Minitest::Test
       LIQUID
     )
     out, _err = capture_io do
-      ThemeCheck::Cli.parse_and_run!([storage.root.to_s, "-a"])
+      PlatformosCheck::Cli.parse_and_run!([storage.root.to_s, "-a"])
     end
     assert_includes(out, "corrected")
   end
@@ -213,7 +213,7 @@ class CliTest < Minitest::Test
       YAML
       "crash_test_check.rb" => <<~RUBY,
         # frozen_string_literal: true
-        module ThemeCheck
+        module PlatformosCheck
           class MockCheck < LiquidCheck
             severity :error
             category :liquid
@@ -235,7 +235,7 @@ class CliTest < Minitest::Test
     )
 
     # Teardown code so that Checks.all doesn't have MockCheck in it
-    ThemeCheck::Check.all.delete(ThemeCheck::MockCheck)
+    PlatformosCheck::Check.all.delete(PlatformosCheck::MockCheck)
 
     assert_exit_code(1, "error",
       "templates/theme.liquid" => <<~YAML,
@@ -264,7 +264,7 @@ class CliTest < Minitest::Test
   def test_init
     storage = make_file_system_storage
     out, _err = capture_io do
-      ThemeCheck::Cli.parse_and_run!([storage.root, "--init"])
+      PlatformosCheck::Cli.parse_and_run!([storage.root, "--init"])
     end
     assert_includes(out, "Writing new .theme-check.yml")
   end
@@ -275,9 +275,9 @@ class CliTest < Minitest::Test
         root: .
       END
     )
-    assert_raises(ThemeCheck::Cli::Abort, /^.theme-check.yml already exists/) do
+    assert_raises(PlatformosCheck::Cli::Abort, /^.theme-check.yml already exists/) do
       capture_io do
-        ThemeCheck::Cli.parse_and_run!([storage.root, "--init"])
+        PlatformosCheck::Cli.parse_and_run!([storage.root, "--init"])
       end
     end
   end
@@ -299,7 +299,7 @@ class CliTest < Minitest::Test
 
     err = assert_raises(SystemExit) do
       capture_io do
-        ThemeCheck::Cli.parse_and_run([storage.root, "--fail-level", severity, "-C", storage.path(".theme-check.yml").to_s])
+        PlatformosCheck::Cli.parse_and_run([storage.root, "--fail-level", severity, "-C", storage.path(".theme-check.yml").to_s])
       end
     end
 

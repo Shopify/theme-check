@@ -48,5 +48,5 @@ This check has been introduced in Theme Check 0.6.0.
 - [Rule Source][codesource]
 - [Documentation Source][docsource]
 
-[codesource]: /lib/theme_check/checks/asset_size_css.rb
+[codesource]: /lib/platformos_check/checks/asset_size_css.rb
 [docsource]: /docs/checks/asset_size_css.md

@@ -2,7 +2,7 @@
 
 require 'test_helper'
 
-module ThemeCheck
+module PlatformosCheck
   module ShopifyLiquid
     class SourceIndex
       class TagEntryTest < Minitest::Test

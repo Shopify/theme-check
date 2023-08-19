@@ -4,7 +4,7 @@ require "test_helper"
 class ParserBlockingScriptTagTest < Minitest::Test
   def test_script_tag_filter
     offenses = analyze_theme(
-      ThemeCheck::ParserBlockingScriptTag.new,
+      PlatformosCheck::ParserBlockingScriptTag.new,
       "templates/index.liquid" => <<~END,
         {{ 'foo.js' | asset_url | script_tag }}
       END

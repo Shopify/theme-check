@@ -3,13 +3,13 @@
 require "test_helper"
 
 class LanguageServerTest < Minitest::Test
-  include ThemeCheck::LanguageServer::URIHelper
+  include PlatformosCheck::LanguageServer::URIHelper
 
-  Diagnostic = ThemeCheck::LanguageServer::Diagnostic
+  Diagnostic = PlatformosCheck::LanguageServer::Diagnostic
 
   def setup
     @messenger = MockMessenger.new
-    @server = ThemeCheck::LanguageServer::Server.new(
+    @server = PlatformosCheck::LanguageServer::Server.new(
       messenger: @messenger,
       should_raise_errors: true,
       number_of_threads: 1
@@ -52,13 +52,13 @@ class LanguageServerTest < Minitest::Test
   TemplateMock = Struct.new(:path, :relative_path)
 
   # Stringify keys
-  CAPABILITIES = ThemeCheck::LanguageServer::Handler::CAPABILITIES
-  SERVER_INFO = ThemeCheck::LanguageServer::Handler::SERVER_INFO
+  CAPABILITIES = PlatformosCheck::LanguageServer::Handler::CAPABILITIES
+  SERVER_INFO = PlatformosCheck::LanguageServer::Handler::SERVER_INFO
 
   def test_sends_offenses_on_open
     storage = make_file_system_storage("layout/theme.liquid" => "")
     offense = OffenseMock.build(storage.path("layout/theme.liquid"))
-    ThemeCheck::Analyzer.any_instance.stubs(:offenses).returns([offense])
+    PlatformosCheck::Analyzer.any_instance.stubs(:offenses).returns([offense])
 
     send_messages({
       jsonrpc: "2.0",
@@ -103,7 +103,7 @@ class LanguageServerTest < Minitest::Test
   def test_sends_offenses_on_text_document_did_save
     storage = make_file_system_storage("layout/theme.liquid" => "")
     offense = OffenseMock.build(storage.path("layout/theme.liquid"))
-    ThemeCheck::Analyzer.any_instance.expects(:offenses).returns([offense])
+    PlatformosCheck::Analyzer.any_instance.expects(:offenses).returns([offense])
 
     send_messages({
       jsonrpc: "2.0",

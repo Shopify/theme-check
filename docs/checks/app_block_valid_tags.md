@@ -37,5 +37,5 @@ This check has been introduced in 1.3.0
 - [Rule Source][codesource]
 - [Documentation Source][docsource]
 
-[codesource]: /lib/theme_check/checks/app_block_valid_tags.rb
+[codesource]: /lib/platformos_check/checks/app_block_valid_tags.rb
 [docsource]: /docs/checks/app_block_valid_tags.md

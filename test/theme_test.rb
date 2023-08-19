@@ -20,17 +20,17 @@ class ThemeTest < Minitest::Test
 
   def test_assets
     assert_equal(2, @theme.assets.size)
-    assert(@theme.assets.all? { |a| a.instance_of?(ThemeCheck::AssetFile) })
+    assert(@theme.assets.all? { |a| a.instance_of?(PlatformosCheck::AssetFile) })
   end
 
   def test_liquid
     assert_equal(3, @theme.liquid.size)
-    assert(@theme.liquid.all? { |a| a.instance_of?(ThemeCheck::LiquidFile) })
+    assert(@theme.liquid.all? { |a| a.instance_of?(PlatformosCheck::LiquidFile) })
   end
 
   def test_json
     assert_equal(2, @theme.json.size)
-    assert(@theme.json.all? { |a| a.instance_of?(ThemeCheck::JsonFile) })
+    assert(@theme.json.all? { |a| a.instance_of?(PlatformosCheck::JsonFile) })
   end
 
   def test_by_name
@@ -60,7 +60,7 @@ class ThemeTest < Minitest::Test
   end
 
   def test_ignore
-    storage = ThemeCheck::FileSystemStorage.new(make_file_system_storage(
+    storage = PlatformosCheck::FileSystemStorage.new(make_file_system_storage(
       "templates/index.liquid" => "",
       "ignored/product.liquid" => "",
       "ignored/nested/product.liquid" => "",
@@ -70,7 +70,7 @@ class ThemeTest < Minitest::Test
       "ignored/*",
       "*.json",
     ])
-    theme = ThemeCheck::Theme.new(storage)
+    theme = PlatformosCheck::Theme.new(storage)
 
     assert_equal([], theme.json.map(&:name))
     assert_equal(["templates/index"], theme.liquid.map(&:name))

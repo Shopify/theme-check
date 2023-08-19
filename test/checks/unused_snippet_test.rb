@@ -4,7 +4,7 @@ require "test_helper"
 class UnusedSnippetTest < Minitest::Test
   def test_finds_unused
     offenses = analyze_theme(
-      ThemeCheck::UnusedSnippet.new,
+      PlatformosCheck::UnusedSnippet.new,
       "templates/index.liquid" => <<~END,
         {% include 'muffin' %}
       END
@@ -22,7 +22,7 @@ class UnusedSnippetTest < Minitest::Test
 
   def test_ignores_dynamic_includes
     offenses = analyze_theme(
-      ThemeCheck::UnusedSnippet.new,
+      PlatformosCheck::UnusedSnippet.new,
       "templates/index.liquid" => <<~END,
         {% assign name = 'muffin' %}
         {% include name %}
@@ -39,7 +39,7 @@ class UnusedSnippetTest < Minitest::Test
 
   def test_does_not_turn_off_the_check_because_of_potential_render_block
     offenses = analyze_theme(
-      ThemeCheck::UnusedSnippet.new,
+      PlatformosCheck::UnusedSnippet.new,
       "templates/index.liquid" => <<~END,
         {% for name in section.blocks %}
           {% render name %}
@@ -56,7 +56,7 @@ class UnusedSnippetTest < Minitest::Test
 
   def test_does_turn_off_the_check_because_of_dynamic_include_in_for_loop
     offenses = analyze_theme(
-      ThemeCheck::UnusedSnippet.new,
+      PlatformosCheck::UnusedSnippet.new,
       "templates/index.liquid" => <<~END,
         {% for name in includes %}
           {% include name %}
@@ -82,7 +82,7 @@ class UnusedSnippetTest < Minitest::Test
       END
     )
 
-    analyzer = ThemeCheck::Analyzer.new(theme, [ThemeCheck::UnusedSnippet.new], true)
+    analyzer = PlatformosCheck::Analyzer.new(theme, [PlatformosCheck::UnusedSnippet.new], true)
     analyzer.analyze_theme
     analyzer.correct_offenses
 

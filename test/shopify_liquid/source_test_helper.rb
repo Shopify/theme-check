@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module ThemeCheck
+module PlatformosCheck
   module ShopifyLiquid
     module SourceTestHelper
       # Use a documentation folder in the test/ directory by default

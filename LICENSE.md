@@ -1,5 +1,5 @@
 
-Copyright 2020-present, Shopify Inc.
+Copyright 2023-present, platformOS.
 
 Contains code from activesupport Copyright (c) 2005-2019 David Heinemeier Hansson
 

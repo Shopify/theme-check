@@ -21,7 +21,7 @@ class OffenseTest < Minitest::Test
     )
   end
 
-  class Bogus < ThemeCheck::Check
+  class Bogus < PlatformosCheck::Check
     MESSAGE = "This is bogus"
   end
 
@@ -31,7 +31,7 @@ class OffenseTest < Minitest::Test
       line_number: 2,
       markup: "1 + 2",
     )
-    offense = ThemeCheck::Offense.new(check: Bogus.new, node: node)
+    offense = PlatformosCheck::Offense.new(check: Bogus.new, node: node)
 
     assert_equal("{{ 1 + 2 }}", offense.source_excerpt)
     assert_equal("1 + 2", offense.markup)
@@ -44,7 +44,7 @@ class OffenseTest < Minitest::Test
       line_number: 1,
       markup: "include 'icon-error'",
     )
-    offense = ThemeCheck::Offense.new(check: Bogus.new, node: node)
+    offense = PlatformosCheck::Offense.new(check: Bogus.new, node: node)
 
     assert_equal("<span class=\"form__message\">{% include 'icon-error' %}{{ form.errors.translated_fields['email'] | capitalize }} {{ fo...", offense.source_excerpt)
     assert_equal("include 'icon-error'", offense.markup)
@@ -59,7 +59,7 @@ class OffenseTest < Minitest::Test
       end_index: @theme["templates/index"].source.index('2 ') + 2,
       markup: "1 + 2",
     )
-    offense = ThemeCheck::Offense.new(check: Bogus.new, node: node, correction: proc { |c| c.insert_after(node, "abc") })
+    offense = PlatformosCheck::Offense.new(check: Bogus.new, node: node, correction: proc { |c| c.insert_after(node, "abc") })
     offense.correct
 
     node.theme_file.write
@@ -72,7 +72,7 @@ class OffenseTest < Minitest::Test
       line_number: 2,
       markup: "1 + 2",
     )
-    offense = ThemeCheck::Offense.new(check: Bogus.new, node: node)
+    offense = PlatformosCheck::Offense.new(check: Bogus.new, node: node)
     assert_equal(1, offense.start_row)
     assert_equal(1, offense.end_row)
     assert_equal(5, offense.start_column)
@@ -85,7 +85,7 @@ class OffenseTest < Minitest::Test
       line_number: 1,
       markup: "render 'product-card',\n  product: product,\n  show: true",
     )
-    offense = ThemeCheck::Offense.new(check: Bogus.new, node: node)
+    offense = PlatformosCheck::Offense.new(check: Bogus.new, node: node)
     assert_equal(0, offense.start_row)
     assert_equal(3, offense.start_column)
     assert_equal(2, offense.end_row)
@@ -99,7 +99,7 @@ class OffenseTest < Minitest::Test
       line_number: 1,
       markup: markup
     )
-    offense = ThemeCheck::Offense.new(check: Bogus.new, node: node)
+    offense = PlatformosCheck::Offense.new(check: Bogus.new, node: node)
     assert_equal(0, offense.start_row)
     assert_equal(3, offense.start_column)
     assert_equal(5, offense.end_row)
@@ -113,7 +113,7 @@ class OffenseTest < Minitest::Test
       line_number: 1,
       markup: markup
     )
-    offense = ThemeCheck::Offense.new(check: Bogus.new, node: node)
+    offense = PlatformosCheck::Offense.new(check: Bogus.new, node: node)
     assert_equal(0, offense.start_row)
     assert_equal(3, offense.start_column)
     assert_equal(3, offense.end_row)
@@ -126,7 +126,7 @@ class OffenseTest < Minitest::Test
       line_number: 1,
       markup: nil,
     )
-    offense = ThemeCheck::Offense.new(check: Bogus.new, node: node)
+    offense = PlatformosCheck::Offense.new(check: Bogus.new, node: node)
     assert_equal(0, offense.start_row)
     assert_equal(0, offense.end_row)
     assert_equal(0, offense.start_column)
@@ -134,13 +134,13 @@ class OffenseTest < Minitest::Test
   end
 
   def test_equal
-    assert_equal(ThemeCheck::Offense.new(check: Bogus.new, line_number: 2), ThemeCheck::Offense.new(check: Bogus.new, line_number: 2))
-    refute_equal(ThemeCheck::Offense.new(check: Bogus.new, line_number: 1), ThemeCheck::Offense.new(check: Bogus.new, line_number: 2))
+    assert_equal(PlatformosCheck::Offense.new(check: Bogus.new, line_number: 2), PlatformosCheck::Offense.new(check: Bogus.new, line_number: 2))
+    refute_equal(PlatformosCheck::Offense.new(check: Bogus.new, line_number: 1), PlatformosCheck::Offense.new(check: Bogus.new, line_number: 2))
   end
 
   def test_offense_in_range
     theme_file = stub(source: "supp world! how are you doing today?")
-    offense = ThemeCheck::Offense.new(
+    offense = PlatformosCheck::Offense.new(
       check: Bogus.new,
       markup: "world",
       theme_file: theme_file,
@@ -178,7 +178,7 @@ class OffenseTest < Minitest::Test
 
   def test_offense_in_range_zero_length_offense
     theme_file = stub(source: '{ "json_file_without_line_numbers": "ok" }')
-    offense = ThemeCheck::Offense.new(
+    offense = PlatformosCheck::Offense.new(
       check: Bogus.new,
       theme_file: theme_file,
     )

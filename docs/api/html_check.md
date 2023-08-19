@@ -8,7 +8,7 @@ The HTML in Liquid files is parsed using the Nokogiri, by consequence you will g
 
 
 ```ruby
-module ThemeCheck
+module PlatformosCheck
   class MyCheckName < HtmlCheck
     category :html,
     # A check can belong to multiple categories. Valid ones:
@@ -18,11 +18,11 @@ module ThemeCheck
     def on_document(node)
       # Called with the root node of all theme files
       node.value      # is an instance of Nokogiri::XML::Node
-      node.theme_file # is the html_file being analyzed, See lib/theme_check/theme_file.rb.
+      node.theme_file # is the html_file being analyzed, See lib/platformos_check/theme_file.rb.
       node.parent     # is the parent node.
       node.children   # are the children nodes.
-      # See lib/theme_check/html_node.rb for more helper methods
-      theme # Gives you access to all the theme files in the theme. See lib/theme_check/theme.rb.
+      # See lib/platformos_check/html_node.rb for more helper methods
+      theme # Gives you access to all the theme files in the theme. See lib/platformos_check/theme.rb.
     end
 
     def on_img(node)

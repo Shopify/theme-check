@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "test_helper"
 
-module ThemeCheck
+module PlatformosCheck
   class AssetSizeJavaScriptTest < Minitest::Test
     def setup
       @extension_files = {

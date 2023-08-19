@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 require "test_helper"
 
-module ThemeCheck
+module PlatformosCheck
   module LanguageServer
     class SourceFixAllCodeActionProviderTest < Minitest::Test
       def setup
         instances = diagnose_theme(
-          ThemeCheck::SpaceInsideBraces.new,
-          ThemeCheck::TemplateLength.new(max_length: 0),
+          PlatformosCheck::SpaceInsideBraces.new,
+          PlatformosCheck::TemplateLength.new(max_length: 0),
           "index.liquid" => <<~LIQUID,
             {{x}}
             muffin

@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-module ThemeCheck
+module PlatformosCheck
   class DeprecatedGlobalAppBlockTypeTest < Minitest::Test
     def test_reject_invalid_global_app_block_type_in_section_schemas
       offenses = analyze_theme(
-        ThemeCheck::DeprecatedGlobalAppBlockType.new,
+        PlatformosCheck::DeprecatedGlobalAppBlockType.new,
         "sections/product.liquid" => <<~END,
           {% schema %}
             {
@@ -22,7 +22,7 @@ module ThemeCheck
 
     def test_reject_invalid_global_app_block_type_in_conditional_statement
       offenses = analyze_theme(
-        ThemeCheck::DeprecatedGlobalAppBlockType.new,
+        PlatformosCheck::DeprecatedGlobalAppBlockType.new,
         "sections/product.liquid" => <<~END,
           {% for block in section.blocks %}
             {% if block.type = "@global" %}
@@ -48,7 +48,7 @@ module ThemeCheck
 
     def test_reject_invalid_global_app_block_type_in_switch_case_statement
       offenses = analyze_theme(
-        ThemeCheck::DeprecatedGlobalAppBlockType.new,
+        PlatformosCheck::DeprecatedGlobalAppBlockType.new,
         "sections/product.liquid" => <<~END,
           {% for block in section.blocks %}
             {% case block.type %}
@@ -74,7 +74,7 @@ module ThemeCheck
 
     def test_reject_invalid_global_app_block_type_defined_as_liquid_variable
       offenses = analyze_theme(
-        ThemeCheck::DeprecatedGlobalAppBlockType.new,
+        PlatformosCheck::DeprecatedGlobalAppBlockType.new,
         "sections/product.liquid" => <<~END,
           {% assign invalid = "@global" %}
           {% assign valid = "@app" %}
@@ -93,7 +93,7 @@ module ThemeCheck
 
     def test_does_not_reject_global_string_used_outside_liquid_control_flow_statements
       offenses = analyze_theme(
-        ThemeCheck::DeprecatedGlobalAppBlockType.new,
+        PlatformosCheck::DeprecatedGlobalAppBlockType.new,
         "sections/product.liquid" => <<~END,
           <p> This is "@global" </p>
           <script> var i = "@global" </script>
@@ -110,7 +110,7 @@ module ThemeCheck
 
     def test_accepts_valid_global_app_block_type
       offenses = analyze_theme(
-        ThemeCheck::DeprecatedGlobalAppBlockType.new,
+        PlatformosCheck::DeprecatedGlobalAppBlockType.new,
         "sections/product.liquid" => <<~END,
           {% for block in section.blocks %}
             {% if block.type = "@app" %}

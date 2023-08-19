@@ -4,7 +4,7 @@ require "test_helper"
 class ContentForHeaderModificationTest < Minitest::Test
   def test_reports_use_of_filter
     offenses = analyze_theme(
-      ThemeCheck::ContentForHeaderModification.new,
+      PlatformosCheck::ContentForHeaderModification.new,
       "layout/theme.liquid" => <<~END,
         {{ content_for_header | split: ',' }}
       END
@@ -16,7 +16,7 @@ class ContentForHeaderModificationTest < Minitest::Test
 
   def test_reports_assign
     offenses = analyze_theme(
-      ThemeCheck::ContentForHeaderModification.new,
+      PlatformosCheck::ContentForHeaderModification.new,
       "layout/theme.liquid" => <<~END,
         {% assign x = content_for_header %}
       END
@@ -28,7 +28,7 @@ class ContentForHeaderModificationTest < Minitest::Test
 
   def test_reports_capture
     offenses = analyze_theme(
-      ThemeCheck::ContentForHeaderModification.new,
+      PlatformosCheck::ContentForHeaderModification.new,
       "layout/theme.liquid" => <<~END,
         {% capture x %}
           {{ content_for_header }}
@@ -42,7 +42,7 @@ class ContentForHeaderModificationTest < Minitest::Test
 
   def test_reports_echo
     offenses = analyze_theme(
-      ThemeCheck::ContentForHeaderModification.new,
+      PlatformosCheck::ContentForHeaderModification.new,
       "layout/theme.liquid" => <<~END,
         {% liquid
           echo content_for_header | split: ','
@@ -56,7 +56,7 @@ class ContentForHeaderModificationTest < Minitest::Test
 
   def test_do_not_report_normal_use
     offenses = analyze_theme(
-      ThemeCheck::ContentForHeaderModification.new,
+      PlatformosCheck::ContentForHeaderModification.new,
       "layout/theme.liquid" => <<~END,
         {{ content_for_header }}
       END

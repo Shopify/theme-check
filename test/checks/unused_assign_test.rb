@@ -4,7 +4,7 @@ require "test_helper"
 class UnusedAssignTest < Minitest::Test
   def test_reports_unused_assigns
     offenses = analyze_theme(
-      ThemeCheck::UnusedAssign.new,
+      PlatformosCheck::UnusedAssign.new,
       "templates/index.liquid" => <<~END,
         {% assign x = 1 %}
       END
@@ -16,7 +16,7 @@ class UnusedAssignTest < Minitest::Test
 
   def test_do_not_report_used_assigns
     offenses = analyze_theme(
-      ThemeCheck::UnusedAssign.new,
+      PlatformosCheck::UnusedAssign.new,
       "templates/index.liquid" => <<~END,
         {% assign a = 1 %}
         {{ a }}
@@ -35,7 +35,7 @@ class UnusedAssignTest < Minitest::Test
 
   def test_do_not_report_used_assigns_bracket_syntax
     offenses = analyze_theme(
-      ThemeCheck::UnusedAssign.new,
+      PlatformosCheck::UnusedAssign.new,
       "templates/index.liquid" => <<~END,
         {% liquid
           assign resource = request.page_type
@@ -49,7 +49,7 @@ class UnusedAssignTest < Minitest::Test
 
   def test_do_not_report_assigns_used_before_defined
     offenses = analyze_theme(
-      ThemeCheck::UnusedAssign.new,
+      PlatformosCheck::UnusedAssign.new,
       "templates/index.liquid" => <<~END,
         {% unless a %}
           {% assign a = 1 %}
@@ -61,7 +61,7 @@ class UnusedAssignTest < Minitest::Test
 
   def test_do_not_report_assigns_used_in_includes
     offenses = analyze_theme(
-      ThemeCheck::UnusedAssign.new,
+      PlatformosCheck::UnusedAssign.new,
       "templates/index.liquid" => <<~END,
         {% assign a = 1 %}
         {% include 'using' %}
@@ -75,7 +75,7 @@ class UnusedAssignTest < Minitest::Test
 
   def test_recursion_in_includes
     offenses = analyze_theme(
-      ThemeCheck::UnusedAssign.new,
+      PlatformosCheck::UnusedAssign.new,
       "templates/index.liquid" => <<~END,
         {% assign a = 1 %}
         {% include 'one' %}
@@ -98,7 +98,7 @@ class UnusedAssignTest < Minitest::Test
       "templates/index.liquid" => "\n",
     }
     sources = fix_theme(
-      ThemeCheck::UnusedAssign.new,
+      PlatformosCheck::UnusedAssign.new,
       "templates/index.liquid" => <<~END,
         {% assign x = 1 %}
       END
@@ -120,7 +120,7 @@ class UnusedAssignTest < Minitest::Test
       END
     }
     sources = fix_theme(
-      ThemeCheck::UnusedAssign.new,
+      PlatformosCheck::UnusedAssign.new,
       "templates/index.liquid" => <<~END,
         {% liquid
           assign x = 1
@@ -143,7 +143,7 @@ class UnusedAssignTest < Minitest::Test
       END
     }
     sources = fix_theme(
-      ThemeCheck::UnusedAssign.new,
+      PlatformosCheck::UnusedAssign.new,
       "templates/index.liquid" => <<~END,
         <p>test case</p>{% assign x = 1 %}<p>test case</p>
       END
@@ -160,7 +160,7 @@ class UnusedAssignTest < Minitest::Test
       END
     }
     sources = fix_theme(
-      ThemeCheck::UnusedAssign.new,
+      PlatformosCheck::UnusedAssign.new,
       "templates/index.liquid" => <<~END,
         <p>test case</p>{% assign x = 1 %}
       END

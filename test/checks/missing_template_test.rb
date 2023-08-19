@@ -5,7 +5,7 @@ require "test_helper"
 class MissingTemplateTest < Minitest::Test
   def test_reports_missing_snippet
     offenses = analyze_theme(
-      ThemeCheck::MissingTemplate.new,
+      PlatformosCheck::MissingTemplate.new,
       "templates/index.liquid" => <<~END,
         {% include 'one' %}
         {% render 'two' %}
@@ -19,7 +19,7 @@ class MissingTemplateTest < Minitest::Test
 
   def test_do_not_report_if_snippet_exists
     offenses = analyze_theme(
-      ThemeCheck::MissingTemplate.new,
+      PlatformosCheck::MissingTemplate.new,
       "templates/index.liquid" => <<~END,
         {% include 'one' %}
         {% render 'two' %}
@@ -36,7 +36,7 @@ class MissingTemplateTest < Minitest::Test
 
   def test_reports_missing_section
     offenses = analyze_theme(
-      ThemeCheck::MissingTemplate.new,
+      PlatformosCheck::MissingTemplate.new,
       "templates/index.liquid" => <<~END,
         {% section 'one' %}
       END
@@ -48,7 +48,7 @@ class MissingTemplateTest < Minitest::Test
 
   def test_do_not_report_if_section_exists
     offenses = analyze_theme(
-      ThemeCheck::MissingTemplate.new,
+      PlatformosCheck::MissingTemplate.new,
       "templates/index.liquid" => <<~END,
         {% section 'one' %}
       END
@@ -61,7 +61,7 @@ class MissingTemplateTest < Minitest::Test
 
   def test_ignore_missing
     offenses = analyze_theme(
-      ThemeCheck::MissingTemplate.new(ignore_missing: [
+      PlatformosCheck::MissingTemplate.new(ignore_missing: [
         "snippets/icon-*",
         "sections/*",
       ]),
@@ -77,7 +77,7 @@ class MissingTemplateTest < Minitest::Test
   # then you should probably also ignore missing templates of all snippets/icon-*
   # See #489 or #589 for more context.
   def test_ignore_config
-    check = ThemeCheck::MissingTemplate.new
+    check = PlatformosCheck::MissingTemplate.new
 
     # this is what config.rb would do
     check.ignored_patterns = [
@@ -104,7 +104,7 @@ class MissingTemplateTest < Minitest::Test
       END
     )
 
-    analyzer = ThemeCheck::Analyzer.new(theme, [ThemeCheck::MissingTemplate.new], true)
+    analyzer = PlatformosCheck::Analyzer.new(theme, [PlatformosCheck::MissingTemplate.new], true)
     analyzer.analyze_theme
     analyzer.correct_offenses
 
@@ -119,7 +119,7 @@ class MissingTemplateTest < Minitest::Test
       END
     )
 
-    analyzer = ThemeCheck::Analyzer.new(theme, [ThemeCheck::MissingTemplate.new], true)
+    analyzer = PlatformosCheck::Analyzer.new(theme, [PlatformosCheck::MissingTemplate.new], true)
     analyzer.analyze_theme
     analyzer.correct_offenses
 

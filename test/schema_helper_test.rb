@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "test_helper"
 
-module ThemeCheck
+module PlatformosCheck
   class SchemaHelperTest < Minitest::Test
     def test_set
       assert_equal({ "a" => { "b" => 1 } }, SchemaHelper.set({}, 'a.b', 1))

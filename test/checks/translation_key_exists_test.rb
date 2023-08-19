@@ -4,7 +4,7 @@ require "test_helper"
 class TranslationKeyExistsTest < Minitest::Test
   def test_noop_without_default_locale
     offenses = analyze_theme(
-      ThemeCheck::TranslationKeyExists.new,
+      PlatformosCheck::TranslationKeyExists.new,
       "templates/index.liquid" => <<~END,
         {{"notfound" | t}}
       END
@@ -14,7 +14,7 @@ class TranslationKeyExistsTest < Minitest::Test
 
   def test_noop_with_invalid_default_locale
     offenses = analyze_theme(
-      ThemeCheck::TranslationKeyExists.new,
+      PlatformosCheck::TranslationKeyExists.new,
       "locales/en.default.json" => "{",
       "templates/index.liquid" => <<~END,
         {{"notfound" | t}}
@@ -25,7 +25,7 @@ class TranslationKeyExistsTest < Minitest::Test
 
   def test_ignores_existing_key
     offenses = analyze_theme(
-      ThemeCheck::TranslationKeyExists.new,
+      PlatformosCheck::TranslationKeyExists.new,
       "locales/en.default.json" => JSON.dump(
         key: "",
         nested: { key: "" }
@@ -41,7 +41,7 @@ class TranslationKeyExistsTest < Minitest::Test
 
   def test_ignores_key_included_in_schema
     offenses = analyze_theme(
-      ThemeCheck::TranslationKeyExists.new,
+      PlatformosCheck::TranslationKeyExists.new,
       "sections/product.liquid" => <<~END,
         {{"submit" | t}}
         {% schema %}
@@ -60,7 +60,7 @@ class TranslationKeyExistsTest < Minitest::Test
 
   def test_reports_unknown_key
     offenses = analyze_theme(
-      ThemeCheck::TranslationKeyExists.new,
+      PlatformosCheck::TranslationKeyExists.new,
       "locales/en.default.json" => JSON.dump({}),
       "templates/index.liquid" => <<~END,
         {{"unknownkey" | t}}
@@ -78,7 +78,7 @@ class TranslationKeyExistsTest < Minitest::Test
 
   def test_counts_shopify_provided_translations_as_defined
     offenses = analyze_theme(
-      ThemeCheck::TranslationKeyExists.new,
+      PlatformosCheck::TranslationKeyExists.new,
       "locales/en.default.json" => JSON.dump({}),
       "templates/index.liquid" => <<~END,
         {{ 'shopify.sentence.words_connector' | t }}
@@ -98,7 +98,7 @@ class TranslationKeyExistsTest < Minitest::Test
       END
     )
 
-    analyzer = ThemeCheck::Analyzer.new(theme, [ThemeCheck::TranslationKeyExists.new], true)
+    analyzer = PlatformosCheck::Analyzer.new(theme, [PlatformosCheck::TranslationKeyExists.new], true)
     analyzer.analyze_theme
     analyzer.correct_offenses
 
@@ -123,7 +123,7 @@ class TranslationKeyExistsTest < Minitest::Test
       END
     )
 
-    analyzer = ThemeCheck::Analyzer.new(theme, [ThemeCheck::TranslationKeyExists.new], true)
+    analyzer = PlatformosCheck::Analyzer.new(theme, [PlatformosCheck::TranslationKeyExists.new], true)
     analyzer.analyze_theme
     analyzer.correct_offenses
 
@@ -159,7 +159,7 @@ class TranslationKeyExistsTest < Minitest::Test
       END
     )
 
-    analyzer = ThemeCheck::Analyzer.new(theme, [ThemeCheck::TranslationKeyExists.new], true)
+    analyzer = PlatformosCheck::Analyzer.new(theme, [PlatformosCheck::TranslationKeyExists.new], true)
     analyzer.analyze_theme
 
     assert_offenses(<<~END, analyzer.offenses)

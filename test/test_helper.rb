@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 $LOAD_PATH.unshift(File.expand_path("../../lib", __FILE__))
-require "theme_check"
+require "platformos_check"
 require "minitest/autorun"
 require "minitest/focus"
 require "mocha/minitest"
@@ -49,7 +49,7 @@ module Minitest
 
     def parse_liquid(code)
       storage = make_storage("file.liquid" => code)
-      ThemeCheck::LiquidFile.new("file.liquid", storage)
+      PlatformosCheck::LiquidFile.new("file.liquid", storage)
     end
 
     def liquid_c_enabled?
@@ -57,23 +57,23 @@ module Minitest
     end
 
     def analyze_theme(*check_classes, templates)
-      analyzer = ThemeCheck::Analyzer.new(make_theme(templates), check_classes)
+      analyzer = PlatformosCheck::Analyzer.new(make_theme(templates), check_classes)
       analyzer.analyze_theme
       analyzer.offenses
     end
 
     def diagnose_theme(*check_classes, templates)
-      storage = ThemeCheck::VersionedInMemoryStorage.new(templates)
+      storage = PlatformosCheck::VersionedInMemoryStorage.new(templates)
       templates.each do |path, value|
         # set initial version of the files to 1
         storage.write(path, value, 1)
       end
 
-      theme = ThemeCheck::Theme.new(storage)
-      analyzer = ThemeCheck::Analyzer.new(theme, check_classes)
+      theme = PlatformosCheck::Theme.new(storage)
+      analyzer = PlatformosCheck::Analyzer.new(theme, check_classes)
       analyzer.analyze_theme
       offenses = analyzer.offenses
-      diagnostics_manager = ThemeCheck::LanguageServer::DiagnosticsManager.new
+      diagnostics_manager = PlatformosCheck::LanguageServer::DiagnosticsManager.new
       diagnostics_manager.build_diagnostics(offenses)
       {
         diagnostics_manager: diagnostics_manager,
@@ -83,7 +83,7 @@ module Minitest
 
     def make_theme(files = {})
       storage = make_storage(files)
-      ThemeCheck::Theme.new(storage)
+      PlatformosCheck::Theme.new(storage)
     end
 
     def make_storage(files = {})
@@ -99,16 +99,16 @@ module Minitest
         path.write(content, mode: 'w+b')
       end
       at_exit { dir.rmtree }
-      ThemeCheck::FileSystemStorage.new(dir)
+      PlatformosCheck::FileSystemStorage.new(dir)
     end
 
     def make_in_memory_storage(files = {})
-      ThemeCheck::InMemoryStorage.new(files)
+      PlatformosCheck::InMemoryStorage.new(files)
     end
 
     def fix_theme(*check_classes, templates)
       theme = make_theme(templates)
-      analyzer = ThemeCheck::Analyzer.new(theme, check_classes, true)
+      analyzer = PlatformosCheck::Analyzer.new(theme, check_classes, true)
       analyzer.analyze_theme
       analyzer.correct_offenses
       sources = theme.liquid.map { |theme_file| [theme_file.relative_path.to_s, theme_file.rewriter.to_s] }
@@ -218,11 +218,11 @@ module Minitest
         line = lines.size + 1
         col = lines.last.size + offset
 
-        ThemeCheck::LanguageServer::CompletionContext.new(storage, relative_path, line, col)
+        PlatformosCheck::LanguageServer::CompletionContext.new(storage, relative_path, line, col)
       end
     end
 
-    class TracerCheck < ThemeCheck::Check
+    class TracerCheck < PlatformosCheck::Check
       attr_reader :calls
 
       def initialize
@@ -251,7 +251,7 @@ module Minitest
       end
     end
 
-    class MockMessenger < ThemeCheck::LanguageServer::Messenger
+    class MockMessenger < PlatformosCheck::LanguageServer::Messenger
       attr_accessor :logs, :sent_messages
       attr_writer :supports_work_done_progress
 
@@ -265,7 +265,7 @@ module Minitest
       def read_message
         @queue.pop
       ensure
-        raise ThemeCheck::LanguageServer::DoneStreaming if @queue.closed?
+        raise PlatformosCheck::LanguageServer::DoneStreaming if @queue.closed?
       end
 
       def send_message(message_body)

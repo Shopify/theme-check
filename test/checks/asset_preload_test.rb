@@ -4,7 +4,7 @@ require "test_helper"
 class AssetPreloadTest < Minitest::Test
   def test_no_offense_with_link_element
     offenses = analyze_theme(
-      ThemeCheck::AssetPreload.new,
+      PlatformosCheck::AssetPreload.new,
       "templates/index.liquid" => <<~END,
         <link href="a.css" rel="stylesheet">
         <link href="b.com" rel="preconnect">
@@ -15,7 +15,7 @@ class AssetPreloadTest < Minitest::Test
 
   def test_reports_stylesheet_preloading
     offenses = analyze_theme(
-      ThemeCheck::AssetPreload.new,
+      PlatformosCheck::AssetPreload.new,
       "templates/index.liquid" => <<~END,
         <link href="a.css" rel="preload" as="style">
       END
@@ -27,7 +27,7 @@ class AssetPreloadTest < Minitest::Test
 
   def test_reports_image_preloading
     offenses = analyze_theme(
-      ThemeCheck::AssetPreload.new,
+      PlatformosCheck::AssetPreload.new,
       "templates/index.liquid" => <<~END,
         <link href="a.png" rel="preload" as="image">
       END
@@ -39,7 +39,7 @@ class AssetPreloadTest < Minitest::Test
 
   def test_reports_general_preloading
     offenses = analyze_theme(
-      ThemeCheck::AssetPreload.new,
+      PlatformosCheck::AssetPreload.new,
       "templates/index.liquid" => <<~END,
         <link href="a..js" rel="preload" as="script">
       END

@@ -46,5 +46,5 @@ This check has been introduced in Theme Check 0.10.2.
 - [Rule Source][codesource]
 - [Documentation Source][docsource]
 
-[codesource]: /lib/theme_check/checks/html_parsing_error.rb
+[codesource]: /lib/platformos_check/checks/html_parsing_error.rb
 [docsource]: /docs/checks/html_parsing_error.md

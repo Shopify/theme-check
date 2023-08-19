@@ -4,7 +4,7 @@ require "test_helper"
 class ConvertIncludeToRenderTest < Minitest::Test
   def test_reports_on_include
     offenses = analyze_theme(
-      ThemeCheck::ConvertIncludeToRender.new,
+      PlatformosCheck::ConvertIncludeToRender.new,
       "templates/index.liquid" => <<~END,
         {% include 'templates/foo.liquid' %}
       END
@@ -16,7 +16,7 @@ class ConvertIncludeToRenderTest < Minitest::Test
 
   def test_does_not_reports_on_render
     offenses = analyze_theme(
-      ThemeCheck::ConvertIncludeToRender.new,
+      PlatformosCheck::ConvertIncludeToRender.new,
       "templates/index.liquid" => <<~END,
         {% render 'templates/foo.liquid' %}
       END
@@ -27,7 +27,7 @@ class ConvertIncludeToRenderTest < Minitest::Test
   def test_corrects_include
     skip
     sources = fix_theme(
-      ThemeCheck::ConvertIncludeToRender.new,
+      PlatformosCheck::ConvertIncludeToRender.new,
       "templates/index.liquid" => <<~END,
         {% include 'foo.liquid' %}
         {% assign greeting = "hello world" %}

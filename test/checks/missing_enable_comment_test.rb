@@ -11,13 +11,13 @@ class MissingEnableCommentTest < Minitest::Test
   end
 
   def test_always_enabled_by_default
-    refute(ThemeCheck::MissingEnableComment.new.can_disable?)
+    refute(PlatformosCheck::MissingEnableComment.new.can_disable?)
   end
 
   def test_no_default_noops
     comment_types.each do |comment|
       offenses = analyze_theme(
-        ThemeCheck::MissingEnableComment.new,
+        PlatformosCheck::MissingEnableComment.new,
         "templates/index.liquid" => <<~END,
           #{comment.call('theme-check-disable')}
           {% assign x = 1 %}
@@ -31,7 +31,7 @@ class MissingEnableCommentTest < Minitest::Test
   def test_first_line_comment_disables_entire_file
     comment_types.each do |comment|
       offenses = analyze_theme(
-        ThemeCheck::MissingEnableComment.new,
+        PlatformosCheck::MissingEnableComment.new,
         "templates/index.liquid" => <<~END,
           #{comment.call('theme-check-disable')}
           {% assign x = 1 %}
@@ -44,7 +44,7 @@ class MissingEnableCommentTest < Minitest::Test
   def test_non_first_line_comment_triggers_offense
     comment_types.each do |comment|
       offenses = analyze_theme(
-        ThemeCheck::MissingEnableComment.new,
+        PlatformosCheck::MissingEnableComment.new,
         "templates/index.liquid" => <<~END,
           <p>Hello, world</p>
           #{comment.call('theme-check-disable')}
@@ -60,7 +60,7 @@ class MissingEnableCommentTest < Minitest::Test
   def test_specific_checks_disabled
     comment_types.each do |comment|
       offenses = analyze_theme(
-        ThemeCheck::MissingEnableComment.new,
+        PlatformosCheck::MissingEnableComment.new,
         Minitest::Test::TracerCheck.new,
         "templates/index.liquid" => <<~END,
           <p>Hello, world</p>
@@ -77,7 +77,7 @@ class MissingEnableCommentTest < Minitest::Test
   def test_specific_checks_disabled_and_reenabled
     comment_types.each do |comment|
       offenses = analyze_theme(
-        ThemeCheck::MissingEnableComment.new,
+        PlatformosCheck::MissingEnableComment.new,
         Minitest::Test::TracerCheck.new,
         "templates/index.liquid" => <<~END,
           <p>Hello, world</p>
@@ -94,7 +94,7 @@ class MissingEnableCommentTest < Minitest::Test
   def test_specific_checks_disabled_and_reenabled_with_all_checks_disabled
     comment_types.each do |comment|
       offenses = analyze_theme(
-        ThemeCheck::MissingEnableComment.new,
+        PlatformosCheck::MissingEnableComment.new,
         Minitest::Test::TracerCheck.new,
         "templates/index.liquid" => <<~END,
           <p>Hello, world</p>

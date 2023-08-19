@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "test_helper"
 
-module ThemeCheck
+module PlatformosCheck
   module LanguageServer
     class DiagnosticsManagerTest < Minitest::Test
       Offense = Struct.new(
@@ -274,7 +274,7 @@ module ThemeCheck
       private
 
       def diagnose_theme(*check_classes, templates)
-        diagnostics_manager = ThemeCheck::LanguageServer::DiagnosticsManager.new
+        diagnostics_manager = PlatformosCheck::LanguageServer::DiagnosticsManager.new
         offenses = analyze_theme(*check_classes, templates)
         diagnostics_manager.build_diagnostics(offenses)
         diagnostics_manager

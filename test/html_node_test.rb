@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "test_helper"
 
-module ThemeCheck
+module PlatformosCheck
   class HtmlNodeTest < Minitest::Test
     def test_markup
       html = <<~HTML

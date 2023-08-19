@@ -59,7 +59,7 @@ SchemaJsonFormat:
 | Parameter | Description |
 | --- | --- |
 | enabled | Whether the check is enabled. |
-| severity | The [severity](https://shopify.dev/themes/tools/theme-check/configuration#check-severity) of the check. |
+| severity | The [severity](https://shopify.dev/themes/tools/platformos-check/configuration#check-severity) of the check. |
 | start_level | The indentation level. If you prefer an indented schema, set this to 1. |
 | indent | The character(s) used for indentation levels. |
 
@@ -72,5 +72,5 @@ SchemaJsonFormat:
 - [Rule source][codesource]
 - [Documentation source][docsource]
 
-[codesource]: /lib/theme_check/checks/schema_json_format.rb
+[codesource]: /lib/platformos_check/checks/schema_json_format.rb
 [docsource]: /docs/checks/schema_json_format.md

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "test_helper"
 
-module ThemeCheck
+module PlatformosCheck
   class AssetSizeCSSStylesheetTagTest < Minitest::Test
     def test_css_bundles_smaller_than_threshold
       offenses = analyze_theme(

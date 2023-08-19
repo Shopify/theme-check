@@ -5,7 +5,7 @@ require "minitest/focus"
 class MatchingTranslationsTest < Minitest::Test
   def test_no_default_noops
     offenses = analyze_theme(
-      ThemeCheck::MatchingTranslations.new,
+      PlatformosCheck::MatchingTranslations.new,
       "locales/en.json" => JSON.dump(a: "a"),
       "locales/fr.json" => JSON.dump(b: "b"),
     )
@@ -14,7 +14,7 @@ class MatchingTranslationsTest < Minitest::Test
 
   def test_invalid_default_json_noops
     offenses = analyze_theme(
-      ThemeCheck::MatchingTranslations.new,
+      PlatformosCheck::MatchingTranslations.new,
       "locales/en.default.json" => "}",
       "locales/fr.json" => JSON.dump(b: "b"),
     )
@@ -23,7 +23,7 @@ class MatchingTranslationsTest < Minitest::Test
 
   def test_non_hash_ignored
     offenses = analyze_theme(
-      ThemeCheck::MatchingTranslations.new,
+      PlatformosCheck::MatchingTranslations.new,
       "locales/en.default.json" => JSON.dump({}),
       "locales/fr.json" => JSON.dump([]),
     )
@@ -32,7 +32,7 @@ class MatchingTranslationsTest < Minitest::Test
 
   def test_nested_matching_translations
     offenses = analyze_theme(
-      ThemeCheck::MatchingTranslations.new,
+      PlatformosCheck::MatchingTranslations.new,
       "locales/en.default.json" => JSON.dump(
         hello: { world: "Hello, world" }
       ),
@@ -48,7 +48,7 @@ class MatchingTranslationsTest < Minitest::Test
 
   def test_report_missing_keys
     offenses = analyze_theme(
-      ThemeCheck::MatchingTranslations.new,
+      PlatformosCheck::MatchingTranslations.new,
       "locales/en.default.json" => JSON.dump(hello: "Hello"),
       "locales/fr.json" => JSON.dump({}),
     )
@@ -60,7 +60,7 @@ class MatchingTranslationsTest < Minitest::Test
 
   def test_report_missing_keys_nested
     offenses = analyze_theme(
-      ThemeCheck::MatchingTranslations.new,
+      PlatformosCheck::MatchingTranslations.new,
       "locales/en.default.json" => JSON.dump(
         "hello": { "world": "Hello, world" }
       ),
@@ -75,7 +75,7 @@ class MatchingTranslationsTest < Minitest::Test
 
   def test_report_extra_keys
     offenses = analyze_theme(
-      ThemeCheck::MatchingTranslations.new,
+      PlatformosCheck::MatchingTranslations.new,
       "locales/en.default.json" => JSON.dump({}),
       "locales/fr.json" => JSON.dump(hello: "Bonjour"),
     )
@@ -86,7 +86,7 @@ class MatchingTranslationsTest < Minitest::Test
 
   def test_report_extra_keys_nested
     offenses = analyze_theme(
-      ThemeCheck::MatchingTranslations.new,
+      PlatformosCheck::MatchingTranslations.new,
       "locales/en.default.json" => JSON.dump(
         hello: {}
       ),
@@ -101,7 +101,7 @@ class MatchingTranslationsTest < Minitest::Test
 
   def test_report_extra_keys_for_mismatched_types
     offenses = analyze_theme(
-      ThemeCheck::MatchingTranslations.new,
+      PlatformosCheck::MatchingTranslations.new,
       "locales/en.default.json" => JSON.dump(
         hello: "Hello"
       ),
@@ -116,7 +116,7 @@ class MatchingTranslationsTest < Minitest::Test
 
   def test_report_missing_keys_for_mismatched_types
     offenses = analyze_theme(
-      ThemeCheck::MatchingTranslations.new,
+      PlatformosCheck::MatchingTranslations.new,
       "locales/en.default.json" => JSON.dump(
         hello: { world: "Hello, World" }
       ),
@@ -131,7 +131,7 @@ class MatchingTranslationsTest < Minitest::Test
 
   def test_ignore_pluralization
     offenses = analyze_theme(
-      ThemeCheck::MatchingTranslations.new,
+      PlatformosCheck::MatchingTranslations.new,
       "locales/en.default.json" => JSON.dump(
         hello: {
           one: "Hello, you",
@@ -151,7 +151,7 @@ class MatchingTranslationsTest < Minitest::Test
 
   def test_ignore_shopify_provided
     offenses = analyze_theme(
-      ThemeCheck::MatchingTranslations.new,
+      PlatformosCheck::MatchingTranslations.new,
       "locales/en.default.json" => JSON.dump(
         hello: "Hello",
         shopify: {
@@ -177,7 +177,7 @@ class MatchingTranslationsTest < Minitest::Test
 
   def test_ignore_schema_json_locale_files
     offenses = analyze_theme(
-      ThemeCheck::MatchingTranslations.new,
+      PlatformosCheck::MatchingTranslations.new,
       "locales/en.default.json" => JSON.dump(
         hello: "Hello",
         shopify: {
@@ -198,7 +198,7 @@ class MatchingTranslationsTest < Minitest::Test
 
   def test_shape_change
     sources = fix_theme(
-      ThemeCheck::MatchingTranslations.new,
+      PlatformosCheck::MatchingTranslations.new,
       "locales/en.default.json" => JSON.dump(
         hello: {
           another_key: "world",

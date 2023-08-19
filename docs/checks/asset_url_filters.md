@@ -49,7 +49,7 @@ This check has been introduced in Theme Check 0.9.1.
 - [Rule Source][codesource]
 - [Documentation Source][docsource]
 
-[codesource]: /lib/theme_check/checks/remote_asset_filters.rb
+[codesource]: /lib/platformos_check/checks/remote_asset_filters.rb
 [docsource]: /docs/checks/remote_asset_filters.md
 [remote_asset]: /docs/checks/remote_asset.md
 [asset_url]: https://shopify.dev/docs/themes/liquid/reference/filters/url-filters#assert_url

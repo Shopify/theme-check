@@ -56,5 +56,5 @@ This check has been introduced in Theme Check 0.1.0.
 - [Rule Source][codesource]
 - [Documentation Source][docsource]
 
-[codesource]: /lib/theme_check/checks/valid_json.rb
+[codesource]: /lib/platformos_check/checks/valid_json.rb
 [docsource]: /docs/checks/valid_json.md

@@ -1,10 +1,10 @@
-# Prevent missing theme-check-enable comments (`MissingEnableComment`)
+# Prevent missing platformos-check-enable comments (`MissingEnableComment`)
 
-When `theme-check-disable` is used in the middle of a theme file, the corresponding `theme-check-enable` comment should also be included.
+When `platformos-check-disable` is used in the middle of a theme file, the corresponding `platformos-check-enable` comment should also be included.
 
 ## Check Details
 
-This check aims at eliminating missing `theme-check-enable` comments.
+This check aims at eliminating missing `platformos-check-enable` comments.
 
 :-1: Example of **incorrect** code for this check:
 
@@ -12,7 +12,7 @@ This check aims at eliminating missing `theme-check-enable` comments.
 <!doctype html>
 <html>
   <head>
-    {% # theme-check-disable ParserBlockingJavaScript %}
+    {% # platformos-check-disable ParserBlockingJavaScript %}
     <script src="https://cdnjs.com/jquery.min.js"></script>
   </head>
   <body>
@@ -27,9 +27,9 @@ This check aims at eliminating missing `theme-check-enable` comments.
 <!doctype html>
 <html>
   <head>
-    {% # theme-check-disable ParserBlockingJavaScript %}
+    {% # platformos-check-disable ParserBlockingJavaScript %}
     <script src="https://cdnjs.com/jquery.min.js"></script>
-    {% # theme-check-enable ParserBlockingJavaScript %}
+    {% # platformos-check-enable ParserBlockingJavaScript %}
   </head>
   <body>
     <!-- ... -->
@@ -46,5 +46,5 @@ This check has been introduced in Theme Check 0.3.0.
 - [Rule Source][codesource]
 - [Documentation Source][docsource]
 
-[codesource]: /lib/theme_check/checks/missing_enable_comment.rb
+[codesource]: /lib/platformos_check/checks/missing_enable_comment.rb
 [docsource]: /docs/checks/missing_enable_comment.md

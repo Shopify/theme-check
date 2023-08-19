@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require "theme_check"
+quire "platformos_check"
 
-ThemeCheck::Cli.parse_and_run(ARGV)
+atformosCheck::Cli.parse_and_run(ARGV)

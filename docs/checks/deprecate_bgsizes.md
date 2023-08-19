@@ -62,5 +62,5 @@ This check has been introduced in Theme Check 1.0.0.
 - [Rule Source][codesource]
 - [Documentation Source][docsource]
 
-[codesource]: /lib/theme_check/checks/deprecate_bgsizes.rb
+[codesource]: /lib/platformos_check/checks/deprecate_bgsizes.rb
 [docsource]: /docs/checks/deprecate_bgsizes.md

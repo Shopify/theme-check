@@ -4,7 +4,7 @@ require "test_helper"
 class HtmlParsingErrorTest < Minitest::Test
   def test_valid
     offenses = analyze_theme(
-      ThemeCheck::HtmlParsingError.new,
+      PlatformosCheck::HtmlParsingError.new,
       "templates/index.liquid" => <<~END,
         <img src="muffin.jpeg" atl="Muffin">
       END
@@ -14,7 +14,7 @@ class HtmlParsingErrorTest < Minitest::Test
 
   def test_reports_to_many_attributes
     offenses = analyze_theme(
-      ThemeCheck::HtmlParsingError.new,
+      PlatformosCheck::HtmlParsingError.new,
       "templates/index.liquid" => <<~END,
         <img src="muffin.jpeg" #{(1..400).map { |i| "attribute#{i}" }.join(" ")}>
       END

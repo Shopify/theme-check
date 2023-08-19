@@ -4,7 +4,7 @@ require "test_helper"
 class ParserBlockingJavaScriptTest < Minitest::Test
   def test_async_script_tag
     offenses = analyze_theme(
-      ThemeCheck::ParserBlockingJavaScript.new,
+      PlatformosCheck::ParserBlockingJavaScript.new,
       "templates/index.liquid" => <<~END,
         <html>
         <head>
@@ -25,7 +25,7 @@ class ParserBlockingJavaScriptTest < Minitest::Test
 
   def test_defer_script_tag
     offenses = analyze_theme(
-      ThemeCheck::ParserBlockingJavaScript.new,
+      PlatformosCheck::ParserBlockingJavaScript.new,
       "templates/index.liquid" => <<~END,
         <html>
         <head>
@@ -44,7 +44,7 @@ class ParserBlockingJavaScriptTest < Minitest::Test
 
   def test_parser_blocking_script_tag
     offenses = analyze_theme(
-      ThemeCheck::ParserBlockingJavaScript.new,
+      PlatformosCheck::ParserBlockingJavaScript.new,
       "templates/index.liquid" => <<~END,
         <html>
         <head>
@@ -60,7 +60,7 @@ class ParserBlockingJavaScriptTest < Minitest::Test
 
   def test_parser_blocking_script_over_multiple_lines
     offenses = analyze_theme(
-      ThemeCheck::ParserBlockingJavaScript.new,
+      PlatformosCheck::ParserBlockingJavaScript.new,
       "templates/index.liquid" => <<~END,
         <html>
         <head>
@@ -79,7 +79,7 @@ class ParserBlockingJavaScriptTest < Minitest::Test
 
   def test_parser_blocking_inline_script
     offenses = analyze_theme(
-      ThemeCheck::ParserBlockingJavaScript.new,
+      PlatformosCheck::ParserBlockingJavaScript.new,
       "templates/index.liquid" => <<~END,
         <html>
         <head>
@@ -99,7 +99,7 @@ class ParserBlockingJavaScriptTest < Minitest::Test
 
   def test_repeated_offenses_are_correctly_reported
     offenses = analyze_theme(
-      ThemeCheck::ParserBlockingJavaScript.new,
+      PlatformosCheck::ParserBlockingJavaScript.new,
       "templates/index.liquid" => <<~END,
         <html>
         <head>

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "test_helper"
 
-module ThemeCheck
+module PlatformosCheck
   module LanguageServer
     class QuickfixCodeActionProviderTest < Minitest::Test
       def setup
@@ -18,9 +18,9 @@ module ThemeCheck
           {% endschema %}
         LIQUID
         instances = diagnose_theme(
-          ThemeCheck::SpaceInsideBraces.new,
-          ThemeCheck::MatchingSchemaTranslations.new,
-          ThemeCheck::TemplateLength.new(max_length: 0),
+          PlatformosCheck::SpaceInsideBraces.new,
+          PlatformosCheck::MatchingSchemaTranslations.new,
+          PlatformosCheck::TemplateLength.new(max_length: 0),
           "index.liquid" => @index,
           "other.liquid" => <<~LIQUID,
             cookies

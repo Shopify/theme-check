@@ -4,12 +4,12 @@ require "test_helper"
 class LiquidVisitorTest < Minitest::Test
   def setup
     @tracer = TracerCheck.new
-    @visitor = ThemeCheck::LiquidVisitor.new(ThemeCheck::Checks.new([@tracer]), ThemeCheck::DisabledChecks.new)
+    @visitor = PlatformosCheck::LiquidVisitor.new(PlatformosCheck::Checks.new([@tracer]), PlatformosCheck::DisabledChecks.new)
   end
 
   def run
     # Liquid-C is disabled from the Analyzer, before the visitor is called
-    ThemeCheck.with_liquid_c_disabled { super }
+    PlatformosCheck.with_liquid_c_disabled { super }
   end
 
   def test_assign

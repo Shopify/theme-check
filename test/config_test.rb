@@ -8,7 +8,7 @@ class ConfigTest < Minitest::Test
       TemplateLength:
         enabled: false
     END
-    config = ThemeCheck::Config.from_path(storage.root).to_h
+    config = PlatformosCheck::Config.from_path(storage.root).to_h
     refute(config.dig("TemplateLength", "enabled"))
   end
 
@@ -20,23 +20,23 @@ class ConfigTest < Minitest::Test
       END
       "dist/templates/index.liquid" => "",
     )
-    config = ThemeCheck::Config.from_path(storage.root.join("dist")).to_h
+    config = PlatformosCheck::Config.from_path(storage.root.join("dist")).to_h
     refute(config.dig("TemplateLength", "enabled"))
   end
 
   def test_missing_file
     storage = make_file_system_storage
-    config = ThemeCheck::Config.from_path(storage.root)
-    assert_equal(ThemeCheck::Config.default, config.to_h)
+    config = PlatformosCheck::Config.from_path(storage.root)
+    assert_equal(PlatformosCheck::Config.default, config.to_h)
   end
 
   def test_from_path_uses_empty_config_when_config_file_is_missing
-    ThemeCheck::Config.expects(:new).with(root: 'theme/')
-    ThemeCheck::Config.from_path('theme/')
+    PlatformosCheck::Config.expects(:new).with(root: 'theme/')
+    PlatformosCheck::Config.from_path('theme/')
   end
 
   def test_from_string
-    config = ThemeCheck::Config.from_string(<<~CONFIG)
+    config = PlatformosCheck::Config.from_string(<<~CONFIG)
       TemplateLength:
         enabled: false
     CONFIG
@@ -44,7 +44,7 @@ class ConfigTest < Minitest::Test
   end
 
   def test_from_hash
-    config = ThemeCheck::Config.from_hash({
+    config = PlatformosCheck::Config.from_hash({
       "TemplateLength" => {
         "enabled" => false,
       },
@@ -53,19 +53,19 @@ class ConfigTest < Minitest::Test
   end
 
   def test_enabled_checks_excludes_disabled_checks
-    config = ThemeCheck::Config.new(root: ".", configuration: { "MissingTemplate" => { "enabled" => false } })
-    refute(check_enabled?(config, ThemeCheck::MissingTemplate))
+    config = PlatformosCheck::Config.new(root: ".", configuration: { "MissingTemplate" => { "enabled" => false } })
+    refute(check_enabled?(config, PlatformosCheck::MissingTemplate))
   end
 
   def test_root
-    config = ThemeCheck::Config.new(root: ".", configuration: { "root" => "dist" })
+    config = PlatformosCheck::Config.new(root: ".", configuration: { "root" => "dist" })
     assert_equal(Pathname.new("dist"), config.root)
   end
 
   def test_empty_file
     storage = make_file_system_storage(".theme-check.yml" => "")
-    config = ThemeCheck::Config.from_path(storage.root)
-    assert_equal(ThemeCheck::Config.default, config.to_h)
+    config = PlatformosCheck::Config.from_path(storage.root)
+    assert_equal(PlatformosCheck::Config.default, config.to_h)
   end
 
   def test_root_from_config
@@ -75,7 +75,7 @@ class ConfigTest < Minitest::Test
       END
       "dist/templates/index.liquid" => "",
     )
-    config = ThemeCheck::Config.from_path(storage.root)
+    config = PlatformosCheck::Config.from_path(storage.root)
     assert_equal(storage.root.join("dist"), config.root)
   end
 
@@ -98,12 +98,12 @@ class ConfigTest < Minitest::Test
       "dist/templates/index.liquid" => "",
     )
 
-    dist_config = ThemeCheck::Config.from_path(storage.root.join('dist'))
+    dist_config = PlatformosCheck::Config.from_path(storage.root.join('dist'))
     assert(dist_config.to_h.dig('MatchingTranslations', 'enabled'))
     refute(dist_config.to_h.dig('SyntaxError', 'enabled'))
     assert_equal(storage.root.join('dist'), dist_config.root)
 
-    root_config = ThemeCheck::Config.from_path(storage.root)
+    root_config = PlatformosCheck::Config.from_path(storage.root)
     refute(root_config.to_h.dig('MatchingTranslations', 'enabled'))
     refute(root_config.to_h.dig('SyntaxError', 'enabled'))
     assert_equal(storage.root.join('src'), root_config.root)
@@ -122,10 +122,10 @@ class ConfigTest < Minitest::Test
       END
     )
 
-    project1_config = ThemeCheck::Config.from_path(storage.root.join('project1'))
+    project1_config = PlatformosCheck::Config.from_path(storage.root.join('project1'))
     assert_equal(storage.root.join('project1/src'), project1_config.root)
 
-    project2_config = ThemeCheck::Config.from_path(storage.root.join('project2'))
+    project2_config = PlatformosCheck::Config.from_path(storage.root.join('project2'))
     assert_equal(storage.root.join('project2/src'), project2_config.root)
   end
 
@@ -142,7 +142,7 @@ class ConfigTest < Minitest::Test
       END
     )
 
-    config = ThemeCheck::Config.from_path(storage.root)
+    config = PlatformosCheck::Config.from_path(storage.root)
     refute(config.to_h.dig('SyntaxError', 'enabled'))
   end
 
@@ -157,29 +157,29 @@ class ConfigTest < Minitest::Test
           enabled: true
       END
     )
-    config = ThemeCheck::Config.from_path(storage.root.join("src"))
+    config = PlatformosCheck::Config.from_path(storage.root.join("src"))
     assert_equal(storage.root.join("src"), config.root)
-    assert(check_enabled?(config, ThemeCheck::TemplateLength))
+    assert(check_enabled?(config, PlatformosCheck::TemplateLength))
   end
 
   def test_respects_provided_root
-    config = ThemeCheck::Config.from_path(__dir__)
+    config = PlatformosCheck::Config.from_path(__dir__)
     assert_equal(Pathname.new(__dir__), config.root)
   end
 
   def test_enabled_checks_returns_default_checks_for_empty_config
     mock_default_config("SyntaxError" => { "enabled" => true })
-    config = ThemeCheck::Config.new(root: ".")
-    assert(check_enabled?(config, ThemeCheck::SyntaxError))
+    config = PlatformosCheck::Config.new(root: ".")
+    assert(check_enabled?(config, PlatformosCheck::SyntaxError))
   end
 
   def test_warn_about_unknown_config
     mock_default_config("SyntaxError" => { "enabled" => true })
-    ThemeCheck::Config.any_instance
+    PlatformosCheck::Config.any_instance
       .expects(:warn).with("unknown configuration: unknown")
-    ThemeCheck::Config.any_instance
+    PlatformosCheck::Config.any_instance
       .expects(:warn).with("unknown configuration: SyntaxError.unknown")
-    ThemeCheck::Config.new(
+    PlatformosCheck::Config.new(
       root: ".",
       configuration: {
         "unknown" => ".",
@@ -195,13 +195,13 @@ class ConfigTest < Minitest::Test
       "SyntaxError" => { "enabled" => true },
       "TemplateLength" => { "enabled" => true },
     )
-    ThemeCheck::Config.any_instance
+    PlatformosCheck::Config.any_instance
       .expects(:warn).with("bad configuration type for root: expected a String, got []")
-    ThemeCheck::Config.any_instance
+    PlatformosCheck::Config.any_instance
       .expects(:warn).with("bad configuration type for SyntaxError.enabled: expected true or false, got nil")
-    ThemeCheck::Config.any_instance
+    PlatformosCheck::Config.any_instance
       .expects(:warn).with("bad configuration type for TemplateLength: expected a Hash, got true")
-    ThemeCheck::Config.new(
+    PlatformosCheck::Config.new(
       root: ".",
       configuration: {
         "root" => [],
@@ -228,7 +228,7 @@ class ConfigTest < Minitest::Test
         "enabled" => true,
       },
     )
-    config = ThemeCheck::Config.new(
+    config = PlatformosCheck::Config.new(
       root: ".",
       configuration: {
         "ignore": [
@@ -268,14 +268,14 @@ class ConfigTest < Minitest::Test
           enabled: true
       END
       "checks/custom_check.rb" => <<~END,
-        module ThemeCheck
+        module PlatformosCheck
           class CustomCheck < Check
           end
         end
       END
     )
-    config = ThemeCheck::Config.from_path(storage.root)
-    assert(check_enabled?(config, ThemeCheck::CustomCheck))
+    config = PlatformosCheck::Config.from_path(storage.root)
+    assert(check_enabled?(config, PlatformosCheck::CustomCheck))
   end
 
   def test_custom_check_with_root
@@ -290,30 +290,30 @@ class ConfigTest < Minitest::Test
       END
       "dist/layout/theme.liquid" => "",
       "checks/custom_check.rb" => <<~END,
-        module ThemeCheck
+        module PlatformosCheck
           class CustomCheck < Check
           end
         end
       END
     )
 
-    config = ThemeCheck::Config.new(
+    config = PlatformosCheck::Config.new(
       root: storage.root,
-      configuration: ThemeCheck::Config.load_config(storage.root.join('.config/.theme-check.yml'))
+      configuration: PlatformosCheck::Config.load_config(storage.root.join('.config/.theme-check.yml'))
     )
 
-    assert(check_enabled?(config, ThemeCheck::CustomCheck))
+    assert(check_enabled?(config, PlatformosCheck::CustomCheck))
   end
 
   def test_include_category
-    config = ThemeCheck::Config.new(root: ".")
+    config = PlatformosCheck::Config.new(root: ".")
     config.include_categories = [:liquid]
     assert(config.enabled_checks.any?)
     assert(config.enabled_checks.all? { |c| c.categories.include?(:liquid) })
   end
 
   def test_include_categories
-    config = ThemeCheck::Config.new(root: ".")
+    config = PlatformosCheck::Config.new(root: ".")
     config.include_categories = [:liquid, :performance]
     assert(config.enabled_checks.any?)
     assert(config.enabled_checks.all? { |c| c.categories.include?(:liquid) && c.categories.include?(:performance) })
@@ -321,14 +321,14 @@ class ConfigTest < Minitest::Test
   end
 
   def test_exclude_category
-    config = ThemeCheck::Config.new(root: ".")
+    config = PlatformosCheck::Config.new(root: ".")
     config.exclude_categories = [:liquid]
     assert(config.enabled_checks.any?)
     assert(config.enabled_checks.none? { |c| c.categories.include?(:liquid) })
   end
 
   def test_exclude_categories
-    config = ThemeCheck::Config.new(root: ".")
+    config = PlatformosCheck::Config.new(root: ".")
     config.exclude_categories = [:liquid, :performance]
     assert(config.enabled_checks.any?)
     assert(config.enabled_checks.none? { |c| c.categories.include?(:liquid) || c.categories.include?(:performance) })
@@ -342,7 +342,7 @@ class ConfigTest < Minitest::Test
           - dist/*.json
       END
     )
-    config = ThemeCheck::Config.from_path(storage.root)
+    config = PlatformosCheck::Config.from_path(storage.root)
     assert_equal(["node_modules", "dist/*.json"], config.ignored_patterns)
   end
 
@@ -359,7 +359,7 @@ class ConfigTest < Minitest::Test
             - 'snippets/foo.js'
       END
     )
-    config = ThemeCheck::Config.from_path(storage.root)
+    config = PlatformosCheck::Config.from_path(storage.root)
     missing_snippets_check = config.enabled_checks.find { |c| c.code_name == 'MissingTemplate' }
     assert_equal(
       ["snippets/foo.js", "node_modules", "dist/*.json"],
@@ -374,8 +374,8 @@ class ConfigTest < Minitest::Test
   end
 
   def mock_default_config(config)
-    ThemeCheck::Config.stubs(:default).returns(config)
-    ThemeCheck::Config.stubs(:load_config).with(:default).returns(config)
-    ThemeCheck::Config.stubs(:load_config).with(":default").returns(config)
+    PlatformosCheck::Config.stubs(:default).returns(config)
+    PlatformosCheck::Config.stubs(:load_config).with(:default).returns(config)
+    PlatformosCheck::Config.stubs(:load_config).with(":default").returns(config)
   end
 end

@@ -4,7 +4,7 @@ require "test_helper"
 class DefaultLocaleTest < Minitest::Test
   def test_default_locale_file
     offenses = analyze_theme(
-      ThemeCheck::DefaultLocale.new,
+      PlatformosCheck::DefaultLocale.new,
       "locales/en.default.json" => "{}"
     )
     assert(offenses.empty?)
@@ -12,7 +12,7 @@ class DefaultLocaleTest < Minitest::Test
 
   def test_default_file_outside_locales
     offenses = analyze_theme(
-      ThemeCheck::DefaultLocale.new,
+      PlatformosCheck::DefaultLocale.new,
       "data/en.default.json" => "{}"
     )
     refute(offenses.empty?)
@@ -27,7 +27,7 @@ class DefaultLocaleTest < Minitest::Test
       END
     )
 
-    analyzer = ThemeCheck::Analyzer.new(theme, [ThemeCheck::DefaultLocale.new], true)
+    analyzer = PlatformosCheck::Analyzer.new(theme, [PlatformosCheck::DefaultLocale.new], true)
     analyzer.analyze_theme
     analyzer.correct_offenses
 

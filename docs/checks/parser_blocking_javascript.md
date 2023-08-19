@@ -78,7 +78,7 @@ ParserBlockingJavaScript:
 
 ## When Not To Use It
 
-This should only be turned off with the `theme-check-disable` comment when there's no better way to accomplish what you're doing than with a parser-blocking script.
+This should only be turned off with the `platformos-check-disable` comment when there's no better way to accomplish what you're doing than with a parser-blocking script.
 
 It is discouraged to turn this rule off.
 
@@ -93,5 +93,5 @@ This check has been introduced in Theme Check 0.3.0.
 - [Documentation Source][docsource]
 
 [render-blocking]: https://web.dev/render-blocking-resources/
-[codesource]: /lib/theme_check/checks/parser_blocking_javascript.rb
+[codesource]: /lib/platformos_check/checks/parser_blocking_javascript.rb
 [docsource]: /docs/checks/parser_blocking_javascript.md

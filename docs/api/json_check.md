@@ -3,7 +3,7 @@
 For checking the content of `.json` files.
 
 ```ruby
-module ThemeCheck
+module PlatformosCheck
   class MyCheckName < JsonCheck
     category :json,
     # A check can belong to multiple categories. Valid ones:
@@ -11,7 +11,7 @@ module ThemeCheck
     severity :suggestion # :error or :style
 
     def on_file(file)
-      file # an instance of `ThemeCheck::JsonFile`
+      file # an instance of `PlatformosCheck::JsonFile`
       file.content # the parsed JSON, as a Ruby object, usually a Hash
     end
   end

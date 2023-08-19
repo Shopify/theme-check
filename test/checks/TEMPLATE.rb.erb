@@ -4,7 +4,7 @@ require "test_helper"
 class <%= class_name %>Test < Minitest::Test
   def test_valid
     offenses = analyze_theme(
-      ThemeCheck::<%= class_name %>.new,
+      PlatformosCheck::<%= class_name %>.new,
       "templates/index.liquid" => <<~END,
         # TODO: Add some accepted examples
       END
@@ -14,7 +14,7 @@ class <%= class_name %>Test < Minitest::Test
 
   def test_reports_offenses
     offenses = analyze_theme(
-      ThemeCheck::<%= class_name %>.new,
+      PlatformosCheck::<%= class_name %>.new,
       "templates/index.liquid" => <<~END,
         # TODO: Add some bad examples
       END

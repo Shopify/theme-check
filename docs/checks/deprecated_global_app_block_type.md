@@ -58,7 +58,7 @@ This check has been introduced in Theme Check 1.5.0.
 - [Rule Source][codesource]
 - [Documentation Source][docsource]
 
-[codesource]: /lib/theme_check/checks/deprecated_global_app_block_type.rb
+[codesource]: /lib/platformos_check/checks/deprecated_global_app_block_type.rb
 [docsource]: /docs/checks/deprecated_global_app_block_type.md
 [remote_asset]: /docs/checks/deprecated_global_app_block_type.md
 [support_app_blocks_in_theme_section]: https://shopify.dev/themes/migration#step-8-add-support-for-app-blocks-to-sections

@@ -35,7 +35,7 @@ class JsonFileTest < Minitest::Test
   def test_write
     storage = make_storage("a.json" => '{ "hello": "world" }')
     expected = { hello: "friend" }
-    @json = ThemeCheck::JsonFile.new("a.json", storage)
+    @json = PlatformosCheck::JsonFile.new("a.json", storage)
     @json.update_contents(expected)
     @json.write
     assert_equal(JSON.pretty_generate(expected), storage.read("a.json"))
@@ -45,6 +45,6 @@ class JsonFileTest < Minitest::Test
 
   def make_json_file(name, content)
     storage = make_storage(name => content)
-    ThemeCheck::JsonFile.new(name, storage)
+    PlatformosCheck::JsonFile.new(name, storage)
   end
 end

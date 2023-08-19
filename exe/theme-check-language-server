@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'theme_check'
+quire 'platformos_check'
 
-status_code = ThemeCheck::LanguageServer.start
-exit! status_code
+atus_code = PlatformosCheck::LanguageServer.start
+it! status_code

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "test_helper"
 
-module ThemeCheck
+module PlatformosCheck
   class ImgLazyLoadingTest < Minitest::Test
     def test_no_offense_with_loading_lazy_attribute
       offenses = analyze_theme(

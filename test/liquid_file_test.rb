@@ -3,7 +3,7 @@ require "test_helper"
 
 class LiquidFileTest < Minitest::Test
   def setup
-    @theme_file = ThemeCheck::LiquidFile.new(
+    @theme_file = PlatformosCheck::LiquidFile.new(
       "templates/index.liquid",
       make_storage("templates/index.liquid" => <<~LIQUID)
         <h1>Title</h1>

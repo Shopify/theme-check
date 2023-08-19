@@ -2,7 +2,7 @@
 
 require "test_helper"
 
-module ThemeCheck
+module PlatformosCheck
   module LanguageServer
     class HandlerTest < Minitest::Test
       include URIHelper
@@ -208,7 +208,7 @@ module ThemeCheck
       def test_handle_text_document_close_by_clearing_diagnostics_with_only_single_file_checks
         initialize!(1, nil, @storage.root)
         initialized!
-        ThemeCheck::LanguageServer::Configuration.any_instance
+        PlatformosCheck::LanguageServer::Configuration.any_instance
           .stubs(:only_single_file?).returns(true)
 
         file_path = "snippets/error.liquid"
@@ -233,7 +233,7 @@ module ThemeCheck
       def test_handle_text_document_close_does_not_clear_diagnostics_unless_only_single_file_checks
         initialize!(1, nil, @storage.root)
         initialized!
-        ThemeCheck::LanguageServer::Configuration.any_instance
+        PlatformosCheck::LanguageServer::Configuration.any_instance
           .stubs(:only_single_file?).returns(false)
 
         file_path = "snippets/error.liquid"
@@ -273,7 +273,7 @@ module ThemeCheck
       end
 
       def initialized!
-        ThemeCheck::LanguageServer::Configuration.any_instance.stubs(:fetch).returns(nil)
+        PlatformosCheck::LanguageServer::Configuration.any_instance.stubs(:fetch).returns(nil)
         @handler.on_initialized(nil, nil)
       end
 

@@ -4,7 +4,7 @@ require "test_helper"
 class MissingRequiredTemplateFilesTest < Minitest::Test
   def test_reports_missing_layout_theme_file
     offenses = analyze_theme(
-      ThemeCheck::MissingRequiredTemplateFiles.new,
+      PlatformosCheck::MissingRequiredTemplateFiles.new,
       "templates/index.liquid" => "",
       "templates/product.liquid" => "",
     )
@@ -14,7 +14,7 @@ class MissingRequiredTemplateFilesTest < Minitest::Test
 
   def test_reports_missing_template_files
     offenses = analyze_theme(
-      ThemeCheck::MissingRequiredTemplateFiles.new,
+      PlatformosCheck::MissingRequiredTemplateFiles.new,
       "layout/theme.liquid" => "",
     )
 
@@ -24,7 +24,7 @@ class MissingRequiredTemplateFilesTest < Minitest::Test
 
   def test_does_not_report_missing_template_files
     offenses = analyze_theme(
-      ThemeCheck::MissingRequiredTemplateFiles.new,
+      PlatformosCheck::MissingRequiredTemplateFiles.new,
       "layout/theme.liquid" => "",
       "templates/index.liquid" => "",
       "templates/product.liquid" => "",
@@ -52,7 +52,7 @@ class MissingRequiredTemplateFilesTest < Minitest::Test
 
   def test_does_not_report_missing_template_files_with_json_templates
     offenses = analyze_theme(
-      ThemeCheck::MissingRequiredTemplateFiles.new,
+      PlatformosCheck::MissingRequiredTemplateFiles.new,
       "layout/theme.liquid" => "",
       "templates/index.json" => "",
       "templates/product.json" => "",
@@ -84,7 +84,7 @@ class MissingRequiredTemplateFilesTest < Minitest::Test
       "templates/product.liquid" => "",
     )
 
-    analyzer = ThemeCheck::Analyzer.new(theme, [ThemeCheck::MissingRequiredTemplateFiles.new], true)
+    analyzer = PlatformosCheck::Analyzer.new(theme, [PlatformosCheck::MissingRequiredTemplateFiles.new], true)
     analyzer.analyze_theme
     analyzer.correct_offenses
 
@@ -112,7 +112,7 @@ class MissingRequiredTemplateFilesTest < Minitest::Test
 
     missing_files = ["templates/product.json", "templates/search.json", "templates/customers/login.liquid", "templates/password.json", "templates/gift_card.liquid"]
 
-    analyzer = ThemeCheck::Analyzer.new(theme, [ThemeCheck::MissingRequiredTemplateFiles.new], true)
+    analyzer = PlatformosCheck::Analyzer.new(theme, [PlatformosCheck::MissingRequiredTemplateFiles.new], true)
     analyzer.analyze_theme
     analyzer.correct_offenses
 

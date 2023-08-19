@@ -53,5 +53,5 @@ This check has been introduced in 1.1.0
 - [Documentation Source][docsource]
 
 [ioip]: https://addyosmani.com/blog/import-on-interaction/
-[codesource]: /lib/theme_check/checks/asset_size_app_block_javascript.rb
+[codesource]: /lib/platformos_check/checks/asset_size_app_block_javascript.rb
 [docsource]: /docs/checks/asset_size_app_block_javascript.md

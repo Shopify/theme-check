@@ -57,9 +57,9 @@ This includes theme and remote scripts.
 When you can't do anything about it, it is preferable to disable this rule using the comment syntax:
 
 ```
-{% # theme-check-disable AssetSizeJavaScript %}
+{% # platformos-check-disable AssetSizeJavaScript %}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
-{% # theme-check-enable AssetSizeJavaScript %}
+{% # platformos-check-enable AssetSizeJavaScript %}
 ```
 
 This makes disabling the rule an explicit affair and shows that the code is smelly.
@@ -75,5 +75,5 @@ This check has been introduced in Theme Check 0.5.0.
 - [Documentation Source][docsource]
 
 [ioip]: https://addyosmani.com/blog/import-on-interaction/
-[codesource]: /lib/theme_check/checks/asset_size_javascript.rb
+[codesource]: /lib/platformos_check/checks/asset_size_javascript.rb
 [docsource]: /docs/checks/asset_size_javascript.md

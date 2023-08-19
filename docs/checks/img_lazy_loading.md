@@ -58,6 +58,6 @@ This check has been introduced in Theme Check 0.10.0.
 - [Documentation Source][docsource]
 - [MDN - Lazy loading][mdn]
 
-[codesource]: /lib/theme_check/checks/img_lazy_loading.rb
+[codesource]: /lib/platformos_check/checks/img_lazy_loading.rb
 [docsource]: /docs/checks/img_lazy_loading.md
 [mdn]: https://developer.mozilla.org/en-US/docs/Web/Performance/Lazy_loading

@@ -1,6 +1,6 @@
 # Check Title (`CdnPreconnect`)
 
-_Version THEME_CHECK_VERSION+_
+_Version PLATFORMOS_CHECK_VERSION+_
 
 The preconnect resource hint is a useful way of making sure connections to external domains are ready as soon as possible. It can improve performance by enabling the browser to start downloading critical assets right after discovering them in the HTML.
 
@@ -39,7 +39,7 @@ CdnPreconnect:
 | Parameter | Description |
 | --- | --- |
 | enabled | Whether the check is enabled. |
-| severity | The [severity](https://shopify.dev/themes/tools/theme-check/configuration#check-severity) of the check. |
+| severity | The [severity](https://shopify.dev/themes/tools/platformos-check/configuration#check-severity) of the check. |
 
 ## Disabling this check
 
@@ -52,5 +52,5 @@ Disabling this check isn't recommended because preconnect to Shopify's CDN is in
 - [Documentation source][docsource]
 
 [resourcehints]: https://performance.shopify.com/blogs/blog/introduction-to-resource-hints
-[codesource]: /lib/theme_check/checks/cdn_preconnect.rb
+[codesource]: /lib/platformos_check/checks/cdn_preconnect.rb
 [docsource]: /docs/checks/cdn_preconnect.md

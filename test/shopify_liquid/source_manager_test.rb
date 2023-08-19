@@ -3,7 +3,7 @@
 require 'test_helper'
 require_relative './source_test_helper'
 
-module ThemeCheck
+module PlatformosCheck
   module ShopifyLiquid
     class SourceManagerTest < Minitest::Test
       include SourceTestHelper

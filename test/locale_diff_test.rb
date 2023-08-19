@@ -3,7 +3,7 @@ require "test_helper"
 
 class LocaleDiffTest < Minitest::Test
   def test_no_diff
-    diff = ThemeCheck::LocaleDiff.new(
+    diff = PlatformosCheck::LocaleDiff.new(
       { "title" => "Hello" },
       { "title" => "Bonjour" }
     )
@@ -12,7 +12,7 @@ class LocaleDiffTest < Minitest::Test
   end
 
   def test_extra_keys
-    diff = ThemeCheck::LocaleDiff.new(
+    diff = PlatformosCheck::LocaleDiff.new(
       { "title" => "Hello", "general" => {} },
       {
         "title" => "Bonjour",
@@ -30,7 +30,7 @@ class LocaleDiffTest < Minitest::Test
   end
 
   def test_missing_keys
-    diff = ThemeCheck::LocaleDiff.new(
+    diff = PlatformosCheck::LocaleDiff.new(
       {
         "title" => "Bonjour",
         "help" => "Aide",
@@ -44,10 +44,10 @@ class LocaleDiffTest < Minitest::Test
     assert_empty(diff.extra_keys)
   end
 
-  class MockCheck < ThemeCheck::LiquidCheck; end
+  class MockCheck < PlatformosCheck::LiquidCheck; end
 
   def test_add_as_offenses
-    diff = ThemeCheck::LocaleDiff.new(
+    diff = PlatformosCheck::LocaleDiff.new(
       { "help" => "Aide" },
       { "title" => "Hello" },
     )

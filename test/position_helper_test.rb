@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "test_helper"
 
-module ThemeCheck
+module PlatformosCheck
   module LanguageServer
     class PositionHelperTest < Minitest::Test
       include PositionHelper

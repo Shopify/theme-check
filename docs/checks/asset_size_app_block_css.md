@@ -48,5 +48,5 @@ This check has been introduced in 1.1.0
 - [Rule Source][codesource]
 - [Documentation Source][docsource]
 
-[codesource]: /lib/theme_check/checks/asset_size_app_block_css.rb
+[codesource]: /lib/platformos_check/checks/asset_size_app_block_css.rb
 [docsource]: /docs/checks/asset_size_app_block_css.md

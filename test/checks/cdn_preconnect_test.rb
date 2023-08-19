@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "test_helper"
 
-module ThemeCheck
+module PlatformosCheck
   class CdnPreconnectTest < Minitest::Test
     def test_no_offense_with_other_external_domains
       offenses = analyze_theme(

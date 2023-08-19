@@ -42,12 +42,12 @@ We handle two Client->Server LSP requests:
 We define providers:
 
 - Two `CodeActionProvider`:
-  1. [`QuickFixCodeActionProvider`](/lib/theme_check/language_server/code_action_providers/quickfix_code_action_provider.rb) - This one provides code actions that fix _one_ diagnostic.
-  2. [`SourceFixAllCodeActionProvider`](/lib/theme_check/language_server/code_action_providers/source_fix_all_code_action_provider.rb) - This one provides code actions that fix _all diagnostics in the current file_.
+  1. [`QuickFixCodeActionProvider`](/lib/platformos_check/language_server/code_action_providers/quickfix_code_action_provider.rb) - This one provides code actions that fix _one_ diagnostic.
+  2. [`SourceFixAllCodeActionProvider`](/lib/platformos_check/language_server/code_action_providers/source_fix_all_code_action_provider.rb) - This one provides code actions that fix _all diagnostics in the current file_.
 - One `ExecuteCommandProvider`:
-  1. [`CorrectionExecuteCommandProvider`](/lib/theme_check/language_server/execute_command_providers/correction_execute_command_provider.rb) - This one takes a list of diagnostics as arguments, turns them into a [WorkspaceEdit](#workspace-edit) and tries to apply them with the server->client `workspace/applyEdit` request.
+  1. [`CorrectionExecuteCommandProvider`](/lib/platformos_check/language_server/execute_command_providers/correction_execute_command_provider.rb) - This one takes a list of diagnostics as arguments, turns them into a [WorkspaceEdit](#workspace-edit) and tries to apply them with the server->client `workspace/applyEdit` request.
 
-We define a [`DocumentChangeCorrector`](/lib/theme_check/language_server/document_change_corrector.rb) (an LSP analog to our [`Corrector`](/lib/theme_check/corrector.rb) class). This class turns corrector calls into document changes supported by the LSP. For more details, see the [LSP reference on resource changes][lspresourcechange].
+We define a [`DocumentChangeCorrector`](/lib/platformos_check/language_server/document_change_corrector.rb) (an LSP analog to our [`Corrector`](/lib/platformos_check/corrector.rb) class). This class turns corrector calls into document changes supported by the LSP. For more details, see the [LSP reference on resource changes][lspresourcechange].
 
 ## Definitions
 

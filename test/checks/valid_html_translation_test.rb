@@ -4,7 +4,7 @@ require "test_helper"
 class ValidHTMLTranslationTest < Minitest::Test
   def test_do_not_report_valid_html
     offenses = analyze_theme(
-      ThemeCheck::ValidHTMLTranslation.new,
+      PlatformosCheck::ValidHTMLTranslation.new,
       "locales/en.default.json" => JSON.dump(
         hello_html: "<h1>Hello, world</h1>",
         image_html: "<img src='spongebob.png'>",
@@ -18,7 +18,7 @@ class ValidHTMLTranslationTest < Minitest::Test
 
   def test_report_invalid_html
     offenses = analyze_theme(
-      ThemeCheck::ValidHTMLTranslation.new,
+      PlatformosCheck::ValidHTMLTranslation.new,
       "locales/en.default.json" => JSON.dump(
         hello_html: "<h1>Hello, world"
       ),
@@ -34,7 +34,7 @@ class ValidHTMLTranslationTest < Minitest::Test
 
   def test_report_nested_invalid_html
     offenses = analyze_theme(
-      ThemeCheck::ValidHTMLTranslation.new,
+      PlatformosCheck::ValidHTMLTranslation.new,
       "locales/en.default.json" => JSON.dump(
         hello: {
           world: {
@@ -54,7 +54,7 @@ class ValidHTMLTranslationTest < Minitest::Test
 
   def test_report_pluralized_key
     offenses = analyze_theme(
-      ThemeCheck::ValidHTMLTranslation.new,
+      PlatformosCheck::ValidHTMLTranslation.new,
       "locales/en.default.json" => JSON.dump(
         hello_html: { one: "<h1>Hello, world" }
       ),

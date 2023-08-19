@@ -3,7 +3,7 @@ source "https://rubygems.org"
 
 git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
 
-# Specify your gem's dependencies in theme-check.gemspec
+# Specify your gem's dependencies in platformos-check.gemspec
 gemspec
 
 gem 'bundler'
@@ -24,8 +24,7 @@ group :development do
   gem 'solargraph'
 end
 
-gem 'rubocop', '~> 1.12.0', require: false
-gem 'rubocop-performance', '~> 1.10.2', require: false
-gem 'rubocop-shopify', '~> 1.0.7', require: false
-gem 'rubocop-minitest', '~> 0.11.0', require: false
-gem 'rubocop-rake', '~> 0.5.1', require: false
+gem 'rubocop', require: false
+gem 'rubocop-performance', require: false
+gem 'rubocop-minitest', require: false
+gem 'rubocop-rake', require: false

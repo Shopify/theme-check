@@ -75,7 +75,7 @@ This check has been introduced in Theme Check 0.7.0.
 - [Documentation Source][docsource]
 
 [googleprivacy]: https://developers.google.com/web/updates/2020/10/http-cache-partitioning#resources
-[codesource]: /lib/theme_check/checks/remote_asset.rb
+[codesource]: /lib/platformos_check/checks/remote_asset.rb
 [docsource]: /docs/checks/remote_asset.md
 [slowstart]: https://en.wikipedia.org/wiki/TCP_congestion_control#Slow_start
 [url_filters]: https://shopify.dev/docs/themes/liquid/reference/filters/url-filters

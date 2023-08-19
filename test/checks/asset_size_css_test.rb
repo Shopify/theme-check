@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "test_helper"
 
-module ThemeCheck
+module PlatformosCheck
   class AssetSizeCSSTest < Minitest::Test
     def test_href_to_file_size
       theme = make_theme({

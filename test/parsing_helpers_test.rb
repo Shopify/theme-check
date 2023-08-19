@@ -2,7 +2,7 @@
 require "test_helper"
 
 class ParsingHelpersTest < Minitest::Test
-  include ThemeCheck::ParsingHelpers
+  include PlatformosCheck::ParsingHelpers
 
   def test_outside_of_strings
     chunks = []

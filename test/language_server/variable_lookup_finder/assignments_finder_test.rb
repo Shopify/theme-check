@@ -2,7 +2,7 @@
 
 require "test_helper"
 
-module ThemeCheck
+module PlatformosCheck
   module LanguageServer
     module VariableLookupFinder
       class AssignmentsFinderTest < Minitest::Test

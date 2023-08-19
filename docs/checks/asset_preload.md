@@ -43,7 +43,7 @@ AssetPreload:
 | Parameter | Description |
 | --- | --- |
 | enabled | Whether the check is enabled. |
-| severity | The [severity](https://shopify.dev/themes/tools/theme-check/configuration#check-severity) of the check. |
+| severity | The [severity](https://shopify.dev/themes/tools/platformos-check/configuration#check-severity) of the check. |
 
 ## Disabling this check
 
@@ -55,6 +55,6 @@ to move them to Shopify because they change frequently or are dynamically genera
 - [Rule source][codesource]
 - [Documentation source][docsource]
 
-[codesource]: /lib/theme_check/checks/asset_preload.rb
+[codesource]: /lib/platformos_check/checks/asset_preload.rb
 [docsource]: /docs/checks/asset_preload.md
 [preload_key_resources]: https://shopify.dev/themes/best-practices/performance#use-resource-hints-to-preload-key-resources

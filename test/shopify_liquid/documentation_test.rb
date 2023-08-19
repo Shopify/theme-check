@@ -2,7 +2,7 @@
 
 require 'test_helper'
 
-module ThemeCheck
+module PlatformosCheck
   module ShopifyLiquid
     class DocumentationTest < Minitest::Test
       def test_filter_doc

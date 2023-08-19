@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "test_helper"
 
-module ThemeCheck
+module PlatformosCheck
   class DisabledChecksTest < Minitest::Test
     # This check flags uses of the assign tag.
     class AssignCheck < Check

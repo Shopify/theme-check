@@ -60,7 +60,7 @@ class RequiredLayoutThemeObjectTest < Minitest::Test
       END
     }
     sources = fix_theme(
-      ThemeCheck::RequiredLayoutThemeObject.new,
+      PlatformosCheck::RequiredLayoutThemeObject.new,
       "layout/theme.liquid" => <<~END,
         <!DOCTYPE html>
         <html>
@@ -92,7 +92,7 @@ class RequiredLayoutThemeObjectTest < Minitest::Test
       END
     }
     sources = fix_theme(
-      ThemeCheck::RequiredLayoutThemeObject.new,
+      PlatformosCheck::RequiredLayoutThemeObject.new,
       "layout/theme.liquid" => <<~END,
         <!DOCTYPE html>
         <html>
@@ -118,7 +118,7 @@ class RequiredLayoutThemeObjectTest < Minitest::Test
       END
     }
     sources = fix_theme(
-      ThemeCheck::RequiredLayoutThemeObject.new,
+      PlatformosCheck::RequiredLayoutThemeObject.new,
       "layout/theme.liquid" => <<~END,
         <!DOCTYPE html>
         <html>
@@ -134,7 +134,7 @@ class RequiredLayoutThemeObjectTest < Minitest::Test
 
   def analyze_layout_theme(content)
     analyze_theme(
-      ThemeCheck::RequiredLayoutThemeObject.new,
+      PlatformosCheck::RequiredLayoutThemeObject.new,
       "layout/theme.liquid" => content
     )
   end

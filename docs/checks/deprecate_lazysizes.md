@@ -54,5 +54,5 @@ This check has been introduced in Theme Check 1.0.0.
 - [Rule Source][codesource]
 - [Documentation Source][docsource]
 
-[codesource]: /lib/theme_check/checks/deprecate_lazysizes.rb
+[codesource]: /lib/platformos_check/checks/deprecate_lazysizes.rb
 [docsource]: /docs/checks/deprecate_lazysizes.md

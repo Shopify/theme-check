@@ -2,7 +2,7 @@
 require "test_helper"
 require "yaml"
 
-module ThemeCheck
+module PlatformosCheck
   class ConfigDefaultTest < Minitest::Test
     def setup
       @default_config = YAML.load(default_config_path.read)

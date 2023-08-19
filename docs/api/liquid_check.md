@@ -8,7 +8,7 @@ Liquid files are parsed using the Liquid parser, by consequence you will get Liq
 
 
 ```ruby
-module ThemeCheck
+module PlatformosCheck
   class MyCheckName < LiquidCheck
     category :liquid,
     # A check can belong to multiple categories. Valid ones:
@@ -18,11 +18,11 @@ module ThemeCheck
     def on_document(node)
       # Called with the root node of all liquid_file
       node.value      # is the original Liquid object for this node. See Liquid source code for details.
-      node.theme_file # is the liquid_file being analyzed, See lib/theme_check/liquid_file.rb.
+      node.theme_file # is the liquid_file being analyzed, See lib/platformos_check/liquid_file.rb.
       node.parent     # is the parent node.
       node.children   # are the children nodes.
-      # See lib/theme_check/node.rb for more helper methods
-      theme # Gives you access to all the theme files in the theme. See lib/theme_check/theme.rb.
+      # See lib/platformos_check/node.rb for more helper methods
+      theme # Gives you access to all the theme files in the theme. See lib/platformos_check/theme.rb.
     end
 
     def on_node(node)

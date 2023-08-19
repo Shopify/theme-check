@@ -22,6 +22,6 @@ class AssetFileTest < Minitest::Test
 
   def make_asset_file(name, content)
     storage = make_storage(name => content)
-    ThemeCheck::AssetFile.new(name, storage)
+    PlatformosCheck::AssetFile.new(name, storage)
   end
 end

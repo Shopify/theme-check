@@ -34,13 +34,13 @@ RuboCop::RakeTask.new
 task default: [:test, :rubocop]
 
 namespace :package do
-  require 'theme_check/packager'
+  require 'platformos_check/packager'
 
   task all: [:homebrew]
 
   desc("Builds a Homebrew package of the CLI")
   task :homebrew do
-    ThemeCheck::Packager.new.build_homebrew
+    PlatformosCheck::Packager.new.build_homebrew
   end
 end
 
@@ -49,27 +49,27 @@ task(package: 'package:all')
 
 desc("Update files in the repo to match new version")
 task :prerelease, [:version] do |_t, args|
-  require 'theme_check/releaser'
-  ThemeCheck::Releaser.new.release(args.version)
+  require 'platformos_check/releaser'
+  PlatformosCheck::Releaser.new.release(args.version)
 end
 
 desc("Download theme-liquid-docs")
 task :download_theme_liquid_docs do
-  require 'theme_check/shopify_liquid/source_manager'
+  require 'platformos_check/shopify_liquid/source_manager'
 
-  ThemeCheck::ShopifyLiquid::SourceManager.download
+  PlatformosCheck::ShopifyLiquid::SourceManager.download
 end
 
 desc "Create a new check"
 task :new_check, [:name] do |_t, args|
-  require "theme_check/string_helpers"
+  require "platformos_check/string_helpers"
   class_name = args.name
-  base_name = ThemeCheck::StringHelpers.underscore(class_name)
-  code_source = "lib/theme_check/checks/#{base_name}.rb"
+  base_name = PlatformosCheck::StringHelpers.underscore(class_name)
+  code_source = "lib/platformos_check/checks/#{base_name}.rb"
   doc_source = "docs/checks/#{base_name}.md"
   test_source = "test/checks/#{base_name}_test.rb"
   erb(
-    "lib/theme_check/checks/TEMPLATE.rb.erb", code_source,
+    "lib/platformos_check/checks/TEMPLATE.rb.erb", code_source,
     class_name: class_name,
   )
   erb(

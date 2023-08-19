@@ -4,7 +4,7 @@ require "test_helper"
 class TemplateLengthTest < Minitest::Test
   def test_finds_unused
     offenses = analyze_theme(
-      ThemeCheck::TemplateLength.new(max_length: 10),
+      PlatformosCheck::TemplateLength.new(max_length: 10),
       "templates/long.liquid" => <<~END,
         #{"\n" * 10}
       END
@@ -19,7 +19,7 @@ class TemplateLengthTest < Minitest::Test
 
   def test_excludes_lines_inside_schema
     offenses = analyze_theme(
-      ThemeCheck::TemplateLength.new(max_length: 10, exclude_schema: true),
+      PlatformosCheck::TemplateLength.new(max_length: 10, exclude_schema: true),
       "sections/long.liquid" => <<~END,
         {% schema %}
           #{"\n" * 10}
@@ -31,7 +31,7 @@ class TemplateLengthTest < Minitest::Test
 
   def test_excludes_lines_inside_stylesheet
     offenses = analyze_theme(
-      ThemeCheck::TemplateLength.new(max_length: 10, exclude_stylesheet: true),
+      PlatformosCheck::TemplateLength.new(max_length: 10, exclude_stylesheet: true),
       "sections/long.liquid" => <<~END,
         {% stylesheet %}
           #{"\n" * 10}
@@ -43,7 +43,7 @@ class TemplateLengthTest < Minitest::Test
 
   def test_excludes_lines_inside_javascript
     offenses = analyze_theme(
-      ThemeCheck::TemplateLength.new(max_length: 10, exclude_javascript: true),
+      PlatformosCheck::TemplateLength.new(max_length: 10, exclude_javascript: true),
       "sections/long.liquid" => <<~END,
         {% javascript %}
           #{"\n" * 10}

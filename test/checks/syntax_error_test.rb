@@ -4,7 +4,7 @@ require "test_helper"
 class SyntaxErrorTest < Minitest::Test
   def test_reports_parse_errors
     offenses = analyze_theme(
-      ThemeCheck::SyntaxError.new,
+      PlatformosCheck::SyntaxError.new,
       "templates/index.liquid" => <<~END,
         {% include 'muffin'
       END
@@ -16,7 +16,7 @@ class SyntaxErrorTest < Minitest::Test
 
   def test_reports_missing_tag
     offenses = analyze_theme(
-      ThemeCheck::SyntaxError.new,
+      PlatformosCheck::SyntaxError.new,
       "templates/index.liquid" => <<~END,
         {% unknown %}
       END
@@ -28,7 +28,7 @@ class SyntaxErrorTest < Minitest::Test
 
   def test_reports_lax_warnings_and_continue
     offenses = analyze_theme(
-      ThemeCheck::SyntaxError.new,
+      PlatformosCheck::SyntaxError.new,
       "templates/index.liquid" => <<~END,
         {% if collection | size > 0 %}
         {% endif %}
@@ -44,7 +44,7 @@ class SyntaxErrorTest < Minitest::Test
 
   def test_invalid_render_tag
     offenses = analyze_theme(
-      ThemeCheck::SyntaxError.new,
+      PlatformosCheck::SyntaxError.new,
       "templates/index.liquid" => "{% render ‘foo’ %}",
     )
     assert_offenses(<<~END, offenses)

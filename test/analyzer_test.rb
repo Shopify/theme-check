@@ -11,7 +11,7 @@ class AnalyzerTest < Minitest::Test
       "sections/article-template/template.liquid" => "",
       "locales/en.default.json" => "",
     )
-    @analyzer = ThemeCheck::Analyzer.new(@theme)
+    @analyzer = PlatformosCheck::Analyzer.new(@theme)
   end
 
   def test_analyze_theme

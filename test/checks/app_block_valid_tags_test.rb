@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "test_helper"
 
-module ThemeCheck
+module PlatformosCheck
   class AppBlockValidTagsTest < Minitest::Test
     def test_include_layout_section_tags
       ['include', 'layout', 'section', 'sections'].each do |tag|

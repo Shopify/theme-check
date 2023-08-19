@@ -42,5 +42,5 @@ This check has been introduced in Theme Check 0.2.0.
 - [Documentation Source][docsource]
 
 [deprecated]: https://shopify.dev/docs/themes/liquid/reference/filters/deprecated-filters
-[codesource]: /lib/theme_check/checks/deprecated_filter.rb
+[codesource]: /lib/platformos_check/checks/deprecated_filter.rb
 [docsource]: /docs/checks/deprecated_filter.md

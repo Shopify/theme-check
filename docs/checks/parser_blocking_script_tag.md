@@ -36,7 +36,7 @@ ParserBlockingScriptTag:
 
 ## When Not To Use It
 
-This should only be turned off with the `theme-check-disable` comment when there's no better way to accomplish what you're doing than with a parser-blocking script.
+This should only be turned off with the `platformos-check-disable` comment when there's no better way to accomplish what you're doing than with a parser-blocking script.
 
 It is discouraged to turn this rule off.
 

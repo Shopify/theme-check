@@ -4,7 +4,7 @@ require "test_helper"
 class DeprecateBgsizesTest < Minitest::Test
   def test_valid
     offenses = analyze_theme(
-      ThemeCheck::DeprecateBgsizes.new,
+      PlatformosCheck::DeprecateBgsizes.new,
       "templates/index.liquid" => <<~END,
         <div class="other-class"></div>
       END
@@ -14,7 +14,7 @@ class DeprecateBgsizesTest < Minitest::Test
 
   def test_reports_data_bgset
     offenses = analyze_theme(
-      ThemeCheck::DeprecateBgsizes.new,
+      PlatformosCheck::DeprecateBgsizes.new,
       "templates/index.liquid" => <<~END,
         <div class="lazyload" data-bgset="image-200.jpg [--small] | image-300.jpg [--medium] | image-400.jpg"></div>
       END

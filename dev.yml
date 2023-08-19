@@ -1,17 +1,17 @@
-name: theme-check
+name: platformos-check
 
 type: ruby
 
 up:
-  - ruby: "2.7"
+  - ruby: "3.2.2"
   - bundler
 
 commands:
   check:
-    desc: 'Check a theme'
+    desc: 'Check an pOS app '
     syntax:
       argument: file
-    run: bundle exec theme-check
+    run: bundle exec platformos-check
   test:
     syntax:
       argument: file
@@ -22,4 +22,4 @@ commands:
   autocorrect:
     run: bundle exec rubocop --auto-correct
   language-server:
-    run: bundle exec theme-check-language-server
+    run: bundle exec platformos-check-language-server

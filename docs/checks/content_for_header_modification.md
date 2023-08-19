@@ -37,6 +37,6 @@ This check has been introduced in Theme Check 0.9.0.
 - [Documentation Source][docsource]
 - [`theme.liquid` template considerations][considerations]
 
-[codesource]: /lib/theme_check/checks/check_class_name.rb
+[codesource]: /lib/platformos_check/checks/check_class_name.rb
 [docsource]: /docs/checks/check_class_name.md
 [considerations]: https://shopify.dev/docs/themes/theme-templates/theme-liquid#template-considerations
