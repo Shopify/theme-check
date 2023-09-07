@@ -3,12 +3,10 @@ require "pathname"
 
 module ThemeCheck
   class Theme
-    DEFAULT_LOCALE_REGEXP = %r{locales/(.*)\.default$}
     LIQUID_REGEX = /\.liquid$/i
     JSON_REGEX = /\.json$/i
 
     attr_reader :storage
-    attr_writer :default_locale_json
 
     def initialize(storage)
       @storage = storage
@@ -34,21 +32,6 @@ module ThemeCheck
 
     def directories
       @storage.directories
-    end
-
-    def default_locale_json
-      return @default_locale_json if defined?(@default_locale_json)
-      @default_locale_json = json.find do |json_file|
-        json_file.name.match?(DEFAULT_LOCALE_REGEXP)
-      end
-    end
-
-    def default_locale
-      if default_locale_json
-        default_locale_json.name[DEFAULT_LOCALE_REGEXP, 1]
-      else
-        "en"
-      end
     end
 
     def all
