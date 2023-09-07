@@ -6,11 +6,10 @@ module ThemeCheck
     category :liquid
     doc docs_url(__FILE__)
 
-    LAYOUT_FILENAME = "layout/theme"
+    LAYOUT_FILENAME = "templates/layout"
 
     def initialize
       @content_for_layout_found = false
-      @content_for_header_found = false
     end
 
     def on_document(node)
@@ -20,15 +19,13 @@ module ThemeCheck
     def on_variable(node)
       return unless node.value.name.is_a?(Liquid::VariableLookup)
 
-      @content_for_header_found ||= node.value.name.name == "content_for_header"
-      @content_for_layout_found ||= node.value.name.name == "content_for_layout"
+      @content_for_layout_found ||= node.value.name.name == "content"
     end
 
     def after_document(node)
       return unless node.theme_file.name == LAYOUT_FILENAME
 
-      add_missing_object_offense("content_for_layout", "</body>") unless @content_for_layout_found
-      add_missing_object_offense("content_for_header", "</head>") unless @content_for_header_found
+      add_missing_object_offense("content", "</body>") unless @content_for_layout_found
     end
 
     private
