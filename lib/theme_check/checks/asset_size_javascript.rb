@@ -26,11 +26,11 @@ module ThemeCheck
     end
 
     def src_to_file_size(src)
-      # We're kind of intentionally only looking at {{ 'asset' | asset_url }} or full urls in here.
+      # We're kind of intentionally only looking at {{ 'asset' | asset }} or full urls in here.
       # More complicated liquid statements are not in scope.
-      if src =~ /^#{LIQUID_VARIABLE}$/o && src =~ /asset_url/ && src =~ Liquid::QuotedString
+      if src =~ /^#{LIQUID_VARIABLE}$/o && src =~ /asset/ && src =~ Liquid::QuotedString
         asset_id = Regexp.last_match(0).gsub(START_OR_END_QUOTE, "")
-        asset = @theme.assets.find { |a| a.name.end_with?("/" + asset_id) }
+        asset = @theme["assets/#{asset_id}"]
         return if asset.nil?
         asset.gzipped_size
       elsif src =~ %r{^(https?:)?//}
