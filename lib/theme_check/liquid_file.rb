@@ -19,12 +19,12 @@ module ThemeCheck
       name.start_with?('templates')
     end
 
-    def section?
-      name.start_with?('sections')
+    def component?
+      name.start_with?('components')
     end
 
-    def snippet?
-      name.start_with?('snippets')
+    def partial?
+      name.start_with?('partials')
     end
 
     def rewriter

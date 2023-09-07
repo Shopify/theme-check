@@ -12,11 +12,15 @@ module ThemeCheck
           if current_level >= max
             yield node
           else
-            template_name = "snippets/#{node.value.template_name_expr}"
+            template_name = filename_for(node.value.template_name_expr)
             templates[template_name]
               &.with_deep_nested(templates, max, current_level + 1) { yield node }
           end
         end
+      end
+
+      def filename_for(name)
+        name.include?("/") ? name : "partials/#{name}"
       end
     end
 

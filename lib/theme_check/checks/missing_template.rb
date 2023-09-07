@@ -14,18 +14,17 @@ module ThemeCheck
     def on_include(node)
       snippet = node.value.template_name_expr
       if snippet.is_a?(String)
-        add_missing_offense("snippets/#{snippet}", node: node)
+        add_missing_offense(filename_for(snippet), node: node)
       end
     end
 
     alias_method :on_render, :on_include
 
-    def on_section(node)
-      section = node.value.section_name
-      add_missing_offense("sections/#{section}", node: node)
-    end
-
     private
+
+    def filename_for(name)
+      name.include?("/") ? name : "partials/#{name}"
+    end
 
     def ignore?(path)
       all_ignored_patterns.any? { |pattern| File.fnmatch?(pattern, path) }
@@ -37,7 +36,7 @@ module ThemeCheck
 
     def add_missing_offense(name, node:)
       path = "#{name}.liquid"
-      unless ignore?(path) || theme[name]
+      unless ignore?(path) || theme[Pathname.new(path)]
         add_offense("'#{path}' is not found", node: node) do |corrector|
           corrector.create_file(@theme.storage, "#{name}.liquid", "")
         end

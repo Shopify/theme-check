@@ -14,7 +14,7 @@ module ThemeCheck
 
     def on_render(node)
       if node.value.template_name_expr.is_a?(String)
-        @used_snippets << "snippets/#{node.value.template_name_expr}"
+        @used_snippets << filename_for(node.value.template_name_expr)
 
       elsif might_have_a_block_as_variable_lookup?(node)
         # We ignore this case, because that's a "proper" use case for
@@ -38,10 +38,14 @@ module ThemeCheck
     end
 
     def missing_snippets
-      theme.snippets.reject { |t| @used_snippets.include?(t.name) }
+      theme.partials.reject { |t| @used_snippets.include?(t.name) }
     end
 
     private
+
+    def filename_for(name)
+      name.include?("/") ? name : "partials/#{name}"
+    end
 
     # This function returns true when the render node passed might have a
     # variable lookup that refers to a block as template_name_expr.

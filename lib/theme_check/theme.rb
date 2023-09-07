@@ -51,12 +51,12 @@ module ThemeCheck
       liquid.select(&:template?)
     end
 
-    def sections
-      liquid.select(&:section?)
+    def components
+      liquid.select(&:component?)
     end
 
-    def snippets
-      liquid.select(&:snippet?)
+    def partials
+      liquid.select(&:partial?)
     end
   end
 end
