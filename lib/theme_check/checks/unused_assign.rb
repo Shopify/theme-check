@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module ThemeCheck
   # Checks unused {% assign x = ... %} or {% capture x %}...{% endcapture %} tags
-  class UnusedAssignOrCapture < LiquidCheck
+  class UnusedAssign < LiquidCheck
     severity :suggestion
     category :liquid
     doc docs_url(__FILE__)

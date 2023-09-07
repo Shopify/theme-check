@@ -46,7 +46,7 @@ UnknownFilter:
   enabled: false
   ignore: []
 
-UnusedAssignOrCapture:
+UnusedAssign:
   enabled: true
   ignore: []
 
