@@ -42,22 +42,11 @@ SyntaxError:
   enabled: true
   ignore: []
 
-TemplateLength:
-  enabled: true
-  ignore: []
-  max_length: 600
-  # Exclude content of {% schema %} in line count
-  exclude_schema: true
-  # Exclude content of {% stylesheet %} in line count
-  exclude_stylesheet: true
-  # Exclude content of {% javascript %} in line count
-  exclude_javascript: true
-
 UnknownFilter:
-  enabled: true
+  enabled: false
   ignore: []
 
-UnusedAssign:
+UnusedAssignOrCapture:
   enabled: true
   ignore: []
 
@@ -65,31 +54,7 @@ UnusedSnippet:
   enabled: true
   ignore: []
 
-MatchingSchemaTranslations:
-  enabled: true
-  ignore: []
-
-MatchingTranslations:
-  enabled: true
-  ignore: []
-
-DefaultLocale:
-  enabled: true
-  ignore: []
-
-TranslationKeyExists:
-  enabled: true
-  ignore: []
-
-ValidHTMLTranslation:
-  enabled: true
-  ignore: []
-
 ValidJson:
-  enabled: true
-  ignore: []
-
-ValidSchema:
   enabled: true
   ignore: []
 
@@ -98,16 +63,12 @@ MissingRequiredTemplateFiles:
   ignore: []
 
 UndefinedObject:
-  enabled: true
+  enabled: false
   ignore: []
   exclude_snippets: true
   config_type: :default
 
 RequiredDirectories:
-  enabled: true
-  ignore: []
-
-DeprecatedFilter:
   enabled: true
   ignore: []
 
@@ -127,14 +88,6 @@ ParserBlockingJavaScript:
   enabled: true
   ignore: []
 
-ParserBlockingScriptTag:
-  enabled: true
-  ignore: []
-
-AssetPreload:
-  enabled: true
-  ignore: []
-
 AssetSizeJavaScript:
   enabled: false
   threshold_in_bytes: 10_000
@@ -145,28 +98,7 @@ AssetSizeCSS:
   threshold_in_bytes: 100_000
   ignore: []
 
-AssetSizeCSSStylesheetTag:
-  enabled: false
-  threshold_in_bytes: 100_000
-  ignore: []
-
-CdnPreconnect:
-  enabled: true
-  ignore: []
-
 ImgWidthAndHeight:
-  enabled: true
-  ignore: []
-
-RemoteAsset:
-  enabled: true
-  ignore: []
-
-AssetUrlFilters:
-  enabled: true
-  ignore: []
-
-ContentForHeaderModification:
   enabled: true
   ignore: []
 
@@ -177,31 +109,3 @@ ImgLazyLoading:
 HtmlParsingError:
   enabled: true
   ignore: []
-
-AssetSizeAppBlockJavaScript:
-  enabled: false
-  ignore: []
-  threshold_in_bytes: 10_000
-
-AssetSizeAppBlockCSS:
-  enabled: false
-  ignore: []
-  threshold_in_bytes: 100_000
-
-AppBlockValidTags:
-  enabled: false
-  ignore: []
-
-PaginationSize:
-  enabled: true
-  ignore: []
-  min_size: 1
-  max_size: 50
-
-DeprecatedGlobalAppBlockType:
-  enabled: true
-
-SchemaJsonFormat:
-  enabled: true
-  start_level: 0
-  indent: '  '
