@@ -24,10 +24,9 @@ module ThemeCheck
     end
 
     def href_to_file_size(href)
-      # asset_url (+ optional stylesheet_tag) variables
-      if href =~ /^#{LIQUID_VARIABLE}$/o && href =~ /asset_url/ && href =~ Liquid::QuotedString
+      if href =~ /^#{LIQUID_VARIABLE}$/o && href =~ /asset/ && href =~ Liquid::QuotedString
         asset_id = Regexp.last_match(0).gsub(START_OR_END_QUOTE, "")
-        asset = @theme.assets.find { |a| a.name.end_with?("/" + asset_id) }
+        asset = @theme["assets/#{asset_id}"]
         return if asset.nil?
         asset.gzipped_size
 
