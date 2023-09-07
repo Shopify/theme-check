@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 module ThemeCheck
-  # Reports missing shopify required directories
-
   class RequiredDirectories < LiquidCheck
     severity :error
     category :liquid
     doc docs_url(__FILE__)
 
-    REQUIRED_DIRECTORIES = %w(assets config layout locales sections snippets templates)
+    REQUIRED_DIRECTORIES = %w(assets config partials components templates)
 
     def on_end
       directories = theme.directories.map(&:to_s)
