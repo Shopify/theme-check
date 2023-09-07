@@ -4,140 +4,63 @@ module ThemeCheck
   module Tags
     # Copied tags parsing code from storefront-renderer
 
-    class Section < Liquid::Tag
-      SYNTAX = /\A\s*(?<section_name>#{Liquid::QuotedString})\s*\z/o
+    class Translate < Liquid::Tag
+      SYNTAX = /\s*(#{::Liquid::QuotedString})\s*/ # careful with newlines
 
-      attr_reader :section_name
+      attr_reader :original, :params
 
-      def initialize(tag_name, markup, options)
+      def initialize(tag_name, markup, parse_context)
         super
+        raise ::Liquid::SyntaxError.new('Syntax Error in "t" - Valid syntax: {% t "text string" %}'), 'Syntax Error' unless markup =~ SYNTAX
 
-        match = markup.match(SYNTAX)
-        raise(
-          Liquid::SyntaxError,
-          "Error in tag 'section' - Valid syntax: section '[type]'",
-        ) unless match
-        @section_name = match[:section_name].tr(%('"), '')
-        @section_name.chomp!(".liquid") if @section_name.end_with?(".liquid")
-      end
-    end
+        @original = parse_expression(Regexp.last_match[1])
+        raise ::Liquid::SyntaxError.new('Syntax Error in "t" - Valid syntax: {% t "text string" %}'), 'Syntax Error' unless original.is_a?(String)
 
-    class Sections < Liquid::Tag
-      SYNTAX = /\A\s*(?<sections_name>#{Liquid::QuotedString})\s*\z/o
+        @original.strip!
+        @params = {}
 
-      attr_reader :sections_name
-
-      def initialize(tag_name, markup, options)
-        super
-
-        match = markup.match(SYNTAX)
-        raise(
-          Liquid::SyntaxError,
-          "Error in tag 'sections' - Valid syntax: sections '[type]'",
-        ) unless match
-        @sections_name = match[:sections_name].tr(%('"), '')
-        @sections_name.chomp!(".liquid") if @sections_name.end_with?(".liquid")
-      end
-    end
-
-    class Form < Liquid::Block
-      TAG_ATTRIBUTES = /([\w\-]+)\s*:\s*(#{Liquid::QuotedFragment})/o
-      # Matches forms with arguments:
-      #  'type', object
-      #  'type', object, key: value, ...
-      #  'type', key: value, ...
-      #
-      # old format: form product
-      # new format: form "product", product, id: "newID", class: "custom-class", data-example: "100"
-      FORM_FORMAT = %r{
-        (?<type>#{Liquid::QuotedFragment})
-        (?:\s*,\s*(?<variable_name>#{Liquid::VariableSignature}+)(?!:))?
-        (?<attributes>(?:\s*,\s*(?:#{TAG_ATTRIBUTES}))*)\s*\Z
-      }xo
-
-      attr_reader :type_expr, :variable_name_expr, :tag_attributes
-
-      def initialize(tag_name, markup, options)
-        super
-        @match = FORM_FORMAT.match(markup)
-        raise Liquid::SyntaxError, "in 'form' - Valid syntax: form 'type'[, object]" unless @match
-        @type_expr = parse_expression(@match[:type])
-        @variable_name_expr = parse_expression(@match[:variable_name])
-        tag_attributes = @match[:attributes].scan(TAG_ATTRIBUTES)
-        tag_attributes.each do |kv_pair|
-          kv_pair[1] = parse_expression(kv_pair[1])
+        after_markup = markup.strip.delete_prefix(Regexp.last_match[1])
+        after_markup.scan(Liquid::TagAttributes) do |key, value|
+          @params[key.to_sym] = parse_expression(value)
         end
-        @tag_attributes = tag_attributes
+      end
+
+      def format_variables
+        original.scan(/%{.+?}/).map { |s| s[2..-2].strip }.sort.uniq
+      end
+
+      def params_keys
+        @params.keys.map(&:to_s).sort.uniq
+      end
+
+      def params_variables
+        @params.values
       end
 
       class ParseTreeVisitor < Liquid::ParseTreeVisitor
         def children
-          super + [@node.type_expr, @node.variable_name_expr] + @node.tag_attributes
+          super + @node.params_variables
         end
       end
     end
 
     class Paginate < Liquid::Block
-      SYNTAX = /(?<liquid_variable_name>#{Liquid::QuotedFragment})\s*((?<by>by)\s*(?<page_size>#{Liquid::QuotedFragment}))?/
+      SYNTAX = /\s*(#{Liquid::QuotedFragment})(\s+by\s+(#{Liquid::QuotedFragment}))?/
 
-      attr_reader :page_size
+      attr_reader :collection_name, :per_page
 
-      def initialize(tag_name, markup, options)
+      def initialize(tag_name, markup, _options)
         super
-        if (matches = markup.match(SYNTAX))
-          @liquid_variable_name = matches[:liquid_variable_name]
-          @page_size = parse_expression(matches[:page_size])
-          @window_size = nil # determines how many pagination links are shown
 
-          @liquid_variable_count_expr = parse_expression("#{@liquid_variable_name}_count")
+        raise ::Liquid::SyntaxError.new("Syntax Error in 'paginate' - Valid syntax: paginate <collection> by <number>"), 'Syntax Error' unless markup =~ SYNTAX
 
-          var_parts = @liquid_variable_name.rpartition('.')
-          @source_drop_expr = parse_expression(var_parts[0].empty? ? var_parts.last : var_parts.first)
-          @method_name = var_parts.last.to_sym
-
-          markup.scan(Liquid::TagAttributes) do |key, value|
-            case key
-            when 'window_size'
-              @window_size = value.to_i
-            end
-          end
-        else
-          raise(Liquid::SyntaxError, "in tag 'paginate' - Valid syntax: paginate [collection] by number")
-        end
+        @collection_name = Regexp.last_match[1]
+        @per_page = parse_expression(Regexp.last_match[3]) if Regexp.last_match[2]
       end
 
       class ParseTreeVisitor < Liquid::ParseTreeVisitor
         def children
-          super + [@node.page_size]
-        end
-      end
-    end
-
-    class Layout < Liquid::Tag
-      SYNTAX = /(?<layout>#{Liquid::QuotedFragment})/
-
-      NO_LAYOUT_KEYS = %w(false nil none).freeze
-
-      attr_reader :layout_expr
-
-      def initialize(tag_name, markup, tokens)
-        super
-        match = markup.match(SYNTAX)
-        raise(
-          Liquid::SyntaxError,
-          "in 'layout' - Valid syntax: layout (none|[layout_name])",
-        ) unless match
-        layout_markup = match[:layout]
-        @layout_expr = if NO_LAYOUT_KEYS.include?(layout_markup.downcase)
-          false
-        else
-          parse_expression(layout_markup)
-        end
-      end
-
-      class ParseTreeVisitor < Liquid::ParseTreeVisitor
-        def children
-          [@node.layout_expr]
+          (super + [@node.collection_name, @node.per_page]).compact
         end
       end
     end
@@ -157,7 +80,7 @@ module ThemeCheck
         ## or {% render "snippet" for products p %}
         (\s+(with|#{Liquid::Render::FOR})\s+(#{Liquid::QuotedFragment}+))?
         (\s+(?:as)\s+(#{Liquid::VariableSegment}+))?
-        ## variables passed into the tag (e.g. {% render "snippet", var1: value1, var2: value2 %}
+        ## variables passed into the tag (e.g. {% render "snippet", var1: value1, var2: value2 %})
         ## are not matched by this regex and are handled by Liquid::Render.initialize
       }xo
 
@@ -195,14 +118,6 @@ module ThemeCheck
       end
     end
 
-    class Style < Liquid::Block; end
-
-    class Schema < Liquid::Raw; end
-
-    class Javascript < Liquid::Raw; end
-
-    class Stylesheet < Liquid::Raw; end
-
     class << self
       attr_writer :register_tags
 
@@ -217,16 +132,9 @@ module ThemeCheck
       def register_tags!
         return if !register_tags? || (defined?(@registered_tags) && @registered_tags)
         @registered_tags = true
-        register_tag('form', Form)
-        register_tag('layout', Layout)
         register_tag('render', Render)
         register_tag('paginate', Paginate)
-        register_tag('section', Section)
-        register_tag('sections', Sections)
-        register_tag('style', Style)
-        register_tag('schema', Schema)
-        register_tag('javascript', Javascript)
-        register_tag('stylesheet', Stylesheet)
+        register_tag('t', Translate)
       end
     end
     self.register_tags = true
