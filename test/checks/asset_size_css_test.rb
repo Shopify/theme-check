@@ -6,6 +6,7 @@ module ThemeCheck
     def test_href_to_file_size
       theme = make_theme({
         "assets/theme.css" => "* { color: green !important; }",
+        "assets/pickers.css.liquid" => "* { color: {{ settings.main_color }} !important; }",
       })
 
       assert_has_file_size("{{ 'theme.css' | asset_url }}", theme)
@@ -14,6 +15,7 @@ module ThemeCheck
       assert_has_file_size("http://example.com/foo.css", theme)
       assert_has_file_size("//example.com/foo.css", theme)
 
+      refute_has_file_size("{{ 'pickers.css' | asset_url }}", theme)
       refute_has_file_size("{{ 'this_file_does_not_exist.css' | asset_url }}", theme)
       refute_has_file_size("{% if on_product %}https://hello.world{% else %}https://hi.world{% endif %}", theme)
     end

@@ -31,7 +31,7 @@ module ThemeCheck
       if src =~ /^#{LIQUID_VARIABLE}$/o && src =~ /asset/ && src =~ Liquid::QuotedString
         asset_id = Regexp.last_match(0).gsub(START_OR_END_QUOTE, "")
         asset = @theme["assets/#{asset_id}"]
-        return if asset.nil?
+        return unless asset.is_a?(AssetFile)
         asset.gzipped_size
       elsif src =~ %r{^(https?:)?//}
         asset = RemoteAssetFile.from_src(src)

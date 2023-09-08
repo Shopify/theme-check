@@ -27,7 +27,7 @@ module ThemeCheck
       if href =~ /^#{LIQUID_VARIABLE}$/o && href =~ /asset/ && href =~ Liquid::QuotedString
         asset_id = Regexp.last_match(0).gsub(START_OR_END_QUOTE, "")
         asset = @theme["assets/#{asset_id}"]
-        return if asset.nil?
+        return unless asset.is_a?(AssetFile)
         asset.gzipped_size
 
       # remote URLs
