@@ -4,8 +4,6 @@ module ThemeCheck
   class VersionedInMemoryStorage < InMemoryStorage
     Version = Struct.new(:id, :version)
 
-    attr_reader :versions
-
     def initialize(files, root = "/dev/null")
       super(files, root)
       @versions = {} # Hash<relative_path, number>

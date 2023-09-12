@@ -21,6 +21,10 @@ module ThemeCheck
       @relative_pathname ||= Pathname.new(@relative_path)
     end
 
+    def workspace_path
+      @workspace_pathname ||= Pathname.new(@storage.workspace_path(@relative_path))
+    end
+
     def name
       relative_path.sub_ext('').to_s
     end

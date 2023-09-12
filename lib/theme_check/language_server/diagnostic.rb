@@ -104,7 +104,7 @@ module ThemeCheck
       end
 
       def relative_path
-        @relative_path ||= offense&.theme_file&.relative_path
+        @relative_path ||= offense&.theme_file&.workspace_path
       end
 
       def uri

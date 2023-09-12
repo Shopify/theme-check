@@ -10,8 +10,7 @@ module ThemeCheck
         @providers = CodeActionProvider.all.map { |c| c.new(storage, diagnostics_manager) }
       end
 
-      def code_actions(absolute_path, start_position, end_position, only_kinds = [])
-        relative_path = @storage.relative_path(absolute_path)
+      def code_actions(relative_path, start_position, end_position, only_kinds = [])
         buffer = @storage.read(relative_path)
         start_index = from_row_column_to_index(buffer, start_position[0], start_position[1])
         end_index = from_row_column_to_index(buffer, end_position[0], end_position[1])

@@ -130,12 +130,12 @@ module ThemeCheck
     end
 
     def location
-      tokens = [theme_file&.relative_path, line_number].compact
+      tokens = [theme_file&.workspace_path, line_number].compact
       tokens.join(":") if tokens.any?
     end
 
     def location_range
-      tokens = [theme_file&.relative_path, start_index, end_index].compact
+      tokens = [theme_file&.workspace_path, start_index, end_index].compact
       tokens.join(":") if tokens.any?
     end
 
@@ -213,7 +213,7 @@ module ThemeCheck
     def to_h
       {
         check: check.code_name,
-        path: theme_file&.relative_path,
+        path: theme_file&.workspace_path,
         severity: check.severity_value,
         start_row: start_row,
         start_column: start_column,

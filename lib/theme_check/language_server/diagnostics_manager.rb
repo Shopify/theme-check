@@ -18,7 +18,7 @@ module ThemeCheck
       #   4. We should be able to create WorkspaceEdits from diagnostics, so that the ExecuteCommandEngine can do its job
       #   5. We should clean up diagnostics that were applied by the client
       def initialize
-        @latest_diagnostics = {} # { [Pathname(relative_path)] => Diagnostic[] }
+        @latest_diagnostics = {} # { [Pathname(workspace_path)] => Diagnostic[] }
         @mutex = Mutex.new
         @first_run = true
       end
@@ -42,7 +42,7 @@ module ThemeCheck
           current_diagnostics = offenses
             .select(&:theme_file)
             .group_by(&:theme_file)
-            .transform_keys { |theme_file| Pathname.new(theme_file.relative_path) }
+            .transform_keys { |theme_file| theme_file.workspace_path }
             .transform_values do |theme_file_offenses|
               theme_file_offenses.map { |o| Diagnostic.new(o) }
             end

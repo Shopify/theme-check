@@ -14,6 +14,10 @@ module ThemeCheck
         @col = col
       end
 
+      def theme_view
+        @theme_view ||= storage.theme_view(relative_path)
+      end
+
       def buffer
         @buffer ||= storage.read(relative_path)
       end

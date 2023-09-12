@@ -79,6 +79,13 @@ module ThemeCheck
       def default
         load_config(":default")
       end
+
+      def is_theme_folder?(absolute_path)
+        absolute_pathname = Pathname.new(absolute_path)
+        absolute_pathname.join(DOTFILE).file? &&
+          absolute_pathname.join('templates').directory? &&
+          absolute_pathname.join('assets').directory?
+      end
     end
 
     def initialize(root: nil, configuration: nil, should_resolve_requires: true)

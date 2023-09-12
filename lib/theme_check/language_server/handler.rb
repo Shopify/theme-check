@@ -65,7 +65,7 @@ module ThemeCheck
         @client_capabilities = ClientCapabilities.new(params.dig(:capabilities) || {})
         @configuration = Configuration.new(@bridge, @client_capabilities)
         @bridge.supports_work_done_progress = @client_capabilities.supports_work_done_progress?
-        @storage = in_memory_storage(@root_path)
+        @storage = Workspace.new(@root_path)
         @diagnostics_manager = DiagnosticsManager.new
         @completion_engine = CompletionEngine.new(@storage, @bridge)
         @document_link_engine = DocumentLinkEngine.new(@storage)
@@ -85,6 +85,16 @@ module ThemeCheck
         })
       end
 
+      def handle(method_name, id, params)
+        return unless respond_to?(method_name)
+
+        absolute_path = params && params[:textDocument] && text_document_uri(params)
+        return send(method_name, id, params) unless absolute_path
+
+        workspace_path = @storage.access(absolute_path)
+        send(method_name, id, params, workspace_path)
+      end
+
       def on_initialized(_id, _params)
         return unless @configuration
 
@@ -102,56 +112,56 @@ module ThemeCheck
         close!
       end
 
-      def on_text_document_did_open(_id, params)
-        relative_path = relative_path_from_text_document_uri(params)
-        @storage.write(relative_path, text_document_text(params), text_document_version(params))
+      def on_text_document_did_open(_id, params, workspace_path)
+        @storage.write(workspace_path, text_document_text(params), text_document_version(params))
         analyze_and_send_offenses(text_document_uri(params)) if @configuration.check_on_open?
       end
 
-      def on_text_document_did_change(_id, params)
-        relative_path = relative_path_from_text_document_uri(params)
-        @storage.write(relative_path, content_changes_text(params), text_document_version(params))
+      def on_text_document_did_change(_id, params, workspace_path)
+        @storage.write(workspace_path, content_changes_text(params), text_document_version(params))
         analyze_and_send_offenses(text_document_uri(params), only_single_file: true) if @configuration.check_on_change?
       end
 
-      def on_text_document_did_close(_id, params)
-        relative_path = relative_path_from_text_document_uri(params)
+      def on_text_document_did_close(_id, params, workspace_path)
         begin
           file_system_content = Pathname.new(text_document_uri(params)).read(mode: 'rb', encoding: 'UTF-8')
           # On close, the file system becomes the source of truth
-          @storage.write(relative_path, file_system_content, nil)
+          @storage.write(workspace_path, file_system_content, nil)
 
         # the file no longer exists because either the user deleted it, or the user renamed it.
         rescue Errno::ENOENT
-          @storage.remove(relative_path)
+          @storage.remove(workspace_path)
         ensure
-          @diagnostics_engine.clear_diagnostics(relative_path) if @configuration.only_single_file?
+          @diagnostics_engine.clear_diagnostics(workspace_path) if @configuration.only_single_file?
         end
       end
 
-      def on_text_document_did_save(_id, params)
+      def on_text_document_did_save(_id, params, _workspace_path)
         analyze_and_send_offenses(text_document_uri(params)) if @configuration.check_on_save?
       end
 
-      def on_text_document_document_link(id, params)
-        relative_path = relative_path_from_text_document_uri(params)
-        @bridge.send_response(id, @document_link_engine.document_links(relative_path))
+      def on_text_document_document_link(id, params, workspace_path)
+        return @bridge.send_response(id, []) unless @storage.find_theme(workspace_path)
+
+        @bridge.send_response(id, @document_link_engine.document_links(workspace_path))
       end
 
-      def on_text_document_completion(id, params)
-        relative_path = relative_path_from_text_document_uri(params)
+      def on_text_document_completion(id, params, workspace_path)
+        return @bridge.send_response(id, []) unless @storage.find_theme(workspace_path)
+
         line = params.dig(:position, :line)
         col = params.dig(:position, :character)
-        @bridge.send_response(id, @completion_engine.completions(relative_path, line, col))
+        @bridge.send_response(id, @completion_engine.completions(workspace_path, line, col))
       end
 
-      def on_text_document_code_action(id, params)
-        absolute_path = text_document_uri(params)
+      def on_text_document_code_action(id, params, workspace_path)
+        return @bridge.send_response(id, []) unless @storage.find_theme(workspace_path)
+
         start_position = range_element(params, :start)
         end_position = range_element(params, :end)
         only_code_action_kinds = params.dig(:context, :only) || []
         @bridge.send_response(id, @code_action_engine.code_actions(
-          absolute_path,
+          workspace_path,
           start_position,
           end_position,
           only_code_action_kinds,
@@ -165,9 +175,9 @@ module ThemeCheck
         return unless paths
 
         paths.each do |path|
-          relative_path = @storage.relative_path(path)
+          workspace_path = @storage.relative_path(path)
           file_system_content = Pathname.new(path).read(mode: 'rb', encoding: 'UTF-8')
-          @storage.write(relative_path, file_system_content, nil)
+          @storage.write(workspace_path, file_system_content, nil)
         end
       end
 
@@ -178,29 +188,29 @@ module ThemeCheck
         return unless absolute_paths
 
         absolute_paths.each do |path|
-          relative_path = @storage.relative_path(path)
-          @storage.remove(relative_path)
+          workspace_path = @storage.relative_path(path)
+          @storage.remove(workspace_path)
         end
 
         analyze_and_send_offenses(absolute_paths)
       end
 
       # We're using workspace/willRenameFiles here because we want this to run
-      # before textDocument/didOpen and textDocumetn/didClose of the files
+      # before textDocument/didOpen and textDocument/didClose of the files
       # (which might trigger another theme analysis).
       def on_workspace_will_rename_files(id, params)
-        relative_paths = params[:files]
+        workspace_paths = params[:files]
           &.map { |file| [file[:oldUri], file[:newUri]] }
           &.map { |(old_uri, new_uri)| [relative_path_from_uri(old_uri), relative_path_from_uri(new_uri)] }
-        return @bridge.send_response(id, nil) unless relative_paths
+        return @bridge.send_response(id, nil) unless workspace_paths
 
-        relative_paths.each do |(old_path, new_path)|
+        workspace_paths.each do |(old_path, new_path)|
           @storage.write(new_path, @storage.read(old_path), nil)
           @storage.remove(old_path)
         end
         @bridge.send_response(id, nil)
 
-        absolute_paths = relative_paths.flatten(2).map { |p| @storage.path(p) }
+        absolute_paths = workspace_paths.flatten(2).map { |p| @storage.path(p) }
         analyze_and_send_offenses(absolute_paths)
       end
 
@@ -217,33 +227,12 @@ module ThemeCheck
 
       private
 
-      def in_memory_storage(root)
-        config = config_for_path(root)
-
-        # Make a real FS to get the files from the snippets folder
-        fs = ThemeCheck::FileSystemStorage.new(
-          config.root,
-          ignored_patterns: config.ignored_patterns
-        )
-
-        # Turn that into a hash of buffers
-        files = fs.files
-          .map { |fn| [fn, fs.read(fn)] }
-          .to_h
-
-        VersionedInMemoryStorage.new(files, config.root)
-      end
-
       def text_document_uri(params)
         file_path(params.dig(:textDocument, :uri))
       end
 
       def relative_path_from_uri(uri)
         @storage.relative_path(file_path(uri))
-      end
-
-      def relative_path_from_text_document_uri(params)
-        @storage.relative_path(text_document_uri(params))
       end
 
       def root_path_from_params(params)

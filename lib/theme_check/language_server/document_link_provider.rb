@@ -19,10 +19,6 @@ module ThemeCheck
         end
       end
 
-      def initialize(storage = InMemoryStorage.new)
-        @storage = storage
-      end
-
       def partial_regexp
         self.class.partial_regexp
       end
@@ -35,7 +31,7 @@ module ThemeCheck
         self.class.destination_postfix
       end
 
-      def document_links(buffer)
+      def document_links(buffer, storage)
         matches(buffer, partial_regexp).map do |match|
           start_row, start_column = from_index_to_row_column(
             buffer,
@@ -47,8 +43,11 @@ module ThemeCheck
             match.end(:partial)
           )
 
+          partial = match[:partial]
+          uri = storage.path(destination_directory + '/' + partial + destination_postfix)
+
           {
-            target: file_link(match[:partial]),
+            target: uri,
             range: {
               start: {
                 line: start_row,
@@ -61,10 +60,6 @@ module ThemeCheck
             },
           }
         end
-      end
-
-      def file_link(partial)
-        file_uri(@storage.path(destination_directory + '/' + partial + destination_postfix))
       end
     end
   end

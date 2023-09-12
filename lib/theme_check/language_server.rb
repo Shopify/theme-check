@@ -26,6 +26,8 @@ require_relative "language_server/diagnostics_manager"
 require_relative "language_server/diagnostics_engine"
 require_relative "language_server/document_change_corrector"
 require_relative "language_server/versioned_in_memory_storage"
+require_relative "language_server/workspace"
+require_relative "language_server/theme_view"
 require_relative "language_server/client_capabilities"
 
 require_relative "language_server/completion_context"

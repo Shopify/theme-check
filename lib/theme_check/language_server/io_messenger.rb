@@ -11,6 +11,11 @@ module ThemeCheck
         end
       end
 
+      def self.log(message)
+        err_stream.puts(message)
+        err_stream.flush
+      end
+
       def initialize(
         in_stream: STDIN,
         out_stream: STDOUT,

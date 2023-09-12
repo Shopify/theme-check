@@ -22,6 +22,10 @@ module ThemeCheck
       raise NotImplementedError
     end
 
+    def workspace_path(relative_path)
+      relative_path
+    end
+
     def versioned?
       false
     end

@@ -88,12 +88,12 @@ module ThemeCheck
         # It's wrapped in here because it prints anyway...
         # This shit is weird, yo.
         Timeout.timeout(1) do
-          $stderr.puts e.full_message
+          @messenger.log(e.full_message)
         end
       ensure
         send_response(id, nil, {
           code: ErrorCodes::INTERNAL_ERROR,
-          message: "A theme-check-language-server has occured, inspect OUTPUT logs for details.",
+          message: "A theme-check-language-server error has occurred, inspect OUTPUT logs for details."
         })
       end
 

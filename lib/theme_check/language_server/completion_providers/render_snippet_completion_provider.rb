@@ -10,7 +10,9 @@ module ThemeCheck
         return [] if content.nil?
         return [] unless cursor_on_quoted_argument?(content, cursor)
         partial = snippet(content) || ''
-        snippets
+        context.theme_view
+          .files
+          .select { |x| x.include?('partials/') }
           .select { |x| x.start_with?(partial) }
           .map { |x| snippet_to_completion(x) }
       end
@@ -27,12 +29,6 @@ module ThemeCheck
         match = content.match(PARTIAL_RENDER)
         return if match.nil?
         match[:partial]
-      end
-
-      def snippets
-        @storage
-          .files
-          .select { |x| x.include?('snippets/') }
       end
 
       def snippet_to_completion(file)

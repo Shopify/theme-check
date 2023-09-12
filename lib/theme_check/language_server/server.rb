@@ -134,9 +134,7 @@ module ThemeCheck
         method_name &&= "on_#{to_snake_case(method_name)}"
         params = message[:params]
 
-        if @handler.respond_to?(method_name)
-          @handler.send(method_name, id, params)
-        end
+        @handler.handle(method_name, id, params)
       rescue DoneStreaming => e
         raise e
       rescue StandardError => e
