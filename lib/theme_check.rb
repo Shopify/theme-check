@@ -43,8 +43,22 @@ require_relative "theme_check/corrector"
 require_relative "theme_check/liquid_visitor"
 require_relative "theme_check/html_visitor"
 require_relative "theme_check/language_server"
+require_relative "theme_check/jumpseller_liquid"
 
 Dir[__dir__ + "/theme_check/checks/*.rb"].each { |file| require file }
+
+# Support external checks and language server providers
+File.write("/tmp/tcls.log", "[3] " + ARGV.inspect + "\n", mode: 'a')
+
+ARGV.reject! do |argument|
+  if argument =~ %r{--extra-checks=(/.+)}
+    File.write("/tmp/tcls.log", "[4] " + Regexp.last_match[1] + "\n", mode: 'a')
+    require Regexp.last_match[1]
+    true
+  end
+end
+
+File.write("/tmp/tcls.log", "[5] " + ARGV.inspect + "\n", mode: 'a')
 
 # UTF-8 is the default internal and external encoding, like in Rails & Shopify.
 Encoding.default_external = Encoding::UTF_8
