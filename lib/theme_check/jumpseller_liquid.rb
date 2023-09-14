@@ -2,13 +2,6 @@
 
 module ThemeCheck
   class JumpsellerLiquidx
-    def self.condition_relations(condition)
-      condition.child_condition ? [condition.send(:child_relation)] + condition_relations(condition.child_condition) : []
-    end
-    def self.subconditions(condition)
-      condition.child_condition ? [condition] + subconditions(condition.child_condition) : [condition]
-    end
-
     module Templates
       def self.blocks
         @blocks ||= %w[

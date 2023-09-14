@@ -109,3 +109,37 @@ ImgLazyLoading:
 HtmlParsingError:
   enabled: true
   ignore: []
+
+BadConditionPrecedence:
+  enabled: true
+  ignore: []
+
+InvertedCondition:
+  enabled: true
+  ignore: []
+
+UnlessElse:
+  enabled: true
+  ignore: []
+
+UselessIf:
+  enabled: true
+  ignore: []
+
+RedundantComparison:
+  enabled: true
+  ignore: []
+
+RefactorIfToDefaultPipe:
+  enabled: true
+  ignore: []
+
+RefactorIfForToForElse:
+  enabled: true
+  ignore: []
+
+RefactorIfToCase:
+  enabled: true
+  ignore: []
+  min_conditions: 3
+  min_branches: 2
