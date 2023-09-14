@@ -20,9 +20,10 @@ module ThemeCheck
       end
 
       def access(absolute_path)
-        path = relative_path(absolute_path)
-        access_theme(absolute_path) unless find_theme(path)
-        path
+        workspace_path = relative_path(absolute_path)
+        folder = find_theme(workspace_path)
+        folder ||= access_theme(absolute_path)
+        [workspace_path, folder]
       end
 
       def find_theme(absolute_or_workspace_path)
@@ -82,6 +83,7 @@ module ThemeCheck
         return unless folder
         return if conflicting_theme_root?(folder)
 
+        IOMessenger.log("Adding theme folder '#{folder}'")
         add_theme_files(folder)
         @themes.add(relative_path(folder))
       end

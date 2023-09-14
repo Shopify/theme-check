@@ -27,6 +27,8 @@ module ThemeCheck
           theme = ThemeCheck::Theme.new(theme_view)
           analyzer = ThemeCheck::Analyzer.new(theme, config.enabled_checks)
 
+          @bridge.log("#{only_single_file} - #{@diagnostics_manager.first_run?} - #{force}")
+
           if !only_single_file && (@diagnostics_manager.first_run? || force)
             run_full_theme_check(theme, analyzer)
           else

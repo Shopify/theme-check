@@ -58,6 +58,7 @@ module ThemeCheck
 
       def on_initialize(id, params)
         @root_path = root_path_from_params(params)
+        @current_theme = nil
 
         # Tell the client we don't support anything if there's no rootPath
         return @bridge.send_response(id, { capabilities: {} }) if @root_path.nil?
@@ -85,14 +86,24 @@ module ThemeCheck
         })
       end
 
+      def reset_active_theme_folder(workspace_path)
+        theme_folder = @storage.find_theme(workspace_path)
+        new_theme = theme_folder && theme_folder != @current_theme_folder
+        @current_theme_folder = theme_folder
+        new_theme
+      end
+
       def handle(method_name, id, params)
         return unless respond_to?(method_name)
 
         absolute_path = params && params[:textDocument] && text_document_uri(params)
         return send(method_name, id, params) unless absolute_path
 
-        workspace_path = @storage.access(absolute_path)
-        send(method_name, id, params, workspace_path)
+        workspace_path = @storage.access(absolute_path).first
+
+        callback = method(method_name)
+        send(method_name, id, params, workspace_path) if callback.arity == 3
+        send(method_name, id, params) if callback.arity == 2
       end
 
       def on_initialized(_id, _params)
@@ -113,8 +124,9 @@ module ThemeCheck
       end
 
       def on_text_document_did_open(_id, params, workspace_path)
+        new_theme = reset_active_theme_folder(workspace_path)
         @storage.write(workspace_path, text_document_text(params), text_document_version(params))
-        analyze_and_send_offenses(text_document_uri(params)) if @configuration.check_on_open?
+        analyze_and_send_offenses(text_document_uri(params), reset: new_theme) if @configuration.check_on_open?
       end
 
       def on_text_document_did_change(_id, params, workspace_path)
@@ -136,8 +148,9 @@ module ThemeCheck
         end
       end
 
-      def on_text_document_did_save(_id, params, _workspace_path)
-        analyze_and_send_offenses(text_document_uri(params)) if @configuration.check_on_save?
+      def on_text_document_did_save(_id, params, workspace_path)
+        new_theme = reset_active_theme_folder(workspace_path)
+        analyze_and_send_offenses(text_document_uri(params), reset: new_theme) if @configuration.check_on_save?
       end
 
       def on_text_document_document_link(id, params, workspace_path)
@@ -263,11 +276,14 @@ module ThemeCheck
         ThemeCheck::Config.from_path(root)
       end
 
-      def analyze_and_send_offenses(absolute_path_or_paths, only_single_file: nil)
+      def analyze_and_send_offenses(absolute_path_or_paths, only_single_file: nil, reset: false)
+        only_single_file = only_single_file.nil? ? @configuration.only_single_file? : only_single_file
+
         @diagnostics_engine.analyze_and_send_offenses(
           absolute_path_or_paths,
           config_for_path(absolute_path_or_paths),
-          only_single_file: only_single_file.nil? ? @configuration.only_single_file? : only_single_file
+          only_single_file: only_single_file && !reset,
+          force: reset
         )
       end
 
