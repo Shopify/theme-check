@@ -17,6 +17,10 @@ module ThemeCheck
         def inherited(subclass)
           all << subclass
         end
+
+        def find_variation(relative_path, _storage)
+          relative_path
+        end
       end
 
       def partial_regexp
@@ -29,6 +33,14 @@ module ThemeCheck
 
       def destination_postfix
         self.class.destination_postfix
+      end
+
+      def find_variation(partial, storage)
+        self.class.find_variation(partial, storage)
+      end
+
+      def non_empty_string?(string)
+        string.is_a?(String) && !string.empty?
       end
 
       def document_links(buffer, storage)
@@ -44,7 +56,12 @@ module ThemeCheck
           )
 
           partial = match[:partial]
-          uri = storage.path(destination_directory + '/' + partial + destination_postfix)
+          partial = destination_directory + '/' + partial if non_empty_string?(destination_directory)
+          partial = partial + destination_postfix if non_empty_string?(destination_postfix)
+          partial = find_variation(partial, storage)
+          next unless partial
+
+          uri = storage.path(partial)
 
           {
             target: uri,
