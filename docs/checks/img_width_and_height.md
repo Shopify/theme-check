@@ -52,7 +52,7 @@ ImgWidthAndHeight:
 
 There are some cases where you can avoid content-layout shift without needing the width and height attributes:
 
-- When the aspect-ratio of the displayed image should be independent of the uploaded image. In those cases, the solution is still the padding-top hack with an `overflow: hidden container`.
+- When the aspect-ratio of the displayed image should be independent of the uploaded image. In those cases, the solution is still the [padding-top hack][csstricks-ratio] with an `overflow: hidden container`.
 - When you are happy with the padding-top hack.
 
 In those cases, it is fine to disable this check with the comment. 
@@ -68,11 +68,13 @@ This check has been introduced in Theme Check 0.6.0.
 - [Cumulative Layout Shift Reference][cls]
 - [Codepen illustrating the impact of width and height on layout shift][codepenshift]
 - [Codepen illustrating the impact of width and height on lazy loading][codepenlazy]
+- [Article detailing how padding can be used to "hack" aspect ratios][csstricks-ratio]
 - [Rule Source][codesource]
 - [Documentation Source][docsource]
 
 [cls]: https://web.dev/cls/
 [codepenshift]: https://codepen.io/charlespwd/pen/YzpxPEp?editors=1100
 [codepenlazy]: https://codepen.io/charlespwd/pen/abZmqXJ?editors=0111
+[csstricks-ratio]: https://css-tricks.com/aspect-ratio-boxes/
 [codesource]: /lib/theme_check/checks/img_aspect_ratio.rb
 [docsource]: /docs/checks/img_aspect_ratio.md
