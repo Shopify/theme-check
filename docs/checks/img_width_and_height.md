@@ -52,7 +52,7 @@ ImgWidthAndHeight:
 
 There are some cases where you can avoid content-layout shift without needing the width and height attributes:
 
-- When the aspect-ratio of the displayed image should be independent of the uploaded image. In those cases, the solution is still the [padding-top hack][csstricks-ratio] with an `overflow: hidden container`.
+- When the aspect-ratio of the displayed image should be independent of the uploaded image. In those cases, the solution is still the [padding-top hack][csstricks-ratio] with an `overflow: hidden` container.
 - When you are happy with the padding-top hack.
 
 In those cases, it is fine to disable this check with the comment. 
