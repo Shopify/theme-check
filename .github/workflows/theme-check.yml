@@ -12,8 +12,10 @@ jobs:
           - ubuntu-latest
           - windows-latest
         version:
-          - 3.0.0
-          - 2.7.6
+          - 3.3
+          - 3.2
+          - 3.1
+          - 3.0
         theme:
           - Shopify/dawn
 
