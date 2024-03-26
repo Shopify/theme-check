@@ -8,7 +8,6 @@
 /tmp/
 
 *.gem
-Gemfile.lock
 
 .rubocop-https---shopify-github-io-ruby-style-guide-rubocop-yml
 packaging/builds

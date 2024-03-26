@@ -24,7 +24,7 @@ group :development do
   gem 'solargraph'
 end
 
-gem 'rubocop', '~> 1.12.0', require: false
+gem 'rubocop', '~> 1.61.0', require: false
 gem 'rubocop-performance', '~> 1.10.2', require: false
 gem 'rubocop-shopify', '~> 1.0.7', require: false
 gem 'rubocop-minitest', '~> 0.11.0', require: false

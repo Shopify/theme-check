@@ -3,7 +3,7 @@ name: theme-check
 type: ruby
 
 up:
-  - ruby: "2.7"
+  - ruby
   - bundler
 
 commands:
