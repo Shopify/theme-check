@@ -7,7 +7,6 @@ require:
   - rubocop-rake
 
 AllCops:
-  TargetRubyVersion: 2.6
   Exclude:
     - 'vendor/bundle/**/*'
     - 'packaging/builds/**/*'
